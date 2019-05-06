@@ -284,8 +284,8 @@ class GetEgData(object):
 
         # 更新result中的开始时间和结束时间
         tempResult = data["Result"]
-        tempResult["Detail"]["StartTime"] = data["BeginTradeDate"]
-        tempResult["Detail"]["EndTime"] = data["EndTradeDate"]
+        # tempResult["Detail"]["StartTime"] = data["BeginTradeDate"]
+        # tempResult["Detail"]["EndTime"] = data["EndTradeDate"]
 
         self._reportData = tempResult
         # 取到报告数据弹出报告

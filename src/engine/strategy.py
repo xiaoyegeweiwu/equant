@@ -192,7 +192,14 @@ class Strategy:
         while not self._isExit():
             event = self._triggerQueue.get()
             # 发单方式，实时发单、k线稳定后发单。
-            self._dataModel.runRealTime(self._context, self._userModule.handle_data, event)
+            eventCode = event.getEventCode()
+            if self._isPause():
+                if eventCode == ST_TRIGGER_FILL_DATA:
+                    self._dataModel.runRealTime(self._context, self._userModule.handle_data, event)
+                else:
+                    continue
+            else:
+                self._dataModel.runRealTime(self._context, self._userModule.handle_data, event)
 
     def _startStrategyThread(self):
         '''历史数据准备完成后，运行策略'''
@@ -397,9 +404,22 @@ class Strategy:
             if sessionId in self._sesnId2eSesnIdMap:
                 self._eSesnId2orderNoMap[self._sesnId2eSesnIdMap[sessionId]] = data['OrderNo']
 
-        # self._dataModel.getTradeModel().updateOrderResult(apiEvent)
-        # 交易触发
-        # self.sendTriggerQueue(apiEvent)
+        if not self._dataModel.getConfigModel().hasTradeTrigger():
+            return
+
+        # print(apiEvent.getEventCode(), apiEvent.getStrategyId())
+        if apiEvent.getEventCode() == EEQU_SRVEVENT_TRADE_ORDER and str(apiEvent.getStrategyId()) == str(self._strategyId):
+            # print("交易触发===================11111")
+            tradeTriggerEvent = Event({
+                "EventCode":ST_TRIGGER_TRADE,
+                "Data":{
+                    "TriggerType":"Trade",
+                    "Data": apiEvent.getData()
+                }
+            })
+
+            # 交易触发
+            self.sendTriggerQueue(tradeTriggerEvent)
 
     def _onTradeOrderEngineResponse(self, event):
         self._dataModel.getTradeModel().updateEquantOrder(event)

@@ -312,6 +312,9 @@ class QuantEditor(StrategyTree):
         """保存策略"""
         # 保存的策略路径
         path = self.control.getEditorText()["path"]
+        # 更新editorHead
+        self.updateEditorHead(os.path.basename(path))
+
         # 策略路径为空
         if len(path) == 0:
             return

@@ -40,8 +40,6 @@ class StrategyMenu(object):
         # 记录右键所选择的策略路径
         if select:  # 存在选择的策略
             self._rightClickPath = self.widget.item(select)["values"][0]
-            # 右键加载策略时将右键所选的策略路径作为当前加载路径
-            self._controller.setEditorTextCode(self._rightClickPath)
 
         if self.selected_item:
             if select:

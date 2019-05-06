@@ -95,7 +95,12 @@ class StrategyModel(object):
             else:
                 self._hisModel.runOtherTrigger(context, handle_data, event)
         elif code == ST_TRIGGER_TRADE:
-            pass
+            # print("交易触发===================")
+            if not self._strategy.isRealTimeStatus():
+                return
+            else:
+                self.logger.info("交易触发")
+                self._hisModel.runOtherTrigger(context, handle_data, event)
 
     def reqHisQuote(self):
         self._hisModel.reqAndSubQuote()
@@ -106,7 +111,7 @@ class StrategyModel(object):
     def onHisQuoteNotice(self, event):
         self._hisModel.onHisQuoteNotice(event)
 
-    #///////////////////////即时行情接口//////////////////////////
+    # ///////////////////////即时行情接口//////////////////////////
     def reqExchange(self):
         self._qteModel.reqExchange()
 
@@ -141,6 +146,16 @@ class StrategyModel(object):
 
     #++++++++++++++++++++++base api接口++++++++++++++++++++++++++
     #////////////////////////K线函数/////////////////////////////
+    def getBarCount(self, contNo):
+        return self._hisModel.getBarCount(contNo)
+
+    def getCurrentBar(self, contNo):
+        curBar = self._hisModel.getCurBar(contNo)
+        return curBar["KLineIndex"] - 1
+
+    def getBarStatus(self, contNo):
+        return self._hisModel.getBarStatus(contNo)
+
     def getBarOpen(self, symbol):
         return self._hisModel.getBarOpen(symbol)
         
@@ -1231,14 +1246,13 @@ class StrategyConfig(object):
                 moneyDict['Value'] = feeValue
 
     def setTradeMode(self, inActual, sendOrderType, useSample, useReal):
-        if sendOrderType not in (0, 1, 2):
-            return -1
-
         runMode = self._metaData['RunMode']
         if inActual:
             # 实盘运行
+            if sendOrderType not in (1, 2):
+                return -1
             runMode['Actual']['SendOrder2Actual'] = True
-            runMode['SendOrder'] = sendOrderType
+            runMode['SendOrder'] = str(sendOrderType)
         else:
             # 模拟盘运行
             runMode['Simulate']['UseSample'] = useSample
@@ -1304,7 +1318,7 @@ class BarInfo(object):
         
     def getCurBar(self):
         return self._curBar
-        
+
     def getBarOpen(self):
         return self._getBarValue('OpeningPrice')
         
@@ -1418,6 +1432,51 @@ class StrategyHisQuote(object):
     def getHisLength(self):
         return self._hisLength
     # ////////////////////////BaseApi类接口////////////////////////
+    def getBarCount(self, contNo):
+        if contNo == '':
+            contNo = self._contractNo
+
+        kLineHisData = self._metaData[contNo]['KLineData']
+
+        if contNo not in self._kLineNoticeData:
+            return len(kLineHisData)
+
+        kLineNoticeData = self._kLineNoticeData[contNo]['KLineData']
+        if len(kLineNoticeData) == 0:
+            return len(kLineHisData)
+
+        lastHisBar = kLineHisData[-1]
+        lastNoticeBar = kLineNoticeData[-1]
+
+        return len(kLineHisData) + (lastNoticeBar['KLineIndex'] - lastHisBar['KLineIndex'])
+
+    def getBarStatus(self, contNo):
+        if contNo == '':
+            contNo = self._contractNo
+
+        curBar = self._curBarDict[contNo].getCurBar()
+        curBarIndex = curBar['KLineIndex']
+        firstHisBarIndex = self._metaData[contNo]['KLineData'][0]['KLineIndex']
+        lastHisBarIndex = self._metaData[contNo]['KLineData'][-1]['KLineIndex']
+
+        if contNo not in self._kLineNoticeData or len(self._kLineNoticeData[contNo]['KLineData']) == 0:
+            # 仅有历史K线
+            if curBarIndex == firstHisBarIndex:
+                return 0
+            elif curBarIndex < lastHisBarIndex:
+                return 1
+            elif curBarIndex == lastHisBarIndex:
+                return 2
+
+        # 既有历史K线，又有实时K线
+        lastNoticeBarIndex = self._kLineNoticeData[contNo]['KLineData'][-1]['KLineIndex']
+
+        if curBarIndex == firstHisBarIndex:
+            return 0
+        elif curBarIndex >= lastNoticeBarIndex:
+            return 2
+        else:
+            return 1
 
     def getBarOpen(self, contNo):
         if contNo == '':
@@ -1876,12 +1935,12 @@ class StrategyHisQuote(object):
         self._strategy.sendEvent2Engine(event)
 
     def runOtherTrigger(self, context, handle_data, event):
-        contNo = self._contractNo
+        # contNo = self._contractNo
         # 执行策略函数
         handle_data(context)
-        # 通知当前Bar结束
-        self._afterBar(contNo)
-        self._sendFlushEvent()
+        # # 通知当前Bar结束
+        # self._afterBar(contNo)
+        # self._sendFlushEvent()
 
     def runReportRealTime(self, context, handle_data, event):
         '''发送回测阶段来的数据'''
@@ -2657,6 +2716,8 @@ class StrategyTrade(TradeModel):
         return self.getDataFromTOrderModel(orderNo, 'InsertTime')
 
     def sendOrder(self, userNo, contNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty):
+        if not self._strategy.isRealTimeStatus():
+            return
         '''
         针对当前公式指定的帐户、商品发送委托单
         :param userNo: 指定的账户名
@@ -2711,7 +2772,6 @@ class StrategyTrade(TradeModel):
         # 更新策略的订单信息
         self._strategy.setESessionId(self._strategy.getESessionId() + 1)
         self._strategy.updateLocalOrder(eId, aOrder)
-
         return eId
 
     def deleteOrder(self, eSession):

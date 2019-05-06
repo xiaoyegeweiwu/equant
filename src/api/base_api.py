@@ -204,16 +204,16 @@ class BaseApi(object):
         '''
         return self._dataModel.getBarTradeDate()
 
-    def BarCount(self):
+    def BarCount(self, contNo):
         '''
         【说明】
               当前合约Bar的总数
 
         【语法】
-              int BarCount()
+              int BarCount(string contNo)
 
         【参数】
-              无
+              contNo 合约编号，为空时使用基准合约。
 
         【备注】
               返回值为整型
@@ -221,7 +221,7 @@ class BaseApi(object):
         【实例】
               无
         '''
-        return self._dataModel.getBarCount()
+        return self._dataModel.getBarCount(contNo)
 
     def CurrentBar(self):
         '''
@@ -242,13 +242,13 @@ class BaseApi(object):
         '''
         return self._dataModel.getCurrentBar()
 
-    def BarStatus(self):
+    def BarStatus(self, contNo):
         '''
         【说明】
               当前Bar的状态值
 
         【语法】
-              int BarStatus()
+              int BarStatus(string contNo)
 
         【参数】
               无
@@ -2908,7 +2908,7 @@ class BaseApi(object):
              设置运行方式，"H"表示回测，"A"表示在实盘上运行
 
         【语法】
-              int SetTradeMode(bool inActual, string sendOrderType, bool useSample, bool useReal)
+              int SetTradeMode(bool inActual, int sendOrderType, bool useSample, bool useReal)
 
         【参数】
               inActual      True 表示在实盘上运行，False 表示在模拟盘上运行
@@ -2920,8 +2920,8 @@ class BaseApi(object):
               返回整型，0成功，-1失败
 
         【示例】
-              SetTradeMode(False, "0", True, True)    # 在模拟盘上使用历史数据回测，并使用实时数据继续运行策略
-              SetTradeMode(True, "2", True, True)     # 在模拟盘上使用历史数据回测，并使用实时数据继续运行策略；在实盘上使用实时数据运行策略，并在K线稳定后发单
+              SetTradeMode(False, 0, True, True)    # 在模拟盘上使用历史数据回测，并使用实时数据继续运行策略
+              SetTradeMode(True, 2, True, True)     # 在模拟盘上使用历史数据回测，并使用实时数据继续运行策略；在实盘上使用实时数据运行策略，并在K线稳定后发单
         '''
         return self._dataModel.setTradeMode(inActual, sendOrderType, useSample, useReal)
 
@@ -3060,14 +3060,14 @@ def OpenInt(symbol=''):
 def TradeDate():
     return baseApi.TradeDate()
 
-def BarCount():
-    return baseApi.BarCount()
+def BarCount(contNo=''):
+    return baseApi.BarCount(contNo)
 
 def CurrentBar():
     return baseApi.CurrentBar()
 
-def BarStatus():
-    return baseApi.BarStatus()
+def BarStatus(contNo=''):
+    return baseApi.BarStatus(contNo)
 
 def HistoryDataExist():
     return baseApi.HistoryDataExist()

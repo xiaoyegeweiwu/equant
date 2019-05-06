@@ -31,7 +31,8 @@ class PyAPI(object):
         # 策略编号<-->会话号
         self._SessionStrategyPair = {} #{session_id, strategy_id}
         # api session id : (strategy id , session id)
-        self._apiSessionIdMap = { }
+        self._apiSessionIdMap = {}
+        self._orderNoMap = {}
 
         # 统计相关结构定义
         self._CommodityList = []
@@ -906,13 +907,14 @@ class PyAPI(object):
 
         self._apiSessionIdMap[sessionId.value] = (event.getStrategyId(), event.getESessionId())
 
-        sessionIdMapEvent = Event({
-            "EventCode":EV_EG2ST_ACTUAL_ORDER_SESSION_MAP,
-            "StrategyId":event.getStrategyId(),
-            "ESessionId":event.getESessionId(),
-            "SessionId":sessionId.value,
-        })
-        self._api2egQueue.put(sessionIdMapEvent)
+        # print("apid session id = ", sessionId.value, event.getStrategyId(), event.getESessionId())
+        # sessionIdMapEvent = Event({
+        #     "EventCode":EV_EG2ST_ACTUAL_ORDER_SESSION_MAP,
+        #     "StrategyId":event.getStrategyId(),
+        #     "ESessionId":event.getESessionId(),
+        #     "SessionId":sessionId.value,
+        # })
+        # self._api2egQueue.put(sessionIdMapEvent)
 
     def reqCancelOrder(self, event):
         '''
@@ -1359,14 +1361,16 @@ class PyAPI(object):
         
         # 发送到引擎
         apiEvent.setData(dataList)
-        sid = apiEvent.getSessionId()
 
-        # print( " now api session id is ", sid)
-        # print(self._apiSessionIdMap, self._SessionStrategyPair)
-        # print(apiEvent.getData())
-        apiEvent.setStrategyId(self._getStrategyId(sid))
-        if sid in self._apiSessionIdMap:
-            apiEvent.setESessionId(self._apiSessionIdMap[sid][1])
+        # 委托通知
+        if apiEvent.getEventCode() == EEQU_SRVEVENT_TRADE_ORDER and len(apiEvent.getData()) > 0:
+            apiSessionId = apiEvent.getData()[0]["SessionId"]
+            # print(apiEvent.getData()[0]["SessionId"], apiEvent.getData()[0]["OrderId"], apiEvent.getEventCode(), apiEvent.getData()[0]["OrderState"])
+            if apiSessionId in self._apiSessionIdMap:
+                strategyId, eSessionId = self._apiSessionIdMap[apiSessionId]
+                apiEvent.setStrategyId(strategyId)
+                apiEvent.setESessionId(eSessionId)
+                # print("Strategy id = ",apiEvent.getStrategyId(),"Esession id =", apiEvent.getESessionId())
         self._api2egQueue.put(apiEvent)
 
     def _onMatchData(self, apiEvent):

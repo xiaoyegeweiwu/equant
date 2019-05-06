@@ -4,7 +4,7 @@ from capi.com_types import *
 
 
 class ReportDetail(object):
-    def __init__(self, expert_setting, position, profit, test_day, fund_record, trade_time_info, orders, trade_info):
+    def __init__(self, expert_setting, position, profit, test_day, fund_record, trade_time_info, orders, trade_info, beginDate, endDate):
         self._expert_setting = expert_setting
         self._position = position
         self._profit = profit
@@ -13,6 +13,8 @@ class ReportDetail(object):
         self._trade_time_info = trade_time_info
         self._orders = orders
         self._trade_info = trade_info
+        self._beginDate = beginDate
+        self._endDate = endDate
 
     @property
     def initial_fund(self):  # 资金
@@ -29,11 +31,13 @@ class ReportDetail(object):
 
     @property
     def start_time(self):  # 计算开始时间
-        return self._expert_setting['StartTime']
+        # return self._expert_setting['StartTime']
+        return self._beginDate
 
     @property
     def end_time(self):  # 计算结束时间
-        return self._expert_setting['EndTime']
+        # return self._expert_setting['EndTime']
+        return self._endDate
 
     @property
     def test_day(self):  # 测试天数

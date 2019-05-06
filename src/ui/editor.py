@@ -160,9 +160,41 @@ class ParentText(Text):
         self.see("insert")
         return "break"
 
-class EditorText(ParentText):
+
+class ModifiedMixin(object):
+    """allow a Text Widget to notice when it's modified"""
+
+    def _init(self):
+        self.clearModifiedFlag()
+        self.bind_all("<<Modified>>", self._beenModified)
+
+    def _beenModified(self, event=None):
+        if self._resettingModifiedFlag:
+            return
+
+        self.clearModifiedFlag()
+        self.beenModified(event)
+
+    def beenModified(self, event=None):
+        pass
+
+    def clearModifiedFlag(self):
+        self._resettingModifiedFlag = True
+
+        try:
+
+            self.tk.call(self._w, 'edit', 'modified', 0)
+
+        finally:
+            self._resettingModifiedFlag = False
+
+
+class EditorText(ParentText, ModifiedMixin):
     def __init__(self, master, view, **kw):
         ParentText.__init__(self, master, **kw)
+        self._init()
+
+        self._view = view
         self._controller = view.control
         self.prog = re.compile(make_pat(), re.S)
         self.idprog = re.compile(r"\s+(\w+)", re.S)
@@ -172,6 +204,14 @@ class EditorText(ParentText):
         self.percolator = Percolator(self)
         self.bind("<Button-3>", self.create_menu)
         self.config(state="normal")
+
+
+    def beenModified(self, event=None):
+        # 获取选中的策略名
+        # TODO: 函数会调用两次
+        strategyPath = self._controller.getEditorText()["path"]
+        text = os.path.basename(strategyPath)
+        self._view.updateEditorHead(text+"*")
 
     def insert(self, index, chars, tags=None):
         self.percolator.insert(index, chars, tags=None)
@@ -453,8 +493,9 @@ class ErrorText(ParentText):
 
     # TODO:setText重写
     def setText(self, text="", file=None):
+        """先清空再写入信息"""
         self.config(state="normal")
-        self.config(state="normal")
+        self.delete('1.0', 'end')
         self.insert("end", text + "\n")
         self.config(state="disabled")
         self.update()

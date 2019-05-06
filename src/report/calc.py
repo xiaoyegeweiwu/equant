@@ -39,6 +39,9 @@ class CalcCenter(object):
         self._currentBar = 0  # 当前bar序号
         # self._curTradeDate = self._strategy["StartTime"]  # 当前交易日
         self._curTradeDate = None  # 当前交易日
+        self._beginDate = None     # 回测开始日期
+        self._endDate   = None     # 回测结束日期
+
         self._firstHoldPosition = 0  # 所有合约第一个有仓未平的开仓单位置
         self._continueWin = 0  # 当前连续盈利次数
         self._continueLose = 0  # 当前连续亏损次数
@@ -713,6 +716,13 @@ class CalcCenter(object):
         t = None
         for contPrice in contPrices:
             self._currentBar = contPrice["CurrentBarIndex"]
+            # TODO: TradeDate应该取基准的时间戳吧
+            # TODO: self._beginDate和self._endDate也应该取的是基准合约的TradeDate吧，目前只支持单合约
+            # 更新回测开始日期和结束日期
+            if not self._beginDate:
+                self._beginDate = contPrice["TradeDate"]
+            self._endDate = contPrice["TradeDate"]
+
             t = contPrice["TradeDate"]
             if not contPrice["Price"] == 0:
                 self._prices[contPrice["Cont"]] = contPrice
@@ -725,6 +735,57 @@ class CalcCenter(object):
         self._updateFundRecord(time, 0, 0)
 
         return
+
+    #TODO: calcProfit的另一种实现方式
+    # def calcProfit(self, contractList, barInfo):
+    #     """
+    #     计算策略实时收益信息，参数为合约的最新价信息
+    #     :param contractNo: 合约代码列表
+    #     :param barInfo: 合约的bar信息，类型为字典类型，键值是合约代码
+    #     :return:
+    #     """
+    #     if contractList is None:
+    #         return
+    #
+    #     if len(contractList) != len(barInfo):
+    #         raise ImportError("args error")
+    #
+    #     # 计算空仓周期
+    #     self._calcEmptyPositionPeriod()
+    #
+    #     t = None
+    #     contPrices = []
+    #
+    #     benchmarkNo = contractList[0]
+    #
+    #     self._currentBar = barInfo[benchmarkNo]["KLineIndex"]
+    #     if not self._beginDate:
+    #         self._beginDate = barInfo[benchmarkNo]["TradeDate"]
+    #     self._endDate = barInfo[benchmarkNo]["TradeDate"]
+    #     t = barInfo[benchmarkNo]["TradeDate"]
+    #     timeStamp = barInfo[benchmarkNo]["DateTimeStamp"]
+    #
+    #     for contract in contractList:
+    #
+    #         contPrice = {
+    #             "Cont": contract,
+    #             "Price": barInfo[contract]['LastPrice'],  # 收盘价格
+    #             "Time": barInfo[contract]["DateTimeStamp"],  # 当前时间戳
+    #             "CurrentBarIndex": barInfo[contract]["KLineIndex"],  # 基准合约的bar索引
+    #             "TradeDate": barInfo[contract]["TradeDate"],
+    #         }
+    #         contPrices.append(contPrice)
+    #
+    #         if not contPrice["Price"] == 0:
+    #             self._prices[contract] = contPrice
+    #
+    #     self._updateTradeDate(t)
+    #
+    #     self._updatePosition(contPrices)
+    #     self._updateOtherProfit(timeStamp)
+    #     self._updateFundRecord(timeStamp, 0, 0)
+    #
+    #     return
 
     # #######################
     # 这个函数是不是有问题
@@ -1215,8 +1276,8 @@ class CalcCenter(object):
         :param end: 信号计算结束时间
         """
         from dateutil.parser import parse
-        s = parse(start)
-        e = parse(end)
+        s = parse(str(start))
+        e = parse(str(end))
         self._testDays = (e-s).days + 1
 
     @property
@@ -1448,11 +1509,13 @@ class CalcCenter(object):
         # 先暂时把计算self._testDays的方法放在这里吧，没想好放在哪里比较合适
         # 放在info文件的show方法中，知道最后出报告时才会计算self._testDays
         # 这样中间出报告时会报错，self._test_days为0
-        self.calcTestDay(self._strategy["StartTime"], self._strategy["EndTime"])
+        # self.calcTestDay(self._strategy["StartTime"], self._strategy["EndTime"])
+        self.calcTestDay(self._beginDate, self._endDate)
+        #TODO: 回测开始日期和回测结束日期在calcProfit中更新，所以把self._beginDate和self._endDate传进类中
         from report.reportdetail import ReportDetail
         self._reportDetails = ReportDetail(self._expertSetting, self._positions, self._profit, self._testDays,
                                             self._fundRecords, self._tradeTimeInfo, self._orders,
-                                            self._tradeInfo).all()
+                                            self._tradeInfo, self._beginDate, self._endDate).all()
         return self._reportDetails
     
     def _calcTradeInfo(self):
