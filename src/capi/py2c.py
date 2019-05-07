@@ -363,8 +363,6 @@ class PyAPI(object):
                 }
             }
         '''
-        # print("in py2c k line =============================")
-        # print(datetime.now().strftime('%H:%M:%S.%f'))
         data = event.getData()
         sessionId = c_uint()
         
