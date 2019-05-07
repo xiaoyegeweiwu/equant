@@ -905,15 +905,6 @@ class PyAPI(object):
 
         self._apiSessionIdMap[sessionId.value] = (event.getStrategyId(), event.getESessionId())
 
-        # print("apid session id = ", sessionId.value, event.getStrategyId(), event.getESessionId())
-        # sessionIdMapEvent = Event({
-        #     "EventCode":EV_EG2ST_ACTUAL_ORDER_SESSION_MAP,
-        #     "StrategyId":event.getStrategyId(),
-        #     "ESessionId":event.getESessionId(),
-        #     "SessionId":sessionId.value,
-        # })
-        # self._api2egQueue.put(sessionIdMapEvent)
-
     def reqCancelOrder(self, event):
         '''
         功能：撤单
