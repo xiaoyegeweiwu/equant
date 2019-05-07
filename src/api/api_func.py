@@ -4,19 +4,19 @@
 _all_func_ = {
                 
     'K线数据': [
-                    # ['BarCount'            , 'Bar总数'],
-                    # ['BarStatus'           , '当前Bar状态值'],
+                    ['BarCount'            , 'Bar总数'],
+                    ['BarStatus'           , '当前Bar状态值'],
                     ['Close'               , '收盘价,简写C'],
-                    # ['CurrentBar'          , '当前Bar索引值'],
-                    # ['Date'                , '当前Bar日期,简写D'],
+                    ['CurrentBar'          , '当前Bar索引值'],
+                    ['Date'                , '当前Bar日期,简写D'],
                     ['High'                , '最高价,简写H'],
-                    # ['HistoryDataExist'    , '历史数据是否存在'],
+                    ['HistoryDataExist'    , '历史数据是否存在'],
                     ['Low'                 , '最低价,简写L'],
                     ['Open'                , '开盘价,简写O'],
-                    # ['OpenInt'             , '持仓量'],
-                    # ['Time'                , '当前Bar时间,简写T'],
-                    # ['TradeDate'           , '当前Bar的交易日'],
-                    # ['Vol'                 , '成交量,简写V'],
+                    ['OpenInt'             , '持仓量'],
+                    ['Time'                , '当前Bar时间,简写T'],
+                    ['TradeDate'           , '当前Bar的交易日'],
+                    ['Vol'                 , '成交量,简写V'],
                 ],
                 
     '即时行情': [

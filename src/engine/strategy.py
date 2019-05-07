@@ -290,7 +290,7 @@ class Strategy:
             EEQU_SRVEVENT_TRADE_POSITION    : self._onTradePosition     ,
             EEQU_SRVEVENT_TRADE_FUNDQRY     : self._onTradeFundRsp      ,
 
-            EV_UI2EG_STRATEGY_PAUSE         : self._onStrategyPause,
+            EV_UI2EG_STRATEGY_QUIT          : self._onStrategyQuit,
             EV_UI2EG_STRATEGY_RESUME        : self._onStrategyResume,
             EV_UI2EG_EQUANT_EXIT            : self._onEquantExit,
         }
@@ -509,29 +509,44 @@ class Strategy:
         time.sleep(5)
         os._exit(0)
 
-    def _onStrategyPause(self, event):
-        self._strategyState = StrategyStatusPause
-        responseEvent = Event({
+    # 停止策略
+    def _onStrategyQuit(self, event):
+        self._strategyState = StrategyStatusExit
+        quitEvent = Event({
             "EventCode": EV_EG2UI_STRATEGY_STATUS,
             "StrategyId": self._strategyId,
             "Data":{
-                "Status":ST_STATUS_PAUSE
+                "Status":ST_STATUS_QUIT,
+                "Config":self._dataModel.getConfigData(),
+                "Pid":os.getpid(),
+                "Path":self._filePath,
             }
         })
-        self.sendEvent2Engine(responseEvent)
+        self.sendEvent2Engine(quitEvent)
 
     def _onStrategyResume(self, event):
-        self._strategyState = StrategyStatusRunning
-        status = ST_STATUS_CONTINUES if self.isRealTimeStatus() else ST_STATUS_HISTORY
+        pass
+        # self._strategyState = StrategyStatusRunning
+        # status = ST_STATUS_CONTINUES if self.isRealTimeStatus() else ST_STATUS_HISTORY
+        # responseEvent = Event({
+        #     "EventCode": EV_EG2UI_STRATEGY_STATUS,
+        #     "StrategyId": self._strategyId,
+        #     "Data": {
+        #         "Status": status
+        #     }
+        # })
+        # self.sendEvent2Engine(responseEvent)
+
+    def _onEquantExit(self, event):
+        self._strategyState = StrategyStatusExit
         responseEvent = Event({
             "EventCode": EV_EG2UI_STRATEGY_STATUS,
             "StrategyId": self._strategyId,
             "Data": {
-                "Status": status
+                "Status": event.getEventCode(),
+                "Config": self._dataModel.getConfigData(),
+                "Pid": os.getpid(),
+                "Path": self._filePath,
             }
         })
         self.sendEvent2Engine(responseEvent)
-
-    def _onEquantExit(self, event):
-        # print(" exit ")
-        pass
