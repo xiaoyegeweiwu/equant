@@ -1273,7 +1273,6 @@ class PyAPI(object):
             }
             dataList.append(idict)
         
-        # print(dataList)
         # 发送到引擎
         apiEvent.setData(dataList)
         self._api2egQueue.put(apiEvent)
@@ -1299,7 +1298,6 @@ class PyAPI(object):
             }
             dataList.append(idict)
         
-        # print(dataList)
         # 发送到引擎
         apiEvent.setData(dataList)
         self._api2egQueue.put(apiEvent)
