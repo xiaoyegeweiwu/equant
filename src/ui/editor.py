@@ -109,13 +109,6 @@ class ParentText(Text):
     def setText(self, text="", file=None):
         '''子类重写'''
         raise NotImplementedError
-        # if file:
-        #     text = open(file, 'r').read()
-        # self.config(state="normal")
-        # self.insert('end', text+ '\n')
-        # self.config(state="disabled")
-        # self.update()
-        # self.focus()
 
     def get_text(self):
         return self.get('1.0', END+'-1c')
@@ -226,14 +219,14 @@ class EditorText(ParentText, ModifiedMixin):
         print("esunny_event")
 
     def show_arrow_cursor(self,event):
-        self.config(cursor='arrow')
+        self.config(cursor="hand2")
 
 
     def show_xterm_cursor(self, event):
         self.config(cursor='xterm')
 
     def click(self, event):
-        index1 = self.index("insert").split(".")
+        index1 = self.index("current").split(".")
         range1 = self.tag_ranges("ESUNNY")
         start_index = 0
         for i, pos in enumerate(range1):
