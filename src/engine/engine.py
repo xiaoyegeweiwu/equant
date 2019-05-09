@@ -10,6 +10,7 @@ from .engine_model import DataModel
 import copy
 import psutil
 import os, json
+import multiprocessing
 
 
 class StrategyEngine(object):
@@ -290,6 +291,13 @@ class StrategyEngine(object):
                 self._onEquantExitData.update({"MaxStrategyId":self._maxStrategyId})
                 json.dump(self._onEquantExitData, jsonFile, ensure_ascii=False, indent=4)
             # print("", isAllStrategyExit)
+            
+            for child in multiprocessing.active_children():
+                child.terminate()
+                child.join()
+                
+                self.logger.debug("Strategy process Exit:%d"%child.pid)
+
 
     # ////////////////api回调及策略请求事件处理//////////////////
     def _handleApiData(self):

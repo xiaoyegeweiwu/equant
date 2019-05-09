@@ -204,6 +204,19 @@ class SendRequest(object):
         self._ui2egQueue.put(event)
         # print("图表事件已发送")
 
+    def strategyRemove(self, strategyId):
+        """移除策略"""
+        msg = {
+            "EventSrc": EEQU_EVSRC_UI,
+            "EventCode": EV_UI2EG_STRATEGY_REMOVE,
+            "SessionId": 0,
+            "StrategyId": strategyId,
+            "Data": {}
+        }
+
+        event = Event(msg)
+        self._ui2egQueue.put(event)
+
 
 # class AskRequest(object):
 #     """用于接收engine_queue的请求，向ui_queue写数据"""
@@ -349,6 +362,14 @@ class GetEgData(object):
             dataDict = self._stManager.getSingleStrategy(id)
 
             self._app.updateStatus(id, dataDict)
+            if sStatus == ST_STATUS_QUIT:
+                self._stManager.removeStrategy(id)
+            if sStatus == ST_STATUS_REMOVE:
+                # TODO：删除策略需要接到通知之后再进行删除
+                # 更新界面
+                self._app.delStrategy(id)
+                # 将策略管理器中的该策略也删除掉
+                self._stManager.removeStrategy(id)
 
     def handlerEgEvent(self):
         while True:

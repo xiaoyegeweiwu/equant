@@ -405,6 +405,11 @@ class RunWin(QuantToplevel, QuantFrame):
         self.createSample(self.sampleFrame)
         self.addButton(self.topFrame)
 
+        # TODO： 如果将配置文件内容删除会报错
+        self.setDefaultConfigure()
+        # 根据内容设置Label文本
+        self.setLabelText()
+
     def initVariable(self):
         # 变量
         self.user = tk.StringVar()  # 用户
@@ -448,58 +453,152 @@ class RunWin(QuantToplevel, QuantFrame):
         self.canClose = tk.IntVar()  # 开仓的当前K线不允许平仓
         self.canOpen = tk.IntVar()  # 平仓的当前K线不允许开仓
 
+        # 根据选择内容设置标签内容变量
+        self.unitVar = tk.StringVar()
+        self.openTypeUnitVar = tk.StringVar()
+        self.closeTypeUnitVar = tk.StringVar()
+
     def getTextConfigure(self):
         """从配置文件中得到配置信息"""
-        configure = self.readConfig()
+        try:
+            configure = self.readConfig()
+        except EOFError:
+            configure = None
+
         key = self._control.getEditorText()["path"]
         if configure:
             if key in configure:
                 return configure[key]
         return None
 
+        # if configure:
+        #     if key in configure:
+        #         return configure[key]
+        # return None
+
     def setDefaultConfigure(self):
         conf = self.getTextConfigure()
         if conf:
-            self.user.set(conf[VUser]),
-            self.initFund.set(conf[VInitFund]),
-            self.defaultType.set(conf[VDefaultType]),
-            self.defaultQty.set(conf[VDefaultQty]),
-            self.minQty.set(conf[VMinQty]),
-            self.hedge.set(conf[VHedge]),
-            self.margin.set(conf[VMinQty]),
+            try:
+                # self.user.set(conf[VUser]),
+                self.initFund.set(conf[VInitFund]),
+                self.defaultType.set(conf[VDefaultType]),
+                self.defaultQty.set(conf[VDefaultQty]),
+                self.minQty.set(conf[VMinQty]),
+                self.hedge.set(conf[VHedge]),
+                self.margin.set(conf[VMinQty]),
 
-            self.openType.set(conf[VOpenType]),
-            self.closeType.set(conf[VCloseType]),
-            self.openFee.set(conf[VOpenFee]),
-            self.closeFee.set(conf[VCloseFee]),
-            self.dir.set(conf[VDirection]),
-            self.slippage.set(conf[VSlippage]),
-            # self.contract.set(conf[VContract]),
+                self.openType.set(conf[VOpenType]),
+                self.closeType.set(conf[VCloseType]),
+                self.openFee.set(conf[VOpenFee]),
+                self.closeFee.set(conf[VCloseFee]),
+                self.dir.set(conf[VDirection]),
+                self.slippage.set(conf[VSlippage]),
+                # self.contract.set(conf[VContract]),
+                # 合约通过函数设置
+                self.setText(self.contractInfo, conf[VContract])
 
-            self.isCycle.set(conf[VIsCycle]),
-            self.cycle.set(conf[VCycle]),
-            # TODO：定时触发
-            self.isKLine.set(conf[VIsKLine]),
-            self.isMarket.set(conf[VIsMarket]),
-            self.isTrade.set(conf[VIsTrade]),
+                self.isCycle.set(conf[VIsCycle]),
+                self.cycle.set(conf[VCycle]),
 
-            self.sampleVar.set(conf[VSampleVar]),
-            self.beginDate.set(conf[VBeginDate]),
-            self.fixQty.set(conf[VFixQty]),
+                # 定时触发通过函数设置
+                self.setText(self.timerText, conf[VTimer])
 
-            self.kLineType.set(conf[VKLineType]),
-            self.kLineSlice.set(conf[VKLineSlice]),
-            self.sendOrderMode.set(conf[VSendOrderMode]),
-            self.isActual.set(conf[VIsActual]),
+                self.isKLine.set(conf[VIsKLine]),
+                self.isMarket.set(conf[VIsMarket]),
+                self.isTrade.set(conf[VIsTrade]),
 
-            self.isOpenTimes.set(conf[VIsOpenTimes]),
-            self.openTimes.set(conf[VOpenTimes]),
-            self.isConOpenTimes.set(conf[VOpenTimes]),
-            self.conOpenTimes.set(conf[VOpenTimes]),
-            self.canClose.set(conf[VCanClose]),
-            self.canOpen.set(conf[VCanOpen]),
+                self.sampleVar.set(conf[VSampleVar]),
+                self.beginDate.set(conf[VBeginDate]),
+                self.fixQty.set(conf[VFixQty]),
 
-        pass
+                self.kLineType.set(conf[VKLineType]),
+                self.kLineSlice.set(conf[VKLineSlice]),
+                self.sendOrderMode.set(conf[VSendOrderMode]),
+                self.isActual.set(conf[VIsActual]),
+
+                self.isOpenTimes.set(conf[VIsOpenTimes]),
+                self.openTimes.set(conf[VOpenTimes]),
+                self.isConOpenTimes.set(conf[VOpenTimes]),
+                self.conOpenTimes.set(conf[VOpenTimes]),
+                self.canClose.set(conf[VCanClose]),
+                self.canOpen.set(conf[VCanOpen]),
+            except:
+                print("I'm wrong!")
+        else:
+            # 设置默认值
+            self.isCycle.set(0),
+            self.cycle.set(200),
+            self.isKLine.set(1),
+            self.isMarket.set(1),
+            self.isTrade.set(0),
+            # 指定时刻不好存
+
+            # 发单时机
+            self.sendOrderMode.set(0)
+            # 运行模式
+            self.isActual.set(0)
+
+            # 数据合约
+
+            # 账户
+
+            # K线类型
+            self.kLineType.set("日")
+            # K线周期
+            self.kLineSlice.set("1")
+
+            # 初始资金
+            self.initFund.set(10000000)
+            # 交易方向
+            self.dir.set("双向交易")
+            # 默认下单量
+            self.defaultType.set("按固定合约数")
+            self.defaultQty.set(1)
+            # 最小下单量
+            self.minQty.set(1)
+
+            # 投保标志
+            self.hedge.set("投机")
+            # 保证金率
+            self.margin.set(8)
+            #TODO:直接设置界面怎么更改（有没有百分号）
+            # 开仓收费方式
+            self.openType.set("固定值")
+            # 平仓收费方式
+            self.closeType.set("固定值")
+            # 开仓手续费（率）
+            self.openFee.set("1")
+            # 平仓手续费（率）
+            self.closeFee.set("1")
+            # 滑点损耗
+            self.slippage.set("1")
+
+            # 样本设置
+            self.sampleVar.set(2)
+            self.fixQty.set(2000)
+
+            # 发单设置
+            # 每根K线同向开仓次数标志
+            self.isOpenTimes.set(0)
+            # 每根K线同向开仓次数
+            self.openTimes.set("1")
+            # 最大连续同向开仓次数标志
+            self.isConOpenTimes.set(0)
+            # 最大连续同向开仓次数
+            self.conOpenTimes.set("1")
+            # 开仓的当前K线不允许平仓
+            self.canClose.set(0)
+            # 平仓的当前K线不允许开仓
+            self.canOpen.set(0)
+
+    def setLabelText(self):
+        """根据配置文件决定所显示的label内容"""
+        # self.openTypeUnitVar.set("") if self.openType.get() == "固定值" else self.openTypeUnitVar.set("%")
+        # self.closeTypeUnitVar.set("") if self.closeType.get() == "固定值" else self.closeTypeUnitVar.set("%")
+        self.openTypeUnitSet()
+        self.closeTypeUnitSet()
+        self.defaultUnitSetting()
 
     def getConfig(self):
         """获取用户配置的config"""
@@ -724,7 +823,7 @@ class RunWin(QuantToplevel, QuantFrame):
         iniFundLabel.pack(side=tk.LEFT)
         self.initFundEntry = tk.Entry(initFundFrame, relief=tk.RIDGE, textvariable=self.initFund, validate="key",
                                       validatecommand=(self.testContent, "%P"))
-        self.initFundEntry.insert(tk.END, 10000000)
+        # self.initFundEntry.insert(tk.END, 10000000)
         self.initFundEntry.pack(side=tk.LEFT, fill=tk.X, padx=5)
         tk.Label(initFundFrame, text='元', bg=rgb_to_hex(255, 255, 255), justif=tk.LEFT, anchor=tk.W, width=2) \
             .pack(side=tk.LEFT, padx=1)
@@ -743,20 +842,21 @@ class RunWin(QuantToplevel, QuantFrame):
                                 justif=tk.LEFT, anchor=tk.W, width=15)
         defaultLabel.pack(side=tk.LEFT)
 
-        typeChosen = ttk.Combobox(defaultFrame, width=12, textvariable=self.defaultType, state="readonly")
+        typeChosen = ttk.Combobox(defaultFrame, width=11, textvariable=self.defaultType, state="readonly")
         typeList = ['按固定合约数', '按资金比例', '按固定资金']
         typeChosen["values"] = typeList
-        typeChosen.current(0)
+        # typeChosen.current(0)
         typeChosen.pack(side=tk.LEFT, fill=tk.X, padx=5)
-        typeChosen.bind('<<ComboboxSelected>>', self.defaultTypeEvent)
+        typeChosen.bind('<<ComboboxSelected>>', self.defaultUnitSetting)
 
-        qtyEntry = tk.Entry(defaultFrame, relief=tk.RIDGE, width=5, textvariable=self.defaultQty,
+        qtyEntry = tk.Entry(defaultFrame, relief=tk.RIDGE, width=7, textvariable=self.defaultQty,
                             validate="key", validatecommand=(self.testContent, "%P"))
-        qtyEntry.insert(tk.END, 1)
+        # qtyEntry.insert(tk.END, 1)
         qtyEntry.pack(side=tk.LEFT, expand=tk.NO)
-        self.defaultUnit = tk.Label(defaultFrame, text='手', bg=rgb_to_hex(255, 255, 255),
-                                    justif=tk.LEFT, anchor=tk.W, width=2)
-        self.defaultUnit.pack(side=tk.LEFT, expand=tk.NO, padx=1)
+
+        defaultUnit = tk.Label(defaultFrame, text='手', bg=rgb_to_hex(255, 255, 255),
+                               textvariable=self.unitVar, justif=tk.LEFT, anchor=tk.W, width=2)
+        defaultUnit.pack(side=tk.LEFT, expand=tk.NO, padx=1)
 
         # 最小下单量
         minQtyFrame = tk.Frame(frame, relief=tk.RAISED, bg=rgb_to_hex(255, 255, 255))
@@ -765,26 +865,24 @@ class RunWin(QuantToplevel, QuantFrame):
             .pack(side=tk.LEFT)
         minQtyEntry = tk.Entry(minQtyFrame, relief=tk.RIDGE, width=10, textvariable=self.minQty,
                                validate="key", validatecommand=(self.testContent, "%P"))
-        minQtyEntry.insert(tk.END, 1)
+        # minQtyEntry.insert(tk.END, 1)
         minQtyEntry.pack(side=tk.LEFT, expand=tk.NO)
         tk.Label(minQtyFrame, text='手(1-{})'.format(MAXSINGLETRADESIZE), bg=rgb_to_hex(255, 255, 255),
                  justif=tk.LEFT, anchor=tk.W, width=10).pack(side=tk.LEFT, expand=tk.NO, padx=2)
 
-    def defaultTypeEvent(self, event):
+    def defaultUnitSetting(self, event=None):
         """默认下单量checkbutton选中事件"""
         # TODO：把字符串定义为事件
         type = self.defaultType.get()
-        # TODO：qtyEntry插入不生效？---跟绑定的变量有关系，显示的是绑定的变量的值
-        self.qtyEntry.delete(0, 'end')
         if type == "按固定合约数":
             self.defaultQty.set(1)
-            self.defaultUnit.config(text="手")
+            self.unitVar.set("手")
         elif type == "按资金比例":
             self.defaultQty.set(5)
-            self.defaultUnit.config(text="%")
+            self.unitVar.set("%")
         elif type == "按固定资金":
             self.defaultQty.set(1000000)
-            self.defaultUnit.config(text="元")
+            self.unitVar.set("元")
         else:
             pass
 
@@ -799,7 +897,7 @@ class RunWin(QuantToplevel, QuantFrame):
         symChosen = ttk.Combobox(symFrame, state="readonly", textvariable=self.hedge)
         symList = ['投机', '套利', '保值', '做市']  # TODO: userList需要从后台获取
         symChosen["values"] = symList
-        symChosen.current(0)
+        # symChosen.current(0)
         symChosen.pack(side=tk.LEFT, fill=tk.X, padx=5)
 
     def setMargin(self, frame):
@@ -812,7 +910,7 @@ class RunWin(QuantToplevel, QuantFrame):
         marginLabel.pack(side=tk.LEFT)
         marginEntry = tk.Entry(marginFrame, relief=tk.RIDGE, textvariable=self.margin,
                                validate="key", validatecommand=(self.testContent, "%P"))
-        marginEntry.insert(tk.END, 8)
+        # marginEntry.insert(tk.END, 8)
         marginEntry.pack(side=tk.LEFT, fill=tk.X, padx=1)
         tk.Label(marginFrame, text='%', bg=rgb_to_hex(255, 255, 255), justif=tk.LEFT, anchor=tk.W, width=2) \
             .pack(side=tk.LEFT, expand=tk.NO, padx=1)
@@ -826,9 +924,9 @@ class RunWin(QuantToplevel, QuantFrame):
         openTypeLabel.pack(side=tk.LEFT)
         openTypeChosen = ttk.Combobox(openTypeFrame, state="readonly", textvariable=self.openType)
         openTypeChosen['values'] = ['固定值', '比例']
-        openTypeChosen.current(0)
+        # openTypeChosen.current(0)
         openTypeChosen.pack(side=tk.LEFT, fill=tk.X, padx=5)
-        openTypeChosen.bind('<<ComboboxSelected>>', self.openTypeEvent)
+        openTypeChosen.bind('<<ComboboxSelected>>', self.openTypeUnitSet)
 
         openFeeFrame = tk.Frame(frame, relief=tk.RAISED, bg=rgb_to_hex(255, 255, 255))
         openFeeFrame.pack(fill=tk.X, padx=15, pady=5)
@@ -836,11 +934,11 @@ class RunWin(QuantToplevel, QuantFrame):
                  justify=tk.LEFT, anchor=tk.W, width=15).pack(side=tk.LEFT)
         openFeeEntry = tk.Entry(openFeeFrame, relief=tk.RIDGE, textvariable=self.openFee,
                                 validate="key", validatecommand=(self.testContent, "%P"))
-        openFeeEntry.insert(tk.END, 1)
+        # openFeeEntry.insert(tk.END, 1)
         openFeeEntry.pack(side=tk.LEFT, fill=tk.X, padx=5)
-        self.openFeeUnit = tk.Label(openFeeFrame, text=' ', bg=rgb_to_hex(255, 255, 255),
-                                    justify=tk.LEFT, anchor=tk.W, width=2)
-        self.openFeeUnit.pack(side=tk.LEFT, padx=5)
+        openFeeUnit = tk.Label(openFeeFrame, text=' ', bg=rgb_to_hex(255, 255, 255),
+                               textvariable=self.openTypeUnitVar, justify=tk.LEFT, anchor=tk.W, width=2)
+        openFeeUnit.pack(side=tk.LEFT, padx=5)
 
         closeTypeFrame = tk.Frame(frame, relief=tk.RAISED, bg=rgb_to_hex(255, 255, 255))
         closeTypeFrame.pack(fill=tk.X, padx=15, pady=5)
@@ -849,9 +947,9 @@ class RunWin(QuantToplevel, QuantFrame):
         closeTypeLabel.pack(side=tk.LEFT)
         closeTypeChosen = ttk.Combobox(closeTypeFrame, state="readonly", textvariable=self.closeType)
         closeTypeChosen['values'] = ['固定值', '比例']
-        closeTypeChosen.current(0)
+        # closeTypeChosen.current(0)
         closeTypeChosen.pack(side=tk.LEFT, fill=tk.X, padx=5)
-        closeTypeChosen.bind('<<ComboboxSelected>>', self.closeTypeEvent)
+        closeTypeChosen.bind('<<ComboboxSelected>>', self.closeTypeUnitSet)
 
         closeFeeFrame = tk.Frame(frame, relief=tk.RAISED, bg=rgb_to_hex(255, 255, 255))
         closeFeeFrame.pack(fill=tk.X, padx=15, pady=5)
@@ -859,26 +957,28 @@ class RunWin(QuantToplevel, QuantFrame):
                  justify=tk.LEFT, anchor=tk.W, width=15).pack(side=tk.LEFT)
         closeFeeEntry = tk.Entry(closeFeeFrame, relief=tk.RIDGE, textvariable=self.closeFee,
                                  validate="key", validatecommand=(self.testContent, "%P"))
-        closeFeeEntry.insert(tk.END, 1)
+        # closeFeeEntry.insert(tk.END, 1)
         closeFeeEntry.pack(side=tk.LEFT, fill=tk.X, padx=5)
-        self.closeFeeUnit = tk.Label(closeFeeFrame, text=' ', bg=rgb_to_hex(255, 255, 255),
-                                     justify=tk.LEFT, anchor=tk.W, width=2)
-        self.closeFeeUnit.pack(side=tk.LEFT, padx=5)
+        closeFeeUnit = tk.Label(closeFeeFrame, text=' ', bg=rgb_to_hex(255, 255, 255),
+                                     textvariable=self.closeTypeUnitVar, justify=tk.LEFT, anchor=tk.W, width=2)
+        closeFeeUnit.pack(side=tk.LEFT, padx=5)
 
-    def openTypeEvent(self, event):
+    def openTypeUnitSet(self, event=None):
         """开仓手续费类型选择事件"""
         openType = self.openType.get()
         if openType == "固定值":
-            self.openFeeUnit.config(text=" ")
+            self.openTypeUnitVar.set(" ")
+            # self.openFeeUnit.config(text=" ")
         if openType == "比例":
-            self.openFeeUnit.config(text="%")
+            # self.openFeeUnit.config(text="%")
+            self.openTypeUnitVar.set("%")
 
-    def closeTypeEvent(self, event):
+    def closeTypeUnitSet(self, event=None):
         closeType = self.closeType.get()
         if closeType == "固定值":
-            self.closeFeeUnit.config(text=" ")
+            self.closeTypeUnitVar.set(" ")
         if closeType == "比例":
-            self.closeFeeUnit.config(text="%")
+            self.closeTypeUnitVar.set("%")
 
     def setTradeDir(self, frame):
         """设置交易方向"""
@@ -891,7 +991,7 @@ class RunWin(QuantToplevel, QuantFrame):
         dirChosen = ttk.Combobox(dirFrame, state="readonly", textvariable=self.dir)
         dirList = ['双向交易', '仅多头', '仅空头']
         dirChosen["values"] = dirList
-        dirChosen.current(0)
+        # dirChosen.current(0)
         dirChosen.pack(side=tk.LEFT, fill=tk.X, padx=5)
 
     def setSlippage(self, frame):
@@ -904,7 +1004,7 @@ class RunWin(QuantToplevel, QuantFrame):
         slipLabel.pack(side=tk.LEFT)
         slipEntry = tk.Entry(slipFrame, relief=tk.RIDGE, width=23, textvariable=self.slippage,
                              validate="key", validatecommand=(self.testContent, "%P"))
-        slipEntry.insert(tk.END, 1)
+        # slipEntry.insert(tk.END, 1)
         slipEntry.pack(side=tk.LEFT, fill=tk.X, padx=5)
 
     # 基础设置
@@ -966,7 +1066,7 @@ class RunWin(QuantToplevel, QuantFrame):
 
         self.cycleEntry = tk.Entry(cycleFrame, relief=tk.RIDGE, width=8, bg=rgb_to_hex(245, 245, 245),
                                    textvariable=self.cycle, validate="key", validatecommand=(self.testContent, "%P"))
-        self.cycleEntry.insert(tk.END, 200)
+        # self.cycleEntry.insert(tk.END, 200)
         self.cycleEntry.config(state="disabled")
         self.cycleEntry.pack(side=tk.LEFT, fill=tk.X, padx=1)
         tk.Label(cycleFrame, text="毫秒执行代码（100的整数倍）", bg=rgb_to_hex(255, 255, 255),
@@ -1001,14 +1101,14 @@ class RunWin(QuantToplevel, QuantFrame):
         # K线触发
         self.kLineCheck = tk.Checkbutton(kLineFrame, text="K线触发", bg=rgb_to_hex(255, 255, 255),
                                          anchor=tk.W, variable=self.isKLine)
-        self.isKLine.set(1)
+        # self.isKLine.set(1)
         self.kLineCheck.pack(side=tk.LEFT, padx=5)
 
         # 即时行情触发
         self.marketCheck = tk.Checkbutton(kLineFrame, text="即时行情触发", bg=rgb_to_hex(255, 255, 255),
                                           anchor=tk.W, variable=self.isMarket)
         self.marketCheck.pack(side=tk.LEFT, padx=5)
-        self.isMarket.set(1)
+        # self.isMarket.set(1)
 
         # 交易数据触发
         self.tradeCheck = tk.Checkbutton(kLineFrame, text="交易数据触发", bg=rgb_to_hex(255, 255, 255),
@@ -1025,12 +1125,16 @@ class RunWin(QuantToplevel, QuantFrame):
             if timer in timers:
                 messagebox.showinfo("极星量化", "该时间点已经存在")
                 return
-            self.timerText.config(state="normal")
-            self.timerText.insert("end", timer + "\n")
-            self.timerText.config(state="disabled")
-            self.timerText.update()
+            self.setText(self.timerText, timer)
         else:
             messagebox.showinfo("极星量化", "时间格式为hhmmss")
+
+    def setText(self, widget, text):
+        widget.config(state="normal")
+        widget.insert("end", text + "\n")
+        widget.config(state="disabled")
+        widget.update()
+
 
     def delBtnEvent(self):
         """删除按钮回调事件"""
@@ -1070,7 +1174,7 @@ class RunWin(QuantToplevel, QuantFrame):
         hisFrame = tk.Frame(sampFrame, bg=rgb_to_hex(255, 255, 255), padx=5)
         hisFrame.pack(side=tk.TOP, fill=tk.X, pady=5)
 
-        self.sampleVar.set(2)
+        # self.sampleVar.set(2)
         # 所有K线
         allKRadio = tk.Radiobutton(allKFrame, text="所有K线", bg=rgb_to_hex(255, 255, 255),
                                    value=0, anchor=tk.W, variable=self.sampleVar)  # self.isAllK
@@ -1093,14 +1197,12 @@ class RunWin(QuantToplevel, QuantFrame):
         tk.Label(beginFrame, text="(格式: YYYYMMDD)", bg=rgb_to_hex(255, 255, 255),
                  anchor=tk.W, width=18).pack(side=tk.LEFT, expand=tk.NO, padx=1)
 
-
         # 固定根数
         self.qtyRadio = tk.Radiobutton(fixFrame, text="固定根数", bg=rgb_to_hex(255, 255, 255),
                                        value=2, anchor=tk.W, variable=self.sampleVar)  # self.isFixQty
         self.qtyRadio.pack(side=tk.LEFT, padx=5)
         self.qtyEntry = tk.Entry(fixFrame, relief=tk.RIDGE, width=8, textvariable=self.fixQty,
                                  validate="key", validatecommand=(self.testContent, "%P"))
-        self.qtyEntry.insert(tk.END, 2000)
         self.qtyEntry.pack(side=tk.LEFT, fill=tk.X, padx=1)
         self.qtyEntry.bind("<Button-1>", self.qtyEnterEvent)
         tk.Label(fixFrame, text="根", bg=rgb_to_hex(255, 255, 255),
@@ -1134,13 +1236,11 @@ class RunWin(QuantToplevel, QuantFrame):
                  anchor=tk.W, width=10).pack(side=tk.LEFT, expand=tk.NO, padx=5)
         # 实时发单
         self.RealTimeRadio = tk.Radiobutton(modeFrame, text="实时发单", bg=rgb_to_hex(255, 255, 255),
-                                            anchor=tk.W, value=0, variable=self.sendOrderMode,
-                                            command=self.sendModeEvent)
+                                            anchor=tk.W, value=0, variable=self.sendOrderMode)
         self.RealTimeRadio.pack(side=tk.LEFT, padx=10, pady=10)
         # K线稳定后发单
         self.steadyRadio = tk.Radiobutton(modeFrame, text="K线稳定后发单", bg=rgb_to_hex(255, 255, 255),
-                                          anchor=tk.W, value=1, variable=self.sendOrderMode,
-                                          command=self.sendModeEvent)
+                                          anchor=tk.W, value=1, variable=self.sendOrderMode)
         self.steadyRadio.pack(side=tk.LEFT, padx=50, pady=10)
 
 
@@ -1148,30 +1248,12 @@ class RunWin(QuantToplevel, QuantFrame):
         sendModeFrame = tk.LabelFrame(frame, text="发单设置", bg=rgb_to_hex(255, 255, 255), padx=5)
         sendModeFrame.pack(side=tk.TOP, fill=tk.X, anchor=tk.W, padx=15, pady=15)
 
-        self.setOpenTimes(sendModeFrame)
         self.setContinueOpenTimes(sendModeFrame)
+        self.setOpenTimes(sendModeFrame)
         self.setCanClose(sendModeFrame)
         self.setCanOpen(sendModeFrame)
         # self.setHelp(setFrame)
         # self.bindEvent()
-
-    def sendModeEvent(self):
-        """发单时机选择回调事件"""
-        mode = self.sendOrderMode.get()
-        btnList = [self.otCheck, self.conCheck, self.canCloseCheck,
-                   self.canOpenCheck, self.timesEntry, self.conTimesEntry]
-        labelList = [self.timesLabel, self.conTimesLabel]
-        if mode == 0:
-            for btn in btnList:
-                btn.config(state="normal")
-            for label in labelList:
-                label.config(fg='black')
-
-        else:
-            for btn in btnList:
-                btn.config(state="disabled")
-            for label in labelList:
-                label.config(fg='grey')
 
     def setRunMode(self, frame):
         """是否实盘运行"""
@@ -1198,7 +1280,7 @@ class RunWin(QuantToplevel, QuantFrame):
 
         self.kLineTypeChosen = ttk.Combobox(kLineTypeFrame, width=20, state="readonly", textvariable=self.kLineType)
         self.kLineTypeChosen['values'] = ['日', '分钟', '秒']
-        self.kLineTypeChosen.current(0)
+        # self.kLineTypeChosen.current(0)
         self.kLineTypeChosen.pack(side=tk.LEFT, fill=tk.X, padx=5)
 
     def setKLineSlice(self, frame):
@@ -1210,7 +1292,7 @@ class RunWin(QuantToplevel, QuantFrame):
 
         self.klineSliceChosen = ttk.Combobox(self.klineSliceFrame, state="readonly", textvariable=self.kLineSlice)
         self.klineSliceChosen["values"] = ['1', '2', '3', '5', '10', '15', '30']
-        self.klineSliceChosen.current(0)
+        # self.klineSliceChosen.current(0)
         self.klineSliceChosen.pack(side=tk.LEFT, fill=tk.X, padx=5)
 
     # 运行设置
@@ -1225,7 +1307,7 @@ class RunWin(QuantToplevel, QuantFrame):
 
         self.timesEntry = tk.Entry(self.openTimesFrame, relief=tk.RIDGE, width=8, textvariable=self.openTimes,
                                    validate="key", validatecommand=(self.testContent, "%P"))
-        self.timesEntry.insert(tk.END, 1)
+        # self.timesEntry.insert(tk.END, 1)
         self.timesEntry.pack(side=tk.LEFT, fill=tk.X, padx=1)
         self.timesLabel = tk.Label(self.openTimesFrame, text='次(1-100)', bg=rgb_to_hex(255, 255, 255),
                  justif=tk.LEFT, anchor=tk.W, width=10)
@@ -1243,7 +1325,7 @@ class RunWin(QuantToplevel, QuantFrame):
 
         self.conTimesEntry = tk.Entry(self.conTimesFrame, relief=tk.RIDGE, width=8, textvariable=self.conOpenTimes,
                                       validate="key", validatecommand=(self.testContent, "%P"))
-        self.conTimesEntry.insert(tk.END, 1)
+        # self.conTimesEntry.insert(tk.END, 1)
         self.conTimesEntry.pack(side=tk.LEFT, fill=tk.X, padx=1)
         self.conTimesLabel = tk.Label(self.conTimesFrame, text='次(1-100)', bg=rgb_to_hex(255, 255, 255),
                  justif=tk.LEFT, anchor=tk.W, width=10)
@@ -1367,7 +1449,6 @@ class RunWin(QuantToplevel, QuantFrame):
         tradeDirection = self.dir.get()
         slippage = self.slippage.get()
         #TODO: contract
-        # contract = self.contract.get()
         contractInfo = self.contractInfo.get('1.0', "end")
         contract = (contractInfo.rstrip("\n")).split("\n")
 
@@ -1411,49 +1492,6 @@ class RunWin(QuantToplevel, QuantFrame):
             if t:
                 tempT = parseTime(t)
                 timerFormatter.append(tempT)
-
-        # -------------保存用户配置--------------------------
-        strategyPath = self._control.getEditorText()["path"]
-        userConfig = {
-            strategyPath: {
-                VUser:                 user,
-                VInitFund:             initFund,
-                VDefaultType:          defaultType,
-                VDefaultQty:           defaultQty,
-                VMinQty:               minQty,
-                VHedge:                hedge,
-                VMargin:               margin,
-                VOpenType:             openType,
-                VCloseType:            openFee,
-                VOpenFee:              closeType,
-                VCloseFee:             closeFee,
-                VDirection:            tradeDirection,
-                VSlippage:             slippage,
-                VContract:             contract,
-                VTimer:                timer,
-                VIsCycle:              isCycle,
-                VCycle:                cycle,
-                VIsKLine:              isKLine,
-                VIsMarket:             isMarket,
-                VIsTrade:              isTrade,
-
-                VSampleVar:            sampleVar,
-                VBeginDate:            beginDate,
-                VFixQty:               fixQty,
-
-                VKLineType:            kLineType,
-                VKLineSlice:           kLineSlice,
-                VSendOrderMode:        sendOrderMode,
-                VIsActual:             isActual,
-                VIsOpenTimes:          isOpenTimes,
-                VOpenTimes:            openTimes,
-                VIsConOpenTimes:       isConOpenTimes,
-                VConOpenTimes:         conOpenTimes,
-                VCanClose:             canClose,
-                VCanOpen:              canOpen,
-            }
-        }
-
 
         if minQty == "":
             messagebox.showinfo("极星量化", "最小下单量不能为空")
@@ -1582,9 +1620,51 @@ class RunWin(QuantToplevel, QuantFrame):
         else:
             self.config["Other"]["TradeDirection"] = 2
 
+        # -------------保存用户配置--------------------------
+        strategyPath = self._control.getEditorText()["path"]
+        userConfig = {
+            strategyPath: {
+                VUser: user,
+                VInitFund: initFund,
+                VDefaultType: defaultType,
+                VDefaultQty: defaultQty,
+                VMinQty: minQty,
+                VHedge: hedge,
+                VMargin: margin,
+                VOpenType: openType,
+                VCloseType: closeType,
+                VOpenFee: openFee,
+                VCloseFee: closeFee,
+                VDirection: tradeDirection,
+                VSlippage: slippage,
+                VContract: contractInfo,
+                VTimer: timer,
+                VIsCycle: isCycle,
+                VCycle: cycle,
+                VIsKLine: isKLine,
+                VIsMarket: isMarket,
+                VIsTrade: isTrade,
+
+                VSampleVar: sampleVar,
+                VBeginDate: beginDate,
+                VFixQty: fixQty,
+
+                VKLineType: kLineType,
+                VKLineSlice: kLineSlice,
+                VSendOrderMode: sendOrderMode,
+                VIsActual: isActual,
+                VIsOpenTimes: isOpenTimes,
+                VOpenTimes: openTimes,
+                VIsConOpenTimes: isConOpenTimes,
+                VConOpenTimes: conOpenTimes,
+                VCanClose: canClose,
+                VCanOpen: canOpen,
+            }
+        }
+
         # print("config: ", self.config)
         # 将配置信息保存到本地文件
-        # self.writeConfig(userConfig)
+        self.writeConfig(userConfig)
 
         self.destroy()
 
@@ -1600,14 +1680,33 @@ class RunWin(QuantToplevel, QuantFrame):
         """读取配置文件"""
         if os.path.exists(r"./config/loadconfigure.json"):
             with open(r"./config/loadconfigure.json", "r", encoding="utf-8") as f:
-                result = json.loads(f.read())
-                return result
-        return None
+                try:
+                    result = json.loads(f.read())
+                except json.decoder.JSONDecodeError:
+                    return None
+                else:
+                    return result
+        else:
+            filePath = os.path.abspath(r"./config/loadconfigure.json")
+            f = open(filePath, 'w')
+            f.close()
 
     def writeConfig(self, configure):
         """写入配置文件"""
+        # 将文件内容追加到配置文件中
+        try:
+            config = self.readConfig()
+        except:
+            config = None
+        if config:
+            for key in configure:
+                config[key] = configure[key]
+                break
+        else:
+            config = configure
+
         with open(r"./config/loadconfigure.json", "w", encoding="utf-8") as f:
-            f.write(json.dumps(configure, indent=4))
+            f.write(json.dumps(config, indent=4))
 
 
 class SelectContractWin(QuantToplevel, QuantFrame):

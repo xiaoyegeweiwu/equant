@@ -221,9 +221,19 @@ class EditorText(ParentText, ModifiedMixin):
     def show_arrow_cursor(self,event):
         self.config(cursor="hand2")
 
+        index1 = self.index("current").split(".")
+        range1 = self.tag_ranges("ESUNNY")
+        for i, pos in enumerate(range1):
+            posit = pos.string.split(".")
+            if int(index1[0]) == int(posit[0]) and int(index1[1]) <= int(posit[1]):
+                self.tag_configure("current_line", background="green")
+                self.tag_remove(pos, 1.0, "end")
+                self.tag_add(pos, "insert linestart", "insert lineend+1c")
+
 
     def show_xterm_cursor(self, event):
         self.config(cursor='xterm')
+
 
     def click(self, event):
         index1 = self.index("current").split(".")
@@ -285,6 +295,8 @@ class EditorText(ParentText, ModifiedMixin):
                                 self.tag_bind(key, '<Enter>', self.show_arrow_cursor)
                                 self.tag_bind(key, '<Leave>', self.show_xterm_cursor)
                                 self.tag_bind(key, '<ButtonRelease-1>', self.click)
+
+                                # self.tag_bind(key, '<Control-Button-1>', self.click)
                             if value in ("def", "class"):
                                 m1 = self.idprog.match(chars, b)
                                 if m1:

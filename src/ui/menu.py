@@ -17,50 +17,50 @@ class StrategyMenu(object):
         self.widget = parent
         self.language = Language("EquantMainFrame")
         self.menu = Menu(parent, tearoff=0)
-        self.selected_item = None
+        self._lClickSelectedItem = None   # 左键选择标签
         self._rightClickPath = ""    # 记录右键弹出菜单时选中的策略路径
 
     def add_event(self):
         new_menu = Menu(self.menu, tearoff=0)
-        if len(self.selected_item) == 1 and self.widget.parent(self.selected_item):  # 保证只选中一个
+        if len(self._lClickSelectedItem) == 1 and self.widget.parent(self._lClickSelectedItem):  # 保证只选中一个
             # self.menu.add_command(label="运行", command=self.runStrategy)
             pass
         self.menu.add_cascade(label="新建", menu=new_menu)
         new_menu.add_command(label=self.language.get_text(41), command=self.newStrategy)
         new_menu.add_command(label=self.language.get_text(42), command=self.newDir)
-        if len(self.selected_item) == 1:
+        if len(self._lClickSelectedItem) == 1:
             self.menu.add_command(label="修改名称", command=self.rename)
         # self.menu.add_command(label="移动分组", command=self.move_strategy)
         self.menu.add_command(label="删除", command=self.delete_)
 
     def popupmenu(self, event):
-        select = self.widget.identify_row(event.y)
-        self.selected_item = event.widget.selection()
+        rSelectItem = self.widget.identify_row(event.y)
+        self._lClickSelectedItem = event.widget.selection()
 
         # 记录右键所选择的策略路径
-        if select:  # 存在选择的策略
-            self._rightClickPath = self.widget.item(select)["values"][0]
+        if rSelectItem:  # 存在选择的策略
+            self._rightClickPath = self.widget.item(rSelectItem)["values"][0]
 
-        if self.selected_item:
-            if select:
-                if select not in self.selected_item:
-                    self.widget.focus(select)
-                    self.widget.selection_set(select)
-                    self.selected_item = event.widget.selection()
+        if self._lClickSelectedItem:
+            if rSelectItem:
+                if rSelectItem not in self._lClickSelectedItem:
+                    self.widget.focus(rSelectItem)
+                    self.widget.selection_set(rSelectItem)
+                    self._lClickSelectedItem = event.widget.selection()
             self.add_event()
             self.menu.post(event.x_root, event.y_root)
         else:
-            if select:
-                self.widget.focus(select)
-                self.widget.selection_set(select)
-                self.selected_item = event.widget.selection()
-                self.widget.focus(select)
-                self.widget.selection_set(select)
+            if rSelectItem:
+                self.widget.focus(rSelectItem)
+                self.widget.selection_set(rSelectItem)
+                self._lClickSelectedItem = event.widget.selection()
+                self.widget.focus(rSelectItem)
+                self.widget.selection_set(rSelectItem)
                 self.add_event()
                 self.menu.post(event.x_root, event.y_root)
 
     def get_file_path(self):
-        select = self.selected_item
+        select = self._lClickSelectedItem
         file_path = []
         for idx in select:
             file_path.append(self.widget.item(idx)["values"][0])
@@ -153,6 +153,8 @@ class StrategyMenu(object):
 
         tempPath = self.get_file_path()
         path = tempPath[0]
+        editorPath = self._controller.getEditorText()["path"]
+
         renameTop = RenameToplevel(path, self._controller.top)
 
         def enter():
@@ -180,15 +182,21 @@ class StrategyMenu(object):
                         return
 
                 if not os.path.exists(newPath):
-                    self.widget.item(self.selected_item, values=[newPath, "!@#$%^&*"])
+                    self.widget.item(self._lClickSelectedItem, values=[newPath, "!@#$%^&*"])
                     os.rename(path, newPath)
 
                     if os.path.isfile(newPath):
+
                         text = renameTop.newEntry.get()
-                        self.widget.item(self.selected_item, text=text)
+                        self.widget.item(self._lClickSelectedItem, text=text)
+                        # TODO:更新标签和model中的editor
+                        if path in editorPath:
+                            self._controller.setEditorTextCode(newPath)
+                            self._controller.updateEditorHead(text)
+
                     if os.path.isdir(newPath):
                         text = renameTop.newEntry.get()
-                        self.widget.tag_configure(self.selected_item, text=text)
+                        self.widget.tag_configure(self._lClickSelectedItem, text=text)
                     self.widget.update()
                 else:
                     messagebox.showinfo("提示", self.language.get_text(32))
@@ -211,7 +219,7 @@ class StrategyMenu(object):
         # TODO: 若删除文件为当前选中文件，需要更新editor_head和editor_text，重置为空吧
         tempPath = self.get_file_path()
         deleteTop = DeleteToplevel(tempPath, self._controller.top)
-        selected_item = self.selected_item
+        selected_item = self._lClickSelectedItem
         # 当前选中的策略路径
         editorPath = self._controller.getEditorText()["path"]
         def enter():
@@ -259,7 +267,7 @@ class RunMenu(object):
         self._controller = controller
         self.widget = parent
         self.menu = Menu(parent, tearoff=0)
-        self.selected_item = None
+        self._lClickSelectedItem = None
         self._strategyId = []   # 策略Id列表，弹出右键菜单时赋值
 
     def add_event(self):
@@ -267,17 +275,17 @@ class RunMenu(object):
         self.menu.add_command(label="启动", command=self.onResume)
         self.menu.add_command(label="停止", command=self.onQuit)
         self.menu.add_command(label="删除", command=self.onDelete)
-        self.menu.add_command(label="报告", command=self.onReport)
-        self.menu.add_command(label="切换策略", command=self.onSignal)
+        self.menu.add_command(label="投资报告", command=self.onReport)
+        self.menu.add_command(label="图表展示", command=self.onSignal)
 
     def popupmenu(self, event):
         select = self.widget.identify_row(event.y)
-        self.selected_item = event.widget.selection()
+        self._lClickSelectedItem = event.widget.selection()
 
         # 右键弹出菜单时给strategyId 赋值
 
-        if self.selected_item:  # 选中之后右键弹出菜单
-            for idx in self.selected_item:
+        if self._lClickSelectedItem:  # 选中之后右键弹出菜单
+            for idx in self._lClickSelectedItem:
                 self._strategyId.append(int(idx))
         else:  # 没有选中，直接右键选择
             if select:
@@ -285,19 +293,19 @@ class RunMenu(object):
 
         # print("strategyId: ", self._strategyId)
 
-        if self.selected_item:
+        if self._lClickSelectedItem:
             if select:
-                if select not in self.selected_item:
+                if select not in self._lClickSelectedItem:
                     self.widget.focus(select)
                     self.widget.selection_set(select)
-                    self.selected_item = event.widget.selection()
+                    self._lClickSelectedItem = event.widget.selection()
             self.add_event()
             self.menu.post(event.x_root, event.y_root)
         else:
             if select:
                 self.widget.focus(select)
                 self.widget.selection_set(select)
-                self.selected_item = event.widget.selection()
+                self._lClickSelectedItem = event.widget.selection()
                 self.widget.focus(select)
                 self.widget.selection_set(select)
                 self.add_event()

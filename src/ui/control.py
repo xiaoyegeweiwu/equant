@@ -6,6 +6,7 @@ from tkinter import messagebox
 from .model import QuantModel, SendRequest
 from .view import QuantApplication
 from .language import *
+from capi.com_types import *
 
 
 
@@ -34,6 +35,9 @@ class TkinterController(object):
         # 创建模块
         self.model = QuantModel(self.app, self._ui2egQueue, self._eg2uiQueue, self.logger)
         self.logger.info("Create quant model!")
+
+        # 策略管理器
+        self.strategyManager = self.getStManager()
 
         #TODO: 暂时先这样调用
         # self.app.setLoadState()
@@ -86,8 +90,13 @@ class TkinterController(object):
         """发送生成报告请求"""
         # TODO：生成报告，如果RepData为空，则显示最新日期的历史报告，
         # TODO：不为空，代表获取到的数据为传过来的数据
-        for id in strategyIdList:
+        # 查看策略的投资报告(不支持查看多个)
+        if len(strategyIdList) >= 1:
+            id = strategyIdList[0]
             self._request.reportRequest(id)
+
+        # for id in strategyIdList:
+        #     self._request.reportRequest(id)
 
     def newStrategy(self, path):
         """右键新建策略"""
@@ -119,10 +128,14 @@ class TkinterController(object):
         :return:
         """
         editor = self.getEditorText()
-        file = os.path.basename(path)
+        fileName = os.path.basename(path)
 
-        self.app.updateEditorHead(file)
+        self.updateEditorHead(fileName)
         self.app.updateEditorText(editor["code"])
+
+    def updateEditorHead(self, text):
+        """更新策略表头"""
+        self.app.updateEditorHead(text)
 
     def sendExitRequest(self):
         """发送量化界面退出请求"""
@@ -143,7 +156,17 @@ class TkinterController(object):
         :param strategyId: 所选策略Id列表
         :return:
         """
+        # for id in strategyIdList:
+        #     self._request.strategyResume(id)
+
         for id in strategyIdList:
+            # 策略如果是启动状态，则忽略此次启动请求
+            strategyDict = self.strategyManager.getStrategyDict()
+            if id in strategyDict:
+                status = self.strategyManager.queryStrategyStatus(id)
+                if status == ST_STATUS_HISTORY or status == ST_STATUS_CONTINUES:
+                    print("ignore!")
+                    continue
             self._request.strategyResume(id)
 
     def quitRequest(self, strategyIdList):
@@ -153,22 +176,30 @@ class TkinterController(object):
         :return:
         """
         for id in strategyIdList:
+            strategyDict = self.strategyManager.getStrategyDict()
+            if id in strategyDict:
+                status = self.strategyManager.queryStrategyStatus(id)
+                if status == ST_STATUS_QUIT:
+                    print("I have been quitted!")
+                    continue
             self._request.strategyQuit(id)
 
     def delStrategy(self, strategyIdList):
         # 获取策略管理器
-        strategyManager = self.getStManager()
         for id in strategyIdList:
+            # strategyDict = self.strategyManager.getStrategyDict()
+            # if id in strategyDict:
+            #     self._request.strategyRemove(id)
             # 通知引擎
-            self._request.strategyQuit(id)
-            # TODO：删除策略需要接到通知之后再进行删除
-            # 更新界面
-            self.app.delStrategy(id)
-            # 将策略管理器中的该策略也删除掉
-            strategyManager.removeStrategy(id)
+            self._request.strategyRemove(id)
+            # # TODO：删除策略需要接到通知之后再进行删除
+            # # 更新界面
+            # self.app.delStrategy(id)
+            # # 将策略管理器中的该策略也删除掉
+            # self.strategyManager.removeStrategy(id)
 
     def signalDisplay(self, strategyIdList):
-        # 查看策略的信号及指标图
+        # 查看策略的信号及指标图(默认查看一个)
         if len(strategyIdList) >= 1:
             id = strategyIdList[0]
             self._request.strategySignal(id)

@@ -117,7 +117,8 @@ class QuantMonitor(object):
             ST_STATUS_HISTORY:      "历史回测",
             ST_STATUS_CONTINUES:    "实时触发",
             ST_STATUS_PAUSE:        "暂停",
-            ST_STATUS_QUIT:         "停止"
+            ST_STATUS_QUIT:         "停止",
+            ST_STATUS_REMOVE:       "移除"
         }
 
     def _getStrategyStatus(self, key):
@@ -129,7 +130,11 @@ class QuantMonitor(object):
         :param dataDict: 策略的所有信息
         :return: 需要展示的信息
         """
-        status = self._getStrategyStatus(dataDict["StrategyState"])
+        try:
+            status = self._getStrategyStatus(dataDict["StrategyState"])
+        except KeyError:
+            return
+
         runType = "是" if dataDict['Config']['RunMode']['Actual']['SendOrder2Actual'] else "否"
 
         values = [
@@ -144,7 +149,11 @@ class QuantMonitor(object):
 
     def updateSingleExecute(self, dataDict):
         values = self._formatMonitorInfo(dataDict)
-        self.executeListTree.insert("", END, iid=dataDict['StrategyId'], values=tuple(values), tag=0)
+        strategyId = dataDict["StrategyId"]
+        if self.executeListTree.exists(strategyId):
+            self.updateStatus(strategyId, dataDict)
+            return
+        self.executeListTree.insert("", END, iid=strategyId, values=tuple(values), tag=0)
 
     def createErr(self):
         # 错误信息展示
