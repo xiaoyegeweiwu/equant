@@ -9,7 +9,6 @@ sys.path.append(".")
 sys.path.append("./ui")
 
 def run_log_process(logger):
-    logger.add_handler()
     logger.run()
 
 def run_capi_process(capi):

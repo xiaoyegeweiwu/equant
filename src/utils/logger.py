@@ -1,7 +1,6 @@
 import logging
 import sys,os
 from multiprocessing import Queue, Process
-from capi.com_types import *
 
 
 class MyHandlerText(logging.StreamHandler):
@@ -31,9 +30,9 @@ class MyHandlerQueue(logging.StreamHandler):
         target = record.msg[1]
         record.msg = record.msg[0]
         msg = self.format(record)
-        if target == EEQU_LOG_TYPE_SIGNAL:
+        if target == 'S':
             self.sig_queue.put(msg, block=False, timeout=1)
-        elif target == EEQU_LOG_TYPE_ERROR:
+        elif target == 'E':
             self.err_queue.put(msg, block=False, timeout=1)
         else:
             self.gui_queue.put(msg, block=False, timeout=1)
@@ -48,19 +47,25 @@ class Logger(object):
         self.sig_queue = Queue()
         self.err_queue = Queue()
         
+    def _initialize(self):
+
         self.logpath = r"./log/"
         if not os.path.exists( self.logpath):
             os.makedirs( self.logpath) 
 
         #logger config
-        self.logger = logging.getLogger()
+        self.logger = logging.getLogger("equant")
         self.logger.setLevel(logging.DEBUG)
         self.formatter = logging.Formatter("[%(levelname)7s][%(asctime)-15s]: %(message)s")
 
         self.level_dict = {"DEBUG":logging.DEBUG, "INFO":logging.INFO, "WARN":logging.WARN, "ERROR":logging.ERROR}
         self.level_func = {"DEBUG":self.logger.debug, "INFO":self.logger.info, "WARN": self.logger.warning, "ERROR": self.logger.error}
+        
+        self.add_handler()
 
     def run(self):
+        #在子进程中做初始化，否则打印失效
+        self._initialize()
         '''从log_queue中获取日志，刷新到文件和控件上'''
         while True:
             data_list = self.log_queue.get()
@@ -117,9 +122,9 @@ class Logger(object):
     def error(self, s, target=""):
         self._log("ERROR", s, target)
 
-    def sig_info(self, s, target=EEQU_LOG_TYPE_SIGNAL):
+    def sig_info(self, s, target='S'):
         self.info(s, target)
 
     # 策略错误
-    def err_error(self, s, target=EEQU_LOG_TYPE_ERROR):
+    def err_error(self, s, target='E'):
         self.error(s, target)
