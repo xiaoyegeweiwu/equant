@@ -64,32 +64,42 @@ class StrategyEngine(object):
         self._onEquantExitData = {}
 
         # 恢复上次推出时保存的结构
-        if os.path.exists('StrategyContext.json'):
-            with open("StrategyContext.json", 'r') as resumeFile:
-                pythonDict = json.load(resumeFile)
-                for k,v in pythonDict.items():
-                    if k == "MaxStrategyId":
-                        self._maxStrategyId = int(v)
-                    else:
-                        loadStrategyEvent = Event({
-                            'EventSrc': EEQU_EVSRC_UI,
-                            'EventCode': EV_UI2EG_LOADSTRATEGY,
-                            'SessionId': None,
-                            'StrategyId': 0,
-                            'UserNo': '',
-                            'Data': {
-                                'Path': v["Path"],
-                                'Args': v["Config"],
-                            }
-                        })
-
-                        self._loadStrategy(loadStrategyEvent, strategyId=int(k))
-                        # print("on equant start, resume strategy ", int(k))
-
-            # jsonFile = open('StrategyContext.json', 'w', encoding='utf-8')
-            # self._onEquantExitData.update({"MaxStrategyId": self._maxStrategyId})
-            # json.dump(self._onEquantExitData, jsonFile, ensure_ascii=False, indent=4)
+        #self._resumeStrategy()
         self.logger.debug('Initialize strategy engine ok!')
+        
+    def _resumeStrategy(self):
+        if not os.path.exists('StrategyContext.json'):
+            return
+        with open("StrategyContext.json", 'r') as resumeFile:
+            pythonDict = json.load(resumeFile)
+            for k,v in pythonDict.items():
+                if k == "MaxStrategyId":
+                    self._maxStrategyId = int(v)
+                else:
+                    strategyId = int(k)
+                    loadStrategyEvent = Event({
+                        'EventSrc': EEQU_EVSRC_UI,
+                        'EventCode': EV_UI2EG_LOADSTRATEGY,
+                        'SessionId': None,
+                        'StrategyId': 0,
+                        'UserNo': '',
+                        'Data': {
+                            'Path': v["Path"],
+                            'Args': v["Config"],
+                            'NoInitialize':True,
+                        }
+                    })
+                    self._loadStrategy(loadStrategyEvent, strategyId=strategyId)
+        
+                    stopEvent = Event({
+                        "EventSrc"    :   EEQU_EVSRC_UI,
+                        "EventCode"   :   EV_UI2EG_STRATEGY_QUIT,
+                        "SessionId"   :   0,
+                        "StrategyId"  :   strategyId,
+                        "Data"        :   {}
+                    })
+                    self._sendEvent2Strategy(strategyId, stopEvent)
+                    # print("on equant start, resume strategy ", int(k))
         
     def _regApiCallback(self):
         self._apiCallbackDict = {
