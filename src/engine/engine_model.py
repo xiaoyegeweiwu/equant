@@ -500,11 +500,11 @@ class TMoneyModel:
         self._metaData['Available']        = data['Available']        #今可用=Equity-Deposit-Frozen(FrozenDeposit+FrozenFee)
         self._metaData['UpdateTime']       = data['UpdateTime']       #资金更新时间戳
         
-        self.logger.info("[MONEY]%s,%f,%f,%f,%f,%f,%f,%f,%f,%f,%s"%(
+        '''self.logger.info("[MONEY]%s,%f,%f,%f,%f,%f,%f,%f,%f,%f,%s"%(
             data['CurrencyNo'], data['Fee'],data['Deposit'], data['FloatProfit'],
             data['FloatProfitTBT'],data['CoverProfit'],data['CoverProfitTBT'],
             data['Balance'], data['Equity'],data['Available'],data['UpdateTime']
-        ))
+        ))'''
         
 class TOrderModel:
     '''委托信息'''
@@ -752,7 +752,7 @@ class TradeModel:
                 self.logger.error("[updateOrderData]The user account(%s) doesn't login!"%userNo)
                 continue
                 
-            self.logger.debug('[ORDER]%s'%data)
+            #self.logger.debug('[ORDER]%s'%data)
         
             self._userInfo[userNo].updateOrder(data)
             
@@ -765,7 +765,7 @@ class TradeModel:
                 self.logger.error("[updateMatchData]The user account(%s) doesn't login!"%userNo)
                 continue
             
-            self.logger.debug('[MATCH]%s'%data)
+            #self.logger.debug('[MATCH]%s'%data)
         
             self._userInfo[userNo].updateMatch(data)
             
@@ -778,6 +778,6 @@ class TradeModel:
                 self.logger.error("[updatePosData]The user account(%s) doesn't login!"%userNo)
                 continue
                 
-            self.logger.debug('[POS]%s'%data)
+            #self.logger.debug('[POS]%s'%data)
         
             self._userInfo[userNo].updatePosition(data)
