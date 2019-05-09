@@ -247,6 +247,9 @@ class QuantEditor(StrategyTree):
         self.editor_text = None
         self.editor_text_scroll = None
 
+        # 策略树双击事件标志位
+        self._dModifyFlag = False
+
         self._context = Context()
 
     # 将strategyTree的get_file_path先放在这里
@@ -260,7 +263,7 @@ class QuantEditor(StrategyTree):
     def treeDoubleClick(self, event):
         """设置策略编辑框中的内容"""
         self.saveEditor()        # 切换策略时将原来的策略保存
-
+        self._dModifyFlag = True
         select = event.widget.selection()
         for idx in select:
             path = self.root_tree.item(idx)["values"][0]
@@ -269,11 +272,17 @@ class QuantEditor(StrategyTree):
                 # self.editor_file = path
                 self.control.setEditorTextCode(path)
                 header = self.root_tree.item(idx)['text']
-                self.updateEditorHead(header)
+                # self.updateEditorHead(header)
                 self.control.setEditorTextCode(path)  # 根据点击事件给editor的文本和路径赋值
                 with open(path, "r", encoding="utf-8") as f:
                     data = f.read()
                 self.updateEditorText(data)
+                self.updateEditorHead(header)
+                self._dModifyFlag = False
+
+    def doubleClickFlag(self):
+        """是否双击策略目录标志位"""
+        return self._dModifyFlag
 
     def updateEditorHead(self, text):
         """设置策略编辑框上方的策略名"""
@@ -329,7 +338,8 @@ class QuantEditor(StrategyTree):
             messagebox.showinfo(self.language.get_text(8), self.language.get_text(9))
         
     def insertEditorHead(self, frame):
-        self.titleLabel = Label(frame, text=os.path.basename(self.root_path), bg=rgb_to_hex(255, 255, 255))
+        # self.titleLabel = Label(frame, text=os.path.basename(self.root_path), bg=rgb_to_hex(255, 255, 255))
+        self.titleLabel = Label(frame, bg=rgb_to_hex(255, 255, 255))
 
         self.loadingBtn = Button(frame, text="运行", relief=FLAT, padx=10, bg=rgb_to_hex(255, 255, 255),
                             activebackground=rgb_to_hex(103, 150, 236), bd=0, state="disabled", command=self.load)

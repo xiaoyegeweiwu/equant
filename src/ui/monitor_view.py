@@ -22,6 +22,8 @@ class QuantMonitor(object):
 
         # 初始化策略状态字典
         self._initStrategyStatus()
+        # 初始化K线类型字典
+        self._initKLineType()
         # 策略编号初始值
         self._strategyNum = 1
 
@@ -91,7 +93,7 @@ class QuantMonitor(object):
         # headList = ["编号", "策略名称", "策略状态", "频率","保证金比例", "手续费",
         #             "初始资金", "总盈利", "总亏损", "可用资金"]
         # headList = ["编号", "策略名称", "策略状态", "运行类型", "初始资金", "合约", "开始时间", "结束时间", "权益"]
-        headList = ["编号", "策略名称", "合约", "运行状态", "实盘运行"]
+        headList = ["编号", "策略名称", "基准合约", "K线类型", "K线周期", "运行状态", "实盘运行"]
 
         self.executeBar = ttk.Scrollbar(self.executeList, orient="vertical")
         self.executeBar.pack(side=RIGHT, fill=Y)
@@ -112,7 +114,7 @@ class QuantMonitor(object):
         RunMenu(self._controller, self.executeListTree).popupmenu(event)
 
     def _initStrategyStatus(self):
-        self.statusDict = {
+        self._statusDict = {
             ST_STATUS_NONE:         "初始状态",
             ST_STATUS_HISTORY:      "历史回测",
             ST_STATUS_CONTINUES:    "实时触发",
@@ -121,8 +123,18 @@ class QuantMonitor(object):
             ST_STATUS_REMOVE:       "移除"
         }
 
+    def _initKLineType(self):
+        self._kLineTypeDict = {
+            "D": "日线",
+            "M": "分钟线",
+            "S": "秒线",
+        }
+
     def _getStrategyStatus(self, key):
-        return self.statusDict[key]
+        return self._statusDict[key]
+
+    def _getKLineType(self, key):
+        return self._kLineTypeDict[key]
 
     def _formatMonitorInfo(self, dataDict):
         """
@@ -131,16 +143,23 @@ class QuantMonitor(object):
         :return: 需要展示的信息
         """
         try:
+            id = dataDict['StrategyId']
+            stName = dataDict['StrategyName']
+            benchCon = dataDict['Config']['Contract'][0]
+            kLineType = self._getKLineType(dataDict['Config']['Sample']['KLineType'])
+            kLineSlice = dataDict['Config']['Sample']['KLineSlice']
+            runType = "是" if dataDict['Config']['RunMode']['Actual']['SendOrder2Actual'] else "否"
             status = self._getStrategyStatus(dataDict["StrategyState"])
+
         except KeyError:
             return
 
-        runType = "是" if dataDict['Config']['RunMode']['Actual']['SendOrder2Actual'] else "否"
-
         values = [
-            dataDict['StrategyId'],
-            dataDict['StrategyName'],
-            dataDict['Config']['Contract'],
+            id,
+            stName,
+            benchCon,
+            kLineType,
+            kLineSlice,
             status,
             runType,
         ]

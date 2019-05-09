@@ -479,52 +479,50 @@ class RunWin(QuantToplevel, QuantFrame):
     def setDefaultConfigure(self):
         conf = self.getTextConfigure()
         if conf:
-            try:
-                # self.user.set(conf[VUser]),
-                self.initFund.set(conf[VInitFund]),
-                self.defaultType.set(conf[VDefaultType]),
-                self.defaultQty.set(conf[VDefaultQty]),
-                self.minQty.set(conf[VMinQty]),
-                self.hedge.set(conf[VHedge]),
-                self.margin.set(conf[VMinQty]),
+            # self.user.set(conf[VUser]),
+            self.initFund.set(conf[VInitFund]),
+            self.defaultType.set(conf[VDefaultType]),
+            self.defaultQty.set(conf[VDefaultQty]),
+            self.minQty.set(conf[VMinQty]),
+            self.hedge.set(conf[VHedge]),
+            self.margin.set(conf[VMinQty]),
 
-                self.openType.set(conf[VOpenType]),
-                self.closeType.set(conf[VCloseType]),
-                self.openFee.set(conf[VOpenFee]),
-                self.closeFee.set(conf[VCloseFee]),
-                self.dir.set(conf[VDirection]),
-                self.slippage.set(conf[VSlippage]),
-                # self.contract.set(conf[VContract]),
-                # 合约通过函数设置
-                self.setText(self.contractInfo, conf[VContract])
+            self.openType.set(conf[VOpenType]),
+            self.closeType.set(conf[VCloseType]),
+            self.openFee.set(conf[VOpenFee]),
+            self.closeFee.set(conf[VCloseFee]),
+            self.dir.set(conf[VDirection]),
+            self.slippage.set(conf[VSlippage]),
+            # self.contract.set(conf[VContract]),
+            # 合约通过函数设置
+            self.setText(self.contractInfo, conf[VContract])
 
-                self.isCycle.set(conf[VIsCycle]),
-                self.cycle.set(conf[VCycle]),
+            self.isCycle.set(conf[VIsCycle]),
+            self.cycle.set(conf[VCycle]),
 
-                # 定时触发通过函数设置
-                self.setText(self.timerText, conf[VTimer])
+            # 定时触发通过函数设置
+            self.setText(self.timerText, conf[VTimer])
 
-                self.isKLine.set(conf[VIsKLine]),
-                self.isMarket.set(conf[VIsMarket]),
-                self.isTrade.set(conf[VIsTrade]),
+            self.isKLine.set(conf[VIsKLine]),
+            self.isMarket.set(conf[VIsMarket]),
+            self.isTrade.set(conf[VIsTrade]),
 
-                self.sampleVar.set(conf[VSampleVar]),
-                self.beginDate.set(conf[VBeginDate]),
-                self.fixQty.set(conf[VFixQty]),
+            self.sampleVar.set(conf[VSampleVar]),
+            self.beginDate.set(conf[VBeginDate]),
+            self.fixQty.set(conf[VFixQty]),
 
-                self.kLineType.set(conf[VKLineType]),
-                self.kLineSlice.set(conf[VKLineSlice]),
-                self.sendOrderMode.set(conf[VSendOrderMode]),
-                self.isActual.set(conf[VIsActual]),
+            self.kLineType.set(conf[VKLineType]),
+            self.kLineSlice.set(conf[VKLineSlice]),
+            self.sendOrderMode.set(conf[VSendOrderMode]),
+            self.isActual.set(conf[VIsActual]),
 
-                self.isOpenTimes.set(conf[VIsOpenTimes]),
-                self.openTimes.set(conf[VOpenTimes]),
-                self.isConOpenTimes.set(conf[VOpenTimes]),
-                self.conOpenTimes.set(conf[VOpenTimes]),
-                self.canClose.set(conf[VCanClose]),
-                self.canOpen.set(conf[VCanOpen]),
-            except:
-                print("I'm wrong!")
+            self.isOpenTimes.set(conf[VIsOpenTimes]),
+            self.openTimes.set(conf[VOpenTimes]),
+            self.isConOpenTimes.set(conf[VOpenTimes]),
+            self.conOpenTimes.set(conf[VOpenTimes]),
+            self.canClose.set(conf[VCanClose]),
+            self.canOpen.set(conf[VCanOpen]),
+
         else:
             # 设置默认值
             self.isCycle.set(0),
