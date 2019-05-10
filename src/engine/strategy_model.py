@@ -288,7 +288,7 @@ class StrategyModel(object):
 
     # ////////////////////////策略函数////////////////////////////
     def setBuy(self, contractNo, share, price):
-        contNo = contractNo
+        contNo = contractNo if contractNo is not None else self._cfgModel.getBenchmark()
 
         # 基准合约的cur bar
         curBar = self._hisModel.getCurBar()
@@ -296,11 +296,11 @@ class StrategyModel(object):
         # 交易计算、生成回测报告
         # 产生信号
         userNo = self._cfgModel.getUserNo() if self._cfgModel.isActualRun() else "Default"
-        self.sendOrder(otMarket, vtNone, dBuy, oOpen, hSpeculate, price, share, contNo, userNo, curBar, 'Buy')
+        self.sendOrder(userNo, contNo, otMarket, vtNone, dBuy, oOpen, hSpeculate, price, share, curBar, 'Buy')
 
 
-    def setBuyToCover(self, share, price):
-        contNo = self._cfgModel.getBenchmark()
+    def setBuyToCover(self, contractNo, share, price):
+        contNo = contractNo if contractNo is not None else self._cfgModel.getBenchmark()
         curBar = self._hisModel.getCurBar()
 
         # 交易计算、生成回测报告
@@ -308,8 +308,8 @@ class StrategyModel(object):
         userNo = self._cfgModel.getUserNo() if self._cfgModel.isActualRun() else "Default"
         self.sendOrder(userNo, contNo, otMarket, vtNone, dBuy, oCover, hSpeculate, price, share, curBar, 'BuyToCover')
 
-    def setSell(self, share, price):
-        contNo = self._cfgModel.getBenchmark()
+    def setSell(self, contractNo, share, price):
+        contNo = contractNo if contractNo is not None else self._cfgModel.getBenchmark()
         curBar = self._hisModel.getCurBar()
 
         # 交易计算、生成回测报告
@@ -317,8 +317,8 @@ class StrategyModel(object):
         userNo = self._cfgModel.getUserNo() if self._cfgModel.isActualRun() else "Default"
         self.sendOrder(userNo, contNo, otMarket, vtNone, dSell, oCover, hSpeculate, price, share, curBar, 'Sell')
 
-    def setSellShort(self, share, price):
-        contNo = self._cfgModel.getBenchmark()
+    def setSellShort(self, contractNo, share, price):
+        contNo = contractNo if contractNo is not None else self._cfgModel.getBenchmark()
         curBar = self._hisModel.getCurBar()
 
         #交易计算、生成回测报告
@@ -587,13 +587,7 @@ class StrategyModel(object):
     def deleteOrder(self, eSession):
         return self._trdModel.deleteOrder(eSession)
 
-    def sendOrder(self, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty, contNo='', userNo='', curBar=None, singnalName='sendOrder'):
-        if not contNo:
-            contNo = self._cfgModel.getBenchmark()
-
-        if not userNo:
-            userNo = self._cfgModel.getUserNo()
-
+    def sendOrder(self, userNo, contNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty, curBar=None, singnalName='sendOrder'):
         self.addOrder2CalcCenter(userNo, contNo, orderDirct, entryOrExit, orderPrice, orderQty, curBar)
         self.sendSignalEvent(singnalName, contNo, orderDirct, entryOrExit, orderPrice, orderQty, curBar)
 
@@ -604,7 +598,7 @@ class StrategyModel(object):
         if not self._strategy.isRealTimeStatus():
             return
 
-        if not orderType or not validType or not orderDirct or not entryOrExit or not hedge or not orderPrice or not orderQty:
+        if not userNo or not contNo or not orderType or not validType or not orderDirct or not entryOrExit or not hedge or not orderPrice or not orderQty:
             return -1
 
         if userNo not in self._userInfo:
@@ -2050,8 +2044,9 @@ class StrategyHisQuote(object):
             # todo 过滤最后一根k线，不过滤的话，会出现 k线稳定发单在交界处异常。
             # 更新当前Bar
             self._updateCurBar(self._contractNo, data)
-            otherContractDatas = self._getHSOtherContractBar(data["DateTimeStamp"])
+
             # 根据基准合约，更新其他Bar
+            otherContractDatas = self._getHSOtherContractBar(data["DateTimeStamp"])
             self._updateOtherBar(otherContractDatas)
 
             # 填入基准合约bar info
@@ -2189,7 +2184,7 @@ class StrategyHisQuote(object):
         self._updateRealTimeKLine(data)
         self._sendFlushEvent()
         self._afterBar(contractList, otherContractDatas)
-        
+
     def runRealTime(self, context, handle_data, event):
         '''K线实时触发'''
         assert self._strategy.isRealTimeStatus(), "error "
@@ -2210,7 +2205,6 @@ class StrategyHisQuote(object):
         # 通知当前Bar结束
         self._sendFlushEvent()
         self._afterBar(contractList, otherContractDatas)
-
 
     def _updateRealTimeKLine(self, data):
         event = Event({

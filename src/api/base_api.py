@@ -945,7 +945,7 @@ class BaseApi(object):
         '''
         return self._dataModel.setBuy(contractNo, share, price)
 
-    def BuyToCover(self, share=0, price=0):
+    def BuyToCover(self, contractNo, share=0, price=0):
         '''
         【说明】
               产生一个空头平仓操作
@@ -973,9 +973,9 @@ class BaseApi(object):
               BuyToCover(5,0) 表示用现价空头买入5张合约)，马上发送委托。
               BuyToCover(0,0) 表示用现价按交易设置中的设置,马上发送委托。
         '''
-        return self._dataModel.setBuyToCover(share, price)
+        return self._dataModel.setBuyToCover(contractNo, share, price)
 
-    def Sell(self, share=0, price=0):
+    def Sell(self, contractNo, share=0, price=0):
         '''
         【说明】
               产生一个多头平仓操作
@@ -1003,9 +1003,9 @@ class BaseApi(object):
               Sell(5,0) 表示用现价卖出5张合约，马上发送委托。
               Sell(0,0) 表示用现价按交易设置中的设置,马上发送委托。
         '''
-        return self._dataModel.setSell(share, price)
+        return self._dataModel.setSell(contractNo, share, price)
 
-    def SellShort(self, share=0, price=0):
+    def SellShort(self, contractNo, share=0, price=0):
         '''
         【说明】
               产生一个空头建仓操作
@@ -1036,7 +1036,7 @@ class BaseApi(object):
               SellShort(10,Close) 表示平掉所有多头仓位，并用当前Bar收盘价空头卖出10张合约，马上发送委托。
 
         '''
-        return self._dataModel.setSellShort(share, price)
+        return self._dataModel.setSellShort(contractNo, share, price)
         
     #/////////////////////////属性函数/////////////////////////////
     def BarInterval(self):
@@ -2381,15 +2381,17 @@ class BaseApi(object):
          '''
         return self._dataModel.getOrderTime(eSession)
 
-    def A_SendOrder(self, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty, contNo, userNo):
+    def A_SendOrder(self, userNo, contNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty):
         '''
         【说明】A_SendOrder
               针对指定的帐户、商品发送委托单。
 
         【语法】
-              bool A_SendOrder(orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty, contNo, userNo)
+              bool A_SendOrder(userNo, contNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty)
 
         【参数】
+              userNo 指定的账户名称，
+              contNo 商品合约编号，
               orderType 订单类型，字符类型，可选值为：
                 '1' : 市价单
                 '2' : 限价单
@@ -2421,9 +2423,7 @@ class BaseApi(object):
                 'S' : 套利
                 'M' : 做市
               orderPrice 委托单的交易价格，
-              orderQty 委托单的交易数量，
-              contNo 商品合约编号，默认为基础合约编号，
-              userNo 指定的账户名称，为空时使用默认账户。
+              orderQty 委托单的交易数量。
 
         【备注】
               针对当前公式指定的帐户、商品发送委托单，发送成功返回如"1-1"的下单编号，发送失败返回-1。
@@ -2433,7 +2433,7 @@ class BaseApi(object):
         【示例】
               无
          '''
-        return self._dataModel.sendOrder(orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty, contNo, userNo)
+        return self._dataModel.sendOrder(userNo, contNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty)
 
     def A_DeleteOrder(self, eSession):
         '''
@@ -3386,24 +3386,24 @@ def A_OrderStatus(eSession=''):
 def A_OrderTime(eSession=''):
     return baseApi.A_OrderTime(eSession)
 
-def A_SendOrder(orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty, contNo='', userNo=''):
-    return baseApi.A_SendOrder(orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty, contNo, userNo)
+def A_SendOrder(userNo, contNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty):
+    return baseApi.A_SendOrder(userNo, contNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty)
 
 def A_DeleteOrder(eSession):
     return baseApi.A_DeleteOrder(eSession)
 
 #策略交易
-def Buy(contractNo, share=0, price=0):
+def Buy(share=0, price=0, contractNo=None):
     return baseApi.Buy(contractNo, share, price)
 
-def BuyToCover(share=0, price=0):
-    return baseApi.BuyToCover(share, price)
+def BuyToCover(share=0, price=0, contractNo=None):
+    return baseApi.BuyToCover(contractNo, share, price)
 
-def Sell(share=0, price=0):
-    return baseApi.Sell(share, price)
+def Sell(share=0, price=0, contractNo=None):
+    return baseApi.Sell(contractNo, share, price)
 
-def SellShort(share=0, price=0):
-    return baseApi.SellShort(share, price)
+def SellShort(share=0, price=0, contractNo=None):
+    return baseApi.SellShort(contractNo, share, price)
     
 # 枚举函数
 def Enum_Period_Tick():
