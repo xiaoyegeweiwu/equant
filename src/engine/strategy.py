@@ -53,6 +53,9 @@ class StartegyManager(object):
         self._strategyProcess[id] = process
 
     def sendEvent2Strategy(self, id, event):
+        if id not in self._strategyDict:
+            self.logger.info("策略 %d 不存在" % id)
+            return
         strategy = self._strategyDict[id]
         eg2stQueue, _ = strategy.getQueues()
         eg2stQueue.put(event)
@@ -73,9 +76,12 @@ class Strategy:
         data = event.getData()
         self._filePath = data['Path']
         self._argsDict = data['Args']
+        self._isInitialize = True
+        if "NoInitialize" in data:
+            self._isInitialize = False
 
-        #print("now config is")
-        #for k, v in self._argsDict.items():
+        # print("now config is")
+        # for k, v in self._argsDict.items():
         #    print(k,":",v)
 
         self._eg2stQueue = args['eg2st']
@@ -87,6 +93,7 @@ class Strategy:
         self._strategyState = StrategyStatusReady
         #
         self._runStatus = ST_STATUS_NONE
+        self._runRealTimeStatus = ST_STATUS_NONE
 
         # self._strategyId+"-"+self._eSessionId 组成本地生成的eSessionId
         self._eSessionId = 1
@@ -120,7 +127,10 @@ class Strategy:
             userModule.__dict__.update(base_api.__dict__)
             
             # 5. 初始化用户策略参数
-            userModule.initialize(self._context)
+            if self._isInitialize:
+                userModule.initialize(self._context)
+                # print("strategy config is ")
+                # print(self._dataModel.getConfigModel().getConfig())
             self._userModule = userModule
             
             # 6. 初始化model
@@ -293,6 +303,7 @@ class Strategy:
             EV_UI2EG_STRATEGY_QUIT          : self._onStrategyQuit,
             EV_UI2EG_STRATEGY_RESUME        : self._onStrategyResume,
             EV_UI2EG_EQUANT_EXIT            : self._onEquantExit,
+            EV_UI2EG_STRATEGY_FIGURE        : self._switchStrategy,
         }
     
     # ////////////////////////////内部数据请求接口////////////////////
@@ -482,11 +493,18 @@ class Strategy:
     def getStrategyName(self):
         return self._strategyName
 
-    def getRunStatus(self):
-        return self._runStatus
-
     def isRealTimeStatus(self):
-        return self._runStatus == ST_STATUS_CONTINUES
+        return self._runStatus == ST_STATUS_CONTINUES and self._runRealTimeStatus == ST_STATUS_CONTINUES_AS_REALTIME
+
+    def isHisStatus(self):
+        return self._runStatus == ST_STATUS_HISTORY
+
+    def isRealTimeAsHisStatus(self):
+        return self._runStatus == ST_STATUS_CONTINUES and self._runRealTimeStatus == ST_STATUS_CONTINUES_AS_HISTORY
+
+    # set run real time status
+    def setRunRealTimeStatus(self, status):
+        self._runRealTimeStatus = status
 
     def sendEvent2Engine(self, event):
         self._st2egQueue.put(event)
@@ -550,3 +568,7 @@ class Strategy:
             }
         })
         self.sendEvent2Engine(responseEvent)
+
+    def _switchStrategy(self, event):
+        contNo = self._dataModel.getConfigModel().getContract()[0]
+        self._dataModel.getHisQuoteModel()._switchKLine(contNo)
