@@ -701,91 +701,91 @@ class CalcCenter(object):
                     self._profit["MaxRetracementRate"] = self._profit["MaxRetracement"]/self._profit["LastAssets"]
                     self._profit["MaxRetracementRateTm"] = time
 
-    def calcProfit(self, contPrices, time):
-        """
-        计算策略实时收益信息，参数为合约的最新价信息
-        :param cont_prices: 不同合约的contPrice组成的数组
-        :param time: 当前基准合约对应的时间戳
-        :return:
-        """
-        if contPrices is None:
-            return
-
-        # 计算空仓周期
-        self._calcEmptyPositionPeriod()
-        t = None
-        for contPrice in contPrices:
-            self._currentBar = contPrice["CurrentBarIndex"]
-            # TODO: TradeDate应该取基准的时间戳吧
-            # TODO: self._beginDate和self._endDate也应该取的是基准合约的TradeDate吧，目前只支持单合约
-            # 更新回测开始日期和结束日期
-            if not self._beginDate:
-                self._beginDate = contPrice["TradeDate"]
-            self._endDate = contPrice["TradeDate"]
-
-            t = contPrice["TradeDate"]
-            if not contPrice["Price"] == 0:
-                self._prices[contPrice["Cont"]] = contPrice
-                # self._updateOrderPrice(contPrice)
-
-        self._updateTradeDate(t)
-
-        self._updatePosition(contPrices)
-        self._updateOtherProfit(time)
-        self._updateFundRecord(time, 0, 0)
-
-        return
-
-    #TODO: calcProfit的另一种实现方式
-    # def calcProfit(self, contractList, barInfo):
+    # def calcProfit(self, contPrices, time):
     #     """
     #     计算策略实时收益信息，参数为合约的最新价信息
-    #     :param contractNo: 合约代码列表
-    #     :param barInfo: 合约的bar信息，类型为字典类型，键值是合约代码
+    #     :param cont_prices: 不同合约的contPrice组成的数组
+    #     :param time: 当前基准合约对应的时间戳
     #     :return:
     #     """
-    #     if contractList is None:
+    #     if contPrices is None:
     #         return
-    #
-    #     if len(contractList) != len(barInfo):
-    #         raise ImportError("args error")
     #
     #     # 计算空仓周期
     #     self._calcEmptyPositionPeriod()
-    #
     #     t = None
-    #     contPrices = []
+    #     for contPrice in contPrices:
+    #         self._currentBar = contPrice["CurrentBarIndex"]
+    #         # TODO: TradeDate应该取基准的时间戳吧
+    #         # TODO: self._beginDate和self._endDate也应该取的是基准合约的TradeDate吧，目前只支持单合约
+    #         # 更新回测开始日期和结束日期
+    #         if not self._beginDate:
+    #             self._beginDate = contPrice["TradeDate"]
+    #         self._endDate = contPrice["TradeDate"]
     #
-    #     benchmarkNo = contractList[0]
-    #
-    #     self._currentBar = barInfo[benchmarkNo]["KLineIndex"]
-    #     if not self._beginDate:
-    #         self._beginDate = barInfo[benchmarkNo]["TradeDate"]
-    #     self._endDate = barInfo[benchmarkNo]["TradeDate"]
-    #     t = barInfo[benchmarkNo]["TradeDate"]
-    #     timeStamp = barInfo[benchmarkNo]["DateTimeStamp"]
-    #
-    #     for contract in contractList:
-    #
-    #         contPrice = {
-    #             "Cont": contract,
-    #             "Price": barInfo[contract]['LastPrice'],  # 收盘价格
-    #             "Time": barInfo[contract]["DateTimeStamp"],  # 当前时间戳
-    #             "CurrentBarIndex": barInfo[contract]["KLineIndex"],  # 基准合约的bar索引
-    #             "TradeDate": barInfo[contract]["TradeDate"],
-    #         }
-    #         contPrices.append(contPrice)
-    #
+    #         t = contPrice["TradeDate"]
     #         if not contPrice["Price"] == 0:
-    #             self._prices[contract] = contPrice
+    #             self._prices[contPrice["Cont"]] = contPrice
+    #             # self._updateOrderPrice(contPrice)
     #
     #     self._updateTradeDate(t)
     #
     #     self._updatePosition(contPrices)
-    #     self._updateOtherProfit(timeStamp)
-    #     self._updateFundRecord(timeStamp, 0, 0)
+    #     self._updateOtherProfit(time)
+    #     self._updateFundRecord(time, 0, 0)
     #
     #     return
+
+    #TODO: calcProfit的另一种实现方式
+    def calcProfit(self, contractList, barInfo):
+        """
+        计算策略实时收益信息，参数为合约的最新价信息
+        :param contractNo: 合约代码列表
+        :param barInfo: 合约的bar信息，类型为字典类型，键值是合约代码
+        :return:
+        """
+        if contractList is None:
+            return
+
+        if len(contractList) != len(barInfo):
+            raise ImportError("args error")
+
+        # 计算空仓周期
+        self._calcEmptyPositionPeriod()
+
+        t = None
+        contPrices = []
+
+        benchmarkNo = contractList[0]
+
+        self._currentBar = barInfo[benchmarkNo]["KLineIndex"]
+        if not self._beginDate:
+            self._beginDate = barInfo[benchmarkNo]["TradeDate"]
+        self._endDate = barInfo[benchmarkNo]["TradeDate"]
+        t = barInfo[benchmarkNo]["TradeDate"]
+        timeStamp = barInfo[benchmarkNo]["DateTimeStamp"]
+
+        for contract in contractList:
+
+            contPrice = {
+                "Cont": contract,
+                "Price": barInfo[contract]['LastPrice'],  # 收盘价格
+                "Time": barInfo[contract]["DateTimeStamp"],  # 当前时间戳
+                "CurrentBarIndex": barInfo[contract]["KLineIndex"],  # 基准合约的bar索引
+                "TradeDate": barInfo[contract]["TradeDate"],
+            }
+            contPrices.append(contPrice)
+
+            if not contPrice["Price"] == 0:
+                self._prices[contract] = contPrice
+
+        self._updateTradeDate(t)
+
+        self._updatePosition(contPrices)
+        self._updateOtherProfit(timeStamp)
+        self._updateFundRecord(timeStamp, 0, 0)
+
+        return
 
     # #######################
     # 这个函数是不是有问题

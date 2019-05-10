@@ -201,10 +201,11 @@ class EditorText(ParentText, ModifiedMixin):
 
     def beenModified(self, event=None):
         # 获取选中的策略名
-        # TODO: 函数会调用两次
-        strategyPath = self._controller.getEditorText()["path"]
-        text = os.path.basename(strategyPath)
-        self._view.updateEditorHead(text+"*")
+        if not self._view.doubleClickFlag():
+            strategyPath = self._controller.getEditorText()["path"]
+            text = os.path.basename(strategyPath)
+            self._view.updateEditorHead(text+"*")
+        return
 
     def insert(self, index, chars, tags=None):
         self.percolator.insert(index, chars, tags=None)
@@ -221,14 +222,14 @@ class EditorText(ParentText, ModifiedMixin):
     def show_arrow_cursor(self,event):
         self.config(cursor="hand2")
 
-        index1 = self.index("current").split(".")
-        range1 = self.tag_ranges("ESUNNY")
-        for i, pos in enumerate(range1):
-            posit = pos.string.split(".")
-            if int(index1[0]) == int(posit[0]) and int(index1[1]) <= int(posit[1]):
-                self.tag_configure("current_line", background="green")
-                self.tag_remove(pos, 1.0, "end")
-                self.tag_add(pos, "insert linestart", "insert lineend+1c")
+        # index1 = self.index("current").split(".")
+        # range1 = self.tag_ranges("ESUNNY")
+        # for i, pos in enumerate(range1):
+        #     posit = pos.string.split(".")
+        #     if int(index1[0]) == int(posit[0]) and int(index1[1]) <= int(posit[1]):
+        #         self.tag_configure("current_line", background="green")
+        #         self.tag_remove(pos, 1.0, "end")
+        #         self.tag_add(pos, "insert linestart", "insert lineend+1c")
 
 
     def show_xterm_cursor(self, event):
