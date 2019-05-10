@@ -146,6 +146,12 @@ class StrategyModel(object):
 
     #++++++++++++++++++++++base api接口++++++++++++++++++++++++++
     #////////////////////////K线函数/////////////////////////////
+    def getBarOpenInt(self, contNo):
+        return self._hisModel.getBarOpenInt(contNo)
+
+    def getBarTradeDate(self, contNo):
+        return self._hisModel.getBarTradeDate(contNo)
+
     def getBarCount(self, contNo):
         return self._hisModel.getBarCount(contNo)
 
@@ -156,12 +162,24 @@ class StrategyModel(object):
     def getBarStatus(self, contNo):
         return self._hisModel.getBarStatus(contNo)
 
+    def isHistoryDataExist(self, contNo):
+        return self._hisModel.isHistoryDataExist(contNo)
+
+    def getBarDate(self, contNo):
+        return self._hisModel.getBarDate(contNo)
+
+    def getBarTime(self, contNo):
+        return self._hisModel.getBarTime(contNo)
+
     def getBarOpen(self, symbol):
         return self._hisModel.getBarOpen(symbol)
         
     def getBarClose(self, symbol):
         return self._hisModel.getBarClose(symbol)
-        
+
+    def getBarVol(self, contNo):
+        return self._hisModel.getBarVol(contNo)
+
     def getBarHigh(self, symbol):
         return self._hisModel.getBarHigh(symbol)
         
@@ -1324,7 +1342,10 @@ class BarInfo(object):
         
     def getBarClose(self):
         return self._getBarValue('LastPrice')
-        
+
+    def getBarOpenInt(self):
+        return self._getBarValue('PositionQty')
+
     def getBarHigh(self):
         return self._getBarValue('HighPrice')
         
@@ -1432,9 +1453,31 @@ class StrategyHisQuote(object):
     def getHisLength(self):
         return self._hisLength
     # ////////////////////////BaseApi类接口////////////////////////
+    def getBarOpenInt(self, contNo):
+        if contNo == '':
+            contNo = self._contractNo
+
+        if contNo not in self._metaData:
+            return []
+
+        return self._curBarDict[contNo].getBarOpenInt()
+
+    def getBarTradeDate(self, contNo):
+        if contNo == '':
+            contNo = self._contractNo
+
+        if contNo not in self._metaData:
+            return 0
+
+        curBar = self._curBarDict[contNo].getCurBar()
+        return curBar['TradeDate']
+
     def getBarCount(self, contNo):
         if contNo == '':
             contNo = self._contractNo
+
+        if contNo not in self._metaData:
+            return 0
 
         kLineHisData = self._metaData[contNo]['KLineData']
 
@@ -1453,6 +1496,9 @@ class StrategyHisQuote(object):
     def getBarStatus(self, contNo):
         if contNo == '':
             contNo = self._contractNo
+
+        if contNo not in self._curBarDict:
+            return -1
 
         curBar = self._curBarDict[contNo].getCurBar()
         curBarIndex = curBar['KLineIndex']
@@ -1478,24 +1524,73 @@ class StrategyHisQuote(object):
         else:
             return 1
 
+    def isHistoryDataExist(self, contNo):
+        if contNo == '':
+            contNo = self._contractNo
+
+        if contNo not in self._curBarDict:
+            return False
+
+        return True if len(self._metaData[contNo]) else False
+
+    def getBarDate(self, contNo):
+        if contNo == '':
+            contNo = self._contractNo
+
+        if contNo not in self._curBarDict:
+            return 0
+        curBar = self._curBarDict[contNo].getCurBar()
+        return (curBar['DateTimeStamp']//1000000000)
+
+    def getBarTime(self, contNo):
+        if contNo == '':
+            contNo = self._contractNo
+
+        if contNo not in self._curBarDict:
+            return 0
+        curBar = self._curBarDict[contNo].getCurBar()
+        return (curBar['DateTimeStamp']%1000000000)/1000000000
+
     def getBarOpen(self, contNo):
         if contNo == '':
-            contNo = self._contractNo         
+            contNo = self._contractNo
+
+        if contNo not in self._curBarDict:
+            return 0
         return self._curBarDict[contNo].getBarOpen()
         
     def getBarClose(self, contNo):
         if contNo == '':
             contNo = self._contractNo
+
+        if contNo not in self._curBarDict:
+            return 0
         return self._curBarDict[contNo].getBarClose()
+
+    def getBarVol(self, contNo):
+        if contNo == '':
+            contNo = self._contractNo
+
+        if contNo not in self._curBarDict:
+            return 0
+
+        curBar = self._curBarDict[contNo].getCurBar()
+        return curBar['TotalQty']
         
     def getBarHigh(self, contNo):
         if contNo == '':
             contNo = self._contractNo
+
+        if contNo not in self._curBarDict:
+            return 0
         return self._curBarDict[contNo].getBarHigh()
         
     def getBarLow(self, contNo):
         if contNo == '':
             contNo = self._contractNo
+
+        if contNo not in self._curBarDict:
+            return 0
         return self._curBarDict[contNo].getBarLow()
         
     #////////////////////////参数设置类接口///////////////////////

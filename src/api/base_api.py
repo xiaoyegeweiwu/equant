@@ -24,16 +24,16 @@ class BaseApi(object):
         self._dataModel = dataModel
 
     #/////////////////////////K线数据/////////////////////////////
-    def Date(self):
+    def Date(self, symbol):
         '''
         【说明】
               当前Bar的日期
 
         【语法】
-              int Date()
+              int Date(string symbol)
 
         【参数】
-              无
+              symbol 合约编号, 默认基准合约
 
         【备注】
               简写D,返回格式为YYYYMMDD的整数
@@ -41,18 +41,18 @@ class BaseApi(object):
         【实例】
               当前Bar日期为2019-03-25,Date返回值为20190325
         '''
-        return self._dataModel.getBarDate()
+        return self._dataModel.getBarDate(symbol)
 
-    def Time(self):
+    def Time(self, symbol):
         '''
         【说明】
               当前Bar的时间
 
         【语法】
-              float Time()
+              float Time(string symbol)
 
         【参数】
-              无
+              symbol 合约编号, 默认基准合约
 
         【备注】
               简写T, 返回格式为0.HHMMSSmmm的浮点数
@@ -60,7 +60,7 @@ class BaseApi(object):
         【实例】
               当前时间为11:34:21.356，Time返回值为0.113421356
         '''
-        return self._dataModel.getBarTime()
+        return self._dataModel.getBarTime(symbol)
 
     def Open(self, symbol=''):
         '''
@@ -151,7 +151,7 @@ class BaseApi(object):
               当前Bar的成交量
 
         【语法】
-              numpy.array Vol()
+              numpy.array Vol(string symbol)
 
         【参数】
               symbol 合约编号, 默认基准合约
@@ -171,7 +171,7 @@ class BaseApi(object):
               当前Bar的持仓量
 
         【语法】
-              numpy.array OpenInt()
+              numpy.array OpenInt(string symbol)
 
         【参数】
               symbol 合约编号, 默认基准合约
@@ -185,16 +185,16 @@ class BaseApi(object):
         '''
         return self._dataModel.getBarOpenInt(symbol)
 
-    def TradeDate(self):
+    def TradeDate(self, symbol):
         '''
         【说明】
               当前Bar的交易日
 
         【语法】
-              int TradeDate()
+              int TradeDate(string symbol)
 
         【参数】
-              无
+              symbol 合约编号, 默认基准合约
 
         【备注】
               返回格式为YYYYMMDD的整数
@@ -202,18 +202,18 @@ class BaseApi(object):
         【实例】
               当前Bar日期为2019-03-25,Date返回值为20190325
         '''
-        return self._dataModel.getBarTradeDate()
+        return self._dataModel.getBarTradeDate(symbol)
 
-    def BarCount(self, contNo):
+    def BarCount(self, symbol):
         '''
         【说明】
               当前合约Bar的总数
 
         【语法】
-              int BarCount(string contNo)
+              int BarCount(string symbol)
 
         【参数】
-              contNo 合约编号，为空时使用基准合约。
+              symbol 合约编号, 默认基准合约
 
         【备注】
               返回值为整型
@@ -221,18 +221,18 @@ class BaseApi(object):
         【实例】
               无
         '''
-        return self._dataModel.getBarCount(contNo)
+        return self._dataModel.getBarCount(symbol)
 
-    def CurrentBar(self):
+    def CurrentBar(self, symbol):
         '''
         【说明】
               当前Bar的索引值
 
         【语法】
-              int CurrentBar()
+              int CurrentBar(string symbol)
 
         【参数】
-              无
+              symbol 合约编号, 默认基准合约
 
         【备注】
               第一个Bar返回值为0，其他Bar递增
@@ -240,18 +240,18 @@ class BaseApi(object):
         【实例】
               无
         '''
-        return self._dataModel.getCurrentBar()
+        return self._dataModel.getCurrentBar(symbol)
 
-    def BarStatus(self, contNo):
+    def BarStatus(self, symbol):
         '''
         【说明】
               当前Bar的状态值
 
         【语法】
-              int BarStatus(string contNo)
+              int BarStatus(string symbol)
 
         【参数】
-              无
+              symbol 合约编号, 默认基准合约
 
         【备注】
               返回值整型, 0表示第一个Bar,1表示中间普通Bar,2表示最后一个Bar
@@ -259,18 +259,18 @@ class BaseApi(object):
         【实例】
               无
         '''
-        return self._dataModel.getBarStatus()
+        return self._dataModel.getBarStatus(symbol)
 
-    def HistoryDataExist(self):
+    def HistoryDataExist(self, symbol):
         '''
         【说明】
               当前合约的历史数据是否有效
 
         【语法】
-              int BarStatus()
+              bool HistoryDataExist(string symbol)
 
         【参数】
-              无
+              symbol 合约编号, 默认基准合约
 
         【备注】
               返回Bool值，有效返回True，否则返回False
@@ -278,7 +278,7 @@ class BaseApi(object):
         【实例】
               无
         '''
-        return self._dataModel.isHistoryDataExist()
+        return self._dataModel.isHistoryDataExist(symbol)
 
     #/////////////////////////即时行情/////////////////////////////
     def Q_AskPrice(self, symbol='', level=1):
@@ -2905,7 +2905,7 @@ class BaseApi(object):
     def SetTradeMode(self, inActual, sendOrderType, useSample, useReal):
         '''
         【说明】
-             设置运行方式，"H"表示回测，"A"表示在实盘上运行
+             设置运行方式
 
         【语法】
               int SetTradeMode(bool inActual, int sendOrderType, bool useSample, bool useReal)
@@ -3012,17 +3012,17 @@ baseApi = BaseApi()
 
 #////////////////////全局函数定义//////////////
 #K线函数
-def Date():
-    return baseApi.Date()
+def Date(contNo=''):
+    return baseApi.Date(contNo)
 
-def D():
-    return baseApi.Date()
+def D(contNo=''):
+    return baseApi.Date(contNo)
 
-def Time():
-    return baseApi.Time()
+def Time(contNo=''):
+    return baseApi.Time(contNo)
 
-def T():
-    return baseApi.Time()
+def T(contNo=''):
+    return baseApi.Time(contNo)
 
 def Open(symbol=''):
     return baseApi.Open(symbol)
@@ -3057,20 +3057,20 @@ def V(symbol=''):
 def OpenInt(symbol=''):
     return baseApi.OpenInt(symbol)
 
-def TradeDate():
-    return baseApi.TradeDate()
+def TradeDate(symbol=''):
+    return baseApi.TradeDate(symbol)
 
 def BarCount(contNo=''):
     return baseApi.BarCount(contNo)
 
-def CurrentBar():
-    return baseApi.CurrentBar()
+def CurrentBar(contNo=''):
+    return baseApi.CurrentBar(contNo)
 
 def BarStatus(contNo=''):
     return baseApi.BarStatus(contNo)
 
-def HistoryDataExist():
-    return baseApi.HistoryDataExist()
+def HistoryDataExist(contNo=''):
+    return baseApi.HistoryDataExist(contNo)
 
 #即时行情
 def Q_AskPrice(symbol='', level=1):

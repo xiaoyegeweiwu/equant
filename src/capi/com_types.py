@@ -62,6 +62,7 @@ EV_UI2EG_STRATEGY_RESUME          = 0x004           # 策略恢复
 EV_UI2EG_EQUANT_EXIT              = 0x005           # 量化退出
 EV_UI2EG_STRATEGY_QUIT            = 0x006           # 策略停止
 EV_UI2EG_STRATEGY_FIGURE          = 0x007           # 策略信号和指标图
+EV_UI2EG_STRATEGY_REMOVE          = 0x008           # 删除策略
 
 #////////////////////引擎->界面事件定义////////////////////////
 EV_EG2UI_LOADSTRATEGY_RESPONSE    = 0x101           # 策略加载应答
@@ -186,6 +187,7 @@ ST_STATUS_HISTORY                 = 'H'             #回测状态
 ST_STATUS_CONTINUES               = 'C'             #运行状态
 ST_STATUS_PAUSE                   = 'P'             #暂停状态
 ST_STATUS_QUIT                    = 'Q'             #停止状态
+ST_STATUS_REMOVE                  = 'R'             #移除状态
 
 #策略触发事件定义
 ST_TRIGGER_TIMER                  = 1               #定时触发

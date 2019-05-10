@@ -109,13 +109,6 @@ class ParentText(Text):
     def setText(self, text="", file=None):
         '''子类重写'''
         raise NotImplementedError
-        # if file:
-        #     text = open(file, 'r').read()
-        # self.config(state="normal")
-        # self.insert('end', text+ '\n')
-        # self.config(state="disabled")
-        # self.update()
-        # self.focus()
 
     def get_text(self):
         return self.get('1.0', END+'-1c')
@@ -208,10 +201,11 @@ class EditorText(ParentText, ModifiedMixin):
 
     def beenModified(self, event=None):
         # 获取选中的策略名
-        # TODO: 函数会调用两次
-        strategyPath = self._controller.getEditorText()["path"]
-        text = os.path.basename(strategyPath)
-        self._view.updateEditorHead(text+"*")
+        if not self._view.doubleClickFlag():
+            strategyPath = self._controller.getEditorText()["path"]
+            text = os.path.basename(strategyPath)
+            self._view.updateEditorHead(text+"*")
+        return
 
     def insert(self, index, chars, tags=None):
         self.percolator.insert(index, chars, tags=None)
@@ -226,14 +220,24 @@ class EditorText(ParentText, ModifiedMixin):
         print("esunny_event")
 
     def show_arrow_cursor(self,event):
-        self.config(cursor='arrow')
+        self.config(cursor="hand2")
+
+        # index1 = self.index("current").split(".")
+        # range1 = self.tag_ranges("ESUNNY")
+        # for i, pos in enumerate(range1):
+        #     posit = pos.string.split(".")
+        #     if int(index1[0]) == int(posit[0]) and int(index1[1]) <= int(posit[1]):
+        #         self.tag_configure("current_line", background="green")
+        #         self.tag_remove(pos, 1.0, "end")
+        #         self.tag_add(pos, "insert linestart", "insert lineend+1c")
 
 
     def show_xterm_cursor(self, event):
         self.config(cursor='xterm')
 
+
     def click(self, event):
-        index1 = self.index("insert").split(".")
+        index1 = self.index("current").split(".")
         range1 = self.tag_ranges("ESUNNY")
         start_index = 0
         for i, pos in enumerate(range1):
@@ -292,6 +296,8 @@ class EditorText(ParentText, ModifiedMixin):
                                 self.tag_bind(key, '<Enter>', self.show_arrow_cursor)
                                 self.tag_bind(key, '<Leave>', self.show_xterm_cursor)
                                 self.tag_bind(key, '<ButtonRelease-1>', self.click)
+
+                                # self.tag_bind(key, '<Control-Button-1>', self.click)
                             if value in ("def", "class"):
                                 m1 = self.idprog.match(chars, b)
                                 if m1:
