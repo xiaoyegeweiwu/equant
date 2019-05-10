@@ -287,33 +287,17 @@ class StrategyModel(object):
         return self._qteModel.getQuoteDataExist(symbol)
 
     # ////////////////////////策略函数////////////////////////////
-    def setBuy(self, share, price):
-        contNo = self._cfgModel.getBenchmark()
+    def setBuy(self, contractNo, share, price):
+        contNo = contractNo
+
+        # 基准合约的cur bar
         curBar = self._hisModel.getCurBar()
 
         # 交易计算、生成回测报告
         # 产生信号
         userNo = self._cfgModel.getUserNo() if self._cfgModel.isActualRun() else "Default"
-        orderParam = {
-            "UserNo"          : userNo,                      # 账户编号
-            "OrderType"       : otMarket,                     # 定单类型
-            "ValidType"       : vtNone,                       # 有效类型
-            "ValidTime"       : '0',                          # 有效日期时间(GTD情况下使用)
-            "Cont"            : contNo,                       # 合约
-            "Direct"          : dBuy,                         # 买卖方向：买、卖
-            "Offset"          : oOpen,                        # 开仓、平仓、平今
-            "Hedge"           : hSpeculate,                   # 投机套保
-            "OrderPrice"      : price,                        # 委托价格 或 期权应价买入价格
-            "OrderQty"        : share,                        # 委托数量 或 期权应价数量
-            "DateTimeStamp"   : curBar['DateTimeStamp'],      # 时间戳（基准合约）
-            "TradeDate"       : curBar['TradeDate'],          # 交易日（基准合约）
-            "CurrentBarIndex" : curBar['KLineIndex'],         # 当前K线索引
-        }
-        self._calcCenter.addOrder(orderParam)
-        self.sendSignalEvent("Buy", contNo, dBuy, oOpen, price, share, curBar)
+        self.sendOrder(userNo, contNo, otMarket, vtNone, dBuy, oOpen, hSpeculate, price, share, curBar, 'Buy')
 
-        if self._cfgModel.isActualRun():
-            self.sendOrder(userNo, contNo, otMarket, vtNone, dBuy, oOpen, hSpeculate, price, share)
 
     def setBuyToCover(self, share, price):
         contNo = self._cfgModel.getBenchmark()
@@ -322,27 +306,7 @@ class StrategyModel(object):
         # 交易计算、生成回测报告
         # 产生信号
         userNo = self._cfgModel.getUserNo() if self._cfgModel.isActualRun() else "Default"
-        orderParam = {
-            "UserNo"          : userNo,                      # 账户编号
-            "OrderType"       : otMarket,                     # 定单类型
-            "ValidType"       : vtNone,                       # 有效类型
-            "ValidTime"       : '0',                          # 有效日期时间(GTD情况下使用)
-            "Cont"            : contNo,                       # 合约
-            "Direct"          : dBuy,                         # 买卖方向：买、卖
-            "Offset"          : oCover,                       # 开仓、平仓、平今
-            "Hedge"           : hSpeculate,                   # 投机套保
-            "OrderPrice"      : price,                        # 委托价格 或 期权应价买入价格
-            "OrderQty"        : share,                        # 委托数量 或 期权应价数量
-            "DateTimeStamp"   : curBar['DateTimeStamp'],      # 时间戳（基准合约）
-            "TradeDate"       : curBar['TradeDate'],          # 交易日（基准合约）
-            "CurrentBarIndex" : curBar['KLineIndex'],         # 当前K线索引
-        }
-
-        self._calcCenter.addOrder(orderParam)
-        self.sendSignalEvent("BuyToCover", contNo, dBuy, oCover, price, share, curBar)
-
-        if self._cfgModel.isActualRun():
-            self.sendOrder(userNo, contNo, otMarket, vtNone, dBuy, oCover, hSpeculate, price, share)
+        self.sendOrder(userNo, contNo, otMarket, vtNone, dBuy, oCover, hSpeculate, price, share, curBar, 'BuyToCover')
 
     def setSell(self, share, price):
         contNo = self._cfgModel.getBenchmark()
@@ -351,25 +315,7 @@ class StrategyModel(object):
         # 交易计算、生成回测报告
         # 产生信号
         userNo = self._cfgModel.getUserNo() if self._cfgModel.isActualRun() else "Default"
-        orderParam = {
-            "UserNo"          : userNo,                      # 账户编号
-            "OrderType"       : otMarket,                     # 定单类型
-            "ValidType"       : vtNone,                       # 有效类型
-            "ValidTime"       : '0',                          # 有效日期时间(GTD情况下使用)
-            "Cont"            : contNo,                       # 合约
-            "Direct"          : dSell,                        # 买卖方向：买、卖
-            "Offset"          : oCover,                       # 开仓、平仓、平今
-            "Hedge"           : hSpeculate,                   # 投机套保
-            "OrderPrice"      : price,                        # 委托价格 或 期权应价买入价格
-            "OrderQty"        : share,                        # 委托数量 或 期权应价数量
-            "DateTimeStamp"   : curBar['DateTimeStamp'],      # 时间戳（基准合约）
-            "TradeDate"       : curBar['TradeDate'],          # 交易日（基准合约）
-            "CurrentBarIndex" : curBar['KLineIndex'],         # 当前K线索引
-        }
-        self._calcCenter.addOrder(orderParam)
-        self.sendSignalEvent("Sell", contNo, dSell, oCover, price, share, curBar)
-        if self._cfgModel.isActualRun():
-            self.sendOrder(userNo, contNo, otMarket, vtNone, dSell, oCover, hSpeculate, price, share)
+        self.sendOrder(userNo, contNo, otMarket, vtNone, dSell, oCover, hSpeculate, price, share, curBar, 'Sell')
 
     def setSellShort(self, share, price):
         contNo = self._cfgModel.getBenchmark()
@@ -378,26 +324,7 @@ class StrategyModel(object):
         #交易计算、生成回测报告
         #产生信号
         userNo = self._cfgModel.getUserNo() if self._cfgModel.isActualRun() else "Default"
-        orderParam = {
-            "UserNo"          : userNo,                      # 账户编号
-            "OrderType"       : otMarket,                     # 定单类型
-            "ValidType"       : vtNone,                       # 有效类型
-            "ValidTime"       : '0',                          # 有效日期时间(GTD情况下使用)
-            "Cont"            : contNo,                       # 合约
-            "Direct"          : dSell,                        # 买卖方向：买、卖
-            "Offset"          : oOpen,                        # 开仓、平仓、平今
-            "Hedge"           : hSpeculate,                   # 投机套保
-            "OrderPrice"      : price,                        # 委托价格 或 期权应价买入价格
-            "OrderQty"        : share,                        # 委托数量 或 期权应价数量
-            "DateTimeStamp"   : curBar['DateTimeStamp'],      # 时间戳（基准合约）
-            "TradeDate"       : curBar['TradeDate'],          # 交易日（基准合约）
-            "CurrentBarIndex" : curBar['KLineIndex'],         # 当前K线索引
-        }
-        self._calcCenter.addOrder(orderParam)
-        self.sendSignalEvent("SellShort", contNo, dSell, oOpen, price, share, curBar)
-
-        if self._cfgModel.isActualRun():
-            self.sendOrder(userNo, contNo, otMarket, vtNone, dSell, oOpen, hSpeculate, price, share)
+        self.sendOrder(userNo, contNo, otMarket, vtNone, dSell, oOpen, hSpeculate, price, share, curBar, 'SellShort')
 
     def sendFlushEvent(self):
         flushEvent = Event({
@@ -407,7 +334,9 @@ class StrategyModel(object):
         self._strategy.sendEvent2Engine(flushEvent)
 
     def sendSignalEvent(self, signalName, contNo, direct, offset, price, share, curBar):
-    
+        if not curBar:
+            return
+
         data = [{
             'KLineIndex' : curBar['KLineIndex'],
             'ContractNo' : contNo,
@@ -416,7 +345,6 @@ class StrategyModel(object):
             'Price'      : price,
             'Qty'        : share,
         }]
-
         #
         eventCode = EV_ST2EG_UPDATE_KLINESIGNAL if self._strategy.isRealTimeStatus() else EV_ST2EG_NOTICE_KLINESIGNAL
         signalNoticeEvent = Event({
@@ -656,13 +584,85 @@ class StrategyModel(object):
     def getOrderTime(self, eSession):
         return self._trdModel.getOrderTime(eSession)
 
-    def sendOrder(self, userNo, contNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty):
-        return self._trdModel.sendOrder(userNo, contNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty)
-
     def deleteOrder(self, eSession):
         return self._trdModel.deleteOrder(eSession)
 
-    #///////////////////////绘图函数///////////////////////////
+    def sendOrder(self, userNo, contNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty, curBar=None, singnalName='sendOrder'):
+        self.addOrder2CalcCenter(userNo, contNo, orderDirct, entryOrExit, orderPrice, orderQty, curBar)
+        self.sendSignalEvent(singnalName, contNo, orderDirct, entryOrExit, orderPrice, orderQty, curBar)
+
+        if not self._cfgModel.isActualRun():
+            # 用户未选定实盘运行
+            return
+
+        if not self._strategy.isRealTimeStatus():
+            return
+
+        if not userNo or not contNo or not orderType or not validType or not orderDirct or not entryOrExit or not hedge or not orderPrice or not orderQty:
+            return -1
+
+        if userNo not in self._userInfo:
+            return -1
+
+        # 获取资金账号
+        userInfoModel = self._userInfo[userNo]
+        sign = userInfoModel._metaData['Sign']
+        aOrder = {
+            'UserNo': userNo,
+            'Sign': sign,
+            'Cont': contNo,
+            'OrderType': orderType,
+            'ValidType': validType,
+            'ValidTime': '0',
+            'Direct': orderDirct,
+            'Offset': entryOrExit,
+            'Hedge': hedge,
+            'OrderPrice': orderPrice,
+            'TriggerPrice': 0,
+            'TriggerMode': tmNone,
+            'TriggerCondition': tcNone,
+            'OrderQty': orderQty,
+            'StrategyType': stNone,
+            'Remark': '',
+            'AddOneIsValid': tsDay,
+        }
+
+        eId = str(self._strategy.getStrategyId()) + '-' + str(self._strategy.getESessionId())
+        aOrderEvent = Event({
+            "EventCode": EV_ST2EG_ACTUAL_ORDER,
+            "StrategyId": self._strategy.getStrategyId(),
+            "Data": aOrder,
+            "ESessionId": eId,
+        })
+        self._strategy.sendEvent2Engine(aOrderEvent)
+
+        # 更新策略的订单信息
+        self._strategy.setESessionId(self._strategy.getESessionId() + 1)
+        self._strategy.updateLocalOrder(eId, aOrder)
+        return eId
+
+    def addOrder2CalcCenter(self, userNo, contNo, direct, offset, price, share, curBar):
+        if not curBar:
+            return
+
+        orderParam = {
+            "UserNo": userNo,  # 账户编号
+            "OrderType": otMarket,  # 定单类型
+            "ValidType": vtNone,  # 有效类型
+            "ValidTime": '0',  # 有效日期时间(GTD情况下使用)
+            "Cont": contNo,  # 合约
+            "Direct": direct,  # 买卖方向：买、卖
+            "Offset": offset,  # 开仓、平仓、平今
+            "Hedge": hSpeculate,  # 投机套保
+            "OrderPrice": price,  # 委托价格 或 期权应价买入价格
+            "OrderQty": share,  # 委托数量 或 期权应价数量
+            "DateTimeStamp": curBar['DateTimeStamp'],  # 时间戳（基准合约）
+            "TradeDate": curBar['TradeDate'],  # 交易日（基准合约）
+            "CurrentBarIndex": curBar['KLineIndex'],  # 当前K线索引
+        }
+        self._calcCenter.addOrder(orderParam)
+
+    #///////////////////////其他函数///////////////////////////
     def _addSeries(self, name, value, locator, color, barsback):
         addSeriesEvent = Event({
             "EventCode": EV_ST2EG_ADD_KLINESERIES,
@@ -685,7 +685,10 @@ class StrategyModel(object):
     
     def setPlotNumeric(self, name, value, locator, color, barsback):
         curBar = self._hisModel.getCurBar()
-        
+
+        # if self._strategy.isRealTimeStatus() and name == "MA_1906_5":
+        #     print("name: ", name, "value:", value)
+
         if name not in self._plotedDict:
             self._addSeries(name, value, locator, color, barsback)
             self._plotedDict[name] = (name, value, locator, color, barsback)
@@ -708,6 +711,35 @@ class StrategyModel(object):
             }
         })
         self._strategy.sendEvent2Engine(serialEvent)
+
+    def formatArgs(self, args):
+        if len(args) == 0:
+            return None
+
+        argStr = ""
+        for arg in args:
+            if isinstance(arg, str):
+                argStr += arg
+            else:
+                argStr += str(arg)
+
+        return '[User]%s' % argStr
+
+    def LogDebug(self, args):
+        logInfo = self.formatArgs(args)
+        self.logger.debug(logInfo)
+
+    def LogInfo(self, args):
+        logInfo = self.formatArgs(args)
+        self.logger.info(logInfo)
+
+    def LogWarn(self, args):
+        logInfo = self.formatArgs(args)
+        self.logger.warn(logInfo)
+
+    def LogError(self, args):
+        logInfo = self.formatArgs(args)
+        self.logger.error(logInfo)
 
     # ///////////////////////属性函数///////////////////////////
     def getBarInterval(self):
@@ -1332,8 +1364,11 @@ class BarInfo(object):
     
     def updateBar(self, data):
         self._curBar = data
-        self._barList.append(data)
-        
+        if len(self._barList) > 0 and data["DateTimeStamp"] <= self._barList[-1]["DateTimeStamp"]:
+            self._barList[-1] = data
+        else:
+            self._barList.append(data)
+
     def getCurBar(self):
         return self._curBar
 
@@ -1388,12 +1423,12 @@ class StrategyHisQuote(object):
         # K线数据定义
         # response data
         self._metaData = {}
-        self._curEarliestKLineDateTimeStamp = -1
-        self._lastEarliestKLineDateTimeStamp = -1
-        self._pkgEarliestKLineDateTimeStamp = -1
-        self._hisLength = 0
+        self._curEarliestKLineDateTimeStamp = {}
+        self._lastEarliestKLineDateTimeStamp = {}
+        self._pkgEarliestKLineDateTimeStamp = {}
         # 请求的 k线数量够了，
-        self._borderIndex = 0
+        self._hisLength = {}
+
         self._kLineNoticeData = {}
 
         self._strategy = strategy
@@ -1446,9 +1481,6 @@ class StrategyHisQuote(object):
     def getEndDate(self):
         data = self._metaData[self._contractNo]['KLineData']
         return str(data[-1]['TradeDate'])
-
-    def getBorderIndex(self):
-        return self._borderIndex
 
     def getHisLength(self):
         return self._hisLength
@@ -1669,63 +1701,69 @@ class StrategyHisQuote(object):
             self._reqBeginDate = int(countOrDate + (dateTimeStampLength - len(countOrDate)) * '0')
             count = self._reqKLineTimes * 4000
 
-        # req by count
-        if not self._reqByDate:
-            self.reqKLinesByCount(self._contractNo, count, EEQU_NOTICE_NEED)
-        # req by date
-        else:
-            self.reqKLinesByCount(self._contractNo, count, EEQU_NOTICE_NOTNEED)
+        for contNo in self._contractTuple:
+            # req by count
+            if not self._reqByDate:
+                self.reqKLinesByCount(contNo, count, EEQU_NOTICE_NEED)
+            # req by date
+            else:
+                self.reqKLinesByCount(self._contractNo, count, EEQU_NOTICE_NOTNEED)
 
     # response 数据
     def onHisQuoteRsp(self, event):
+        contractNo = event.getContractNo()
         # req by count
         if not self._reqByDate:
             self._updateHisRspData(event)
             if self.isHisQuoteRspEnd(event):
-                self._reIndexHisRspData()
-                self._borderIndex = len(self._metaData[self._contractNo]["KLineData"])
-                # print("now borderIndex is ", self._borderIndex)
-                self._hisLength = len(self._metaData[self._contractNo]["KLineData"])
+                # print(contractNo," end ***************")
+                self._reIndexHisRspData(contractNo)
+                self._hisLength[contractNo] = len(self._metaData[contractNo]["KLineData"])
             return
 
         # req by date
         if not self._reqByDateEnd:
+            if contractNo not in self._pkgEarliestKLineDateTimeStamp:
+                self._pkgEarliestKLineDateTimeStamp[contractNo] = -1
+            if contractNo not in self._curEarliestKLineDateTimeStamp:
+                self._curEarliestKLineDateTimeStamp[contractNo] = -1
+            if contractNo not in self._lastEarliestKLineDateTimeStamp:
+                self._lastEarliestKLineDateTimeStamp[contractNo] = -1
+
             dataList = event.getData()
             # update current package earliest KLine DateTimeStamp
             if len(dataList) == 0:
                 pass
             else:
-                self._pkgEarliestKLineDateTimeStamp = dataList[-1]["DateTimeStamp"]
+                self._pkgEarliestKLineDateTimeStamp[contractNo] = dataList[-1]["DateTimeStamp"]
 
             # update current req earliest KLine DateTimeStamp
-            if event.isChainEnd() and self._curEarliestKLineDateTimeStamp < self._pkgEarliestKLineDateTimeStamp:
-                self._curEarliestKLineDateTimeStamp = self._pkgEarliestKLineDateTimeStamp
+            if event.isChainEnd() and self._curEarliestKLineDateTimeStamp[contractNo] < self._pkgEarliestKLineDateTimeStamp[contractNo]:
+                self._curEarliestKLineDateTimeStamp[contractNo] = self._pkgEarliestKLineDateTimeStamp[contractNo]
 
             # req by date end or continue
             # enough data
             if not event.isChainEnd():
                 pass
-            elif self._curEarliestKLineDateTimeStamp <= self._reqBeginDate:
+            elif self._curEarliestKLineDateTimeStamp[contractNo] <= self._reqBeginDate:
                 self._reqByDateEnd = True
-                self.reqKLinesByCount(self._contractNo, self._reqKLineTimes * 4000, EEQU_NOTICE_NEED)
+                self.reqKLinesByCount(contractNo, self._reqKLineTimes * 4000, EEQU_NOTICE_NEED)
             # 9.5 lack data
-            elif self._curEarliestKLineDateTimeStamp == self._lastEarliestKLineDateTimeStamp:
+            elif self._curEarliestKLineDateTimeStamp[contractNo] == self._lastEarliestKLineDateTimeStamp[contractNo]:
                 self._reqByDateEnd = True
-                self.reqKLinesByCount(self._contractNo, self._reqKLineTimes * 4000, EEQU_NOTICE_NEED)
+                self.reqKLinesByCount(contractNo, self._reqKLineTimes * 4000, EEQU_NOTICE_NEED)
             # local lack data
-            elif self._curEarliestKLineDateTimeStamp > self._reqBeginDate:
+            elif self._curEarliestKLineDateTimeStamp[contractNo] > self._reqBeginDate:
                 self._reqKLineTimes += 1
-                self.reqKLinesByCount(self._contractNo, self._reqKLineTimes * 4000, EEQU_NOTICE_NOTNEED)
-                self._lastEarliestKLineDateTimeStamp = self._curEarliestKLineDateTimeStamp
+                self.reqKLinesByCount(contractNo, self._reqKLineTimes * 4000, EEQU_NOTICE_NOTNEED)
+                self._lastEarliestKLineDateTimeStamp[contractNo] = self._curEarliestKLineDateTimeStamp[contractNo]
             else:
                 raise IndexError("can't be this case")
         else:
             self._updateHisRspData(event)
             if self.isHisQuoteRspEnd(event):
-                self._reIndexHisRspData()
-                self._borderIndex = len(self._metaData[self._contractNo]["KLineData"])
-                # print("now borderIndex is ", self._borderIndex)
-                self._hisLength = len(self._metaData[self._contractNo]["KLineData"])
+                self._reIndexHisRspData(contractNo)
+                self._hisLength[contractNo] = len(self._metaData[contractNo]["KLineData"])
 
     def isHisQuoteRspEnd(self, event):
         if event.isChainEnd() and not self._reqByDate:
@@ -1760,8 +1798,8 @@ class StrategyHisQuote(object):
                 if len(rfdataList) == 0 or (len(rfdataList) >= 1 and kLineData["DateTimeStamp"] < rfdataList[0]["DateTimeStamp"]):
                     rfdataList.insert(0, kLineData)
 
-    def _reIndexHisRspData(self):
-        dataDict = self._metaData[self._contractNo]
+    def _reIndexHisRspData(self, contractNo):
+        dataDict = self._metaData[contractNo]
         rfdataList = dataDict['KLineData']
         dataDict['KLineReady'] = True
         for i, record in enumerate(rfdataList):
@@ -1793,6 +1831,8 @@ class StrategyHisQuote(object):
                 'KLineReady':True,
                 'KLineData' : [],
             }
+        if contNo not in self._hisLength:
+            self._hisLength[contNo] = 0
 
         dataDict = self._kLineNoticeData[contNo]
         dataDict['KLineType'] = event.getKLineType()
@@ -1805,11 +1845,11 @@ class StrategyHisQuote(object):
             data["IsKLineStable"] = False
             # 没有数据，索引取回测数据的最后一条数据的索引，没有数据从1开始
             if len(rfdataList) == 0:
-                if len(self._metaData[self._contractNo]['KLineData']) == 0:
-                    data["KLineIndex"] = self._borderIndex+1
+                if self._hisLength[contNo] == 0:
+                    data["KLineIndex"] = self._hisLength[contNo]+1
                 else:
-                    lastKLine = self._metaData[self._contractNo]['KLineData'][-1]
-                    data["KLineIndex"] = self._borderIndex if lastKLine["DateTimeStamp"] == data["DateTimeStamp"] else self._borderIndex+1
+                    lastKLine = self._metaData[contNo]['KLineData'][-1]
+                    data["KLineIndex"] = self._hisLength[contNo] if lastKLine["DateTimeStamp"] == data["DateTimeStamp"] else self._hisLength[contNo]+1
                 # print("len of rfdatalist = ", len(rfdataList))
                 # print(self._metaData[self._contractNo]['KLineData'][-1]["DateTimeStamp"])
                 # print(dataList[0]["DateTimeStamp"])
@@ -1821,12 +1861,28 @@ class StrategyHisQuote(object):
                 data["KLineIndex"] = rfdataList[-1]["KLineIndex"] + 1
                 rfdataList[-1]["IsKLineStable"] = True
 
-            event = Event({
-                "EventCode":ST_TRIGGER_FILL_DATA,
-                "ContractNo":contNo,
-                "Data":data
-            })
-            self._strategy.sendTriggerQueue(event)
+            # //// 填充基准合约k线，使得基准合约k线连续
+            if contNo == self._contractNo:
+                if self._strategy.isHisStatus():
+                    event = Event({
+                        "EventCode":ST_TRIGGER_FILL_DATA,
+                        "ContractNo":contNo,
+                        "Data":{
+                            "Data":data,
+                            "Status":ST_STATUS_CONTINUES_AS_HISTORY
+                        }
+                    })
+                    self._strategy.sendTriggerQueue(event)
+                else:
+                    event = Event({
+                        "EventCode": ST_TRIGGER_FILL_DATA,
+                        "ContractNo": contNo,
+                        "Data": {
+                            "Data": data,
+                            "Status": ST_STATUS_CONTINUES_AS_REALTIME
+                        }
+                    })
+                    self._strategy.sendTriggerQueue(event)
 
             if not self._strategy.isRealTimeStatus():
                 rfdataList.append(data)
@@ -1852,7 +1908,7 @@ class StrategyHisQuote(object):
                 # print("========================real time trigger")
             # K线稳定后发单，不考虑闭市最后一笔触发问题
             if orderWay == SendOrderStable and isLastKLineStable and kLineTrigger:
-                if self._borderIndex > 0 and rfdataList[-1]["DateTimeStamp"] == self._metaData[self._contractNo]['KLineData'][-1]["DateTimeStamp"]:
+                if self._hisLength[contNo] > 0 and rfdataList[-1]["DateTimeStamp"] == self._metaData[contNo]['KLineData'][-1]["DateTimeStamp"]:
                     pass
                 else:
                     event = Event({
@@ -1927,28 +1983,20 @@ class StrategyHisQuote(object):
         '''更新当前Bar值'''
         self._curBarDict[contNo].updateBar(data)
         
-    def _updateOtherBar(self, contNo, data):
+    def _updateOtherBar(self, otherContractDatas):
         '''根据指定合约Bar值，更新其他合约bar值'''
-        pass
+        for otherContract, otherContractData in otherContractDatas.items():
+            if otherContract not in self._curBarDict:
+                self._curBarDict[otherContract] = BarInfo(self.logger)
+            self._curBarDict[otherContract].updateBar(otherContractData)
     
-    def _afterBar(self, contNo):
-        barInfo = self.getCurBar(contNo)
-        
-        contPrices = [{
-            "Cont"  : contNo,
-            "Price" : barInfo['LastPrice'],     # 收盘价格
-            "Time"  : barInfo["DateTimeStamp"],  # 当前时间戳
-            "CurrentBarIndex"   : barInfo["KLineIndex"],  # 基准合约的bar索引
-            "TradeDate"         : barInfo["TradeDate"],
-         }]
-        self._calc.calcProfit(contPrices, barInfo["DateTimeStamp"])
+    def _afterBar(self, contractNos, barInfos):
+        self._calc.calcProfit(contractNos,barInfos)
         result = self._calc.getMonResult()
-
         result.update({
             "StrategyName":self._strategy.getStrategyName(),
-            "StrategyState":EEQU_STRATEGY_STATE_RUNNING,
+            "Status":ST_STATUS_HISTORY,
         })
-
         event = Event({
             "EventCode":EV_EG2ST_MONITOR_INFO,
             "StrategyId":self._strategy.getStrategyId(),
@@ -1977,38 +2025,112 @@ class StrategyHisQuote(object):
         self._addSignal()
         self._sendFlushEvent()
 
+        self._curHisIndex = {contract: 0 for contract in self._config.getContract()}
+        self._curRealTimeIndex = {contract: 0 for contract in self._config.getContract()}
+
         if not self._useSample:
             return
 
         while not self._isAllReady():
             time.sleep(1)
+
         # ==============使用基准合约回测==================
-        # TODO: 基准合约和其他合约通过时间戳对应，暂时不考虑tick
-        dataList = self._metaData[self._contractNo]['KLineData']
-        # print("data list is ")
-        # print(dataList)
+        baseContractData = self._metaData[self._contractNo]['KLineData']
         self.logger.info('[runReport] run report begin')
+
+        contractList = list(self._config.getContract())
         beginIndex = 0
-        for i, data in enumerate(dataList):
+        for i, data in enumerate(baseContractData):
+            # todo 过滤最后一根k线，不过滤的话，会出现 k线稳定发单在交界处异常。
             # 更新当前Bar
             self._updateCurBar(self._contractNo, data)
+            otherContractDatas = self._getHSOtherContractBar(data["DateTimeStamp"])
             # 根据基准合约，更新其他Bar
-            self._updateOtherBar(self._contractNo, data)
+            self._updateOtherBar(otherContractDatas)
+
+            # 填入基准合约bar info
+            otherContractDatas.update({self._contractNo:data})
             # 执行策略函数
             if self._config.hasKLineTrigger():
                 handle_data(context)
             # 通知当前Bar结束
-            self._afterBar(self._contractNo)
+            self._afterBar(contractList, otherContractDatas)
+
             if i%200==0:
-                self.drawBatchHisKine(dataList[beginIndex:i])
+                self.drawBatchHisKine(baseContractData[beginIndex:i])
                 beginIndex = i
-                
-        if beginIndex != len(dataList):
-            self.drawBatchHisKine(dataList[beginIndex:])
+
+        if beginIndex != len(baseContractData):
+            self.drawBatchHisKine(baseContractData[beginIndex:])
 
         self.logger.debug('[runReport] run report completed!')
         # 回测完成，刷新信号、指标
         self._sendFlushEvent()
+
+        # print('**************************** run his end')
+
+    # History Status
+    def _getHSOtherContractBar(self, baseContractDateTimeStamp):
+        otherContracts = list(self._config.getContract()[1:])
+        result = {}
+        for otherContract in otherContracts:
+            index = self._curHisIndex[otherContract]
+            otherContractKLineData = self._metaData[otherContract]["KLineData"]
+            while True:
+                if self._hisLength[otherContract] == 0 or index + 1 >= self._hisLength[otherContract]:
+                    break
+                #
+                if otherContractKLineData[index]["DateTimeStamp"] <= baseContractDateTimeStamp and \
+                otherContractKLineData[index + 1]["DateTimeStamp"] > baseContractDateTimeStamp:
+                    break
+                elif otherContractKLineData[index]["DateTimeStamp"] <= baseContractDateTimeStamp and \
+                otherContractKLineData[index + 1]["DateTimeStamp"] <= baseContractDateTimeStamp:
+                    index += 1
+                elif otherContractKLineData[index]["DateTimeStamp"] > baseContractDateTimeStamp:
+                    break
+
+            # 找到了正确的位置或者没有
+            if self._hisLength[otherContract] == 0 or otherContractKLineData[index]["DateTimeStamp"] > baseContractDateTimeStamp:
+                otherContractBar = self._curBarDict[otherContract].getCurBar()
+            else:
+                otherContractBar = otherContractKLineData[index]
+            self._curHisIndex[otherContract] = index
+            result[otherContract] = otherContractBar
+        return result
+
+    # real time status 获取其他合约最近的k线
+    def _getRTSOtherContractBar(self, baseContractDateTimeStamp):
+        otherContracts = list(self._config.getContract()[1:])
+        result = {}
+
+        for otherContract in otherContracts:
+            if otherContract not in self._kLineNoticeData or len(self._kLineNoticeData[otherContract]["KLineData"]) == 0:
+                otherContractBar = self._curBarDict[otherContract].getCurBar()
+                result[otherContract] = otherContractBar
+                continue
+
+            otherContractKLineData = self._kLineNoticeData[otherContract]["KLineData"]
+            index = self._curRealTimeIndex[otherContract]
+            while True:
+                if index+1 >= len(self._kLineNoticeData[otherContract]["KLineData"]):
+                    break
+                #
+                if otherContractKLineData[index]["DateTimeStamp"] <= baseContractDateTimeStamp and \
+                otherContractKLineData[index + 1]["DateTimeStamp"] > baseContractDateTimeStamp:
+                    break
+                elif otherContractKLineData[index]["DateTimeStamp"] <= baseContractDateTimeStamp and \
+                otherContractKLineData[index + 1]["DateTimeStamp"] <= baseContractDateTimeStamp:
+                    index += 1
+                elif otherContractKLineData[index]["DateTimeStamp"] <= baseContractDateTimeStamp:
+                    break
+
+            if otherContractKLineData[index]["DateTimeStamp"] > baseContractDateTimeStamp:
+                otherContractBar = self._curBarDict[otherContract].getCurBar()
+            else:
+                otherContractBar = otherContractKLineData[index]
+            self._curRealTimeIndex[otherContract] = index
+            result[otherContract] = otherContractBar
+        return result
 
     def drawBatchHisKine(self, data):
         self.sendAllHisKLine(data)
@@ -2030,38 +2152,59 @@ class StrategyHisQuote(object):
         self._strategy.sendEvent2Engine(event)
 
     def runOtherTrigger(self, context, handle_data, event):
-        # contNo = self._contractNo
-        # 执行策略函数
         handle_data(context)
-        # # 通知当前Bar结束
-        # self._afterBar(contNo)
-        # self._sendFlushEvent()
 
+
+    # 填充实时k线
     def runReportRealTime(self, context, handle_data, event):
         '''发送回测阶段来的数据'''
+        assert event.getContractNo() == self._contractNo, "error ,only base contract can update k line "
+        data = event.getData()["Data"]
+        contractList = list(self._config.getContract())
+
         # 更新当前bar数据
-        data = event.getData()
         self._updateCurBar(self._contractNo, data)
-        # self._updateOtherBar(contNo, data)
-        # 推送K线
-        # print("k line index = ", data["KLineIndex"])
+        # 更新其他bar
+        otherContractDatas = self._getRTSOtherContractBar(data["DateTimeStamp"])
+        self._updateOtherBar(otherContractDatas)
+
+        otherContractDatas.update({self._contractNo: data})
+
+        # 进一步把实时阶段，划分成 历史 + 真实时阶段
+        # 将在跑历史回测期间到的实时数据， 按照历史回测处理
+        status = event.getData()["Status"]
+        self._strategy.setRunRealTimeStatus(status)
+        # print(self._strategy.isRealTimeStatus(), self._strategy._runStatus, self._strategy._runRealTimeStatus, self._strategy.isRealTimeAsHisStatus())
+        #
+        if self._strategy.isRealTimeAsHisStatus():
+            handle_data(context)
+
+        # 推送基准合约K线
         self._updateRealTimeKLine(data)
         self._sendFlushEvent()
-
+        self._afterBar(contractList, otherContractDatas)
+        
     def runRealTime(self, context, handle_data, event):
         '''K线实时触发'''
+        assert self._strategy.isRealTimeStatus(), "error "
+        contractList = list(self._config.getContract())
         contNo = event.getContractNo()
         data = event.getData()
-        # print("run real time ")
         # 更新当前bar数据
         self._updateCurBar(contNo, data)
-        self._updateOtherBar(contNo, data)
+        # 更新其他bar
+        otherContractDatas = self._getRTSOtherContractBar(data["DateTimeStamp"])
+        self._updateOtherBar(otherContractDatas)
+        otherContractDatas.update({self._contractNo: data})
+        # print("current k line index is", data["KLineIndex"])
+        # print(" data is ", self._curBarDict[contNo]._barList[-5:])
 
         # 执行策略函数
         handle_data(context)
         # 通知当前Bar结束
-        self._afterBar(contNo)
         self._sendFlushEvent()
+        self._afterBar(contractList, otherContractDatas)
+
 
     def _updateRealTimeKLine(self, data):
         event = Event({
@@ -2809,65 +2952,6 @@ class StrategyTrade(TradeModel):
         '''
         orderNo = self._strategy.getOrderNo(eSession)
         return self.getDataFromTOrderModel(orderNo, 'InsertTime')
-
-    def sendOrder(self, userNo, contNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty):
-        if not self._strategy.isRealTimeStatus():
-            return
-        '''
-        针对当前公式指定的帐户、商品发送委托单
-        :param userNo: 指定的账户名
-        :param contNo: 商品合约编号
-        :param orderType: 订单类型
-        :param validType: 订单有效类型
-        :param orderDirct: 发送委托单的买卖类型，取值为Enum_Buy或Enum_Sell之一
-        :param entryOrExit: 发送委托单的开平仓类型，取值为Enum_Entry,Enum_Exit,Enum_ExitToday之一
-        :param hedge: 投保标记
-        :param orderPrice: 委托单的交易价格
-        :param orderQty: 委托单的交易数量
-        :return: True/False
-        '''
-        if not userNo or not contNo or not orderType or not validType or not orderDirct or not entryOrExit or not hedge or not orderPrice or not orderQty:
-            return -1
-
-        if userNo not in self._userInfo:
-            return -1
-
-        # 获取资金账号
-        userInfoModel = self._userInfo[userNo]
-        sign = userInfoModel._metaData['Sign']
-        aOrder = {
-            'UserNo': userNo,
-            'Sign': sign,
-            'Cont': contNo,
-            'OrderType': orderType,
-            'ValidType': validType,
-            'ValidTime': '0',
-            'Direct': orderDirct,
-            'Offset': entryOrExit,
-            'Hedge': hedge,
-            'OrderPrice': orderPrice,
-            'TriggerPrice': 0,
-            'TriggerMode': tmNone,
-            'TriggerCondition': tcNone,
-            'OrderQty': orderQty,
-            'StrategyType': stNone,
-            'Remark': '',
-            'AddOneIsValid': tsDay,
-        }
-
-        eId = str(self._strategy.getStrategyId()) + '-' + str(self._strategy.getESessionId())
-        aOrderEvent = Event({
-            "EventCode": EV_ST2EG_ACTUAL_ORDER,
-            "StrategyId": self._strategy.getStrategyId(),
-            "Data": aOrder,
-            "ESessionId": eId,
-        })
-        self._strategy.sendEvent2Engine(aOrderEvent)
-
-        # 更新策略的订单信息
-        self._strategy.setESessionId(self._strategy.getESessionId() + 1)
-        self._strategy.updateLocalOrder(eId, aOrder)
-        return eId
 
     def deleteOrder(self, eSession):
         '''

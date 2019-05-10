@@ -912,7 +912,7 @@ class BaseApi(object):
         return self._dataModel.getQuoteDataExist(symbol)
 
     #/////////////////////////策略交易/////////////////////////////
-    def Buy(self, share=0, price=0):
+    def Buy(self, contractNo, share=0, price=0):
         '''
         【说明】
               产生一个多头建仓操作
@@ -943,7 +943,7 @@ class BaseApi(object):
               在当前持有空头仓位的情况下：
               Buy(10,Close) 表示平掉所有空仓，并用当前Bar收盘价买入10张合约，马上发送委托。
         '''
-        return self._dataModel.setBuy(share, price)
+        return self._dataModel.setBuy(contractNo, share, price)
 
     def BuyToCover(self, share=0, price=0):
         '''
@@ -2387,7 +2387,7 @@ class BaseApi(object):
               针对指定的帐户、商品发送委托单。
 
         【语法】
-              bool A_SendOrder(contNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty)
+              bool A_SendOrder(userNo, contNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty)
 
         【参数】
               userNo 指定的账户名称，
@@ -2456,31 +2456,6 @@ class BaseApi(object):
               无
          '''
         return self._dataModel.deleteOrder(eSession)
-
-    #////////////////////////////绘图函数/////////////////
-    def PlotNumeric(self, name, value, locator=0, color=-1, barsback=0):
-        '''
-        【说明】
-              在当前Bar输出一个数值
-
-        【语法】
-              float PlotNumeric(string Name,float Value,float Locator=0,int Color=-1,int BarsBack=0)
-
-        【参数】
-              Name 输出值的名称，不区分大小写；
-              Number 输出的数值；
-              Locator 输出值的定位点，默认时输出单点，否则输出连接两个值线段，用法请看例3；
-              Color 输出值的显示颜色，默认表示使用属性设置框中的颜色；
-              BarsBack 从当前Bar向前回溯的Bar数，默认值为当前Bar。 
-
-        【备注】
-              在当前Bar输出一个数值，输出的值用于在上层调用模块显示。返回数值型，即输入的Number。
-
-        【示例】
-              例1：PlotNumeric ("MA1",Ma1Value);
-              输出MA1的值。 
-        '''
-        return self._dataModel.setPlotNumeric(name, value, locator, color, barsback)
         
     #/////////////////////////////枚举函数/////////////////
     def Enum_Buy(self):
@@ -3008,6 +2983,120 @@ class BaseApi(object):
         '''
         return self._dataModel.setSlippage(slippage)
 
+    # //////////////////////其他函数////////////////////
+
+    def PlotNumeric(self, name, value, locator=0, color=-1, barsback=0):
+        '''
+        【说明】
+            在当前Bar输出一个数值
+
+        【语法】
+            float PlotNumeric(string Name,float Value,float Locator=0,int Color=-1,int BarsBack=0)
+
+        【参数】
+            Name 输出值的名称，不区分大小写；
+            Number 输出的数值；
+            Locator 输出值的定位点，默认时输出单点，否则输出连接两个值线段，用法请看例3；
+            Color 输出值的显示颜色，默认表示使用属性设置框中的颜色；
+            BarsBack 从当前Bar向前回溯的Bar数，默认值为当前Bar。
+
+        【备注】
+            在当前Bar输出一个数值，输出的值用于在上层调用模块显示。返回数值型，即输入的Number。
+
+        【示例】
+            例1：PlotNumeric ("MA1",Ma1Value);
+            输出MA1的值。
+        '''
+        return self._dataModel.setPlotNumeric(name, value, locator, color, barsback)
+
+    def LogDebug(self, args):
+        '''
+        【说明】
+             在运行日志窗口中打印用户指定的调试信息。
+
+        【语法】
+              LogDebug(args)
+
+        【参数】
+              args 用户需要打印的内容，如需要在运行日志窗口中输出多个内容，内容之间用英文逗号分隔。
+
+        【备注】
+              无
+
+        【示例】
+              accountId = A_AccountID()
+              LogDebug("当前使用的用户账户ID为 : ", accountId)
+              freeMargin = A_FreeMargin()
+              LogDebug("当前使用的用户账户ID为 : %s，可用资金为 : %10.2f" % (accountId, freeMargin))
+        '''
+        return self._dataModel.LogDebug(args)
+
+    def LogInfo(self, args):
+        '''
+        【说明】
+             在运行日志窗口中打印用户指定的普通信息。
+
+        【语法】
+              LogInfo(args)
+
+        【参数】
+              args 用户需要打印的内容，如需要在运行日志窗口中输出多个内容，内容之间用英文逗号分隔。
+
+        【备注】
+              无
+
+        【示例】
+              accountId = A_AccountID()
+              LogInfo("当前使用的用户账户ID为 : ", accountId)
+              freeMargin = A_FreeMargin()
+              LogInfo("当前使用的用户账户ID为 : %s，可用资金为 : %10.2f" % (accountId, freeMargin))
+        '''
+        return self._dataModel.LogInfo(args)
+
+    def LogWarn(self, args):
+        '''
+        【说明】
+             在运行日志窗口中打印用户指定的警告信息。
+
+        【语法】
+              LogWarn(args)
+
+        【参数】
+              args 用户需要打印的内容，如需要在运行日志窗口中输出多个内容，内容之间用英文逗号分隔。
+
+        【备注】
+              无
+
+        【示例】
+              accountId = A_AccountID()
+              LogWarn("当前使用的用户账户ID为 : ", accountId)
+              freeMargin = A_FreeMargin()
+              LogWarn("当前使用的用户账户ID为 : %s，可用资金为 : %10.2f" % (accountId, freeMargin))
+        '''
+        return self._dataModel.LogWarn(args)
+
+    def LogError(self, args):
+        '''
+        【说明】
+             在运行日志窗口中打印用户指定的错误信息。
+
+        【语法】
+              LogError(args)
+
+        【参数】
+              args 用户需要打印的内容，如需要在运行日志窗口中输出多个内容，内容之间用英文逗号分隔。
+
+        【备注】
+              无
+
+        【示例】
+              accountId = A_AccountID()
+              LogError("当前使用的用户账户ID为 : ", accountId)
+              freeMargin = A_FreeMargin()
+              LogError("当前使用的用户账户ID为 : %s，可用资金为 : %10.2f" % (accountId, freeMargin))
+        '''
+        return self._dataModel.LogError(args)
+
 baseApi = BaseApi()
 
 #////////////////////全局函数定义//////////////
@@ -3304,8 +3393,8 @@ def A_DeleteOrder(eSession):
     return baseApi.A_DeleteOrder(eSession)
 
 #策略交易
-def Buy(share=0, price=0):
-    return baseApi.Buy(share, price)
+def Buy(contractNo, share=0, price=0):
+    return baseApi.Buy(contractNo, share, price)
 
 def BuyToCover(share=0, price=0):
     return baseApi.BuyToCover(share, price)
@@ -3316,11 +3405,7 @@ def Sell(share=0, price=0):
 def SellShort(share=0, price=0):
     return baseApi.SellShort(share, price)
     
-#绘图函数
-def PlotNumeric(name, value, locator=0, color=0xdd0000, barsback=0):
-    return baseApi.PlotNumeric(name, value, locator, color, barsback)
-    
-#枚举函数
+# 枚举函数
 def Enum_Period_Tick():
     return baseApi.Enum_Period_Tick()
     
@@ -3472,4 +3557,20 @@ def SymbolName(contNo=''):
 
 def SymbolType(contNo=''):
     return baseApi.SymbolType(contNo)
+
+#其他函数
+def PlotNumeric(name, value, locator=0, color=0xdd0000, barsback=0):
+    return baseApi.PlotNumeric(name, value, locator, color, barsback)
+
+def LogDebug(*args):
+    return baseApi.LogDebug(args)
+
+def LogInfo(*args):
+    return baseApi.LogInfo(args)
+
+def LogWarn(*args):
+    return baseApi.LogWarn(args)
+
+def LogError(*args):
+    return baseApi.LogError(args)
 

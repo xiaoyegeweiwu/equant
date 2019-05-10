@@ -78,7 +78,7 @@ _all_func_ = {
                     ['MaxBarsBack'         , '最大回溯Bar数'],
                     ['MaxSingleTradeSize'  , '单笔交易限量'],
                     ['MinMove'             , '最小变动量'],
-                    ['OptionStyle'         , '期权类型'],
+                    # ['OptionStyle'         , '期权类型'],
                     ['OptionType'          , '看涨看跌'],
                     ['PriceScale'          , '价格精度'],
                     ['RelativeSymbol'      , '关联合约'],
@@ -195,13 +195,8 @@ _all_func_ = {
     #                 ['Enum_Period_Year'    , '周期类型_年线'],
     #                 ['Enum_Period_DayX'    , '周期类型_多日'],
     #             ],
-                
-    '绘图函数': [
-                    ['PlotNumeric'         , '绘制指标线'],
-                ],
 
     '设置函数': [
-                    ['GetConfig'           , '获取设置参数'],
                     ['SetBenchmark'        , '设置基准合约'],
                     ['SetUserNo'           , '设置交易账号'],
                     ['SetSample'           , '设置策略历史回测样本数量'],
@@ -218,4 +213,13 @@ _all_func_ = {
                     ['SetHedge'            , '设置投保标志'],
                     ['SetSlippage'         , '设置滑点损耗'],
                 ],
+
+    '其他函数': [
+                    ['PlotNumeric'          ,'绘制指标线'],
+                    ['LogDebug'             ,'打印调试信息'],
+                    ['LogInfo'              ,'打印普通信息'],
+                    ['LogWarn'              ,'打印警告信息'],
+                    ['LogError'             ,'打印错误信息'],
+    ],
+
 }
