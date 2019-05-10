@@ -367,7 +367,7 @@ class GetEgData(object):
             if sStatus == ST_STATUS_REMOVE:
                 # TODO：删除策略需要接到通知之后再进行删除
                 # 更新界面
-                self._app.delStrategy(id)
+                self._app.delUIStrategy(id)
                 # 将策略管理器中的该策略也删除掉
                 self._stManager.removeStrategy(id)
 
