@@ -254,6 +254,8 @@ class Strategy:
         
     def _runTimer(self):
         timeList = self._dataModel.getConfigData()['Trigger']['Timer']
+        if timeList is None:
+            timeList = []
         self._isTimeTriggered = [False for i in timeList]
         self._nowTime = datetime.now()
         '''秒级定时器'''
