@@ -2381,17 +2381,15 @@ class BaseApi(object):
          '''
         return self._dataModel.getOrderTime(eSession)
 
-    def A_SendOrder(self, userNo, contNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty):
+    def A_SendOrder(self, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty, contNo, userNo):
         '''
         【说明】A_SendOrder
               针对指定的帐户、商品发送委托单。
 
         【语法】
-              bool A_SendOrder(userNo, contNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty)
+              bool A_SendOrder(orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty, contNo, userNo)
 
         【参数】
-              userNo 指定的账户名称，
-              contNo 商品合约编号，
               orderType 订单类型，字符类型，可选值为：
                 '1' : 市价单
                 '2' : 限价单
@@ -2423,7 +2421,9 @@ class BaseApi(object):
                 'S' : 套利
                 'M' : 做市
               orderPrice 委托单的交易价格，
-              orderQty 委托单的交易数量。
+              orderQty 委托单的交易数量，
+              contNo 商品合约编号，默认为基础合约编号，
+              userNo 指定的账户名称，为空时使用默认账户。
 
         【备注】
               针对当前公式指定的帐户、商品发送委托单，发送成功返回如"1-1"的下单编号，发送失败返回-1。
@@ -2433,7 +2433,7 @@ class BaseApi(object):
         【示例】
               无
          '''
-        return self._dataModel.sendOrder(userNo, contNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty)
+        return self._dataModel.sendOrder(orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty, contNo, userNo)
 
     def A_DeleteOrder(self, eSession):
         '''
@@ -3386,8 +3386,8 @@ def A_OrderStatus(eSession=''):
 def A_OrderTime(eSession=''):
     return baseApi.A_OrderTime(eSession)
 
-def A_SendOrder(userNo, contNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty):
-    return baseApi.A_SendOrder(userNo, contNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty)
+def A_SendOrder(orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty, contNo='', userNo=''):
+    return baseApi.A_SendOrder(orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty, contNo, userNo)
 
 def A_DeleteOrder(eSession):
     return baseApi.A_DeleteOrder(eSession)

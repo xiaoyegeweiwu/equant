@@ -296,7 +296,7 @@ class StrategyModel(object):
         # 交易计算、生成回测报告
         # 产生信号
         userNo = self._cfgModel.getUserNo() if self._cfgModel.isActualRun() else "Default"
-        self.sendOrder(userNo, contNo, otMarket, vtNone, dBuy, oOpen, hSpeculate, price, share, curBar, 'Buy')
+        self.sendOrder(otMarket, vtNone, dBuy, oOpen, hSpeculate, price, share, contNo, userNo, curBar, 'Buy')
 
 
     def setBuyToCover(self, share, price):
@@ -587,7 +587,13 @@ class StrategyModel(object):
     def deleteOrder(self, eSession):
         return self._trdModel.deleteOrder(eSession)
 
-    def sendOrder(self, userNo, contNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty, curBar=None, singnalName='sendOrder'):
+    def sendOrder(self, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty, contNo='', userNo='', curBar=None, singnalName='sendOrder'):
+        if not contNo:
+            contNo = self._cfgModel.getBenchmark()
+
+        if not userNo:
+            userNo = self._cfgModel.getUserNo()
+
         self.addOrder2CalcCenter(userNo, contNo, orderDirct, entryOrExit, orderPrice, orderQty, curBar)
         self.sendSignalEvent(singnalName, contNo, orderDirct, entryOrExit, orderPrice, orderQty, curBar)
 
@@ -598,7 +604,7 @@ class StrategyModel(object):
         if not self._strategy.isRealTimeStatus():
             return
 
-        if not userNo or not contNo or not orderType or not validType or not orderDirct or not entryOrExit or not hedge or not orderPrice or not orderQty:
+        if not orderType or not validType or not orderDirct or not entryOrExit or not hedge or not orderPrice or not orderQty:
             return -1
 
         if userNo not in self._userInfo:
