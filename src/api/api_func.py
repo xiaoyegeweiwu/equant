@@ -213,6 +213,7 @@ _all_func_ = {
                     ['SetMinTradeQuantity' , '设置最小下单量'],
                     ['SetHedge'            , '设置投保标志'],
                     ['SetSlippage'         , '设置滑点损耗'],
+                    ['SetTriggerMode', '设置触发方式'],
                 ],
 
     '其他函数': [
@@ -221,6 +222,6 @@ _all_func_ = {
                     ['LogInfo'              ,'打印普通信息'],
                     ['LogWarn'              ,'打印警告信息'],
                     ['LogError'             ,'打印错误信息'],
-    ],
+                ],
 
 }

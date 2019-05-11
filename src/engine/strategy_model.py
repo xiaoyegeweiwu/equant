@@ -508,6 +508,9 @@ class StrategyModel(object):
         self._cfgModel.setSlippage(slippage)
         return 0
 
+    def setTriggerMode(self, type, interval, timeList):
+        return self._cfgModel.setTrigger(type, interval, timeList)
+
     # ///////////////////////账户函数///////////////////////////
     def getAccountId(self):
         return self._trdModel.getAccountId()
@@ -1200,11 +1203,37 @@ class StrategyConfig(object):
     def getTrigger(self):
         '''获取触发方式'''
         return self._metaData['Trigger']
+
+    def setTrigger(self, type, interval, timeList):
+        '''设置触发方式'''
+        if type not in (1, 2, 3, 4):
+            return -1
+        if interval%100 != 0:
+            return -1
+        if timeList:
+            for timeStr in timeList:
+                if len(timeStr) != 14 or not self.isVaildDate(timeStr, "%Y%m%d%H%M%S"):
+                    return -1
+
+        trigger = self._metaData['Trigger']
+        if timeList:
+            trigger['Timer'] = timeList
+        if type == 1:
+            trigger['KLine'] = True
+        elif type == 2:
+            trigger['SnapShot'] = True
+        elif type == 3:
+            trigger['Trade'] = True
+        else:
+            trigger['Cycle'] = interval
+        return 0
         
     def getSample(self, contNo=''):
         '''获取样本数据'''
         if not contNo:
             contNo = self.getBenchmark()
+        if contNo in self._metaData['Sample']:
+            return None
         return self._metaData['Sample'][contNo]
 
     def getStartTime(self):
@@ -1465,6 +1494,11 @@ class StrategyConfig(object):
     def isActualRun(self):
         return bool(self._metaData['RunMode']['Actual']['SendOrder2Actual'])
 
+    def isVaildDate(self, date, format):
+        try:
+            return True
+        except:
+            return False
 
 class BarInfo(object):
     def __init__(self, logger):

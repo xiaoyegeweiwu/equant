@@ -2991,6 +2991,33 @@ class BaseApi(object):
         '''
         return self._dataModel.setSlippage(slippage)
 
+    def SetTriggerMode(self, type, interval, timeList):
+        '''
+        【说明】
+             设置滑点损耗
+
+        【语法】
+              int SetTriggerMode(int type, int interval, list timeList)
+
+        【参数】
+              type 触发方式，可使用的值为：
+                1 : K线触发
+                2 : 即时行情触发
+                3 : 交易数据触发
+                4 : 每隔固定时间触发
+              interval 当触发方式是为每隔固定时间触发(type=4)时，触发间隔，单位为毫秒，必须为100的整数倍，当type为其他值时，该值无效
+              timeList 触发时刻列表，时间的格式为'20190511121314'
+
+        【备注】
+              返回整型，0成功，-1失败
+
+        【示例】
+              SetTriggerMode(1, 0) # 使用K线触发
+              SetTriggerMode(2, 0，['20190511121314', '20190511121315', '20190511121316']) # 使用即时行情触发，并指定特定时刻列表
+              SetTriggerMode(4, 1000，['20190511121314']) # 每隔1000毫秒触发一次，并指定特定时刻列表
+        '''
+        return self._dataModel.setTriggerMode(type, interval, timeList)
+
     # //////////////////////其他函数////////////////////
 
     def PlotNumeric(self, name, value, locator=0, color=-1, barsback=0):
@@ -3495,6 +3522,9 @@ def SetHedge(hedge, contNo=''):
 
 def SetSlippage(slippage):
     return baseApi.SetSlippage(slippage)
+
+def SetTriggerMode(type, interval, timeList=None):
+    return baseApi.SetTriggerMode(type, interval, timeList)
 
 # 属性函数
 def BarInterval():
