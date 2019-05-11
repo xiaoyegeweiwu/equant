@@ -68,7 +68,7 @@ class StrategyEngine(object):
         self._onStrategyRemoveData = {}
 
         # 恢复上次推出时保存的结构
-        self._resumeStrategy()
+        #self._resumeStrategy()
         self.logger.debug('Initialize strategy engine ok!')
 
     def _resumeStrategy(self):
@@ -865,7 +865,7 @@ class StrategyEngine(object):
         eg2stQueue = self._eg2stQueueDict[strategyId]
         eg2stQueue.put(event)
 
-    # 恢复当前策略
+    # 启动当前策略
     def _onStrategyResume(self, event):
         if event.getStrategyId() in self._eg2stQueueDict:
             self.logger.info("策略 %d 已经存在" % event.getStrategyId())
