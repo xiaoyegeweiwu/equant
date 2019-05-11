@@ -686,8 +686,10 @@ class StrategyModel(object):
     def setPlotNumeric(self, name, value, locator, color, barsback):
         curBar = self._hisModel.getCurBar()
 
-        # if self._strategy.isRealTimeStatus() and name == "MA_1906_5":
-        #     print("name: ", name, "value:", value)
+        # if self._strategy.isRealTimeStatus() and name == "MA_909_5":
+        #     print("Real Time ************* :", "name: ", name, "value:", value)
+        # if self._strategy.isRealTimeAsHisStatus() and name == "MA_909_5":
+        #     print("Real Time As History*** :", "name: ", name, "value:", value)
 
         if name not in self._plotedDict:
             self._addSeries(name, value, locator, color, barsback)
@@ -2056,7 +2058,6 @@ class StrategyHisQuote(object):
                 handle_data(context)
             # 通知当前Bar结束
             self._afterBar(contractList, otherContractDatas)
-
             if i%200==0:
                 self.drawBatchHisKine(baseContractData[beginIndex:i])
                 beginIndex = i
@@ -2197,9 +2198,13 @@ class StrategyHisQuote(object):
         otherContractDatas = self._getRTSOtherContractBar(data["DateTimeStamp"])
         self._updateOtherBar(otherContractDatas)
         otherContractDatas.update({self._contractNo: data})
-        # print("current k line index is", data["KLineIndex"])
-        # print(" data is ", self._curBarDict[contNo]._barList[-5:])
 
+        # print("contractNo is ", contNo)
+        # if contNo == self._contractNo:
+        #     print("current k line index is", data["KLineIndex"])
+        #     lastFive = self._curBarDict[contNo]._barList[-5:]
+        #     lastFiveClose =[barInfo['LastPrice'] for barInfo in lastFive]
+        #     print(" in inner data is ", lastFiveClose)
         # 执行策略函数
         handle_data(context)
         # 通知当前Bar结束

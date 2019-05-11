@@ -540,8 +540,10 @@ class Strategy:
                 "Config":self._dataModel.getConfigData(),
                 "Pid":os.getpid(),
                 "Path":self._filePath,
+                "StrategyName": self._strategyName,
             }
         })
+
         self.sendEvent2Engine(quitEvent)
 
     def _onStrategyResume(self, event):
