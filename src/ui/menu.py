@@ -325,7 +325,8 @@ class RunMenu(object):
 
     def onDelete(self):
         """删除策略"""
-        self._controller.delStrategy(self._strategyId)
+        if messagebox.askokcancel('提示', '删除策略运行数据也将删除，确定删除么'):
+            self._controller.delStrategy(self._strategyId)
 
     def onReport(self):
         """展示报告"""

@@ -494,7 +494,7 @@ class RunWin(QuantToplevel, QuantFrame):
             self.cycle.set(conf[VCycle]),
 
             # 定时触发通过函数设置
-            self.timerText.delete(0.0, )
+            self.timerText.delete(0.0, tk.END)
             self.setText(self.timerText, conf[VTimer])
 
             self.isKLine.set(conf[VIsKLine]),

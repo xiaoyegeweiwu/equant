@@ -315,12 +315,14 @@ class GetEgData(object):
     def _onEgMonitorInfo(self, event):
         """获取引擎实时推送监控信息"""
         # TODO: data中包含的数据太多
-        # stId = event.getStrategyId()
-        # data = event.getData()
+        stId = event.getStrategyId()
+        data = event.getData()
         # 实时更新监控界面信息
-        # self._stManager.addStrategyData(stId, data)
-        # self._stManager.updateStrategyStatus(stId, data["StrategyState"])
-        pass
+        # print("MonitorData: ", data)
+        self._stManager.addStrategyData(stId, data)
+        # dataDict = self._stManager.getSingleStrategy(stId)
+        # #TODO：updateStatus名字要改一下
+        # self._app.updateStatus(stId, dataDict)
 
     def _onEgExchangeInfo(self, event):
         """获取引擎推送交易所信息"""
@@ -426,7 +428,7 @@ class StrategyManager(object):
         self._strategyDict[id] = dataDict
 
     def addStrategyData(self, id, data):
-        self._strategyDict[id].update({"Data": data})
+        self._strategyDict[id].update({"RunningData": data})
 
     def removeStrategy(self, id):
         if id in self._strategyDict:
