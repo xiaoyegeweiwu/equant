@@ -464,6 +464,16 @@ class StrategyModel(object):
     def setTriggerMode(self, type, interval, timeList):
         return self._cfgModel.setTrigger(type, interval, timeList)
 
+    # ///////////////////////套利函数///////////////////////////
+    def setSpread(self, contNo):
+        return self._cfgModel.setSpread(contNo)
+
+    def setSpreadSample(self, sampleType, sampleValue):
+        return self._cfgModel.setSpreadSample(sampleType, sampleValue)
+
+    def setSpreadBarInterval(self, barType, barInterval):
+        return self._cfgModel.setSpreadBarInterval(barType, barInterval)
+
     # ///////////////////////账户函数///////////////////////////
     def getAccountId(self):
         return self._trdModel.getAccountId()
@@ -557,11 +567,11 @@ class StrategyModel(object):
         if not userNo or not contNo or not orderType or not validType or not orderDirct or not entryOrExit or not hedge or not orderPrice or not orderQty:
             return -1
 
-        if userNo not in self._userInfo:
+        if userNo not in self._trdModel._userInfo:
             return -1
 
         # 获取资金账号
-        userInfoModel = self._userInfo[userNo]
+        userInfoModel = self._trdModel._userInfo[userNo]
         sign = userInfoModel._metaData['Sign']
         aOrder = {
             'UserNo': userNo,
@@ -1231,7 +1241,7 @@ class StrategyConfig(object):
             return self._metaData['Sample'][contNo]['KLineSlice']
         return self._metaData['Sample']['KLineSlice']
 
-    def setAllKTrueInSample(self, sample):
+    def setAllKTrueInSample(self, sample, setForSpread=False):
         if 'BeginTime' in sample:
             del sample['BeginTime']
 
@@ -1239,9 +1249,12 @@ class StrategyConfig(object):
             del sample['KLineCount']
 
         sample['AllK'] = True
-        self._metaData['RunMode']['Simulate']['UseSample'] = True
+        if setForSpread:
+            sample['UseSample'] = True
+        else:
+            self._metaData['RunMode']['Simulate']['UseSample'] = True
 
-    def setBarPeriodInSample(self, beginDate, sample):
+    def setBarPeriodInSample(self, beginDate, sample, setForSpread=False):
         '''设置起止时间'''
         if 'AllK' in sample:
             del sample['AllK']
@@ -1250,9 +1263,12 @@ class StrategyConfig(object):
             del sample['KLineCount']
 
         sample['BeginTime'] = beginDate
-        self._metaData['RunMode']['Simulate']['UseSample'] = True
+        if setForSpread:
+            sample['UseSample'] = True
+        else:
+            self._metaData['RunMode']['Simulate']['UseSample'] = True
 
-    def setBarCountInSample(self, count, sample):
+    def setBarCountInSample(self, count, sample, setForSpread=False):
         '''设置K线数量'''
         if 'AllK' in sample:
             del sample['AllK']
@@ -1261,13 +1277,18 @@ class StrategyConfig(object):
             del sample['BeginTime']
 
         sample['KLineCount'] = count
-        self._metaData['RunMode']['Simulate']['UseSample'] = True
+        if setForSpread:
+            sample['UseSample'] = True
+        else:
+            self._metaData['RunMode']['Simulate']['UseSample'] = True
 
     def setUseSample(self, isUseSample):
         self._metaData['RunMode']['Simulate']['UseSample'] = isUseSample
 
     def setBarInterval(self, barType, barInterval, contNo=''):
         '''设置K线类型和K线周期'''
+        if barType not in ('t', 'T', 'S', 'M', 'H', 'D', 'W', 'm', 'Y'):
+            return -1
         if contNo in self._metaData['Sample']:
             self.setBarIntervalInSample(barType, barInterval, self._metaData['Sample'][contNo])
             return
@@ -1469,6 +1490,84 @@ class StrategyConfig(object):
             return True
         except:
             return False
+
+    # ----------------- 设置套利函数相关 ---------------------
+    def setSpread(self, contList):
+        '''设置套利合约列表'''
+        if not contList:
+            return 0
+
+        contract = []
+        for cont in contList:
+            if cont in self.getContract():
+                contract.append(cont)
+
+        if not contract:
+            return -1
+        self._metaData['Spread'] = {'Contract' : tuple(contract)}
+
+    def getSpread(self):
+        '''获取套利合约列表'''
+        if self.isSetSpread():
+            return self._metaData['Spread']['Contract']
+
+    def isSetSpread(self):
+        '''是否设置套利合约列表'''
+        if 'Spread' in self._metaData and len(self._metaData['Spread']['Contract']) > 0:
+            return True
+        return False
+
+    def setSpreadSample(self, sampleType, sampleValue):
+        '''设置套利合约的样本数据'''
+        if not self.isSetSpread():
+            return -1
+
+        if sampleType not in ('A', 'D', 'C', 'N'):
+            return -1
+
+        if 'Sample' not in self._metaData['Spread']:
+            self._metaData['Spread']['Sample'] = self.initSampleDict()
+
+        # 使用所有K线
+        if sampleType == 'A':
+            self.setAllKTrueInSample(self._metaData['Spread']['Sample'], True)
+            return 0
+
+        # 指定日期开始触发
+        if sampleType == 'D':
+            if not sampleValue or not isinstance(sampleValue, str):
+                return -1
+            if not self.isVaildDate(sampleValue, "%Y%m%d"):
+                return -1
+            self.setBarPeriodInSample(sampleValue, self._metaData['Spread']['Sample'], True)
+            return 0
+
+        # 使用固定根数
+        if sampleType == 'C':
+            if not isinstance(sampleValue, int) or sampleValue <= 0:
+                return -1
+            self.setBarCountInSample(sampleValue, self._metaData['Spread']['Sample'], True)
+            return 0
+
+        # 不执行历史K线
+        if sampleType == 'N':
+            self._metaData['Spread']['Sample']['UseSample'] = False
+            return 0
+
+        return -1
+
+    def setSpreadBarInterval(self, barType, barInterval):
+        '''设置K线类型和K线周期'''
+        if not self.isSetSpread():
+            return -1
+        if barType not in ('t', 'T', 'S', 'M', 'H', 'D', 'W', 'm', 'Y'):
+            return -1
+        self.setBarIntervalInSample(barType, barInterval, self._metaData['Spread']['Sample'])
+
+    def getSpreadSample(self):
+        if not self.isSetSpread():
+            return None
+        return self._metaData['Spread']['Sample']
 
 class BarInfo(object):
     def __init__(self, logger):

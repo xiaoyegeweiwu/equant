@@ -211,7 +211,13 @@ _all_func_ = {
                     ['SetMinTradeQuantity' , '设置最小下单量'],
                     ['SetHedge'            , '设置投保标志'],
                     ['SetSlippage'         , '设置滑点损耗'],
-                    ['SetTriggerMode', '设置触发方式'],
+                    ['SetTriggerMode'      , '设置触发方式'],
+                ],
+
+    '套利函数': [
+                    ['S_SetSpread'         , '设置套利合约列表'],
+                    ['S_SetSample'         , '设置套利合约历史回测样本数量'],
+                    ['S_SetBarInterval'    , '设置套利合约的K线类型'],
                 ],
 
     '其他函数': [
