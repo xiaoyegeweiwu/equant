@@ -378,13 +378,13 @@ class StrategyModel(object):
     def setBarInterval(self, barType, barInterval, contNo):
         self._cfgModel.setBarInterval(barType, barInterval, contNo)
 
-    def setSample(self, sampleType, sampleValue):
+    def setSample(self, sampleType, sampleValue, contNo):
         if sampleType not in ('A', 'D', 'C', 'N'):
             return -1
 
         # 使用所有K线
         if sampleType == 'A':
-            self._cfgModel.setAllKTrue()
+            self._cfgModel.setAllKTrue(contNo)
             return 0
 
         # 指定日期开始触发
@@ -393,14 +393,14 @@ class StrategyModel(object):
                 return -1
             if not self.isVaildDate(sampleValue):
                 return -1
-            self._cfgModel.setBarPeriod(sampleValue)
+            self._cfgModel.setBarPeriod(sampleValue, contNo)
             return 0
 
         # 使用固定根数
         if sampleType == 'C':
             if not isinstance(sampleValue, int) or sampleValue <= 0:
                 return -1
-            self._cfgModel.setBarCount(sampleValue)
+            self._cfgModel.setBarCount(sampleValue, contNo)
             return 0
 
         # 不执行历史K线
@@ -1036,12 +1036,16 @@ class StrategyConfig(object):
         },
         
         'Sample'   : {  #样本设置
-            'BarInterval'    :  {
-                'ZCE|F|SC|906'  :   {
-                    'KLineType'     : 'M',   K线类型
-                    'KLineSlice'    : 1,     K线周期
-                }
+            'ZCE|F|SC|906'  :   {
+                'KLineType'     : 'M',   K线类型
+                'KLineSlice'    : 1,     K线周期
+
+                'UseSample'     : True,  是否使用样本
+                'KLineCount'    : 0,     K线数量
+                'BeginTime'     : '',    起始日期， 目前支持到天
             }
+            'KLineType'     : 'M',   K线类型
+            'KLineSlice'    : 1,     K线周期
             'UseSample'     : True,  是否使用样本
             'KLineCount'    : 0,     K线数量
             'BeginTime'     : '',    起始日期， 目前支持到天
@@ -1089,43 +1093,8 @@ class StrategyConfig(object):
         if ret > 0:
             raise Exception(ret)
 
-        self._metaData = self.convertArgsDict(argsDict)
-
-    def convertArgsDict(self, argsDict):
-        metaData = {}
-        contNo = None
-        for key, value in argsDict.items():
-            if key == 'Contract' and len(value) > 0:
-                # argsDict 中的合约信息可以为空
-                contNo = value[0]
-
-            if key == 'Sample' and contNo:
-                sampleDict = {contNo : {}}
-                for sampleKey, sampleValue in value.items():
-                    if sampleKey in ('KLineType', 'KLineSlice'):
-                        sampleDict[contNo][sampleKey] = sampleValue
-                    else:
-                        sampleDict[sampleKey] = sampleValue
-                metaData['Sample'] = deepcopy(sampleDict)
-                continue
-
-            if key == 'Money':
-                moneyDict = {contNo : {}}
-                userNo = None
-                for moneyKey, moneyValue in value.items():
-                    # if moneyKey in ('UserNo', 'InitFunds'):
-                    if moneyKey == 'UserNo':
-                        userNo = moneyValue
-                        moneyDict[moneyKey] = moneyValue
-                    elif moneyKey == 'InitFunds':
-                        moneyDict[userNo] = {moneyKey : moneyValue}
-                    else:
-                        moneyDict[contNo][moneyKey] = moneyValue
-                metaData['Money'] = deepcopy(moneyDict)
-                continue
-
-            metaData[key] = deepcopy(value)
-        return metaData
+        # self._metaData = self.convertArgsDict(argsDict)
+        self._metaData = deepcopy(argsDict)
         
     def _chkConfig(self, argsDict):
         if 'Contract' not in argsDict:
@@ -1230,37 +1199,41 @@ class StrategyConfig(object):
         
     def getSample(self, contNo=''):
         '''获取样本数据'''
-        if not contNo:
-            contNo = self.getBenchmark()
         if contNo in self._metaData['Sample']:
-            return None
-        return self._metaData['Sample'][contNo]
+            return self._metaData['Sample'][contNo]
+        return self._metaData['Sample']
 
-    def getStartTime(self):
+    def getStartTime(self, contNo=''):
         '''获取回测起始时间'''
+        if contNo in self._metaData['Sample']:
+            if "BeginTime" in self._metaData['Sample'][contNo]:
+                return self._metaData['Sample'][contNo]['BeginTime']
+            else:
+                return 0
         if "BeginTime" in self._metaData['Sample']:
             return self._metaData['Sample']['BeginTime']
         return 0
 
     def getKLineType(self, contNo=''):
         '''获取K线类型'''
-        if not contNo:
-            contNo = self.getBenchmark()
-        if contNo not in self._metaData['Sample']:
-            return None
-        return self._metaData['Sample'][contNo]['KLineType']
+        if contNo in self._metaData['Sample']:
+            return self._metaData['Sample'][contNo]['KLineType']
+        return self._metaData['Sample']['KLineType']
 
     def getKLineSlice(self, contNo=''):
         '''获取K线间隔'''
-        if not contNo:
-            contNo = self.getBenchmark()
-        if contNo not in self._metaData['Sample']:
-            return 0
-        return self._metaData['Sample'][contNo]['KLineSlice']
+        if contNo in self._metaData['Sample']:
+            return self._metaData['Sample'][contNo]['KLineSlice']
+        return self._metaData['Sample']['KLineSlice']
 
-    def setAllKTrue(self):
+    def setAllKTrue(self, contNo=''):
         '''使用所有K线回测'''
-        sample = self._metaData['Sample']
+        if contNo in self._metaData['Sample']:
+            self.setAllKTrueInSample(self._metaData['Sample'][contNo])
+            return 0
+        self.setAllKTrueInSample(self._metaData['Sample'])
+
+    def setAllKTrueInSample(self, sample):
         if 'BeginTime' in sample:
             del sample['BeginTime']
 
@@ -1270,9 +1243,14 @@ class StrategyConfig(object):
         sample['AllK'] = True
         self._metaData['RunMode']['Simulate']['UseSample'] = True
 
-    def setBarPeriod(self, beginDate):
+    def setBarPeriod(self, beginDate, contNo=''):
         '''设置起止时间'''
-        sample = self._metaData['Sample']
+        if contNo in self._metaData['Sample']:
+            self.setBarPeriodInSample(beginDate, self._metaData['Sample'][contNo])
+            return 0
+        self.setBarPeriodInSample(beginDate, self._metaData['Sample'])
+
+    def setBarPeriodInSample(self, beginDate, sample):
         if 'AllK' in sample:
             del sample['AllK']
 
@@ -1282,9 +1260,15 @@ class StrategyConfig(object):
         sample['BeginTime'] = beginDate
         self._metaData['RunMode']['Simulate']['UseSample'] = True
 
-    def setBarCount(self, count):
+    def setBarCount(self, count, contNo=''):
         '''设置K线数量'''
-        sample = self._metaData['Sample']
+        if contNo in self._metaData['Sample']:
+            self.serBarCountInSample(count, self._metaData['Sample'][contNo])
+            return 0
+        self.setBarCountInSample(count, self._metaData['Sample'])
+
+
+    def setBarCountInSample(self, count, sample):
         if 'AllK' in sample:
             del sample['AllK']
 
@@ -1299,23 +1283,27 @@ class StrategyConfig(object):
 
     def setBarInterval(self, barType, barInterval, contNo=''):
         '''设置K线类型和K线周期'''
-        if not contNo:
-            contNo = self.getBenchmark()
-        if barType and barInterval > 0:
-            self._metaData['Sample'][contNo] = {'KLineType': barType, 'KLineSlice': barInterval}
+        if contNo in self._metaData['Sample']:
+            self.setBarIntervalInSample(barType, barInterval, self._metaData['Sample'][contNo])
+            return
+        self.setBarIntervalInSample(barType, barInterval, self._metaData['Sample'])
+
+    def setBarIntervalInSample(self, barType, barInterval, sample):
+        if barType:
+            sample['KLineType'] = barType
+        if barInterval > 0:
+            sample['KLineSlice'] = barInterval
 
     def getInitCapital(self, userNo=''):
         '''获取初始资金'''
-        if not userNo:
-            userNo = self.getUserNo()
-        if userNo not in self._metaData:
-            return 0
-        return self._metaData['Money'][userNo]['InitFunds']
+        if userNo in self._metaData:
+            return self._metaData['Money'][userNo]['InitFunds']
+        return self._metaData['Money']['InitFunds']
 
     def setInitCapital(self, capital, userNo=''):
         '''设置初始资金'''
         if not userNo:
-            userNo = self.getUserNo()
+            self._metaData['Money']['InitFunds'] = capital
         if userNo not in self._metaData['Money']:
             self._metaData['Money'][userNo] = {'InitFunds': capital}
         else:
@@ -1327,23 +1315,15 @@ class StrategyConfig(object):
 
     def getMarginValue(self, contNo=''):
         '''获取保证金比例值'''
-        if not contNo:
-            contNo = self.getBenchmark()
-
-        if contNo not in self._metaData['Money']:
-            return 0
-        else:
+        if contNo in self._metaData['Money']:
             return self._metaData['Money'][contNo]['Margin']['Value']
+        return self._metaData['Money']['Margin']['Value']
 
     def getMarginType(self, contNo=''):
         '''获取保证金类型'''
-        if not contNo:
-            contNo = self.getBenchmark()
-
-        if contNo not in self._metaData['Money']:
-            return None
-        else:
+        if contNo in self._metaData['Money']:
             return self._metaData['Money'][contNo]['Margin']['Type']
+        return self._metaData['Money']['Margin']['Type']
 
     def setMargin(self, type, value, contNo=''):
         '''设置保证金的类型及比例/额度'''
@@ -1351,7 +1331,9 @@ class StrategyConfig(object):
             return -1
 
         if not contNo:
-            contNo = self.getBenchmark()
+            self._metaData['Money'][contNo]['Margin']['Value'] = value
+            self._metaData['Money'][contNo]['Margin']['Type'] = type
+            return 0
         if contNo not in self._metaData['Money']:
             self._metaData['Money'][contNo] = self.initFeeDict()
         self._metaData['Money'][contNo]['Margin']['Value'] = value
@@ -1362,13 +1344,11 @@ class StrategyConfig(object):
         '''获取 开仓/平仓/今平 手续费率或固定手续费'''
         if feeType not in ('OpenFee', 'CloseFee', 'CloseTodayFee'):
             return 0
-        if not contNo:
-            contNo = self.getBenchmark()
-        if contNo not in self._metaData['Money']:
-            return 0
 
         openFeeType = EEQU_FEE_TYPE_RATIO if isRatio else EEQU_FEE_TYPE_FIXED
-        return self._metaData['Money'][contNo][feeType]['Value'] if self._metaData['Money'][contNo][feeType]['Type'] == openFeeType else 0
+        if contNo in self._metaData['Money']:
+            return self._metaData['Money'][contNo][feeType]['Value'] if self._metaData['Money'][contNo][feeType]['Type'] == openFeeType else 0
+        return self._metaData['Money'][feeType]['Value'] if self._metaData['Money'][feeType]['Type'] == openFeeType else 0
 
     def getOpenRatio(self, contNo=''):
         '''获取开仓手续费率'''
@@ -1396,26 +1376,29 @@ class StrategyConfig(object):
 
 
     def setTradeFee(self, type, feeType, feeValue, contNo=''):
+        if not contNo:
+            self.setTradeFeeInMoneyDict(type, feeType, feeValue, self._metaData['Money'])
+            return
+
+        if contNo not in self._metaData['Money']:
+            self._metaData['Money'][contNo] = self.initFeeDict()
+        self.setTradeFeeInMoneyDict(type, feeType, feeValue, self._metaData['Money'][contNo])
+
+    def setTradeFeeInMoneyDict(self, type, feeType, feeValue, moneyDict):
         typeMap = {
-            'A' : ('OpenFee', 'CloseFee', 'CloseTodayFee'),
-            'O' : ('OpenFee',),
-            'C' : ('CloseFee',),
-            'T' : ('CloseTodayFee',),
+            'A': ('OpenFee', 'CloseFee', 'CloseTodayFee'),
+            'O': ('OpenFee',),
+            'C': ('CloseFee',),
+            'T': ('CloseTodayFee',),
         }
         if type not in typeMap:
             return
 
-        if not contNo:
-            contNo = self.getBenchmark()
-        if contNo not in self._metaData['Money']:
-            self._metaData['Money'][contNo] = self.initFeeDict()
-
-        money = self._metaData['Money'][contNo]
         keyList = typeMap[type]
         for key in keyList:
-            moneyDict = money[key]
-            moneyDict['Type'] = feeType
-            moneyDict['Value'] = feeValue
+            money = moneyDict[key]
+            money['Type'] = feeType
+            money['Value'] = feeValue
 
     def initFeeDict(self):
         keys = ('Margin', 'OpenFee', 'CloseFee', 'CloseTodayFee')
@@ -1452,7 +1435,8 @@ class StrategyConfig(object):
     def setMinQty(self, minQty, contNo=''):
         '''设置最小下单量'''
         if not contNo:
-            contNo = self.getBenchmark()
+            self._metaData["Money"]["MinQty"] = minQty
+            return
         if contNo not in self._metaData['Money']:
             self._metaData['Money'][contNo] = self.initFeeDict()
         self._metaData["Money"]["MinQty"] = minQty
@@ -1460,7 +1444,7 @@ class StrategyConfig(object):
     def setHedge(self, hedge, contNo=''):
         '''设置投保标志'''
         if not contNo:
-            contNo = self.getBenchmark()
+            self._metaData["Money"]["Hedge"] = hedge
         if contNo not in self._metaData['Money']:
             self._metaData['Money'][contNo] = self.initFeeDict()
         self._metaData["Money"][contNo]["Hedge"] = hedge

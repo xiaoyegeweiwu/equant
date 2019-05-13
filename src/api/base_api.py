@@ -2732,13 +2732,13 @@ class BaseApi(object):
         '''
         return self._dataModel.setBarInterval(barType, barInterval, contNo)
 
-    def SetSample(self, sampleType, sampleValue):
+    def SetSample(self, sampleType, sampleValue, contNo):
         '''
         【说明】
               设置策略历史回测的样本数量，默认为使用2000根K线进行回测。
 
         【语法】
-              int SetSample(char sampleType, int|string sampleValue)
+              int SetSample(char sampleType, int|string sampleValue, string contNo)
 
         【参数】
               sampleType 历史回测起始点类型
@@ -2750,17 +2750,19 @@ class BaseApi(object):
                 当sampleType为A或N时，sampleValue的值不设置；
                 当sampleType为D时，sampleValue为形如'20190430'的string型触发指定日期；
                 当sampleType为C时，sampleValue为int型历史回测使用的K线根数。
+              contNo 合约编号，不填表示是对默认历史回测的样本参数做修改。
 
         【备注】
               返回整型，0成功，-1失败
 
         【示例】
-              SetSample(sampleType, sampleValue)
+              SetSample(sampleType, sampleValue, contNo)
         '''
-        return self._dataModel.setSample(sampleType, sampleValue)
+        return self._dataModel.setSample(sampleType, sampleValue, contNo)
 
     def SetAllKTrue(self):
         '''
+        已经对用户屏蔽！！！！
         【说明】
               使用所有历史K线进行历史回测
 
@@ -2780,6 +2782,7 @@ class BaseApi(object):
 
     def SetBarPeriod(self, beginDate):
         '''
+        已经对用户屏蔽！！！！
         【说明】
               设置K线范围，不设置年线、月线、周线、日线全部，分钟线1年，秒线1月，tick2天
 
@@ -2799,6 +2802,7 @@ class BaseApi(object):
 
     def SetBarCount(self, count):
         '''
+        已经对用户屏蔽！！！！
         【说明】
               设置K线数量
 
@@ -3485,8 +3489,8 @@ def SetUserNo(userNo=''):
 def SetBarInterval(barType, barInterval, contNo=''):
     return baseApi.SetBarInterval(barType, barInterval, contNo)
 
-def SetSample(sampleType='C', sampleValue=2000):
-    return baseApi.SetSample(sampleType, sampleValue)
+def SetSample(sampleType='C', sampleValue=2000, contNo=''):
+    return baseApi.SetSample(sampleType, sampleValue, contNo)
 
 ################### Begin ####################
 def SetAllKTrue():
