@@ -1331,8 +1331,8 @@ class StrategyConfig(object):
             return -1
 
         if not contNo:
-            self._metaData['Money'][contNo]['Margin']['Value'] = value
-            self._metaData['Money'][contNo]['Margin']['Type'] = type
+            self._metaData['Money']['Margin']['Value'] = value
+            self._metaData['Money']['Margin']['Type'] = type
             return 0
         if contNo not in self._metaData['Money']:
             self._metaData['Money'][contNo] = self.initFeeDict()
