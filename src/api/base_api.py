@@ -2759,67 +2759,6 @@ class BaseApi(object):
               SetSample(sampleType, sampleValue, contNo)
         '''
         return self._dataModel.setSample(sampleType, sampleValue, contNo)
-
-    def SetAllKTrue(self):
-        '''
-        已经对用户屏蔽！！！！
-        【说明】
-              使用所有历史K线进行历史回测
-
-        【语法】
-              int SetAllKTrue()
-
-        【参数】
-              无
-
-        【备注】
-              返回整型，0成功，-1失败
-
-        【示例】
-              SetAllKTrue()
-        '''
-        return self._dataModel.setAllKTrue()
-
-    def SetBarPeriod(self, beginDate):
-        '''
-        已经对用户屏蔽！！！！
-        【说明】
-              设置K线范围，不设置年线、月线、周线、日线全部，分钟线1年，秒线1月，tick2天
-
-        【语法】
-              int SetBarPeriod(string beginDate)
-
-        【参数】
-              beginDate 起始日期
-
-        【备注】
-              返回整型，0成功，-1失败
-
-        【示例】
-              SetBarPeriod('20180327')
-        '''
-        return self._dataModel.setBarPeriod(beginDate)
-
-    def SetBarCount(self, count):
-        '''
-        已经对用户屏蔽！！！！
-        【说明】
-              设置K线数量
-
-        【语法】
-              int SetBarCount(int count)
-
-        【参数】
-              count K线数量
-
-        【备注】
-              返回整型，0成功，-1失败
-
-        【示例】
-              SetBarCount(1000)
-            
-        '''
-        return self._dataModel.setBarCount(count)
         
     def SetInitCapital(self, capital, userNo):
         '''
@@ -3491,17 +3430,6 @@ def SetBarInterval(barType, barInterval, contNo=''):
 
 def SetSample(sampleType='C', sampleValue=2000, contNo=''):
     return baseApi.SetSample(sampleType, sampleValue, contNo)
-
-################### Begin ####################
-def SetAllKTrue():
-    return baseApi.SetAllKTrue()
-
-def SetBarPeriod(beginDate):
-    return baseApi.SetBarPeriod(beginDate)
-    
-def SetBarCount(count):
-    return baseApi.SetBarCount(count)
-################### End ####################
 
 def SetInitCapital(capital='', userNo=''):
     return baseApi.SetInitCapital(capital, userNo)

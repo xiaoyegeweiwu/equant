@@ -372,58 +372,11 @@ class StrategyModel(object):
     def setUserNo(self, userNo):
         self._cfgModel.setUserNo(userNo)
 
-    def setAllKTrue(self):
-        self._cfgModel.setAllKTrue()
-
     def setBarInterval(self, barType, barInterval, contNo):
         self._cfgModel.setBarInterval(barType, barInterval, contNo)
 
     def setSample(self, sampleType, sampleValue, contNo):
-        if sampleType not in ('A', 'D', 'C', 'N'):
-            return -1
-
-        # 使用所有K线
-        if sampleType == 'A':
-            self._cfgModel.setAllKTrue(contNo)
-            return 0
-
-        # 指定日期开始触发
-        if sampleType == 'D':
-            if not sampleValue or not isinstance(sampleValue, str):
-                return -1
-            if not self.isVaildDate(sampleValue):
-                return -1
-            self._cfgModel.setBarPeriod(sampleValue, contNo)
-            return 0
-
-        # 使用固定根数
-        if sampleType == 'C':
-            if not isinstance(sampleValue, int) or sampleValue <= 0:
-                return -1
-            self._cfgModel.setBarCount(sampleValue, contNo)
-            return 0
-
-        # 不执行历史K线
-        if sampleType == 'N':
-            self._cfgModel.setUseSample(False)
-            return 0
-
-        return -1
-
-    def isVaildDate(self, date):
-        try:
-            time.strptime(date, "%Y%m%d")
-            return True
-        except:
-            return False
-
-    def setBarPeriod(self, beginDate):
-        if not beginDate:
-            return -1
-        self._cfgModel.setBarPeriod(beginDate)
-        
-    def setBarCount(self, count):
-        self._cfgModel.setBarCount(count)
+        return self._cfgModel.setSample(sampleType, sampleValue, contNo)
 
     def setInitCapital(self, capital, userNo):
         initFund = capital if capital else 1000000
@@ -1196,7 +1149,57 @@ class StrategyConfig(object):
         else:
             trigger['Cycle'] = interval
         return 0
-        
+
+    def setSample(self, sampleType, sampleValue, contNo=''):
+        '''设置样本数据'''
+        if sampleType not in ('A', 'D', 'C', 'N'):
+            return -1
+
+        sample = None
+        if not contNo:
+            sample = self._metaData['Sample']
+        elif contNo not in self._metaData['Sample']:
+            self._metaData['Sample'][contNo] = self.initSampleDict()
+            sample = self._metaData['Sample'][contNo]
+        else:
+            sample = self._metaData['Sample'][contNo]
+
+        # 使用所有K线
+        if sampleType == 'A':
+            self.setAllKTrueInSample(sample)
+            return 0
+
+        # 指定日期开始触发
+        if sampleType == 'D':
+            if not sampleValue or not isinstance(sampleValue, str):
+                return -1
+            if not self.isVaildDate(sampleValue, "%Y%m%d"):
+                return -1
+            self.setBarPeriodInSample(sampleValue, sample)
+            return 0
+
+        # 使用固定根数
+        if sampleType == 'C':
+            if not isinstance(sampleValue, int) or sampleValue <= 0:
+                return -1
+            self.setBarCountInSample(sampleValue, sample)
+            return 0
+
+        # 不执行历史K线
+        if sampleType == 'N':
+            self.setUseSample(False)
+            return 0
+
+        return -1
+
+    def initSampleDict(self):
+        sample = {
+            'KLineType': 'D',
+            'KLineSlice': 1,
+            'KLineCount': 2000
+        }
+        return sample
+
     def getSample(self, contNo=''):
         '''获取样本数据'''
         if contNo in self._metaData['Sample']:
@@ -1226,13 +1229,6 @@ class StrategyConfig(object):
             return self._metaData['Sample'][contNo]['KLineSlice']
         return self._metaData['Sample']['KLineSlice']
 
-    def setAllKTrue(self, contNo=''):
-        '''使用所有K线回测'''
-        if contNo in self._metaData['Sample']:
-            self.setAllKTrueInSample(self._metaData['Sample'][contNo])
-            return 0
-        self.setAllKTrueInSample(self._metaData['Sample'])
-
     def setAllKTrueInSample(self, sample):
         if 'BeginTime' in sample:
             del sample['BeginTime']
@@ -1243,14 +1239,8 @@ class StrategyConfig(object):
         sample['AllK'] = True
         self._metaData['RunMode']['Simulate']['UseSample'] = True
 
-    def setBarPeriod(self, beginDate, contNo=''):
-        '''设置起止时间'''
-        if contNo in self._metaData['Sample']:
-            self.setBarPeriodInSample(beginDate, self._metaData['Sample'][contNo])
-            return 0
-        self.setBarPeriodInSample(beginDate, self._metaData['Sample'])
-
     def setBarPeriodInSample(self, beginDate, sample):
+        '''设置起止时间'''
         if 'AllK' in sample:
             del sample['AllK']
 
@@ -1260,15 +1250,8 @@ class StrategyConfig(object):
         sample['BeginTime'] = beginDate
         self._metaData['RunMode']['Simulate']['UseSample'] = True
 
-    def setBarCount(self, count, contNo=''):
-        '''设置K线数量'''
-        if contNo in self._metaData['Sample']:
-            self.serBarCountInSample(count, self._metaData['Sample'][contNo])
-            return 0
-        self.setBarCountInSample(count, self._metaData['Sample'])
-
-
     def setBarCountInSample(self, count, sample):
+        '''设置K线数量'''
         if 'AllK' in sample:
             del sample['AllK']
 
@@ -1480,6 +1463,7 @@ class StrategyConfig(object):
 
     def isVaildDate(self, date, format):
         try:
+            time.strptime(date, format)
             return True
         except:
             return False
