@@ -655,8 +655,10 @@ class StrategyModel(object):
             'KLineIndex' : curBar['KLineIndex'],
             'Value'      : value
         }]
-
-        eventCode = EV_ST2EG_UPDATE_KLINESERIES if self._strategy.isRealTimeStatus() else EV_ST2EG_NOTICE_KLINESERIES
+        if self._strategy.isRealTimeStatus() or self._strategy.isRealTimeAsHisStatus():
+            eventCode = EV_ST2EG_UPDATE_KLINESERIES
+        else:
+            eventCode = EV_ST2EG_NOTICE_KLINESERIES
         serialEvent = Event({
             "EventCode" : eventCode,
             "StrategyId": self._strategy.getStrategyId(),
