@@ -628,6 +628,112 @@ class StrategyModel(object):
         }
         self._calcCenter.addOrder(orderParam)
 
+    # ///////////////////////枚举函数///////////////////////////
+    def getEnumBuy(self):
+        return dBuy
+
+    def getEnumSell(self):
+        return dSell
+
+    def getEnumEntry(self):
+        return oOpen
+
+    def getEnumExit(self):
+        return oCover
+
+    def getEnumExitToday(self):
+        return oCoverT
+
+    def getEnumEntryExitIgnore(self):
+        return oNone
+
+    def getEnumSended(self):
+        return osSended
+
+    def getEnumAccept(self):
+        return osAccept
+
+    def getEnumTriggering(self):
+        return osTriggering
+
+    def getEnumActive(self):
+        return osActive
+
+    def getEnumQueued(self):
+        return osQueued
+
+    def getEnumFillPart(self):
+        return osFillPart
+
+    def getEnumFilled(self):
+        return osFilled
+
+    def getEnumCanceling(self):
+        return osCanceling
+
+    def getEnumModifying(self):
+        return osModifying
+
+    def getEnumCanceled(self):
+        return osCanceled
+
+    def getEnumPartCanceled(self):
+        return osPartCanceled
+
+    def getEnumFail(self):
+        return osFail
+
+    def getEnumSuspended(self):
+        return osSuspended
+
+    def getEnumApply(self):
+        return osApply
+
+    def getEnumPeriodTick(self):
+        return EEQU_KLINE_TICK
+
+    def getEnumPeriodDyna(self):
+        return EEQU_KLINE_TIMEDIVISION
+
+    def getEnumPeriodSecond(self):
+        return EEQU_KLINE_SECOND
+
+    def getEnumPeriodMin(self):
+        return EEQU_KLINE_MINUTE
+
+    def getEnumPeriodHour(self):
+        return EEQU_KLINE_HOUR
+
+    def getEnumPeriodDay(self):
+        return EEQU_KLINE_DAY
+
+    def getEnumPeriodWeek(self):
+        return EEQU_KLINE_WEEK
+
+    def getEnumPeriodMonth(self):
+        return EEQU_KLINE_MONTH
+
+    def getEnumPeriodYear(self):
+        return EEQU_KLINE_YEAR
+
+    def getEnumPeriodDayX(self):
+        return EEQU_KLINE_DayX
+
+    def getEnumColorRed(self):
+        return 0xFF0000
+
+    def getEnumColorGreen(self):
+        return 0x00FF00
+
+    def getEnumColorBlue(self):
+        return 0x0000FF
+
+    def getEnumColorPurple(self):
+        return 0x9900FF
+
+    def getEnumColorGray(self):
+        return 0x999999
+
     #///////////////////////其他函数///////////////////////////
     def _addSeries(self, name, value, locator, color, barsback):
         addSeriesEvent = Event({

@@ -2464,32 +2464,393 @@ class BaseApi(object):
               返回买卖状态的买入枚举值
 
         【语法】
-              int Enum_Buy()
+              char Enum_Buy()
 
         【参数】
               无
 
         【备注】
-              返回整型
+              返回字符
 
         【示例】
               无
         '''
         return self._dataModel.getEnumBuy()
-        
+
+    def Enum_Sell(self):
+        '''
+        【说明】
+              返回买卖状态的卖出枚举值
+
+        【语法】
+              char Enum_Sell()
+
+        【参数】
+              无
+
+        【备注】
+              返回字符
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getEnumSell()
+
+    def Enum_Entry(self):
+        '''
+        【说明】
+              返回开平状态的开仓枚举值
+
+        【语法】
+              char Enum_Entry()
+
+        【参数】
+              无
+
+        【备注】
+              返回字符
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getEnumEntry()
+
+    def Enum_Exit(self):
+        '''
+        【说明】
+              返回开平状态的平仓枚举值
+
+        【语法】
+              char Enum_Exit()
+
+        【参数】
+              无
+
+        【备注】
+              返回字符
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getEnumExit()
+
+    def Enum_ExitToday(self):
+        '''
+        【说明】
+              返回开平状态的平今枚举值
+
+        【语法】
+              char Enum_ExitToday()
+
+        【参数】
+              无
+
+        【备注】
+              返回字符
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getEnumExitToday()
+
+    def Enum_EntryExitIgnore(self):
+        '''
+        【说明】
+              返回开平状态不区分开平的枚举值
+
+        【语法】
+              char Enum_EntryExitIgnore()
+
+        【参数】
+              无
+
+        【备注】
+              返回字符
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getEnumEntryExitIgnore()
+
+    def Enum_Sended(self):
+        '''
+        【说明】
+              返回委托状态为已发送的枚举值
+
+        【语法】
+              char Enum_Sended()
+
+        【参数】
+              无
+
+        【备注】
+              返回字符
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getEnumSended()
+
+    def Enum_Accept(self):
+        '''
+        【说明】
+              返回委托状态为已受理的枚举值
+
+        【语法】
+              char Enum_Accept()
+
+        【参数】
+              无
+
+        【备注】
+              返回字符
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getEnumAccept()
+
+    def Enum_Triggering(self):
+        '''
+        【说明】
+              返回委托状态为待触发的枚举值
+
+        【语法】
+              char Enum_Triggering()
+
+        【参数】
+              无
+
+        【备注】
+              返回字符
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getEnumTriggering()
+
+    def Enum_Active(self):
+        '''
+        【说明】
+              返回委托状态为已生效的枚举值
+
+        【语法】
+              char Enum_Active()
+
+        【参数】
+              无
+
+        【备注】
+              返回字符
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getEnumActive()
+
+    def Enum_Queued(self):
+        '''
+        【说明】
+              返回委托状态为已排队的枚举值
+
+        【语法】
+              char Enum_Queued()
+
+        【参数】
+              无
+
+        【备注】
+              返回字符
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getEnumQueued()
+
+    def Enum_FillPart(self):
+        '''
+        【说明】
+              返回委托状态为部分成交的枚举值
+
+        【语法】
+              char Enum_FillPart()
+
+        【参数】
+              无
+
+        【备注】
+              返回字符
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getEnumFillPart()
+
+    def Enum_Filled(self):
+        '''
+        【说明】
+              返回委托状态为全部成交的枚举值
+
+        【语法】
+              char Enum_Filled()
+
+        【参数】
+              无
+
+        【备注】
+              返回字符
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getEnumFilled()
+
+    def Enum_Canceling(self):
+        '''
+        【说明】
+              返回委托状态为待撤的枚举值
+
+        【语法】
+              char Enum_Canceling()
+
+        【参数】
+              无
+
+        【备注】
+              返回字符
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getEnumCanceling()
+
+    def Enum_Modifying(self):
+        '''
+        【说明】
+              返回委托状态为待改的枚举值
+
+        【语法】
+              char Enum_Modifying()
+
+        【参数】
+              无
+
+        【备注】
+              返回字符
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getEnumModifying()
+
+    def Enum_Canceled(self):
+        '''
+        【说明】
+              返回委托状态为已撤单的枚举值
+
+        【语法】
+              char Enum_Canceled()
+
+        【参数】
+              无
+
+        【备注】
+              返回字符
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getEnumCanceled()
+
+    def Enum_PartCanceled(self):
+        '''
+        【说明】
+              返回委托状态为已撤余单的枚举值
+
+        【语法】
+              char Enum_PartCanceled()
+
+        【参数】
+              无
+
+        【备注】
+              返回字符
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getEnumPartCanceled()
+
+    def Enum_Fail(self):
+        '''
+        【说明】
+              返回委托状态为指令失败的枚举值
+
+        【语法】
+              char Enum_Fail()
+
+        【参数】
+              无
+
+        【备注】
+              返回字符
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getEnumFail()
+
+    def Enum_Suspended(self):
+        '''
+        【说明】
+              返回委托状态为已挂起的枚举值
+
+        【语法】
+              char Enum_Suspended()
+
+        【参数】
+              无
+
+        【备注】
+              返回字符
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getEnumSuspended()
+
+    def Enum_Apply(self):
+        '''
+        【说明】
+              返回委托状态为已申请的枚举值
+
+        【语法】
+              char Enum_Apply()
+
+        【参数】
+              无
+
+        【备注】
+              返回字符
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getEnumApply()
+
     def Enum_Period_Tick(self):
         '''
         【说明】
               返回周期类型成交明细的枚举值
 
         【语法】
-              int Enum_Period_Tick()
+              char Enum_Period_Tick()
 
         【参数】
               无
 
         【备注】
-              返回整型
+              返回字符
 
         【示例】
               无
@@ -2502,13 +2863,13 @@ class BaseApi(object):
               返回周期类型分时图枚举值
 
         【语法】
-              int Enum_Period_Dyna()
+              char Enum_Period_Dyna()
 
         【参数】
               无
 
         【备注】
-              返回整型
+              返回字符
 
         【示例】
               无
@@ -2521,13 +2882,13 @@ class BaseApi(object):
               返回周期类型秒线的枚举值
 
         【语法】
-              int Enum_Period_Second()
+              char Enum_Period_Second()
 
         【参数】
               无
 
         【备注】
-              返回整型
+              返回字符
 
         【示例】
               无
@@ -2540,13 +2901,13 @@ class BaseApi(object):
               返回周期类型分钟线的枚举值
 
         【语法】
-              int Enum_Period_Min()
+              char Enum_Period_Min()
 
         【参数】
               无
 
         【备注】
-              返回整型
+              返回字符
 
         【示例】
               无
@@ -2559,13 +2920,13 @@ class BaseApi(object):
               返回周期类型小时线的枚举值
 
         【语法】
-              int Enum_Period_Hour()
+              char Enum_Period_Hour()
 
         【参数】
               无
 
         【备注】
-              返回整型
+              返回字符
 
         【示例】
               无
@@ -2578,13 +2939,13 @@ class BaseApi(object):
               返回周期类型日线的枚举值
 
         【语法】
-              int Enum_Period_Day()
+              char Enum_Period_Day()
 
         【参数】
               无
 
         【备注】
-              返回整型
+              返回字符
 
         【示例】
               无
@@ -2597,13 +2958,13 @@ class BaseApi(object):
               返回周期类型周线的枚举值
 
         【语法】
-              int Enum_Period_Week()
+              char Enum_Period_Week()
 
         【参数】
               无
 
         【备注】
-              返回整型
+              返回字符
 
         【示例】
               无
@@ -2616,13 +2977,13 @@ class BaseApi(object):
               返回周期类型月线的枚举值
 
         【语法】
-              int Enum_Period_Month()
+              char Enum_Period_Month()
 
         【参数】
               无
 
         【备注】
-              返回整型
+              返回字符
 
         【示例】
               无
@@ -2635,13 +2996,13 @@ class BaseApi(object):
               返回周期类型年线的枚举值
 
         【语法】
-              int Enum_Period_Year()
+              char Enum_Period_Year()
 
         【参数】
               无
 
         【备注】
-              返回整型
+              返回字符
 
         【示例】
               无
@@ -2654,18 +3015,113 @@ class BaseApi(object):
               返回周期类型多日线的枚举值
 
         【语法】
-              int Enum_Period_DayX()
+              char Enum_Period_DayX()
 
         【参数】
               无
 
         【备注】
-              返回整型
+              返回字符
 
         【示例】
               无
         '''
-        return self._dataModel.getEnumPeriodDayX()   
+        return self._dataModel.getEnumPeriodDayX()
+
+    def Enum_Color_Red(self):
+        '''
+        【说明】
+             返回颜色类型红色的枚举值
+
+        【语法】
+              int Enum_Color_Red()
+
+        【参数】
+              无
+
+        【备注】
+              返回16进制颜色代码
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getEnumColorRed()
+
+    def Enum_Color_Green(self):
+        '''
+        【说明】
+              返回颜色类型绿色的枚举值
+
+        【语法】
+              int Enum_Color_Green()
+
+        【参数】
+              无
+
+        【备注】
+              返回16进制颜色代码
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getEnumColorGreen()
+
+    def Enum_Color_Blue(self):
+        '''
+        【说明】
+              返回颜色类型蓝色的枚举值
+
+        【语法】
+              int Enum_Color_Blue()
+
+        【参数】
+              无
+
+        【备注】
+              返回16进制颜色代码
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getEnumColorBlue()
+
+    def Enum_Color_Purple(self):
+        '''
+        【说明】
+              返回颜色类型紫色的枚举值
+
+        【语法】
+              int Enum_Color_Purple()
+
+        【参数】
+              无
+
+        【备注】
+              返回16进制颜色代码
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getEnumColorPurple()
+
+    def Enum_Color_Gray(self):
+        '''
+        【说明】
+              返回颜色类型灰色的枚举值
+
+        【语法】
+              int Enum_Color_Gray()
+
+        【参数】
+              无
+
+        【备注】
+              返回16进制颜色代码
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getEnumColorGray()
 
     #//////////////////////设置函数////////////////////
     def GetConfig(self):
@@ -3452,6 +3908,66 @@ def SellShort(share=0, price=0, contractNo=None):
     return baseApi.SellShort(contractNo, share, price)
     
 # 枚举函数
+def Enum_Buy():
+    return baseApi.Enum_Buy()
+
+def Enum_Sell():
+    return baseApi.Enum_Sell()
+
+def Enum_Entry():
+    return baseApi.Enum_Entry()
+
+def Enum_Exit():
+    return baseApi.Enum_Exit()
+
+def Enum_ExitToday():
+    return baseApi.Enum_ExitToday()
+
+def Enum_EntryExitIgnore():
+    return baseApi.Enum_EntryExitIgnore()
+
+def Enum_Sended():
+    return baseApi.Enum_Sended()
+
+def Enum_Accept():
+    return baseApi.Enum_Accept()
+
+def Enum_Triggering():
+    return baseApi.Enum_Triggering()
+
+def Enum_Active():
+    return baseApi.Enum_Active()
+
+def Enum_Queued():
+    return baseApi.Enum_Queued()
+
+def Enum_FillPart():
+    return baseApi.Enum_FillPart()
+
+def Enum_Filled():
+    return baseApi.Enum_Filled()
+
+def Enum_Canceling():
+    return baseApi.Enum_Canceling()
+
+def Enum_Modifying():
+    return baseApi.Enum_Modifying()
+
+def Enum_Canceled():
+    return baseApi.Enum_Canceled()
+
+def Enum_PartCanceled():
+    return baseApi.Enum_PartCanceled()
+
+def Enum_Fail():
+    return baseApi.Enum_Fail()
+
+def Enum_Suspended():
+    return baseApi.Enum_Suspended()
+
+def Enum_Apply():
+    return baseApi.Enum_Apply()
+
 def Enum_Period_Tick():
     return baseApi.Enum_Period_Tick()
     
@@ -3482,6 +3998,20 @@ def Enum_Period_Year():
 def Enum_Period_DayX():
     return baseApi.Enum_Period_DayX()
 
+def Enum_Color_Red():
+    return baseApi.Enum_Color_Red()
+
+def Enum_Color_Green():
+    return baseApi.Enum_Color_Green()
+
+def Enum_Color_Blue():
+    return baseApi.Enum_Color_Blue()
+
+def Enum_Color_Purple():
+    return baseApi.Enum_Color_Purple()
+
+def Enum_Color_Gray():
+    return baseApi.Enum_Color_Gray()
 
 # 设置函数
 def GetConfig():

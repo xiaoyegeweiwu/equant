@@ -277,6 +277,7 @@ EEQU_KLINE_DAY                   = 'D'			     # 日线
 EEQU_KLINE_WEEK                  = 'W'			     # 周线
 EEQU_KLINE_MONTH                 = 'm'			     # 月线
 EEQU_KLINE_YEAR                  = 'Y'			     # 年线
+EEQU_KLINE_DayX                  = 'X'			     # 多日
                                                      
 EEQU_NOTICE_NOTNEED              = '0'			     #不需要后续刷新推送
 EEQU_NOTICE_NEED                 = '1'		         #需要后续推送
@@ -357,6 +358,28 @@ hSpeculate                      = 'T'
 hHedge                          = 'B'
 hSpread                         = 'S'
 hMarket                         = 'M'
+
+# 委托状态
+osNone                          = 'N' # 无
+osSended                        = '0' # 已发送
+osAccept                        = '1' # 已受理
+osTriggering                    = '2' # 待触发
+osActive                        = '3' # 已生效
+osQueued                        = '4' # 已排队
+osFillPart                      = '5' # 部分成交
+osFilled                        = '6' # 完全成交
+osCanceling                     = '7' # 待撤
+osModifying                     = '8' # 待改
+osCanceled                      = '9' # 已撤单
+osPartCanceled                  = 'A' # 已撤余单
+osFail                          = 'B' # 指令失败
+osAuditing                      = 'C' # 待审核
+osSuspended                     = 'D' # 已挂起
+osApply                         = 'E' # 已申请
+osInvalid                       = 'F' # 无效单
+osTriggerPart                   = 'G' # 部分触发
+osTriggered                     = 'H' # 完全触发
+osPartFailed                    = 'I' # 余单失败
 
 # 触发模式
 tmNone = 'N'
