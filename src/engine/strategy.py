@@ -295,12 +295,19 @@ class Strategy:
             EV_UI2EG_LOADSTRATEGY           : self._onLoadStrategyResponse,
 
             EV_EG2ST_TRADEINFO_RSP          : self._onTradeInfo         ,
-            EEQU_SRVEVENT_TRADE_ORDER       : self._onTradeOrder        ,
             EV_EG2ST_ACTUAL_ORDER_ENGINE_RESPONSE: self._onTradeOrderEngineResponse,
             EV_EG2ST_ACTUAL_ORDER_SESSION_MAP: self._onOrderSessionMap,
-            EEQU_SRVEVENT_TRADE_MATCH       : self._onTradeMatch        ,
-            EEQU_SRVEVENT_TRADE_POSITION    : self._onTradePosition     ,
-            EEQU_SRVEVENT_TRADE_FUNDQRY     : self._onTradeFundRsp      ,
+
+            EEQU_SRVEVENT_TRADE_LOGINQRY    : self._onTradeLoginQry,
+            EEQU_SRVEVENT_TRADE_LOGINNOTICE : self._onTradeLoginNotice,
+            EEQU_SRVEVENT_TRADE_USERQRY     : self._onTradeUserQry,
+            EEQU_SRVEVENT_TRADE_MATCHQRY    : self._onTradeMatchQry,
+            EEQU_SRVEVENT_TRADE_MATCH       : self._onTradeMatch,
+            EEQU_SRVEVENT_TRADE_POSITQRY    : self._onTradePositionQry,
+            EEQU_SRVEVENT_TRADE_POSITION    : self._onTradePosition,
+            EEQU_SRVEVENT_TRADE_FUNDQRY     : self._onTradeFundRsp,
+            EEQU_SRVEVENT_TRADE_ORDERQRY    : self._onTradeOrderQry,
+            EEQU_SRVEVENT_TRADE_ORDER       : self._onTradeOrder,
 
             EV_UI2EG_STRATEGY_QUIT          : self._onStrategyQuit,
             EV_UI2EG_EQUANT_EXIT            : self._onEquantExit,
@@ -438,6 +445,25 @@ class Strategy:
 
     def _onOrderSessionMap(self, event):
         self.updateSesnId2eSesnIdMap(event.getSessionId(), event.getESessionId())
+
+    def _onTradeLoginQry(self, apiEvent):
+        self._dataModel._trdModel.updateLoginInfo(apiEvent)
+
+    def _onTradeLoginNotice(self, apiEvent):
+        self._dataModel._trdModel.updateLoginInfo(apiEvent)
+
+    def _onTradeUserQry(self, apiEvent):
+        self._dataModel._trdModel.updateUserInfo(apiEvent)
+        self._dataModel._trdModel.updateLoginInfo(apiEvent)
+
+    def _onTradeMatchQry(self, apiEvent):
+        self._dataModel._trdModel.updateMatchData(apiEvent)
+
+    def _onTradePositionQry(self, apiEvent):
+        self._dataModel._trdModel.updatePosData(apiEvent)
+
+    def _onTradeOrderQry(self, apiEvent):
+        self._dataModel._trdModel.updateOrderData(apiEvent)
 
     def _onTradeMatch(self, apiEvent):
         '''
