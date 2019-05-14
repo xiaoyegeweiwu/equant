@@ -127,7 +127,6 @@ class StrategyEngine(object):
             EEQU_SRVEVENT_TRADE_POSITQRY    : self._onApiPosDataQry            ,
             EEQU_SRVEVENT_TRADE_POSITION    : self._onApiPosData               ,
             EEQU_SRVEVENT_TRADE_FUNDQRY     : self._onApiMoney                 ,
-            EV_EG2ST_ACTUAL_ORDER_SESSION_MAP: self._onOrderSessionMap,
         }
         
     def _regMainWorkFunc(self):
@@ -577,9 +576,6 @@ class StrategyEngine(object):
         self._trdModel.updateMoney(apiEvent)
         # print("++++++ 资金信息 引擎 ++++++", apiEvent.getData())
         self._sendEvent2AllStrategy(apiEvent)
-
-    def _onOrderSessionMap(self, event):
-        self._sendEvent2Strategy(event.getStrategyId(), event)
 
     def _reqTradeInfo(self, event):
         '''

@@ -67,6 +67,42 @@ class StrategyContext:
     def __init__(self):
         pass
 
+class TradeRecord(object):
+    def __init__(self, eSessionId, orderData={}):
+        self._eSessionId = eSessionId   # eSessionId
+        self._barInfo = None # 触发的Bar信息
+        # SessionId
+        self._sessionId = orderData['SessionId'] if 'SessionId' in orderData else None
+        # 合约编号
+        self._contNo = orderData['Cont'] if 'Cont' in orderData else None
+        # 委托单号
+        self._orderNo = orderData['OrderNo'] if 'OrderNo' in orderData else None
+        # 方向
+        self._direct = orderData['Direct'] if 'Direct' in orderData else None
+        # 开平
+        self._offset = orderData['Offset'] if 'Offset' in orderData else None
+        # 订单状态
+        self._orderState = orderData['OrderState'] if 'OrderState' in orderData else None
+
+    def updateOrderInfo(self, eSessionId, orderData):
+        if eSessionId != self._eSessionId:
+            return
+
+        if 'SessionId' in orderData:
+            self._sessionId = orderData['SessionId']
+        if 'Cont' in orderData:
+            self._contNo = orderData['Cont']
+        if 'OrderNo' in orderData:
+            self._orderNo = orderData['OrderNo']
+        if 'Direct' in orderData:
+            self._direct = orderData['Direct']
+        if 'Offset' in orderData:
+            self._offset = orderData['Offset']
+        if 'OrderState' in orderData:
+            self._orderState = orderData['OrderState']
+
+    def getBarInfo(self):
+        return self._barInfo
 
 class Strategy:
     def __init__(self, logger, id, event, args):
@@ -98,11 +134,8 @@ class Strategy:
         # self._strategyId+"-"+self._eSessionId 组成本地生成的eSessionId
         self._eSessionId = 1
         # 该策略的所有下单信息
-        self._localOrder = {} # {本地生成的eSessionId : 下单数据}
-        # api 返回的SessionId到本地生成的eSessionId的映射关系
-        self._sesnId2eSesnIdMap = {} # {api 返回的SessionId : 本地生成的eSessionId}
-        # 本地生成的eSessionId到委托号的映射关系
-        self._eSesnId2orderNoMap = {} # {本地生成的eSessionId : 委托号}
+        self._eSessionIdList = [] # 存储本地生成的eSessionId，为了保存下单顺序信息
+        self._localOrder = {} # {本地生成的eSessionId : TradeRecode对象}
 
     # ////////////////////////////对外接口////////////////////
     def _initialize(self):
@@ -293,10 +326,7 @@ class Strategy:
             EV_EG2ST_HISQUOTE_NOTICE        : self._onHisQuoteNotice   ,
             EV_UI2EG_REPORT                 : self._onReport           ,
             EV_UI2EG_LOADSTRATEGY           : self._onLoadStrategyResponse,
-
             EV_EG2ST_TRADEINFO_RSP          : self._onTradeInfo         ,
-            EV_EG2ST_ACTUAL_ORDER_ENGINE_RESPONSE: self._onTradeOrderEngineResponse,
-            EV_EG2ST_ACTUAL_ORDER_SESSION_MAP: self._onOrderSessionMap,
 
             EEQU_SRVEVENT_TRADE_LOGINQRY    : self._onTradeLoginQry,
             EEQU_SRVEVENT_TRADE_LOGINNOTICE : self._onTradeLoginNotice,
@@ -414,14 +444,16 @@ class Strategy:
         :param apiEvent: 引擎返回事件
         :return: None
         '''
+        if str(apiEvent.getStrategyId()) != str(self._strategyId):
+            return
+
         self._dataModel._trdModel.updateOrderData(apiEvent)
 
         # 更新本地订单信息
         dataList = apiEvent.getData()
+        eSessionId = apiEvent.getESessionId()
         for data in dataList:
-            sessionId = data['SessionId']
-            if sessionId in self._sesnId2eSesnIdMap:
-                self._eSesnId2orderNoMap[self._sesnId2eSesnIdMap[sessionId]] = data['OrderNo']
+            self.updateLocalOrder(eSessionId, data)
 
         if not self._dataModel.getConfigModel().hasTradeTrigger():
             return
@@ -439,12 +471,6 @@ class Strategy:
 
             # 交易触发
             self.sendTriggerQueue(tradeTriggerEvent)
-
-    def _onTradeOrderEngineResponse(self, event):
-        self._dataModel.getTradeModel().updateEquantOrder(event)
-
-    def _onOrderSessionMap(self, event):
-        self.updateSesnId2eSesnIdMap(event.getSessionId(), event.getESessionId())
 
     def _onTradeLoginQry(self, apiEvent):
         self._dataModel._trdModel.updateLoginInfo(apiEvent)
@@ -500,22 +526,34 @@ class Strategy:
             return 0
         self._eSessionId = eSessionId
 
-    def updateSesnId2eSesnIdMap(self, sesnId, eSesnId):
-        self._sesnId2eSesnIdMap[sesnId] = eSesnId
+    def getLocalOrder(self):
+        return self._localOrder
+
+    def getESessionIdList(self):
+        return self._eSessionIdList
 
     def updateLocalOrder(self, eSesnId, data):
-        self._localOrder[eSesnId] = data
+        # 更新本地订单信息
+        if eSesnId in self._localOrder:
+            tradeRecode = self._localOrder[eSesnId]
+            tradeRecode.updateOrderInfo(eSesnId, data)
+        else:
+            self._localOrder[eSesnId] = TradeRecord(eSesnId, data)
+            self._eSessionIdList.append(eSesnId)
+
+    def updateBarInfoInLocalOrder(self, eSessionId, barInfo):
+        if not barInfo:
+            return
+        if eSessionId not in self._localOrder:
+            return
+        tradeRecode = self._localOrder[eSessionId]
+        tradeRecode._barInfo = barInfo
 
     def getOrderNo(self, eSessionId):
-        if eSessionId in self._eSesnId2orderNoMap:
-            return self._eSesnId2orderNoMap[eSessionId]
-        return 0
-
-    def getSessionId(self, eSessionId):
-        for sesn, sSesn in self._sesnId2eSesnIdMap.item():
-            if sSesn == eSessionId:
-                return sesn
-        return 0
+        if eSessionId not in self._localOrder:
+            return 0
+        tradeRecord = self._localOrder[eSessionId]
+        return tradeRecord._orderNo
 
     def getStrategyName(self):
         return self._strategyName

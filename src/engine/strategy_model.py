@@ -296,7 +296,8 @@ class StrategyModel(object):
         # 交易计算、生成回测报告
         # 产生信号
         userNo = self._cfgModel.getUserNo() if self._cfgModel.isActualRun() else "Default"
-        self.sendOrder(userNo, contNo, otMarket, vtNone, dBuy, oOpen, hSpeculate, price, share, curBar, 'Buy')
+        eSessionId = self.sendOrder(userNo, contNo, otMarket, vtNone, dBuy, oOpen, hSpeculate, price, share, curBar, 'Buy')
+        self._strategy.updateBarInfoInLocalOrder(eSessionId, curBar)
 
 
     def setBuyToCover(self, contractNo, share, price):
@@ -306,7 +307,8 @@ class StrategyModel(object):
         # 交易计算、生成回测报告
         # 产生信号
         userNo = self._cfgModel.getUserNo() if self._cfgModel.isActualRun() else "Default"
-        self.sendOrder(userNo, contNo, otMarket, vtNone, dBuy, oCover, hSpeculate, price, share, curBar, 'BuyToCover')
+        eSessionId = self.sendOrder(userNo, contNo, otMarket, vtNone, dBuy, oCover, hSpeculate, price, share, curBar, 'BuyToCover')
+        self._strategy.updateBarInfoInLocalOrder(eSessionId, curBar)
 
     def setSell(self, contractNo, share, price):
         contNo = contractNo if contractNo is not None else self._cfgModel.getBenchmark()
@@ -315,7 +317,8 @@ class StrategyModel(object):
         # 交易计算、生成回测报告
         # 产生信号
         userNo = self._cfgModel.getUserNo() if self._cfgModel.isActualRun() else "Default"
-        self.sendOrder(userNo, contNo, otMarket, vtNone, dSell, oCover, hSpeculate, price, share, curBar, 'Sell')
+        eSessionId = self.sendOrder(userNo, contNo, otMarket, vtNone, dSell, oCover, hSpeculate, price, share, curBar, 'Sell')
+        self._strategy.updateBarInfoInLocalOrder(eSessionId, curBar)
 
     def setSellShort(self, contractNo, share, price):
         contNo = contractNo if contractNo is not None else self._cfgModel.getBenchmark()
@@ -324,7 +327,8 @@ class StrategyModel(object):
         #交易计算、生成回测报告
         #产生信号
         userNo = self._cfgModel.getUserNo() if self._cfgModel.isActualRun() else "Default"
-        self.sendOrder(userNo, contNo, otMarket, vtNone, dSell, oOpen, hSpeculate, price, share, curBar, 'SellShort')
+        eSessionId = self.sendOrder(userNo, contNo, otMarket, vtNone, dSell, oOpen, hSpeculate, price, share, curBar, 'SellShort')
+        self._strategy.updateBarInfoInLocalOrder(eSessionId, curBar)
 
     def sendFlushEvent(self):
         flushEvent = Event({
@@ -2867,11 +2871,6 @@ class StrategyTrade(TradeModel):
         
     def initialize(self):
         self._selectedUserNo = self._config.getUserNo()
-
-    # 更新本地订单
-    def updateEquantOrder(self, event):
-        self._localOrder[event.getESessionId()] = event.getData()
-        # print(" 本地订单id ",event.getESessionId())
 
     #
     def updateSessionIdMap(self, event):

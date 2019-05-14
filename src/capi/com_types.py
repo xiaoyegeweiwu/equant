@@ -116,9 +116,6 @@ EV_EG2ST_DEPTH_NOTICE             = 0x322            #深度行情推送
 EV_EG2ST_HISQUOTE_RSP             = 0x323            #历史K线查询应答
 EV_EG2ST_HISQUOTE_NOTICE          = 0x324            #历史行情推送
 
-EV_EG2ST_ACTUAL_ORDER_ENGINE_RESPONSE = 0x325        # 引擎生成了订单号
-EV_EG2ST_ACTUAL_ORDER_SESSION_MAP = 0x326            # 两个session id 的映射
-
 EV_EG2ST_LOGINNO_RSP              = 0x330           #请求登录账号
 EV_EG2ST_USERNO_RSP               = 0x331           #请求资金账号
 
