@@ -2209,7 +2209,7 @@ class StrategyHisQuote(object):
                     })
                     self._strategy.sendTriggerQueue(event)
 
-            if not self._strategy.isRealTimeStatus():
+            if not self._strategy.isRealTimeStatus() or contNo != self._contractNo:
                 rfdataList.append(data)
                 continue
 
@@ -2350,9 +2350,6 @@ class StrategyHisQuote(object):
         self._addSignal()
         self._sendFlushEvent()
 
-        self._curHisIndex = {contract: 0 for contract in self._config.getContract()}
-        self._curRealTimeIndex = {contract: 0 for contract in self._config.getContract()}
-
         if not self._useSample:
             return
 
@@ -2371,9 +2368,7 @@ class StrategyHisQuote(object):
             self._updateCurBar(self._contractNo, data)
 
             # 根据基准合约，更新其他Bar
-            otherContractDatas = self._getHSOtherContractBar(data["DateTimeStamp"])
-            self._updateOtherBar(otherContractDatas)
-
+            otherContractDatas = {}
             # 填入基准合约bar info
             otherContractDatas.update({self._contractNo:data})
             # 执行策略函数
@@ -2391,71 +2386,7 @@ class StrategyHisQuote(object):
         self.logger.debug('[runReport] run report completed!')
         # 回测完成，刷新信号、指标
         self._sendFlushEvent()
-
         # print('**************************** run his end')
-
-    # History Status
-    def _getHSOtherContractBar(self, baseContractDateTimeStamp):
-        otherContracts = list(self._config.getContract()[1:])
-        result = {}
-        for otherContract in otherContracts:
-            index = self._curHisIndex[otherContract]
-            otherContractKLineData = self._metaData[otherContract]["KLineData"]
-            while True:
-                if self._hisLength[otherContract] == 0 or index + 1 >= self._hisLength[otherContract]:
-                    break
-                #
-                if otherContractKLineData[index]["DateTimeStamp"] <= baseContractDateTimeStamp and \
-                otherContractKLineData[index + 1]["DateTimeStamp"] > baseContractDateTimeStamp:
-                    break
-                elif otherContractKLineData[index]["DateTimeStamp"] <= baseContractDateTimeStamp and \
-                otherContractKLineData[index + 1]["DateTimeStamp"] <= baseContractDateTimeStamp:
-                    index += 1
-                elif otherContractKLineData[index]["DateTimeStamp"] > baseContractDateTimeStamp:
-                    break
-
-            # 找到了正确的位置或者没有
-            if self._hisLength[otherContract] == 0 or otherContractKLineData[index]["DateTimeStamp"] > baseContractDateTimeStamp:
-                otherContractBar = self._curBarDict[otherContract].getCurBar()
-            else:
-                otherContractBar = otherContractKLineData[index]
-            self._curHisIndex[otherContract] = index
-            result[otherContract] = otherContractBar
-        return result
-
-    # real time status 获取其他合约最近的k线
-    def _getRTSOtherContractBar(self, baseContractDateTimeStamp):
-        otherContracts = list(self._config.getContract()[1:])
-        result = {}
-
-        for otherContract in otherContracts:
-            if otherContract not in self._kLineNoticeData or len(self._kLineNoticeData[otherContract]["KLineData"]) == 0:
-                otherContractBar = self._curBarDict[otherContract].getCurBar()
-                result[otherContract] = otherContractBar
-                continue
-
-            otherContractKLineData = self._kLineNoticeData[otherContract]["KLineData"]
-            index = self._curRealTimeIndex[otherContract]
-            while True:
-                if index+1 >= len(self._kLineNoticeData[otherContract]["KLineData"]):
-                    break
-                #
-                if otherContractKLineData[index]["DateTimeStamp"] <= baseContractDateTimeStamp and \
-                otherContractKLineData[index + 1]["DateTimeStamp"] > baseContractDateTimeStamp:
-                    break
-                elif otherContractKLineData[index]["DateTimeStamp"] <= baseContractDateTimeStamp and \
-                otherContractKLineData[index + 1]["DateTimeStamp"] <= baseContractDateTimeStamp:
-                    index += 1
-                elif otherContractKLineData[index]["DateTimeStamp"] <= baseContractDateTimeStamp:
-                    break
-
-            if otherContractKLineData[index]["DateTimeStamp"] > baseContractDateTimeStamp:
-                otherContractBar = self._curBarDict[otherContract].getCurBar()
-            else:
-                otherContractBar = otherContractKLineData[index]
-            self._curRealTimeIndex[otherContract] = index
-            result[otherContract] = otherContractBar
-        return result
 
     def drawBatchHisKine(self, data):
         self.sendAllHisKLine(data)
@@ -2479,7 +2410,6 @@ class StrategyHisQuote(object):
     def runOtherTrigger(self, context, handle_data, event):
         handle_data(context)
 
-
     # 填充实时k线
     def runReportRealTime(self, context, handle_data, event):
         '''发送回测阶段来的数据'''
@@ -2490,8 +2420,7 @@ class StrategyHisQuote(object):
         # 更新当前bar数据
         self._updateCurBar(self._contractNo, data)
         # 更新其他bar
-        otherContractDatas = self._getRTSOtherContractBar(data["DateTimeStamp"])
-        self._updateOtherBar(otherContractDatas)
+        otherContractDatas = {}
 
         otherContractDatas.update({self._contractNo: data})
 
@@ -2518,8 +2447,7 @@ class StrategyHisQuote(object):
         # 更新当前bar数据
         self._updateCurBar(contNo, data)
         # 更新其他bar
-        otherContractDatas = self._getRTSOtherContractBar(data["DateTimeStamp"])
-        self._updateOtherBar(otherContractDatas)
+        otherContractDatas = {}
         otherContractDatas.update({self._contractNo: data})
 
         # print("contractNo is ", contNo)

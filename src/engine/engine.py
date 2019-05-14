@@ -294,7 +294,7 @@ class StrategyEngine(object):
                 if strategyId not in self._onEquantExitData:
                     isAllStrategyExit = False
 
-            print("333333333333333", isAllStrategyExit)
+            # print("333333333333333", isAllStrategyExit)
             if isAllStrategyExit:
                 self.saveStrategyContext2File()
 
