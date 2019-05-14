@@ -4,35 +4,11 @@ import datetime
 from dateutil.parser import parse
 from collections import defaultdict
 
-
 from capi.com_types import *
-
-# ####################################
-"""
-strategy={
-"InitialFunds":            # 初始资金       
-"StrategyName":            # 策略名称
-"StartTime":               # 回测开始时间
-"EndTime":                 # 回测结束时间
-"Margin":                  # 保证金
-"Slippage":                # 滑点
-"OpenRatio":
-"CloseRatio":
-"OpenFixed":
-"CloseFixed":
-"CloseTodayRatio":
-"CloseTodayFixed":         
-"KLineType":               # K线类型
-"KLineSlice":              # K线间隔（1， 2， 5）
-"TradeDot":                # 每手乘数
-"PriceTick":               # 最小变动价位
-}
-"""
 
 
 class CalcCenter(object):
     def __init__(self, logger):
-        # self._strategy = strategy
         self._logger = logger
 
         self._orderId = 0
@@ -61,7 +37,7 @@ class CalcCenter(object):
         self._fundInfo = defaultdict(float)  # 资金概要：期初资产、期末资产、交易盈亏、最大资产、最小资产、佣金合计
         self._riskInfo = defaultdict(float)
 
-        self._tradeTimeInfo = defaultdict(int)  # 将下面的trade信息整合到字典中
+        self._tradeTimeInfo = defaultdict(int)
 
         self._yearStatis = []  # 年统计
         self._quarterStatis = []  # 季度统计
@@ -210,6 +186,8 @@ class CalcCenter(object):
         self._currentBar = order["CurrentBarIndex"]
         self._costs[order["Cont"]] = self.getCostRate(order["Cont"])
         self._updateTradeDate(order["TradeDate"])
+
+        self._logger.sig_info(order)
 
         contPrice = {
             "Cont": order["Cont"],
@@ -986,10 +964,18 @@ class CalcCenter(object):
         else:
             charge = qty * cost["OpenFixed"]
 
+        # ------------------------------------------------------------------
+        print("cost: ", cost)
+        print(qty)
+        print(cost["TradeDot"])
+        print(order["OrderPrice"])
+
+
         # 成交额、保证金、净利润
         turnover = order["OrderPrice"] * qty * cost["TradeDot"]
         margin = turnover * cost["Margin"]
         profit = -charge  # 净利润需要扣除手续费
+        print(turnover)
 
         return charge, turnover, margin, profit
 

@@ -45,7 +45,9 @@ class QuantApplication(object):
         self.root.geometry('%dx%d+%d+%d' % (width, height, width*0.1, height*0.1))
         #title
         self.root.title("极星量化")
-        self.root.iconbitmap(bitmap=r'./icon/epolestar ix1.ico')
+        icon = r'./icon/epolestar ix1.ico'
+        self.root.iconbitmap(bitmap=icon)
+        self.root.bitmap = icon
         top_frame = Frame(self.root)
         top_frame.pack(fill=BOTH, expand=YES)
 

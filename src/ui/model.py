@@ -358,7 +358,7 @@ class GetEgData(object):
             }
             self._stManager.add_(dataDict)
         else:
-            # TODO：策略状态改变后要通知监控界面
+            # 策略状态改变后要通知监控界面
             self._stManager.updateStrategyStatus(id, sStatus)
             # TODO：直接将dataDict传进去？
             dataDict = self._stManager.getSingleStrategy(id)
@@ -367,7 +367,7 @@ class GetEgData(object):
             if sStatus == ST_STATUS_QUIT:
                 self._stManager.removeStrategy(id)
             if sStatus == ST_STATUS_REMOVE:
-                # TODO：删除策略需要接到通知之后再进行删除
+                # 删除策略需要接到通知之后再进行删除
                 # 更新界面
                 self._app.delUIStrategy(id)
                 # 将策略管理器中的该策略也删除掉

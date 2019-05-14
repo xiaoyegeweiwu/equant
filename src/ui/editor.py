@@ -242,13 +242,15 @@ class EditorText(ParentText, ModifiedMixin):
         start_index = 0
         for i, pos in enumerate(range1):
             posit = pos.string.split(".")
-            if int(index1[0]) == int(posit[0]) and int(index1[1]) <= int(posit[1]):
+            # if int(index1[0]) == int(posit[0]) and int(index1[1]) <= int(posit[1]):
+            if int(index1[0]) == int(posit[0]) and int(index1[1]) < int(posit[1]):
                 start_index = i
                 posit = pos.string
                 break
         funcName = self.get(range1[start_index-1].string, range1[start_index].string)
-        func = globals()['BaseApi'].__dict__[funcName]
-        self._controller.set_help_text(funcName, func.__doc__)
+        if funcName:
+            func = globals()['BaseApi'].__dict__[funcName]
+            self._controller.set_help_text(funcName, func.__doc__)
 
     def recolorize_main(self):
         next = "1.0"

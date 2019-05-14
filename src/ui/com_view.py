@@ -228,7 +228,7 @@ class DeleteToplevel(QuantToplevel):
         self.saveBtn = tk.Button(f2, text=self.language.get_text(33), bd=0)
         self.cancelBtn = tk.Button(f2, text=self.language.get_text(20), bd=0)
 
-        label.pack(side=tk.LEFT, fill=tk.X, expand=tk.NO, padx=15)
+        label.pack(side=tk.LEFT, fill=tk.X, expand=tk.NO, padx=15, pady=15)
         self.cancelBtn.pack(side=tk.RIGHT, expand=tk.NO, ipadx=5, padx=15, pady=10)
         self.saveBtn.pack(side=tk.RIGHT, expand=tk.NO, ipadx=5, padx=15, pady=10)
 

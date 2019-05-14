@@ -49,8 +49,9 @@ class TkinterController(object):
         self.app.updateLogText()
         self.app.updateSigText()
         self.app.updateErrText()
-        #TODO:
+
         self.top.after(10, self.update_log)
+
 
     def update_monitor(self):
         # 更新监控界面策略信息
@@ -109,7 +110,8 @@ class TkinterController(object):
         """右键新建策略"""
         if not os.path.exists(path):
             f = open(path, "w")
-            f.write('\n'
+            f.write('import talib\n'
+                    '\n\n'
                     'def initialize(context): \n    pass\n\n\n'
                     'def handle_data(context):\n    pass')
             f.close()
