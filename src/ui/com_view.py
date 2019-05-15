@@ -1610,7 +1610,6 @@ class RunWin(QuantToplevel, QuantFrame):
         self.destroy()
 
     def cancel(self):
-        # TODO：关闭窗口
         self.config = {}
         self.destroy()
 

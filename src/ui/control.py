@@ -186,16 +186,22 @@ class TkinterController(object):
             if id in strategyDict:
                 status = self.strategyManager.queryStrategyStatus(id)
                 if status == ST_STATUS_QUIT:
-                    print("I have been quitted!")
+                    self.logger.info("策略%s已经停止!"%(id))
                     continue
-            self._request.strategyQuit(id)
+                self._request.strategyQuit(id)
+            else:
+                self.logger.info("策略管理器中不存在策略%s"%(id))
 
     def delStrategy(self, strategyIdList):
         # 获取策略管理器
         for id in strategyIdList:
-            self._request.strategyRemove(id)
+            # self._request.strategyRemove(id)
             strategyDict = self.strategyManager.getStrategyDict()
             if id in strategyDict:
+                if strategyDict[id]["StrategyState"] == ST_STATUS_QUIT:
+                    self.strategyManager.removeStrategy(id)
+                    self.app.delUIStrategy(id)
+                    return
                 self._request.strategyRemove(id)
             else:  # 策略已经停止， 直接删除
                 self.app.delUIStrategy(id)

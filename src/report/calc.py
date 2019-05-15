@@ -942,11 +942,12 @@ class CalcCenter(object):
         self._calcStageStaticInfo(self._quarterStatis)
         self._calcStageStaticInfo(self._yearStatis)
 
-    def getFundRecord(self):
+    def getAvailableFund(self):
+        """可用资金"""
         if self._fundRecords:
-            return self._fundRecords
+            return self._fundRecords[-1]["Available"]
         else:
-            return defaultdict(int)
+            return self._expertSetting["StartFund"]
 
     def getProfit(self):
         return self._profit
@@ -964,18 +965,10 @@ class CalcCenter(object):
         else:
             charge = qty * cost["OpenFixed"]
 
-        # ------------------------------------------------------------------
-        print("cost: ", cost)
-        print(qty)
-        print(cost["TradeDot"])
-        print(order["OrderPrice"])
-
-
         # 成交额、保证金、净利润
         turnover = order["OrderPrice"] * qty * cost["TradeDot"]
         margin = turnover * cost["Margin"]
         profit = -charge  # 净利润需要扣除手续费
-        print(turnover)
 
         return charge, turnover, margin, profit
 
