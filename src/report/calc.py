@@ -946,8 +946,8 @@ class CalcCenter(object):
         """可用资金"""
         if self._fundRecords:
             return self._fundRecords[-1]["Available"]
-        else:
-            return self._expertSetting["StartFund"]
+
+        return self._expertSetting["StartFund"]
 
     def getProfit(self):
         return self._profit

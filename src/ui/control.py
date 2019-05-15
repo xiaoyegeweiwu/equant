@@ -198,10 +198,10 @@ class TkinterController(object):
             # self._request.strategyRemove(id)
             strategyDict = self.strategyManager.getStrategyDict()
             if id in strategyDict:
-                if strategyDict[id]["StrategyState"] == ST_STATUS_QUIT:
+                if strategyDict[id]["StrategyState"] == ST_STATUS_QUIT:  # 策略已经停止
                     self.strategyManager.removeStrategy(id)
                     self.app.delUIStrategy(id)
-                    return
+                    # return
                 self._request.strategyRemove(id)
             else:  # 策略已经停止， 直接删除
                 self.app.delUIStrategy(id)

@@ -367,11 +367,12 @@ class GetEgData(object):
             if sStatus == ST_STATUS_QUIT:
                 self._stManager.removeStrategy(id)
             if sStatus == ST_STATUS_REMOVE:
+                print("状态: ", sStatus)
                 # 删除策略需要接到通知之后再进行删除
-                # 更新界面
-                self._app.delUIStrategy(id)
                 # 将策略管理器中的该策略也删除掉
                 self._stManager.removeStrategy(id)
+                # 更新界面
+                self._app.delUIStrategy(id)
 
     def handlerEgEvent(self):
         while True:

@@ -49,7 +49,7 @@ class QuantToplevel(tk.Toplevel):
         self.language = Language("EquantMainFrame")
         self.setPos()
         #图标
-        self.iconbitmap(bitmap=r"./icon/epolestar ix1.ico")
+        self.iconbitmap(bitmap=r"./icon/epolestar ix3.ico")
 
     def setPos(self):
         # 获取主窗口大小和位置，根据主窗口调整输入框位置
