@@ -156,7 +156,6 @@ class StrategyEngine(object):
             EV_UI2EG_STRATEGY_QUIT          : self._onStrategyQuit,
             EV_UI2EG_STRATEGY_RESUME        : self._onStrategyResume,
             EV_UI2EG_EQUANT_EXIT            : self._onEquantExit,
-            EV_UI2EG_STRATEGY_REMOVE        : self._onStrategyRemove,
             EV_UI2EG_STRATEGY_FIGURE        : self._switchStrategy,
 
             EV_ST2EG_UPDATE_STRATEGYDATA    : self._reqStrategyDataUpdateNotice,
@@ -222,6 +221,7 @@ class StrategyEngine(object):
             if type(event) is dict:
                 event = Event(event)
             code  = event.getEventCode()
+
             if code == EV_UI2EG_LOADSTRATEGY:
                 # 加载策略事件
                 self._loadStrategy(event)
@@ -286,13 +286,12 @@ class StrategyEngine(object):
                 if strategyId not in self._onEquantExitData:
                     isAllStrategyExit = False
 
-            # print("333333333333333", isAllStrategyExit)
+            # print("is all strategy exit: ", isAllStrategyExit)
             if isAllStrategyExit:
                 self.saveStrategyContext2File()
         elif event.getData()["Status"] == ST_STATUS_CONTINUES:
             self._eg2uiQueue.put(event)
         elif event.getData()["Status"] == ST_STATUS_REMOVE:
-            print("33333333333333333333333")
             self._onEquantExitData[event.getStrategyId()] = None
             self._eg2uiQueue.put(event)
             self.destroyProcess(event.getData()["Pid"])
@@ -870,7 +869,7 @@ class StrategyEngine(object):
     def _onStrategyRemove(self, event):
         strategyId = event.getStrategyId()
         # 如果已经停止
-        if strategyId in self._onStrategyQuitData:
+        if strategyId in self._onStrategyQuitData and self._onStrategyQuitData[strategyId] is not None:
             self._onEquantExitData[event.getStrategyId()] = None
 
         # 如果还在运行中
@@ -878,7 +877,6 @@ class StrategyEngine(object):
             self._isEffective[event.getStrategyId()] = False
             eg2stQueue = self._eg2stQueueDict[event.getStrategyId()]
             eg2stQueue.put(event)
-            self._sendEvent2Strategy(event.getStrategyId(), event)
 
     def _switchStrategy(self, event):
         self._sendEvent2Strategy(event.getStrategyId(), event)

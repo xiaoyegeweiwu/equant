@@ -564,6 +564,7 @@ class StrategyModel(object):
         curVirtualFund = self._calcCenter.getAvailableFund()
         marginRate = self._cfgModel.getMarginValue() if not self._cfgModel.getMarginValue() else 0.08
         if self._calcController.canOrderByVirtualFund(curVirtualFund, orderQty, orderPrice, marginRate, 0)["ErrorCode"] == OrderFail:
+            self.logger.info("资金不足")
             return
         self.addOrder2CalcCenter(userNo, contNo, orderDirct, entryOrExit, orderPrice, orderQty, curBar)
         self.sendSignalEvent(singnalName, contNo, orderDirct, entryOrExit, orderPrice, orderQty, curBar)
