@@ -10,6 +10,7 @@ import copy
 
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
+from .calc_controller import CalcController
 
 class StrategyModel(object):
     def __init__(self, strategy):
@@ -30,6 +31,8 @@ class StrategyModel(object):
 
         #
         self._runBarInfo = BarInfo(self.logger)
+        limit = self._cfgModel.getLimit()
+        self._calcController = CalcController(self.logger, limit)
 
     def setRunStatus(self, status):
         self._runStatus = status
@@ -558,6 +561,10 @@ class StrategyModel(object):
         return self._trdModel.deleteOrder(eSession)
 
     def sendOrder(self, userNo, contNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty, curBar=None, singnalName='sendOrder'):
+        curVirtualFund = self._calcCenter.getAvailableFund()
+        marginRate = self._cfgModel.getMarginValue() if not self._cfgModel.getMarginValue() else 0.08
+        if self._calcController.canOrderByVirtualFund(curVirtualFund, orderQty, orderPrice, marginRate, 0)["ErrorCode"] == OrderFail:
+            return
         self.addOrder2CalcCenter(userNo, contNo, orderDirct, entryOrExit, orderPrice, orderQty, curBar)
         self.sendSignalEvent(singnalName, contNo, orderDirct, entryOrExit, orderPrice, orderQty, curBar)
 
@@ -1191,7 +1198,7 @@ class StrategyConfig(object):
             return 6
             
         return 0
-        
+
     def continues(self):
         runModeDict = self.getRunMode()
         
@@ -1679,6 +1686,9 @@ class StrategyConfig(object):
             return None
         return self._metaData['Spread']['Sample']
 
+    def getLimit(self):
+        return self._metaData['Limit']
+
 class BarInfo(object):
     def __init__(self, logger):
         self._logger = logger
@@ -1782,7 +1792,9 @@ class StrategyHisQuote(object):
         # 回测阶段的实时K线数据,不出指标和信号
         self._reportRealDataList = []
         self._isAfterReportFirstData = True
-        
+
+        #
+
     def initialize(self):
         self._contractTuple = self._config.getContract()
         

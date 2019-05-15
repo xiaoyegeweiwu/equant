@@ -342,6 +342,7 @@ class Strategy:
             EV_UI2EG_STRATEGY_QUIT          : self._onStrategyQuit,
             EV_UI2EG_EQUANT_EXIT            : self._onEquantExit,
             EV_UI2EG_STRATEGY_FIGURE        : self._switchStrategy,
+            EV_UI2EG_STRATEGY_REMOVE        : self._onStrategyRemove,
         }
     
     # ////////////////////////////内部数据请求接口////////////////////
@@ -627,3 +628,17 @@ class Strategy:
     def _switchStrategy(self, event):
         contNo = self._dataModel.getConfigModel().getContract()[0]
         self._dataModel.getHisQuoteModel()._switchKLine(contNo)
+
+    def _onStrategyRemove(self, event):
+        responseEvent = Event({
+            "EventCode": EV_EG2UI_STRATEGY_STATUS,
+            "StrategyId": self._strategyId,
+            "Data": {
+                "Status": ST_STATUS_REMOVE,
+                "Config": self._dataModel.getConfigData(),
+                "Pid": os.getpid(),
+                "Path": self._filePath,
+                "StrategyName": self._strategyName,
+            }
+        })
+        self.sendEvent2Engine(responseEvent)

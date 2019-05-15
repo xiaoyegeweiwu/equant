@@ -68,7 +68,7 @@ class StrategyEngine(object):
         # 量化退出时，在文件中保存策略的配置信息
         self._onEquantExitData = {}
 
-        self._onStrategyRemoveData = {}
+
         #
         # 恢复上次推出时保存的结构
         self._resumeStrategy()
@@ -272,14 +272,7 @@ class StrategyEngine(object):
             # 暂存当前策略的配置，
             self._onStrategyQuitData[event.getStrategyId()] = curStragegyInfo
             self._onEquantExitData[event.getStrategyId()] = curStragegyInfo
-            try:
-                # todo 删除订阅关系
-                strategyProcess = psutil.Process(event.getData()["Pid"])
-                strategyProcess.terminate()
-                strategyProcess.wait(timeout=0.1)
-                # print("策略进程已经退出", strategyProcess.name)
-            except (psutil.NoSuchProcess, psutil.AccessDenied) as e:
-                self.logger.info("pid %d exit fail" % event.getData()["Pid"])
+            self.destroyProcess(event.getData()["Pid"])
             self._eg2uiQueue.put(event)
         elif event.getData()["Status"] == EV_UI2EG_EQUANT_EXIT:
             curStragegyInfo = {
@@ -296,9 +289,13 @@ class StrategyEngine(object):
             # print("333333333333333", isAllStrategyExit)
             if isAllStrategyExit:
                 self.saveStrategyContext2File()
-
         elif event.getData()["Status"] == ST_STATUS_CONTINUES:
             self._eg2uiQueue.put(event)
+        elif event.getData()["Status"] == ST_STATUS_REMOVE:
+            print("33333333333333333333333")
+            self._onEquantExitData[event.getStrategyId()] = None
+            self._eg2uiQueue.put(event)
+            self.destroyProcess(event.getData()["Pid"])
 
     # ////////////////api回调及策略请求事件处理//////////////////
     def _handleApiData(self):
@@ -859,8 +856,8 @@ class StrategyEngine(object):
 
         self._loadStrategy(loadStrategyEvent, strategyId=event.getStrategyId())
         # 删除信息
-        del self._onStrategyQuitData[event.getStrategyId()]
-        # del self._onEquantExitData[event.getStrategyId()]
+        self._onStrategyQuitData[event.getStrategyId()] = None
+        # self._onEquantExitData[event.getStrategyId()] = None
 
     #  当量化退出时，发事件给所有的策略
     def _onEquantExit(self, event):
@@ -871,10 +868,17 @@ class StrategyEngine(object):
             self._sendEvent2AllStrategy(event)
 
     def _onStrategyRemove(self, event):
-        if event.getStrategyId() not in self._onStrategyQuitData:
-            self.logger.info("策略 %d 没有停止，删除无效" % event.getStrategyId())
-            return
-        self._onStrategyRemoveData[event.getStrategyId()] = True
+        strategyId = event.getStrategyId()
+        # 如果已经停止
+        if strategyId in self._onStrategyQuitData:
+            self._onEquantExitData[event.getStrategyId()] = None
+
+        # 如果还在运行中
+        else:
+            self._isEffective[event.getStrategyId()] = False
+            eg2stQueue = self._eg2stQueueDict[event.getStrategyId()]
+            eg2stQueue.put(event)
+            self._sendEvent2Strategy(event.getStrategyId(), event)
 
     def _switchStrategy(self, event):
         self._sendEvent2Strategy(event.getStrategyId(), event)
@@ -882,8 +886,21 @@ class StrategyEngine(object):
     def saveStrategyContext2File(self):
         jsonFile = open('config/StrategyContext.json', 'w', encoding='utf-8')
         self._onEquantExitData.update({"MaxStrategyId": self._maxStrategyId})
-        tmpOrderedDict = OrderedDict(sorted(self._onEquantExitData.items(), key=lambda obj: str(obj[0])))
+        tmpOrderedDict = {}
+        for k, v in self._onEquantExitData.items():
+            if v is not None:
+                tmpOrderedDict[k] = v
+        tmpOrderedDict = OrderedDict(sorted(tmpOrderedDict.items(), key=lambda obj: str(obj[0])))
         json.dump(tmpOrderedDict, jsonFile, ensure_ascii=False, indent=4)
         for child in multiprocessing.active_children():
             child.terminate()
             child.join()
+
+    def destroyProcess(self, pid):
+        try:
+            strategyProcess = psutil.Process(pid)
+            strategyProcess.terminate()
+            strategyProcess.wait(timeout=0.1)
+            # print("策略进程已经退出", strategyProcess.name)
+        except (psutil.NoSuchProcess, psutil.AccessDenied) as e:
+            self.logger.info("pid %d exit fail" % pid)

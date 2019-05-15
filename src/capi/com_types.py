@@ -492,6 +492,19 @@ VConOpenTimes                = "31"     # 最大连续同向开仓次数
 VCanClose                    = "32"     # 开仓的当前K线不允许平仓
 VCanOpen                     = "33"     # 平仓的当前K线不允许开仓
 
+#
+OrderSuccess                 = 0
+OrderFail                    = 1
+
+# 资金限制
+OrderLimitFromFund          = 1000
+# 最大持仓限制
+OrderLimitFromMaxTotalPosition = 1001
+# 最大连续开仓限制
+# 最大连续平仓限制
+# 当前k线最大开仓限制
+# 当前k线最大平仓限制
+
 
 class EEquExchangeReq(Structure):
     """交易所信息查询请求"""
