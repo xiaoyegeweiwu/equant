@@ -283,7 +283,7 @@ class RunMenu(object):
         self._controller = controller
         self.widget = parent
         self.menu = Menu(parent, tearoff=0)
-        self._lClickSelectedItem = None
+        self._ClickSelectedItem = None   # 选中条目，鼠标单击或前一次右键选中条目
         self._strategyId = []   # 策略Id列表，弹出右键菜单时赋值
 
     def add_event(self):
@@ -296,32 +296,34 @@ class RunMenu(object):
 
     def popupmenu(self, event):
         select = self.widget.identify_row(event.y)
-        self._lClickSelectedItem = event.widget.selection()
+        self._ClickSelectedItem = event.widget.selection()
 
         # 右键弹出菜单时给strategyId 赋值
+        print("select: ", select)
+        print("self._ClickSelectedItem: ", self._ClickSelectedItem)
 
-        if self._lClickSelectedItem:  # 选中之后右键弹出菜单
-            for idx in self._lClickSelectedItem:
+        if self._ClickSelectedItem:  # 选中之后右键弹出菜单
+            for idx in self._ClickSelectedItem:
                 self._strategyId.append(int(idx))
         else:  # 没有选中，直接右键选择
             if select:
                 self._strategyId.append(int(select))
 
-        # print("strategyId: ", self._strategyId)
-
-        if self._lClickSelectedItem:
+        if self._ClickSelectedItem:
             if select:
-                if select not in self._lClickSelectedItem:
+                if select not in self._ClickSelectedItem:
                     self.widget.focus(select)
                     self.widget.selection_set(select)
-                    self._lClickSelectedItem = event.widget.selection()
+                    self._ClickSelectedItem = event.widget.selection()
+                    self._strategyId = [int(select)]
+
             self.add_event()
             self.menu.post(event.x_root, event.y_root)
         else:
             if select:
                 self.widget.focus(select)
                 self.widget.selection_set(select)
-                self._lClickSelectedItem = event.widget.selection()
+                self._ClickSelectedItem = event.widget.selection()
                 self.widget.focus(select)
                 self.widget.selection_set(select)
                 self.add_event()

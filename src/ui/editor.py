@@ -175,9 +175,7 @@ class ModifiedMixin(object):
         self._resettingModifiedFlag = True
 
         try:
-
             self.tk.call(self._w, 'edit', 'modified', 0)
-
         finally:
             self._resettingModifiedFlag = False
 
@@ -200,6 +198,7 @@ class EditorText(ParentText, ModifiedMixin):
 
 
     def beenModified(self, event=None):
+        print("--------modified------")
         # 获取选中的策略名
         if not self._view.doubleClickFlag():
             strategyPath = self._controller.getEditorText()["path"]

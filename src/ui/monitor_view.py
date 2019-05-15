@@ -26,8 +26,6 @@ class QuantMonitor(object):
         self._initStrategyStatus()
         # 初始化K线类型字典
         self._initKLineType()
-        # 策略编号初始值
-        self._strategyNum = 1
 
         # Monitor不同标签的背景色
         self.rColor = self.bgColorW
@@ -102,10 +100,6 @@ class QuantMonitor(object):
         self.executeListTree.pack(fill=BOTH, expand=YES)
 
         self.executeListTree.bind("<Button-3>", self.createMenu)
-
-        # for key in tuple(headList):
-        #     self.executeListTree.column(key, minwidth=20, width=55, anchor=CENTER)
-        #     self.executeListTree.heading(key, text=key)
 
         for key, w in zip(headList, widthList):
             self.executeListTree.column(key, width=w, anchor=CENTER)
