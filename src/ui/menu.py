@@ -299,8 +299,6 @@ class RunMenu(object):
         self._ClickSelectedItem = event.widget.selection()
 
         # 右键弹出菜单时给strategyId 赋值
-        print("select: ", select)
-        print("self._ClickSelectedItem: ", self._ClickSelectedItem)
 
         if self._ClickSelectedItem:  # 选中之后右键弹出菜单
             for idx in self._ClickSelectedItem:

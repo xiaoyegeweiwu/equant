@@ -52,10 +52,8 @@ class TkinterController(object):
             self.app.updateErrText()
 
             self.top.after(10, self.update_log)
-        except SystemExit:
-            pass
-        except:
-            pass
+        except Exception as e:
+            self.logger.warn("update_log error: %s"%e)
 
     def update_monitor(self):
         # 更新监控界面策略信息
@@ -64,10 +62,10 @@ class TkinterController(object):
             for stId in strategyDict:
                 self.app.updateStatus(stId, strategyDict[stId])
             self.top.after(1000, self.update_monitor)
-        except SystemExit:
-            raise
-        except:
-            pass
+        # except SystemExit:
+        #     raise
+        except Exception as e:
+            self.logger.warn("update_monitor error: %s"%(e))
 
     def run(self):
         #启动主界面线程

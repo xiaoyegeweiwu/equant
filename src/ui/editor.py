@@ -194,17 +194,30 @@ class EditorText(ParentText, ModifiedMixin):
         self.config_colors()
         self.percolator = Percolator(self)
         self.bind("<Button-3>", self.create_menu)
+
+        # TODO: 捕获modified需要修改
+        self.edit_modified(False)
+        self.bind("<<Modified>>", self.beenModified)
+
         self.config(state="normal")
 
-
     def beenModified(self, event=None):
-        print("--------modified------")
+        # print("--------modified------")
         # 获取选中的策略名
+        # if not self._view.doubleClickFlag():
+        #     strategyPath = self._controller.getEditorText()["path"]
+        #     text = os.path.basename(strategyPath)
+        #     self._view.updateEditorHead(text+"*")
+        # return
+
         if not self._view.doubleClickFlag():
-            strategyPath = self._controller.getEditorText()["path"]
-            text = os.path.basename(strategyPath)
-            self._view.updateEditorHead(text+"*")
-        return
+
+            if self.edit_modified():
+                if not self._view.doubleClickFlag():
+                    strategyPath = self._controller.getEditorText()["path"]
+                    text = os.path.basename(strategyPath)
+                    self._view.updateEditorHead(text+"*")
+                return
 
     def insert(self, index, chars, tags=None):
         self.percolator.insert(index, chars, tags=None)

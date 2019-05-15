@@ -365,12 +365,15 @@ class GetEgData(object):
 
     def handlerEgEvent(self):
         while True:
-            event = self._eg2uiQueue.get()
-            eventCode = event.getEventCode()
-            if eventCode not in self._egAskCallbackDict:
-                self._logger.error("Unknown engine event(%d)"%eventCode)
-                continue
-            self._egAskCallbackDict[eventCode](event)
+            try:
+                event = self._eg2uiQueue.get()
+                eventCode = event.getEventCode()
+                if eventCode not in self._egAskCallbackDict:
+                    self._logger.error("Unknown engine event(%d)"%(eventCode))
+                    continue
+                self._egAskCallbackDict[eventCode](event)
+            except Exception as e:
+                self._logger.error("handlerEgEvent error: %s" %(e))
 
     def getReportData(self):
         if self._reportData:

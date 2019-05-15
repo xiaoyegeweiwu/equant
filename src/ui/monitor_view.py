@@ -193,9 +193,12 @@ class QuantMonitor(object):
             return
 
         strategyId = dataDict["StrategyId"]
-        if self.executeListTree.exists(strategyId):
-            self.updateStatus(strategyId, dataDict)
-            return
+        try:
+            if self.executeListTree.exists(strategyId):
+                self.updateStatus(strategyId, dataDict)
+                return
+        except Exception as e:
+            self.logger.warn("updateSingleExecute exception")
         self.executeListTree.insert("", END, iid=strategyId, values=tuple(values), tag=0)
 
     def createErr(self):
