@@ -505,7 +505,6 @@ class Trade(BaseFrame):
             self.tree.delete(child)
         orders = data['Orders']
         kline_type = data['KLineType']
-        print("orders: ", orders)
         for eo in orders:
             time = self.get_order_time(kline_type, eo['Order'])
             trade_type = self.get_trade_type(eo['Order'])

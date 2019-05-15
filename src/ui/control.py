@@ -46,19 +46,24 @@ class TkinterController(object):
         return self.logger
 
     def update_log(self):
-        self.app.updateLogText()
-        self.app.updateSigText()
-        self.app.updateErrText()
+        try:
+            self.app.updateLogText()
+            self.app.updateSigText()
+            self.app.updateErrText()
 
-        self.top.after(10, self.update_log)
-
+            self.top.after(10, self.update_log)
+        except SystemExit:
+            pass
 
     def update_monitor(self):
         # 更新监控界面策略信息
-        strategyDict = self.strategyManager.getStrategyDict()
-        for stId in strategyDict:
-            self.app.updateStatus(stId, strategyDict[stId])
-        self.top.after(1000, self.update_monitor)
+        try:
+            strategyDict = self.strategyManager.getStrategyDict()
+            for stId in strategyDict:
+                self.app.updateStatus(stId, strategyDict[stId])
+            self.top.after(1000, self.update_monitor)
+        except SystemExit:
+            raise
 
     def run(self):
         #启动主界面线程
@@ -98,13 +103,23 @@ class TkinterController(object):
         """发送生成报告请求"""
         # TODO：生成报告，如果RepData为空，则显示最新日期的历史报告，
         # TODO：不为空，代表获取到的数据为传过来的数据
+        # 量化启动时的恢复策略列表中的策略没有回测数据
+        # 策略停止之后的报告数据从本地获取，不发送请求
+        # 策略启动时查看数据发送报告请求，从engine获取数据
         # 查看策略的投资报告(不支持查看多个)
         if len(strategyIdList) >= 1:
             id = strategyIdList[0]
+            status = self.strategyManager.queryStrategyStatus(id)
+            strategyData = self.strategyManager.getSingleStrategy(id)
+            if status == ST_STATUS_QUIT:  # 策略已停止，从本地获取数据
+                if "RunningData" not in strategyData:  # 程序启动时恢复的策略没有回测数据
+                    messagebox.showinfo("提示", "策略未启动，报告数据不存在", parent=self.top)
+                    return
+                reportData = strategyData["RunningData"]
+                self.app.reportDisplay(reportData, id)
+                return
             self._request.reportRequest(id)
 
-        # for id in strategyIdList:
-        #     self._request.reportRequest(id)
 
     def newStrategy(self, path):
         """右键新建策略"""
@@ -186,7 +201,7 @@ class TkinterController(object):
             if id in strategyDict:
                 status = self.strategyManager.queryStrategyStatus(id)
                 if status == ST_STATUS_QUIT:
-                    self.logger.info("策略%s已经停止!"%(id))
+                    self.logger.info("策略%s已停止!"%(id))
                     continue
                 self._request.strategyQuit(id)
             else:

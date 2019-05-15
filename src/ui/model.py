@@ -1,7 +1,7 @@
 import os
 
-import multiprocessing
 import threading
+import copy
 import queue
 import traceback
 from utils.utils import load_file
@@ -174,7 +174,6 @@ class SendRequest(object):
 
         event = Event(msg)
         self._ui2egQueue.put(event)
-        # print("恢复事件已发送")
 
     def strategyQuit(self, strategyId):
         """策略停止运行"""
@@ -188,7 +187,6 @@ class SendRequest(object):
 
         event = Event(msg)
         self._ui2egQueue.put(event)
-        # print("停止事件已发送")
 
     def strategySignal(self, strategyId):
         """策略信号和指标图"""
@@ -202,7 +200,6 @@ class SendRequest(object):
 
         event = Event(msg)
         self._ui2egQueue.put(event)
-        # print("图表事件已发送")
 
     def strategyRemove(self, strategyId):
         """移除策略"""
@@ -294,11 +291,7 @@ class GetEgData(object):
         data = event.getData()
         id = event.getStrategyId()
 
-
-        # 更新result中的开始时间和结束时间
         tempResult = data["Result"]
-        # tempResult["Detail"]["StartTime"] = data["BeginTradeDate"]
-        # tempResult["Detail"]["EndTime"] = data["EndTradeDate"]
 
         self._reportData = tempResult
         # 取到报告数据弹出报告
@@ -320,9 +313,6 @@ class GetEgData(object):
         # 实时更新监控界面信息
         # print("MonitorData: ", data)
         self._stManager.addStrategyData(stId, data)
-        # dataDict = self._stManager.getSingleStrategy(stId)
-        # #TODO：updateStatus名字要改一下
-        # self._app.updateStatus(stId, dataDict)
 
     def _onEgExchangeInfo(self, event):
         """获取引擎推送交易所信息"""
@@ -364,10 +354,9 @@ class GetEgData(object):
             dataDict = self._stManager.getSingleStrategy(id)
 
             self._app.updateStatus(id, dataDict)
-            if sStatus == ST_STATUS_QUIT:
-                self._stManager.removeStrategy(id)
+            # if sStatus == ST_STATUS_QUIT:
+            #     self._stManager.removeStrategy(id)
             if sStatus == ST_STATUS_REMOVE:
-                print("状态: ", sStatus)
                 # 删除策略需要接到通知之后再进行删除
                 # 将策略管理器中的该策略也删除掉
                 self._stManager.removeStrategy(id)
@@ -452,7 +441,7 @@ class StrategyManager(object):
 
     def getStrategyDict(self):
         """获取全部运行策略"""
-        return self._strategyDict
+        return copy.deepcopy(self._strategyDict)
 
     def getSingleStrategy(self, id):
         """获取某个运行策略"""

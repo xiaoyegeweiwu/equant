@@ -187,7 +187,7 @@ class CalcCenter(object):
         self._costs[order["Cont"]] = self.getCostRate(order["Cont"])
         self._updateTradeDate(order["TradeDate"])
 
-        self._logger.sig_info(order)
+        # self._logger.sig_info(order)
 
         contPrice = {
             "Cont": order["Cont"],
@@ -942,6 +942,12 @@ class CalcCenter(object):
         self._calcStageStaticInfo(self._quarterStatis)
         self._calcStageStaticInfo(self._yearStatis)
 
+    def getFundRecord(self):
+        if self._fundRecords:
+            return self._fundRecords
+        else:
+            return defaultdict(int)
+
     def getAvailableFund(self):
         """可用资金"""
         if self._fundRecords:
@@ -1642,6 +1648,19 @@ class CalcCenter(object):
         """获取量化界面策略运行监控所需数据"""
         result = {}
 
+        result["Fund"] = self.getFundRecord()
+        result["Stage"] = {
+            "年度分析": self.getYearStatis,
+            "季度分析": self.getQuarterStatis,
+            "月度分析": self.getMonthStatis,
+            "周分析": self.getWeekStatis,
+            "日分析": self.getDailyStatis
+        }
+        result["Orders"] = self.getOrders
         result["Detail"] = self.getReportDetail()
+        result["KLineType"] = {
+            "KLineType": self._expertSetting["KLineType"],
+            "KLineSlice": self._expertSetting["KLineSlice"]
+        }
 
-        return result
+        return copy.deepcopy(result)
