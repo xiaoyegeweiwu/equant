@@ -1771,6 +1771,8 @@ class SelectContractWin(QuantToplevel, QuantFrame):
             self._master.contractEntry.insert(tk.END, con)
         self._master.contractEntry.config(state="disabled")
 
+        # 不加focus会出现选择合约确定后设置窗口后移
+        self._master.focus()
         self.destroy()
 
     def cancel(self):
