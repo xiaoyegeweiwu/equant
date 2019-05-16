@@ -83,6 +83,10 @@ class TradeRecord(object):
         self._offset = orderData['Offset'] if 'Offset' in orderData else None
         # 订单状态
         self._orderState = orderData['OrderState'] if 'OrderState' in orderData else None
+        # 委托成交价
+        self._matchPrice = orderData['MatchPrice'] if 'MatchPrice' in orderData else None
+        # 委托成交量
+        self._matchQty = orderData['MatchQty'] if 'MatchQty' in orderData else None
 
     def updateOrderInfo(self, eSessionId, orderData):
         if eSessionId != self._eSessionId:
@@ -100,6 +104,10 @@ class TradeRecord(object):
             self._offset = orderData['Offset']
         if 'OrderState' in orderData:
             self._orderState = orderData['OrderState']
+        if 'MatchPrice' in orderData:
+            self._matchPrice = orderData['MatchPrice']
+        if 'MatchQty' in orderData:
+            self._matchQty = orderData['MatchQty']
 
     def getBarInfo(self):
         return self._barInfo

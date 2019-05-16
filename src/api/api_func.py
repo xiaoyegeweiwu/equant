@@ -89,9 +89,9 @@ _all_func_ = {
                     ['SymbolType'          , '品种编号'],
                 ],
                 
-    # '策略状态': [
-    #                 ['AvgEntryPrice'       , '当前持仓平均建仓价格'],
-    #                 ['BarsSinceEntry'      , '当前持仓的第一个建仓位置到当前位置的Bar计数'],
+    '策略状态': [
+                    ['AvgEntryPrice'       , '当前持仓平均建仓价格'],
+                    ['BarsSinceEntry'      , '当前持仓的第一个建仓位置到当前位置的Bar计数'],
     #                 ['BarsSinceExit'       , '最近平仓位置到当前位置的Bar计数'],
     #                 ['BarsSinceLastEntry'  , '当前持仓的最后一个建仓位置到当前位置的Bar计数'],
     #                 ['ContractProfit'      , '当前持仓位置的每手浮动盈亏'],
@@ -112,7 +112,7 @@ _all_func_ = {
     #                 ['MaxPositionLoss'     , '当前持仓的最大浮动亏损数'],
     #                 ['MaxPositionProfit'   , '当前持仓的最大浮动盈利数'],
     #                 ['PositionProfit'      , '当前持仓位置的浮动盈亏'],
-    #             ],
+                ],
                 
                 
     '策略性能': [

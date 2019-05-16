@@ -1035,6 +1035,36 @@ class StrategyModel(object):
     def getSymbolType(self, contNo):
         return self.getCommodityInfoFromContNo(contNo)['CommodityCode']
 
+    # ///////////////////////策略状态///////////////////////////
+    def getAvgEntryPrice(self):
+        '''当前持仓的平均建仓价格'''
+        matchPrice = 0
+        matchQty = 0
+        for tradeRecord in self._strategy._localOrder.values():
+            if tradeRecord._offset == oOpen and tradeRecord._orderState in (osFillPart, osFilled):
+                matchPrice += tradeRecord._matchPrice
+                matchQty += tradeRecord._matchQty
+        return matchPrice/matchQty if matchQty != 0 else 0
+
+    def getBarsSinceEntry(self, contNo):
+        '''获得当前持仓中指定合约的第一个建仓位置到当前位置的Bar计数'''
+        if not contNo:
+            contNo = self._cfgModel.getBenchmark()
+
+        barInfo = None
+        for eSessionId in self._strategy._eSessionIdList:
+            tradeRecord = self._strategy._localOrder[eSessionId]
+            # if contNo == tradeRecord._contNo and tradeRecord._offset == oOpen:
+            if contNo == tradeRecord._contNo and tradeRecord._offset == 'N':
+                barInfo = tradeRecord.getBarInfo()
+                break
+
+        if not barInfo:
+            return 0
+
+        curBar = self._hisModel.getCurBar()
+        return (curBar['KLineIndex'] - barInfo['KLineIndex'])
+
     # ///////////////////////策略性能///////////////////////////
     def getAvailable(self):
         return self._calcCenter.getProfit()['Available']
@@ -2869,26 +2899,9 @@ class StrategyTrade(TradeModel):
         self._config = config
         #self._selectedUserNo = self._config._metaData['Money']['UserNo']
         # print("===== StrategyTrade ====", self._config._metaData)
-
-        # 本策略下的单
-        # key 为 equant session id
-        self._localOrder = {}
-        # 本策略下单后，返回的结果
-        # key 为 api session id
-        # self._orderResult = {}
-
-        # equant session id 到 api session id 的 映射
-        # api session id 到 equant session id 的 映射
-        self._eSessionId2apiSessionId = {}
-        self._apiSessionId2ESessionId = {}
         
     def initialize(self):
         self._selectedUserNo = self._config.getUserNo()
-
-    #
-    def updateSessionIdMap(self, event):
-        self._eSessionId2apiSessionId[event.getESessionId()] = event.getSessionId()
-        # print(" 对应关系", event.getESessionId(), event.getSessionId())
 
     def reqTradeData(self):
         event = Event({
