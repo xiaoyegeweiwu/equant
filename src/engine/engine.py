@@ -68,42 +68,41 @@ class StrategyEngine(object):
         # 量化退出时，在文件中保存策略的配置信息
         self._onEquantExitData = {}
 
-
         #
         # 恢复上次推出时保存的结构
-        self._resumeStrategy()
+        # self._resumeStrategy()
         self.logger.debug('Initialize strategy engine ok!')
 
-    def _resumeStrategy(self):
-        if not os.path.exists('config/StrategyContext.json'):
-            return
-        with open("config/StrategyContext.json", 'r') as resumeFile:
-            pythonDict = json.load(resumeFile)
-            for k,v in pythonDict.items():
-                if k == "MaxStrategyId":
-                    self._maxStrategyId = int(v)
-                else:
-                    strategyId = int(k)
-                    revent = Event({
-                        "EventCode": EV_EG2UI_LOADSTRATEGY_RESPONSE,
-                        "StrategyId": strategyId,
-                        "ErrorCode": 0,
-                        "ErrorText": "",
-                        "Data": {
-                            "StrategyId": strategyId,
-                            "StrategyName": v["StrategyName"],
-                            "StrategyState": ST_STATUS_QUIT,
-                            "Config": v["Config"],
-                        }
-                    })
-                    curStragegyInfo = {
-                        "Path": v["Path"],
-                        "Config": v["Config"],
-                        "StrategyName": v["StrategyName"]
-                    }
-                    self._onStrategyQuitData[strategyId] = curStragegyInfo
-                    self._onEquantExitData[strategyId] = curStragegyInfo
-                    self._eg2uiQueue.put(revent)
+    # def _resumeStrategy(self):
+    #     if not os.path.exists('config/StrategyContext.json'):
+    #         return
+    #     with open("config/StrategyContext.json", 'r') as resumeFile:
+    #         pythonDict = json.load(resumeFile)
+    #         for k,v in pythonDict.items():
+    #             if k == "MaxStrategyId":
+    #                 self._maxStrategyId = int(v)
+    #             else:
+    #                 strategyId = int(k)
+    #                 revent = Event({
+    #                     "EventCode": EV_EG2UI_LOADSTRATEGY_RESPONSE,
+    #                     "StrategyId": strategyId,
+    #                     "ErrorCode": 0,
+    #                     "ErrorText": "",
+    #                     "Data": {
+    #                         "StrategyId": strategyId,
+    #                         "StrategyName": v["StrategyName"],
+    #                         "StrategyState": ST_STATUS_QUIT,
+    #                         "Config": v["Config"],
+    #                     }
+    #                 })
+    #                 curStragegyInfo = {
+    #                     "Path": v["Path"],
+    #                     "Config": v["Config"],
+    #                     "StrategyName": v["StrategyName"]
+    #                 }
+    #                 self._onStrategyQuitData[strategyId] = curStragegyInfo
+    #                 self._onEquantExitData[strategyId] = curStragegyInfo
+    #                 self._eg2uiQueue.put(revent)
         
     def _regApiCallback(self):
         self._apiCallbackDict = {
@@ -179,6 +178,7 @@ class StrategyEngine(object):
         
         while True:
             self._handleUIData()
+            time.sleep(0.1)
             
     def _sendEvent2Strategy(self, strategyId, event):
         if strategyId not in self._eg2stQueueDict or not self._isEffective[strategyId]:
@@ -253,7 +253,7 @@ class StrategyEngine(object):
         id = self._getStrategyId() if strategyId is None else strategyId
         eg2stQueue = Queue(2000)
         self._eg2stQueueDict[id] = eg2stQueue
-        self._strategyMgr.create(id, eg2stQueue, event)
+        self._strategyMgr.create(id, eg2stQueue, self._eg2uiQueue, self._st2egQueue, event)
         # broken pip error 修复
         self._isEffective[id] = True
         # =================
@@ -305,29 +305,34 @@ class StrategyEngine(object):
             if code not in self._apiCallbackDict:
                 return
             self._apiCallbackDict[code](apiEvent)
+
+            self.maxContinuousIdleTimes = 0
         except queue.Empty as e:
+            self.maxContinuousIdleTimes += 1
             pass
             
-    def _handelStData(self):
+    def _handleStData(self):
         try:
             event = self._st2egQueue.get_nowait()
             code  = event.getEventCode()
             if code not in self._mainWorkFuncDict:
                 self.logger.debug('Event %d not register in _mainWorkFuncDict'%code)
-                #print("未处理的event code =",code)
+                # print("未处理的event code =",code)
                 return
             self._mainWorkFuncDict[code](event)
-        except (queue.Empty, KeyError) as e:
-            if e is KeyError:
-                event.printTool()
-                print(" now code is ", code)
+            self.maxContinuousIdleTimes = 0
+        except queue.Empty as e:
+            self.maxContinuousIdleTimes += 1
             pass
-            
+
+    maxContinuousIdleTimes = 0
     def _mainThreadFunc(self):
         while True:
             self._handleApiData()
-            self._handelStData()
-            #time.sleep(0.01)
+            self._handleStData()
+            if self.maxContinuousIdleTimes >= 1000:
+                time.sleep(0.1)
+            self.maxContinuousIdleTimes %= 1000
             
     def _startMainThread(self):
         '''从api队列及策略队列中接收数据'''
