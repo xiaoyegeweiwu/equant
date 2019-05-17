@@ -145,6 +145,8 @@ class Strategy:
         # 该策略的所有下单信息
         self._eSessionIdList = [] # 存储本地生成的eSessionId，为了保存下单顺序信息
         self._localOrder = {} # {本地生成的eSessionId : TradeRecode对象}
+        
+        self._moneyLastTime = 0
 
     # ////////////////////////////对外接口////////////////////
     def _initialize(self):
@@ -293,6 +295,21 @@ class Strategy:
                 }
             })
             self._triggerQueue.put(event)
+            
+    def _triggerMoney(self):
+        nowTime = datetime.now()
+        event = Event({
+                "StrategyId" : self._strategyId,
+                "EventCode": ST_TRIGGER_MONEY,
+                "ContractNo": self._dataModel.getConfigModel().getBenchmark(),
+                "Data":{
+                    "TriggerType":"Money"
+                }
+            })
+            
+        if self._moneyLastTime == 0 or (nowTime - self._moneyLastTime).total_seconds() > 1:
+            self._triggerQueue.put(event)
+            self._moneyLastTime = nowTime
         
     def _runTimer(self):
         timeList = self._dataModel.getConfigData()['Trigger']['Timer']
@@ -306,6 +323,8 @@ class Strategy:
             self._triggerTime()
             # 周期性触发
             self._triggerCycle()
+            # 通知资金变化
+            self._triggerMoney()
             # 休眠100ms
             time.sleep(0.1)
         

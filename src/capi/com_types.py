@@ -194,7 +194,9 @@ ST_TRIGGER_CYCLE                  = 2               #周期性触发
 ST_TRIGGER_KLINE                  = 3               #K线触发
 ST_TRIGGER_SANPSHOT               = 4               #即时行情触发
 ST_TRIGGER_TRADE                  = 5               #交易触发
-ST_TRIGGER_FILL_DATA              = 6
+ST_TRIGGER_FILL_DATA              = 6               #回测阶段中间数据
+ST_TRIGGER_MONEY                  = 7               #策略资金推送
+
 
 #策略触发操作定义
 ST_EVENT_TRIGGER                  = 0               #触发操作

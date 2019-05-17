@@ -80,6 +80,17 @@ class StrategyModel(object):
             "PriceTick": self.getPriceScale(contNo),  # 最小变动价位
         }
         self._calcCenter.initArgs(strategyParam)
+        
+    def _updateUIMoney(self, event):
+        result = self._calcCenter.getMonResult()
+        sEvent = Event({
+            "StrategyId" : event.getStrategyId(),
+            "EventCode": EV_EG2ST_MONITOR_INFO,
+            "EventSrc" : EEQU_EVSRC_ENGINE, 
+            "Data": result
+        })
+        
+        self._strategy.sendEvent2UI(sEvent)
 
     # ++++++++++++++++++++++策略接口++++++++++++++++++++++++++++++
     # //////////////////////历史行情接口//////////////////////////
@@ -104,6 +115,10 @@ class StrategyModel(object):
             else:
                 self.logger.info("交易触发")
                 self._hisModel.runOtherTrigger(context, handle_data, event)
+                
+        elif code == ST_TRIGGER_MONEY:
+            #回测阶段也同步资金
+            self._updateUIMoney(event)
 
     def reqHisQuote(self):
         self._hisModel.reqAndSubQuote()
@@ -564,7 +579,7 @@ class StrategyModel(object):
         curVirtualFund = self._calcCenter.getAvailableFund()
         marginRate = self._cfgModel.getMarginValue() if not self._cfgModel.getMarginValue() else 0.08
         if self._calcController.canOrderByVirtualFund(curVirtualFund, orderQty, orderPrice, marginRate, 0)["ErrorCode"] == OrderFail:
-            self.logger.info("资金不足")
+            #self.logger.info("资金不足")
             return
         self.addOrder2CalcCenter(userNo, contNo, orderDirct, entryOrExit, orderPrice, orderQty, curBar)
         self.sendSignalEvent(singnalName, contNo, orderDirct, entryOrExit, orderPrice, orderQty, curBar)
@@ -2364,17 +2379,17 @@ class StrategyHisQuote(object):
     
     def _afterBar(self, contractNos, barInfos):
         self._calc.calcProfit(contractNos,barInfos)
-        result = self._calc.getMonResult()
-        result.update({
-            "StrategyName":self._strategy.getStrategyName(),
-            "Status":ST_STATUS_HISTORY,
-        })
-        event = Event({
-            "EventCode":EV_EG2ST_MONITOR_INFO,
-            "StrategyId":self._strategy.getStrategyId(),
-            "Data":result
-        })
-        self._strategy.sendEvent2Engine(event)
+        #result = self._calc.getMonResult()
+        # result.update({
+            # "StrategyName":self._strategy.getStrategyName(),
+            # "Status":ST_STATUS_HISTORY,
+        # })
+        # event = Event({
+            # "EventCode":EV_EG2ST_MONITOR_INFO,
+            # "StrategyId":self._strategy.getStrategyId(),
+            # "Data":result
+        # })
+        # self._strategy.sendEvent2Engine(event)
         
     def _sendFlushEvent(self):
         event = Event({
