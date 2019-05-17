@@ -303,6 +303,7 @@ class StrategyModel(object):
 
         # 对于开仓，需要平掉反向持仓
         qty = self._calcCenter.needCover(userNo, contNo, dBuy, share, price)
+        qty = 0
         if qty > 0:
             eSessionId = buySellOrder(userNo, contNo, otMarket, vtNone, dSell, oCover, hSpeculate, price, qty, curBar, 'Sell')
             if eSessionId != "": self._strategy.updateBarInfoInLocalOrder(eSessionId, curBar)
@@ -337,6 +338,7 @@ class StrategyModel(object):
         
         userNo = self._cfgModel.getUserNo() if self._cfgModel.isActualRun() else "Default"
         qty = self._calcCenter.needCover(userNo, contNo, dSell, share, price)
+        qty = 0
         if qty > 0:
             eSessionId = buySellOrder(userNo, contNo, otMarket, vtNone, dBuy, oCover, hSpeculate, price, qty, curBar, 'BuyToCover')
             if eSessionId != "": self._strategy.updateBarInfoInLocalOrder(eSessionId, curBar)
@@ -576,7 +578,6 @@ class StrategyModel(object):
             2. 如果支持K线触发，会产生下单信号
             3. 对于即时行情和委托触发，在日志中分析下单信号
         '''
-
         datetime = '20190517090001001'
         tradeDate = '20190517'
         
@@ -590,15 +591,15 @@ class StrategyModel(object):
         
         orderParam = {
             "UserNo"         : userNo,                   # 账户编号
-            "OrderType"      : otMarket,                 # 定单类型
-            "ValidType"      : vtNone,                   # 有效类型
+            "OrderType"      : orderType,                 # 定单类型
+            "ValidType"      : validType,                   # 有效类型
             "ValidTime"      : '0',                      # 有效日期时间(GTD情况下使用)
             "Cont"           : contNo,                   # 合约
-            "Direct"         : direct,                   # 买卖方向：买、卖
-            "Offset"         : offset,                   # 开仓、平仓、平今
-            "Hedge"          : hSpeculate,               # 投机套保
-            "OrderPrice"     : price,                    # 委托价格 或 期权应价买入价格
-            "OrderQty"       : share,                    # 委托数量 或 期权应价数量
+            "Direct"         : orderDirct,                   # 买卖方向：买、卖
+            "Offset"         : entryOrExit,                   # 开仓、平仓、平今
+            "Hedge"          : hedge,               # 投机套保
+            "OrderPrice"     : orderPrice,                    # 委托价格 或 期权应价买入价格
+            "OrderQty"       : orderQty,                    # 委托数量 或 期权应价数量
             "DateTimeStamp"  : datetime,                 # 时间戳（基准合约）
             "TradeDate"      : tradeDate,                # 交易日（基准合约）
         }
@@ -2143,7 +2144,7 @@ class StrategyHisQuote(object):
             dateTimeStampLength = len("20190326143100000")
             self._reqBeginDate = int(countOrDate + (dateTimeStampLength - len(countOrDate)) * '0')
             count = self._reqKLineTimes * 4000
-
+            
         for contNo in self._contractTuple:
             # req by count
             if not self._reqByDate:
