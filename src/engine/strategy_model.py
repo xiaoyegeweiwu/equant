@@ -1479,8 +1479,10 @@ class StrategyConfig(object):
         '''设置K线类型和K线周期'''
         if barType not in ('t', 'T', 'S', 'M', 'H', 'D', 'W', 'm', 'Y'):
             return -1
-        if not contNo:
-            contNo = self.getBenchmark()
+        if not contNo or contNo == self.getBenchmark():
+            self._metaData['Sample']['KLineType'] = barType
+            self._metaData['Sample']['KLineSlice'] = barInterval
+            return 0
 
         if contNo not in self._metaData['Sample']:
             self._metaData['Sample'][contNo] = [{'KLineType' : barType, 'KLineSlice' : barInterval}, ]
