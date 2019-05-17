@@ -42,10 +42,10 @@ class StartegyManager(object):
         '''
         pass
 
-    def create(self, id, queue, event):
-        qdict = {'eg2st': queue, 'st2eg': self._st2egQueue}
-        strategy = Strategy(self.logger, id, event, qdict)
-        self._strategyDict[id] = strategy
+    def create(self, strategyId, eg2stQueue, eg2uiQueue, st2egQueue, event):
+        qdict = {'eg2st': eg2stQueue, 'st2eg': st2egQueue, 'st2ui':eg2uiQueue}
+        strategy = Strategy(self.logger, strategyId, qdict, event)
+        self._strategyDict[strategyId] = strategy
 
         process = Process(target=self.run, args=(strategy,))
         process.daemon = True
@@ -83,6 +83,10 @@ class TradeRecord(object):
         self._offset = orderData['Offset'] if 'Offset' in orderData else None
         # 订单状态
         self._orderState = orderData['OrderState'] if 'OrderState' in orderData else None
+        # 委托成交价
+        self._matchPrice = orderData['MatchPrice'] if 'MatchPrice' in orderData else None
+        # 委托成交量
+        self._matchQty = orderData['MatchQty'] if 'MatchQty' in orderData else None
 
     def updateOrderInfo(self, eSessionId, orderData):
         if eSessionId != self._eSessionId:
@@ -100,12 +104,16 @@ class TradeRecord(object):
             self._offset = orderData['Offset']
         if 'OrderState' in orderData:
             self._orderState = orderData['OrderState']
+        if 'MatchPrice' in orderData:
+            self._matchPrice = orderData['MatchPrice']
+        if 'MatchQty' in orderData:
+            self._matchQty = orderData['MatchQty']
 
     def getBarInfo(self):
         return self._barInfo
 
 class Strategy:
-    def __init__(self, logger, id, event, args):
+    def __init__(self, logger, id, args, event):
         self._strategyId = id
         self.logger = logger
         
@@ -122,6 +130,7 @@ class Strategy:
 
         self._eg2stQueue = args['eg2st']
         self._st2egQueue = args['st2eg']
+        self._st2uiQueue = args['st2ui']
         moduleDir, moduleName = os.path.split(self._filePath)
         self._strategyName = ''.join(moduleName.split('.')[:-1])
 
@@ -396,7 +405,7 @@ class Strategy:
                 "EndTradeDate":self._dataModel.getHisQuoteModel().getEndDate(),
             }
         })
-        self.sendEvent2Engine(responseEvent)
+        self.sendEvent2UI(responseEvent)
 
     def getQueues(self):
         return self._eg2stQueue, self._st2egQueue
@@ -404,7 +413,6 @@ class Strategy:
     def _onLoadStrategyResponse(self, event):
         '''向界面返回策略加载应答'''
         cfg = self._dataModel.getConfigData()
-        
         revent = Event({
             "EventCode" : EV_EG2UI_LOADSTRATEGY_RESPONSE,
             "StrategyId": self._strategyId,
@@ -417,8 +425,7 @@ class Strategy:
                 "Config"       : cfg,
             }
         })
-        
-        self.sendEvent2Engine(revent)
+        self.sendEvent2UI(revent)
 
     def _onTradeInfo(self, event):
         '''
@@ -574,6 +581,9 @@ class Strategy:
 
     def sendEvent2Engine(self, event):
         self._st2egQueue.put(event)
+
+    def sendEvent2UI(self, event):
+        self._st2uiQueue.put(event)
 
     def sendTriggerQueue(self, event):
         self._triggerQueue.put(event)

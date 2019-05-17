@@ -1517,7 +1517,48 @@ class BaseApi(object):
               "ZCE|F|SR|001"的品种编号为"ZCE|F|SR"
         '''
         return self._dataModel.getSymbolType(contNo)
-        
+
+    # //////////////////////策略状态////////////////////
+    def AvgEntryPrice(self):
+        '''
+        【说明】
+              获得当前持仓的平均建仓价格。
+
+        【语法】
+              float AvgEntryPrice()
+
+        【参数】
+              无
+
+        【备注】
+              无
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getAvgEntryPrice()
+
+    def BarsSinceEntry(self, contNo):
+        '''
+        【说明】
+              获得当前持仓中指定合约的第一个建仓位置到当前位置的Bar计数。
+
+        【语法】
+              int BarsSinceEntry(string contNo)
+
+        【参数】
+              contNo 合约编号，默认为基础合约。
+
+        【备注】
+              获得当前持仓指定合约的第一个建仓位置到当前位置的Bar计数，返回值为整型。
+              只有当MarketPosition != 0时，即有持仓的状况下，该函数才有意义，否则返回0。
+              注意：在开仓Bar上为0。
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getBarsSinceEntry(contNo)
+
     #////////////////////////////策略性能/////////////////
     def Available(self):
         '''
@@ -3762,6 +3803,13 @@ def Q_UpperLimit(symbol=''):
 
 def QuoteDataExist(symbol=''):
     return baseApi.QuoteDataExist(symbol)
+
+#策略状态
+def AvgEntryPrice():
+    return baseApi.AvgEntryPrice()
+
+def BarsSinceEntry(contNo=''):
+    return baseApi.BarsSinceEntry(contNo)
 
 # 策略性能
 def Available():
