@@ -1074,7 +1074,7 @@ class StrategyModel(object):
 
         positionInfo = self._calcCenter.getPositionInfo(contNo)
         buy = positionInfo['TotalBuy']
-        sell = positionInfo['TodaySell']
+        sell = positionInfo['TotalSell']
         if buy == sell:
             return 0
         return 1 if buy > sell else -1
