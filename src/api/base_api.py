@@ -1559,6 +1559,30 @@ class BaseApi(object):
         '''
         return self._dataModel.getBarsSinceEntry(contNo)
 
+    def MarketPosition(self, contNo):
+        '''
+        【说明】
+               获得当前持仓状态 。
+
+        【语法】
+              int MarketPosition(string contNo)
+
+        【参数】
+              contNo 合约编号，默认为基础合约。
+
+        【备注】
+              获得当前持仓状态，返回值为整型。
+              返回值定义如下：
+                -1 当前位置为持空仓
+                0 当前位置为持平
+                1 当前位置为持多仓
+
+        【示例】
+              if(MarketPosition("ZCE|F|SR|905")==1)判断合约ZCE|F|SR|905当前是否持多仓
+              if(MarketPosition("ZCE|F|SR|905")!=0)判断合约ZCE|F|SR|905当前是否有持仓，无论持空仓或多仓
+        '''
+        return self._dataModel.getMarketPosition(contNo)
+
     #////////////////////////////策略性能/////////////////
     def Available(self):
         '''
@@ -3811,6 +3835,8 @@ def AvgEntryPrice():
 def BarsSinceEntry(contNo=''):
     return baseApi.BarsSinceEntry(contNo)
 
+def MarketPosition(contNo=''):
+    return baseApi.MarketPosition(contNo)
 # 策略性能
 def Available():
     return baseApi.Available()

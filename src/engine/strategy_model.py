@@ -810,9 +810,9 @@ class StrategyModel(object):
         argStr = ""
         for arg in args:
             if isinstance(arg, str):
-                argStr += arg
+                argStr = argStr + ' ' + arg
             else:
-                argStr += str(arg)
+                argStr = argStr + ' ' + str(arg)
 
         return '[User]%s' % argStr
 
@@ -1067,6 +1067,17 @@ class StrategyModel(object):
 
         curBar = self._hisModel.getCurBar()
         return (curBar['KLineIndex'] - barInfo['KLineIndex'])
+
+    def getMarketPosition(self, contNo):
+        if not contNo:
+            contNo = self._cfgModel.getBenchmark()
+
+        positionInfo = self._calcCenter.getPositionInfo(contNo)
+        buy = positionInfo['TotalBuy']
+        sell = positionInfo['TodaySell']
+        if buy == sell:
+            return 0
+        return 1 if buy > sell else -1
 
     # ///////////////////////策略性能///////////////////////////
     def getAvailable(self):
