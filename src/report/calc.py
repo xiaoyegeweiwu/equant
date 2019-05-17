@@ -172,7 +172,6 @@ class CalcCenter(object):
                 if availableFund < coverCharge:
                     return -1   # 平卖开仓失败
                 else:
-
                     # beforePrice = pInfo["SellPrice"]  # 未平之前的持仓价
                     # afterPrice = self._getHoldPrice(contNo, 0, False)  # 平过之后的持仓价
                     #
@@ -192,8 +191,10 @@ class CalcCenter(object):
                         return -2  # 开买开仓失败
                     else:
                         return pInfo["TotalSell"]
+        else:
+            return 0  # 没有对头仓
 
-        if direct == dSell:  # 买开
+        if direct == dSell:  # 卖开
             if pInfo["TotalBuy"] > 0:
                 if cost["CloseRatio"]:
                     coverCharge = orderPrice * pInfo["TotalBuy"] * cost["TradeDot"] * cost["CloseRatio"]
@@ -211,6 +212,8 @@ class CalcCenter(object):
                         return -2  # 开卖开仓失败
                     else:
                         return pInfo["TotalBuy"]
+        else:
+            return 0  # 没有对头仓
 
     def addOrder111(self, order):
         # 封装self._addOrder函数
