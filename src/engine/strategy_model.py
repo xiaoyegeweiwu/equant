@@ -48,6 +48,9 @@ class StrategyModel(object):
 
     def getHisQuoteModel(self):
         return self._hisModel
+        
+    def getMonResult(self):
+        return self._calcCenter.getMonResult()
 
     # +++++++++++++++++++++++内部接口++++++++++++++++++++++++++++
     def getCalcCenter(self):
@@ -80,17 +83,6 @@ class StrategyModel(object):
             "PriceTick": self.getPriceScale(contNo),  # 最小变动价位
         }
         self._calcCenter.initArgs(strategyParam)
-        
-    def _updateUIMoney(self, event):
-        result = self._calcCenter.getMonResult()
-        sEvent = Event({
-            "StrategyId" : event.getStrategyId(),
-            "EventCode": EV_EG2ST_MONITOR_INFO,
-            "EventSrc" : EEQU_EVSRC_ENGINE, 
-            "Data": result
-        })
-        
-        self._strategy.sendEvent2UI(sEvent)
 
     # ++++++++++++++++++++++策略接口++++++++++++++++++++++++++++++
     # //////////////////////历史行情接口//////////////////////////
@@ -115,10 +107,6 @@ class StrategyModel(object):
             else:
                 self.logger.info("交易触发")
                 self._hisModel.runOtherTrigger(context, handle_data, event)
-                
-        elif code == ST_TRIGGER_MONEY:
-            #回测阶段也同步资金
-            self._updateUIMoney(event)
 
     def reqHisQuote(self):
         self._hisModel.reqAndSubQuote()

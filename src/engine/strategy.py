@@ -298,18 +298,19 @@ class Strategy:
             
     def _triggerMoney(self):
         nowTime = datetime.now()
-        event = Event({
-                "StrategyId" : self._strategyId,
-                "EventCode": ST_TRIGGER_MONEY,
-                "ContractNo": self._dataModel.getConfigModel().getBenchmark(),
-                "Data":{
-                    "TriggerType":"Money"
-                }
-            })
-            
         if self._moneyLastTime == 0 or (nowTime - self._moneyLastTime).total_seconds() > 1:
-            self._triggerQueue.put(event)
             self._moneyLastTime = nowTime
+            data = self._dataModel.getMonResult()
+            if len(data) == 0:
+                return
+            event = Event({
+                "StrategyId" : self._strategyId,
+                "EventCode": EV_EG2ST_MONITOR_INFO,
+                "Data": self._dataModel.getMonResult()
+            })
+        
+            self.sendEvent2UI(event)
+            
         
     def _runTimer(self):
         timeList = self._dataModel.getConfigData()['Trigger']['Timer']

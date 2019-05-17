@@ -289,7 +289,6 @@ class GetEgData(object):
         stId = event.getStrategyId()
         data = event.getData()
         # 实时更新监控界面信息
-        # print("MonitorData: ", data)
         self._stManager.addStrategyData(stId, data)
 
     def _onEgExchangeInfo(self, event):

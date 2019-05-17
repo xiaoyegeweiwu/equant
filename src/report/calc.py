@@ -1282,10 +1282,14 @@ class CalcCenter(object):
         :param start: 信号计算开始时间
         :param end: 信号计算结束时间
         """
+        if not start or not end:
+            return -1
         from dateutil.parser import parse
         s = parse(str(start))
         e = parse(str(end))
         self._testDays = (e-s).days + 1
+        
+        return 0
 
     @property
     def paramStatistic(self):
@@ -1517,7 +1521,8 @@ class CalcCenter(object):
         # 放在info文件的show方法中，知道最后出报告时才会计算self._testDays
         # 这样中间出报告时会报错，self._test_days为0
         # self.calcTestDay(self._strategy["StartTime"], self._strategy["EndTime"])
-        self.calcTestDay(self._beginDate, self._endDate)
+        ret = self.calcTestDay(self._beginDate, self._endDate)
+        if ret < 0: return None
         #TODO: 回测开始日期和回测结束日期在calcProfit中更新，所以把self._beginDate和self._endDate传进类中
         from report.reportdetail import ReportDetail
         self._reportDetails = ReportDetail(self._expertSetting, self._positions, self._profit, self._testDays,
@@ -1669,6 +1674,8 @@ class CalcCenter(object):
     def getMonResult(self):
         """获取量化界面策略运行监控所需数据"""
         result = {}
+        detail = self.getReportDetail()
+        if not detail: return result
 
         result["Detail"] = self.getReportDetail()
 
