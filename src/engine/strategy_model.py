@@ -429,8 +429,11 @@ class StrategyModel(object):
             contNoTuple = contNoTuple[:4]
         return self._cfgModel.setTriggerCont(contNoTuple)
 
-    def setTradeMode(self, inActual, useSample, useReal):
-        return self._cfgModel.setTradeMode(inActual, useSample, useReal)
+    # def setTradeMode(self, inActual, useSample, useReal):
+    #     return self._cfgModel.setTradeMode(inActual, useSample, useReal)
+
+    def setActual(self):
+        return self._cfgModel.setActual()
 
     def setOrderWay(self, type):
         if type not in (1, 2):
@@ -831,18 +834,19 @@ class StrategyModel(object):
 
         sample = self._cfgModel.getSample()
         if not contNo:
-            return [{'KLineType': sample['KLineSlice'], 'KLineSlice': sample['KLineSlice']},]
-        return sample[contNo]
+            return sample['KLineSlice']
+        barInfo = sample[contNo][-1]
+        return barInfo['KLineSlice']
 
-    def getBarType(self):
+    def getBarType(self,contNo):
         if len(self._cfgModel._metaData) == 0 or 'Sample' not in self._cfgModel._metaData:
             return None
 
         sample = self._cfgModel.getSample()
-        if 'KLineType' not in sample:
-            return None
-
-        return sample['KLineType']
+        if not contNo:
+            return sample['KLineType']
+        barInfo = sample[contNo][-1]
+        return barInfo['KLineType']
 
     def getBidAskSize(self, contNo):
         contractNo = contNo
@@ -1583,15 +1587,18 @@ class StrategyConfig(object):
             return self._metaData['TriggerCont']
         return None
 
-    def setTradeMode(self, inActual, useSample, useReal):
-        runMode = self._metaData['RunMode']
-        if inActual:
-            # 实盘运行
-            runMode['Actual']['SendOrder2Actual'] = True
-        else:
-            # 模拟盘运行
-            runMode['Simulate']['UseSample'] = useSample
-            runMode['Simulate']['Continues'] = useReal
+    def setActual(self):
+        self._metaData['RunMode']['Actual']['SendOrder2Actual'] = True
+
+    # def setTradeMode(self, inActual, useSample, useReal):
+    #     runMode = self._metaData['RunMode']
+    #     if inActual:
+    #         # 实盘运行
+    #         runMode['Actual']['SendOrder2Actual'] = True
+    #     else:
+    #         # 模拟盘运行
+    #         runMode['Simulate']['UseSample'] = useSample
+    #         runMode['Simulate']['Continues'] = useReal
 
     def setOrderWay(self, type):
         if type not in (1, 2):

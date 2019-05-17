@@ -1061,7 +1061,7 @@ class BaseApi(object):
         '''
         return self._dataModel.getBarInterval(contNo)
         
-    def BarType(self):
+    def BarType(self, contNo):
         '''
         【说明】
               合约图表周期类型值
@@ -1070,7 +1070,7 @@ class BaseApi(object):
               int BarType()
 
         【参数】
-              无
+              contNo 合约编号，为空时取的时设置界面设置的周期数值
 
         【备注】
               返回值为整型，通常和BarInterval一起使用进行数据周期的判别
@@ -1092,7 +1092,7 @@ class BaseApi(object):
               当前数据周期为1TICK线，BarType等于1；
               当前数据周期为3秒线，BarType等于2。
         '''
-        return self._dataModel.getBarType()
+        return self._dataModel.getBarType(contNo)
         
     def BidAskSize(self, contNo):
         '''
@@ -3370,27 +3370,46 @@ class BaseApi(object):
         '''
         return self._dataModel.setTriggerCont(contractNo)
 
-    def SetTradeMode(self, inActual, useSample, useReal):
+    # def SetTradeMode(self, inActual, useSample, useReal):
+    #     '''
+    #     【说明】
+    #          设置运行方式
+    #
+    #     【语法】
+    #           int SetTradeMode(bool inActual, bool useSample, bool useReal)
+    #
+    #     【参数】
+    #           inActual      True 表示在实盘上运行，False 表示在模拟盘上运行
+    #           useSample     在模拟盘上是否使用历史数据进行回测
+    #           useReal       在模拟盘上是否使用实时数据运行策略
+    #
+    #     【备注】
+    #           返回整型，0成功，-1失败
+    #
+    #     【示例】
+    #           SetTradeMode(False, True, True)    # 在模拟盘上使用历史数据回测，并使用实时数据继续运行策略
+    #           SetTradeMode(True, True, True)     # 在模拟盘上使用历史数据回测，并使用实时数据继续运行策略；在实盘上使用实时数据运行策略
+    #     '''
+    #     return self._dataModel.setTradeMode(inActual, useSample, useReal)
+
+    def SetActual(self):
         '''
         【说明】
-             设置运行方式
+             设置策略在实盘上运行
 
         【语法】
-              int SetTradeMode(bool inActual, bool useSample, bool useReal)
+              int SetActual()
 
         【参数】
-              inActual      True 表示在实盘上运行，False 表示在模拟盘上运行
-              useSample     在模拟盘上是否使用历史数据进行回测
-              useReal       在模拟盘上是否使用实时数据运行策略
+              无
 
         【备注】
               返回整型，0成功，-1失败
 
         【示例】
-              SetTradeMode(False, True, True)    # 在模拟盘上使用历史数据回测，并使用实时数据继续运行策略
-              SetTradeMode(True, True, True)     # 在模拟盘上使用历史数据回测，并使用实时数据继续运行策略；在实盘上使用实时数据运行策略
+              无
         '''
-        return self._dataModel.setTradeMode(inActual, useSample, useReal)
+        return self._dataModel.setActual()
 
     def SetOrderWay(self, type):
         '''
@@ -4156,8 +4175,11 @@ def SetMargin(type, value=0, contNo=''):
 def SetTradeFee(type, feeType, feeValue, contNo=''):
     return baseApi.SetTradeFee(type, feeType, feeValue, contNo)
 
-def SetTradeMode(inActual, useSample, useReal):
-    return baseApi.SetTradeMode(inActual, useSample, useReal)
+# def SetTradeMode(inActual, useSample, useReal):
+# #     return baseApi.SetTradeMode(inActual, useSample, useReal)
+
+def SetActual():
+    return baseApi.SetActual()
 
 def SetOrderWay(type):
     return baseApi.SetOrderWay(type)
@@ -4194,8 +4216,8 @@ def S_SetBarInterval(barType, barInterval):
 def BarInterval(contNo=''):
     return baseApi.BarInterval(contNo)
 
-def BarType():
-    return baseApi.BarType()
+def BarType(contNo=''):
+    return baseApi.BarType(contNo)
 
 def BidAskSize(contNo=''):
     return baseApi.BidAskSize(contNo)
