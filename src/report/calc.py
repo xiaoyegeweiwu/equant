@@ -333,7 +333,6 @@ class CalcCenter(object):
         计算订单的扩展持仓信息
         :return:
         """
-        availableFund = self.getAvailableFund()
         charge = 0  # 手续费
         charge1 = 0  # 手续费1
         margin = 0  # 保证金
@@ -347,7 +346,6 @@ class CalcCenter(object):
         if order["Direct"] == dBuy and order["Offset"] == oOpen:  # 买开
             qty = order["OrderQty"]
             charge, turnover, margin, profit = self._buyOpen(order, qty)
-
 
         elif order["Direct"] == dBuy and order["Offset"] == oCover:  # 买平
             qty = order["OrderQty"] if pInfo["TotalSell"] > order["OrderQty"] else pInfo["TotalSell"]
@@ -1787,7 +1785,8 @@ class CalcCenter(object):
                 "MaxRetrace": self._profit['MaxRetracement'],
                 "NetProfit": self._profit["TotalProfit"],
                 "WinRate": self._profit["WinRate"],
-                "Available": self._fundRecords[-1]['Available'] if len(self._fundRecords) > 0 else self._expertSetting["StartFund"]
+                "Available": self._fundRecords[-1]['Available'] if len(self._fundRecords) > 0 else self._expertSetting[
+                    "StartFund"]
              }
         )
         return result

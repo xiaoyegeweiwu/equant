@@ -89,8 +89,8 @@ class QuantMonitor(object):
 
     def createExecute(self):
         headList  = ["编号", "策略名称", "基准合约", "频率", "运行状态", "实盘运行",
-                    "初始资金", "可用资金", "年化收益", "最大回撤", "累计收益", "胜率"]
-        widthList = [5, 50, 50, 5, 10, 5, 20, 10, 5, 20, 20, 5]
+                    "初始资金", "可用资金", "最大回撤", "累计收益", "胜率"]
+        widthList = [5, 50, 50, 5, 10, 5, 20, 10, 20, 20, 5]
 
         self.executeBar = ttk.Scrollbar(self.executeList, orient="vertical")
         self.executeBar.pack(side=RIGHT, fill=Y)
@@ -156,13 +156,13 @@ class QuantMonitor(object):
                 # Available =  "{:.2f}".format(dataDict['RunningData']['Fund'][-1]['Available'])
                 Available = 0
                 # 年化单利收益率
-                AnnualizedReturns = "{:.2f}".format(dataDict['RunningData']['Detail']['AnnualizedSimple'])
-                MaxRetrace = "{:.2f}".format((dataDict['RunningData']['Detail']['MaxRetrace']))
-                TotalProfit = "{:.2f}".format(dataDict['RunningData']['Detail']['NetProfit'])
-                WinRate = "{:.2f}".format(dataDict['RunningData']['Detail']['WinRate'])
+                # AnnualizedReturns = "{:.2f}".format(dataDict['RunningData']['Detail']['AnnualizedSimple'])
+                MaxRetrace = "{:.2f}".format((dataDict['RunningData']['MaxRetrace']))
+                TotalProfit = "{:.2f}".format(dataDict['RunningData']['NetProfit'])
+                WinRate = "{:.2f}".format(dataDict['RunningData']['WinRate'])
             else:
                 Available = InitFund
-                AnnualizedReturns = 0
+                # AnnualizedReturns = 0
                 MaxRetrace = 0
                 TotalProfit = 0
                 WinRate = 0
@@ -180,7 +180,6 @@ class QuantMonitor(object):
             RunType,
             InitFund,
             Available,
-            AnnualizedReturns,
             MaxRetrace,
             TotalProfit,
             WinRate
