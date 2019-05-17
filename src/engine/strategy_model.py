@@ -302,7 +302,7 @@ class StrategyModel(object):
         userNo = self._cfgModel.getUserNo() if self._cfgModel.isActualRun() else "Default"
 
         # 对于开仓，需要平掉反向持仓
-        qty = self._calcCenter.needCover(userNo, contNo, dBuy, qty, price)
+        qty = self._calcCenter.needCover(userNo, contNo, dBuy, share, price)
         if qty > 0:
             eSessionId = buySellOrder(userNo, contNo, otMarket, vtNone, dSell, oCover, hSpeculate, price, qty, curBar, 'Sell')
             if eSessionId != "": self._strategy.updateBarInfoInLocalOrder(eSessionId, curBar)
@@ -336,7 +336,7 @@ class StrategyModel(object):
         curBar = None
         
         userNo = self._cfgModel.getUserNo() if self._cfgModel.isActualRun() else "Default"
-        qty = self._calcCenter.needCover(userNo, contNo, dSell, qty, price)
+        qty = self._calcCenter.needCover(userNo, contNo, dSell, share, price)
         if qty > 0:
             eSessionId = buySellOrder(userNo, contNo, otMarket, vtNone, dBuy, oCover, hSpeculate, price, qty, curBar, 'BuyToCover')
             if eSessionId != "": self._strategy.updateBarInfoInLocalOrder(eSessionId, curBar)
