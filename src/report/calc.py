@@ -299,7 +299,7 @@ class CalcCenter(object):
             "Cont": order["Cont"],
             "Price": order["OrderPrice"],
             "Time": order["DateTimeStamp"],
-            "bar": order["CurrentBarIndex"]
+            #"bar": order["CurrentBarIndex"]
         }
 
         # 11ms
