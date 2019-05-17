@@ -294,47 +294,58 @@ class StrategyModel(object):
 
     # ////////////////////////策略函数////////////////////////////
     def setBuy(self, contractNo, share, price):
-        contNo = contractNo if contractNo is not None else self._cfgModel.getBenchmark()
-
-        # 基准合约的cur bar
-        curBar = self._hisModel.getCurBar()
-
-        # 交易计算、生成回测报告
-        # 产生信号
+        contNo = contractNo if contractNo else self._cfgModel.getBenchmark()
+        
+        # 非K线触发的策略，不使用Bar
+        curBar = None
+        # 账户
         userNo = self._cfgModel.getUserNo() if self._cfgModel.isActualRun() else "Default"
-        eSessionId = self.sendOrder(userNo, contNo, otMarket, vtNone, dBuy, oOpen, hSpeculate, price, share, curBar, 'Buy')
-        self._strategy.updateBarInfoInLocalOrder(eSessionId, curBar)
+
+        # 对于开仓，需要平掉反向持仓
+        qty = self._calcCenter.needCover(userNo, contNo, dBuy, qty, price)
+        if qty > 0:
+            eSessionId = buySellOrder(userNo, contNo, otMarket, vtNone, dSell, oCover, hSpeculate, price, qty, curBar, 'Sell')
+            if eSessionId != "": self._strategy.updateBarInfoInLocalOrder(eSessionId, curBar)
+            
+        eSessionId = self.buySellOrder(userNo, contNo, otMarket, vtNone, dBuy, oOpen, hSpeculate, price, share, curBar, 'Buy')
+        if eSessionId != "": self._strategy.updateBarInfoInLocalOrder(eSessionId, curBar)
 
 
     def setBuyToCover(self, contractNo, share, price):
         contNo = contractNo if contractNo is not None else self._cfgModel.getBenchmark()
-        curBar = self._hisModel.getCurBar()
+        curBar = None
 
         # 交易计算、生成回测报告
         # 产生信号
         userNo = self._cfgModel.getUserNo() if self._cfgModel.isActualRun() else "Default"
-        eSessionId = self.sendOrder(userNo, contNo, otMarket, vtNone, dBuy, oCover, hSpeculate, price, share, curBar, 'BuyToCover')
-        self._strategy.updateBarInfoInLocalOrder(eSessionId, curBar)
+        eSessionId = self.buySellOrder(userNo, contNo, otMarket, vtNone, dBuy, oCover, hSpeculate, price, share, curBar, 'BuyToCover')
+        if eSessionId != "": self._strategy.updateBarInfoInLocalOrder(eSessionId, curBar)
 
     def setSell(self, contractNo, share, price):
         contNo = contractNo if contractNo is not None else self._cfgModel.getBenchmark()
-        curBar = self._hisModel.getCurBar()
+        curBar = None
 
         # 交易计算、生成回测报告
         # 产生信号
         userNo = self._cfgModel.getUserNo() if self._cfgModel.isActualRun() else "Default"
-        eSessionId = self.sendOrder(userNo, contNo, otMarket, vtNone, dSell, oCover, hSpeculate, price, share, curBar, 'Sell')
-        self._strategy.updateBarInfoInLocalOrder(eSessionId, curBar)
+        eSessionId = self.buySellOrder(userNo, contNo, otMarket, vtNone, dSell, oCover, hSpeculate, price, share, curBar, 'Sell')
+        if eSessionId != "": self._strategy.updateBarInfoInLocalOrder(eSessionId, curBar)
 
     def setSellShort(self, contractNo, share, price):
         contNo = contractNo if contractNo is not None else self._cfgModel.getBenchmark()
-        curBar = self._hisModel.getCurBar()
+        curBar = None
+        
+        userNo = self._cfgModel.getUserNo() if self._cfgModel.isActualRun() else "Default"
+        qty = self._calcCenter.needCover(userNo, contNo, dSell, qty, price)
+        if qty > 0:
+            eSessionId = buySellOrder(userNo, contNo, otMarket, vtNone, dBuy, oCover, hSpeculate, price, qty, curBar, 'BuyToCover')
+            if eSessionId != "": self._strategy.updateBarInfoInLocalOrder(eSessionId, curBar)
 
         #交易计算、生成回测报告
         #产生信号
         userNo = self._cfgModel.getUserNo() if self._cfgModel.isActualRun() else "Default"
-        eSessionId = self.sendOrder(userNo, contNo, otMarket, vtNone, dSell, oOpen, hSpeculate, price, share, curBar, 'SellShort')
-        self._strategy.updateBarInfoInLocalOrder(eSessionId, curBar)
+        eSessionId = self.buySellOrder(userNo, contNo, otMarket, vtNone, dSell, oOpen, hSpeculate, price, share, curBar, 'SellShort')
+        if eSessionId != "": self._strategy.updateBarInfoInLocalOrder(eSessionId, curBar)
 
     def sendFlushEvent(self):
         flushEvent = Event({
@@ -557,35 +568,62 @@ class StrategyModel(object):
 
     def deleteOrder(self, eSession):
         return self._trdModel.deleteOrder(eSession)
+        
+    def buySellOrder(self, userNo, contNo, orderType, validType, orderDirct, \
+        entryOrExit, hedge, orderPrice, orderQty, curBar, singnalName):
+        '''
+            1. buySell下单，经过calc模块，会判断虚拟资金，会产生平仓单
+            2. 如果支持K线触发，会产生下单信号
+            3. 对于即时行情和委托触发，在日志中分析下单信号
+        '''
 
-    def sendOrder(self, userNo, contNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty, curBar=None, singnalName='sendOrder'):
-        curVirtualFund = self._calcCenter.getAvailableFund()
-        marginRate = self._cfgModel.getMarginValue() if not self._cfgModel.getMarginValue() else 0.08
-        if self._calcController.canOrderByVirtualFund(curVirtualFund, orderQty, orderPrice, marginRate, 0)["ErrorCode"] == OrderFail:
-            #self.logger.info("资金不足")
-            return
-        self.addOrder2CalcCenter(userNo, contNo, orderDirct, entryOrExit, orderPrice, orderQty, curBar)
-        self.sendSignalEvent(singnalName, contNo, orderDirct, entryOrExit, orderPrice, orderQty, curBar)
+        datetime = '20190517090001001'
+        tradeDate = '20190517'
+        
+        triggerDict = self._cfgModel.getTrigger()
+        kilneTrigger = True if 'KLine' in triggerDict else False
+        #K线触发
+        if not curBar and kilneTrigger:
+            curBar = self._hisModel.getCurBar()
+            datetime = curBar['DateTimeStamp']
+            tradeDate = curBar['TradeDate']
+        
+        orderParam = {
+            "UserNo"         : userNo,                   # 账户编号
+            "OrderType"      : otMarket,                 # 定单类型
+            "ValidType"      : vtNone,                   # 有效类型
+            "ValidTime"      : '0',                      # 有效日期时间(GTD情况下使用)
+            "Cont"           : contNo,                   # 合约
+            "Direct"         : direct,                   # 买卖方向：买、卖
+            "Offset"         : offset,                   # 开仓、平仓、平今
+            "Hedge"          : hSpeculate,               # 投机套保
+            "OrderPrice"     : price,                    # 委托价格 或 期权应价买入价格
+            "OrderQty"       : share,                    # 委托数量 或 期权应价数量
+            "DateTimeStamp"  : datetime,                 # 时间戳（基准合约）
+            "TradeDate"      : tradeDate,                # 交易日（基准合约）
+        }
 
+        # K线触发，发送信号
+        if kilneTrigger:
+            self.sendSignalEvent(singnalName, contNo, orderDirct, entryOrExit, orderPrice, orderQty, curBar) 
+        return self.sendOrder(userNo, contNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty)
+        
+    def sendOrder(self, userNo, contNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty):
+        '''A账户下单函数，不经过calc模块，不产生信号，直接发单'''
+    
+        #发送下单信号,K线触发、即时行情触发
+        # 未选择实盘运行
         if not self._cfgModel.isActualRun():
-            # 用户未选定实盘运行
-            return
-
-        if not self._strategy.isRealTimeStatus():
-            return
-
-        if not userNo or not contNo or not orderType or not validType or not orderDirct or not entryOrExit or not hedge or not orderPrice or not orderQty:
-            return -1
-
-        if userNo not in self._trdModel._userInfo:
-            return -1
-
-        # 获取资金账号
-        userInfoModel = self._trdModel._userInfo[userNo]
-        sign = userInfoModel._metaData['Sign']
+            return ""
+               
+        # 账户错误
+        if not userNo or userNo == 'Default':
+            return ""
+        
+        # 发送定单到实盘
         aOrder = {
             'UserNo': userNo,
-            'Sign': sign,
+            'Sign': self._trdModel.getSign(userNo),
             'Cont': contNo,
             'OrderType': orderType,
             'ValidType': validType,
@@ -616,6 +654,7 @@ class StrategyModel(object):
         self._strategy.setESessionId(self._strategy.getESessionId() + 1)
         self._strategy.updateLocalOrder(eId, aOrder)
         return eId
+
 
     def addOrder2CalcCenter(self, userNo, contNo, direct, offset, price, share, curBar):
         if not curBar:
@@ -2982,6 +3021,15 @@ class StrategyTrade(TradeModel):
             return 0
 
         return tMoneyModel._metaData[key]
+        
+    def getSign(self, userNo):
+        '''
+        :return: 获取当前账户的服务器标识
+        '''
+        userInfo = self.getUserModel(userNo)
+        if not userInfo:
+            return None
+        return userInfo.getSign()
 
     def getCost(self):
         '''
