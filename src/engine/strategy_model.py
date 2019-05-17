@@ -429,12 +429,8 @@ class StrategyModel(object):
             contNoTuple = contNoTuple[:4]
         return self._cfgModel.setTriggerCont(contNoTuple)
 
-    def setTradeMode(self, inActual, sendOrderType, useSample, useReal):
-        if sendOrderType not in (0, 1, 2):
-            return -1
-
-        self._cfgModel.setTradeMode(inActual, sendOrderType, useSample, useReal)
-        return 0
+    def setTradeMode(self, inActual, useSample, useReal):
+        return self._cfgModel.setTradeMode(inActual, useSample, useReal)
 
     def setOrderWay(self, type):
         if type not in (1, 2):
