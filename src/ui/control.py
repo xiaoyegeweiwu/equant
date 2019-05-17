@@ -37,37 +37,44 @@ class TkinterController(object):
         # 策略管理器
         self.strategyManager = self.getStManager()
 
-        # 设置日志更新
-        self.update_log()
-        # 监控信息
-        self.update_monitor()
+        # 创建日志更新线程
+        self.logThread = ChildThread(self.updateLog)
+        # 创建策略信息更新线程
+        self.monitorThread = ChildThread(self.updateMonitor, 1)
+        # 创建接收引擎数据线程
+        self.receiveEgThread = ChildThread(self.model.receiveEgEvent)
 
     def get_logger(self):
         return self.logger
 
-    def update_log(self):
-        try:
-            self.app.updateLogText()
-            self.app.updateSigText()
-            self.app.updateErrText()
+    def updateLog(self):
+        self.app.updateLogText()
+        self.app.updateSigText()
+        self.app.updateErrText()
 
-            self.top.after(10, self.update_log)
-        except Exception as e:
-            self.logger.warn("update_log error: %s"%e)
-
-    def update_monitor(self):
+    def updateMonitor(self):
         # 更新监控界面策略信息
-        try:
-            strategyDict = self.strategyManager.getStrategyDict()
-            for stId in strategyDict:
-                self.app.updateStatus(stId, strategyDict[stId])
-            self.top.after(1000, self.update_monitor)
-        # except SystemExit:
-        #     raise
-        except Exception as e:
-            self.logger.warn("update_monitor error: %s"%(e))
+        strategyDict = self.strategyManager.getStrategyDict()
+        for stId in strategyDict:
+            self.app.updateStatus(stId, strategyDict[stId])
+
+    def quitThread(self):
+        # 停止更新界面子线程
+        self.logThread.stop()
+        self.logThread.join()
+        self.monitorThread.stop()
+        self.monitorThread.join()
+        # 停止接收策略引擎队列数据
+        self.receiveEgThread.stop()
+        self.receiveEgThread.join()
 
     def run(self):
+        #启动日志线程
+        self.logThread.start()
+        #启动监控策略线程
+        self.monitorThread.start()
+        #启动接收数据线程
+        self.receiveEgThread.start()
         #启动主界面线程
         self.app.mainloop()
         
@@ -103,8 +110,6 @@ class TkinterController(object):
 
     def generateReportReq(self, strategyIdList):
         """发送生成报告请求"""
-        # TODO：生成报告，如果RepData为空，则显示最新日期的历史报告，
-        # TODO：不为空，代表获取到的数据为传过来的数据
         # 量化启动时的恢复策略列表中的策略没有回测数据
         # 策略停止之后的报告数据从本地获取，不发送请求
         # 策略启动时查看数据发送报告请求，从engine获取数据
@@ -228,3 +233,24 @@ class TkinterController(object):
         if len(strategyIdList) >= 1:
             id = strategyIdList[0]
             self._request.strategySignal(id)
+
+
+class ChildThread(threading.Thread):
+    """带停止标志位的线程"""
+    def __init__(self, target, wait=0):
+        threading.Thread.__init__(self)
+
+        self.target = target
+        self.sleepTime = wait
+
+        # self.cond = threading.Condition()
+        self.isStopped = False
+
+    def run(self):
+        while not self.isStopped:
+            self.target()
+            time.sleep(self.sleepTime)
+
+    def stop(self):
+        # 设置停止标志位
+        self.isStopped = True

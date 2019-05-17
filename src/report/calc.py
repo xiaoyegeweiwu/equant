@@ -1,6 +1,7 @@
 import copy
 import numpy
 import datetime
+from datetime import datetime
 from dateutil.parser import parse
 from collections import defaultdict
 
@@ -64,8 +65,6 @@ class CalcCenter(object):
 
         self._reportDetails = {}  # 回测报告详情
 
-        # 放在这里，在对这个类初始化时会不会有问题。。
-        # self._setProfitInitialFundInfo(int(self._strategy["InitialFunds"]) - self._expertSetting["StartFund"])
         # TODO: setExpertSetting外部调用比较合适
         # self._setExpertSetting()
 
@@ -181,6 +180,7 @@ class CalcCenter(object):
         }
         :return:
         """
+
         order.update({"OrderId": self._orderId})
         self._orderId += 1
         self._currentBar = order["CurrentBarIndex"]
@@ -196,17 +196,39 @@ class CalcCenter(object):
             "bar": order["CurrentBarIndex"]
         }
 
+        # 11ms
         self._calcOrder(order)
+        # -------------11ms-----------------------
+
         # self._updateOrderPrice(contPrice)
 
+        # 1ms
         self._updateFirstHoldPosition()
+        # -------------1ms-----------------------
+
+        # 1ms-2ms
         self._calcPosition(order)
+        # ------------------1ms-2ms有点长-------------------------
+
+
+        # 4ms
         self._updateFirstOrder(order["Cont"])
+        # -------------------4ms----------------------------------
+
+        # 1ms
         eo = self._orders[-1]
         self._calcOrderProfit(eo)   # self._calcSingleReturns（eo)是不是可以放在calcOrderProfit中呢？？？
+        # ----------------1ms--------------------
+
+        # 1ms
         self._calcSingleReturns(eo)
+        # ---------------------1ms------------------
+        # 1ms
         self._calcTradeTimes(eo)
+        # ---------------------1ms------------------
+        # print("begin:", datetime.now().strftime('%H:%M:%S.%f'))
         self._updateOtherProfit(order["DateTimeStamp"])
+        # print("end:", datetime.now().strftime('%H:%M:%S.%f'))
 
         # self._calcTradeInfo()
         # ----------------- 在目前的情况下，先不调用_updateFundRecord函数
@@ -714,7 +736,6 @@ class CalcCenter(object):
     #
     #     return
 
-    #TODO: calcProfit的另一种实现方式
     def calcProfit(self, contractList, barInfo):
         """
         计算策略实时收益信息，参数为合约的最新价信息
@@ -722,6 +743,7 @@ class CalcCenter(object):
         :param barInfo: 合约的bar信息，类型为字典类型，键值是合约代码
         :return:
         """
+        # 1ms或小于1ms
         if contractList is None:
             return
 
@@ -758,11 +780,11 @@ class CalcCenter(object):
                 self._prices[contract] = contPrice
 
         self._updateTradeDate(t)
-
         self._updatePosition(contPrices)
         self._updateOtherProfit(timeStamp)
-        self._updateFundRecord(timeStamp, 0, 0)
 
+        self._updateFundRecord(timeStamp, 0, 0)
+        # ----------1ms或小于1ms-----------------------
         return
 
     # #######################
@@ -1459,7 +1481,7 @@ class CalcCenter(object):
         # 统计k线上有无持仓时，当在当根k线上发生了开仓又平完的操作时，
         # 暂时将该k线也记做空仓的周期吧（这样记是不是错误的呀）
         # if self._strategy["CurrentBarIndex"] == self._currentBar:  # 确保在收盘时统计空仓信息
-        for pInfo in self._positions.values():
+        for k, pInfo in self._positions.items():
             if pInfo["TotalBuy"] != 0 or pInfo["TotalSell"] != 0:
                 self._continueEmptyPeriod = 0
                 return
@@ -1648,19 +1670,6 @@ class CalcCenter(object):
         """获取量化界面策略运行监控所需数据"""
         result = {}
 
-        result["Fund"] = self.getFundRecord()
-        result["Stage"] = {
-            "年度分析": self.getYearStatis,
-            "季度分析": self.getQuarterStatis,
-            "月度分析": self.getMonthStatis,
-            "周分析": self.getWeekStatis,
-            "日分析": self.getDailyStatis
-        }
-        result["Orders"] = self.getOrders
         result["Detail"] = self.getReportDetail()
-        result["KLineType"] = {
-            "KLineType": self._expertSetting["KLineType"],
-            "KLineSlice": self._expertSetting["KLineSlice"]
-        }
 
-        return copy.deepcopy(result)
+        return result

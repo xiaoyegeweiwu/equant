@@ -1,3 +1,5 @@
+import ctypes
+
 from tkinter import *
 from utils.utils import *
 from .language import Language
@@ -37,6 +39,9 @@ class QuantApplication(object):
         self.root.mainloop()
 
     def create_window(self):
+        myappid = 'mycompany.myproduct.subproduct.version'  # arbitrary string
+        ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
+
         #srceen size
         width = self.root.winfo_screenwidth()*0.8
         height = self.root.winfo_screenheight()*0.8
@@ -46,6 +51,7 @@ class QuantApplication(object):
         #title
         self.root.title("极星量化")
         icon = r'./icon/epolestar ix2.ico'
+
         self.root.iconbitmap(bitmap=icon)
         self.root.bitmap = icon
         top_frame = Frame(self.root)
@@ -145,7 +151,10 @@ class QuantApplication(object):
 
     def quantExit(self):
         """量化界面关闭处理"""
+        # 向引擎发送主进程退出信号
         self.control.sendExitRequest()
+        # 退出子线程
+        self.control.quitThread()
         self.root.destroy()
 
     def reportDisplay(self, data, id):

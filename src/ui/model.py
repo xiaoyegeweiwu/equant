@@ -2,7 +2,7 @@ import os
 
 import threading
 import copy
-import queue
+
 import traceback
 from utils.utils import load_file
 from capi.com_types import *
@@ -23,12 +23,6 @@ class QuantModel(object):
         self._editor = {"path": "", "code": ""}
         self._strategyId = []   # 策略ID
         self._top = top
-        self.createReceiveThread()
-
-    def createReceiveThread(self):
-        receive_th = threading.Thread(target=self.receiveEgEvent)
-        receive_th.daemon = True
-        receive_th.start()
 
     def receiveEgEvent(self):
         """处理engine事件"""
@@ -37,9 +31,6 @@ class QuantModel(object):
     def getCurStId(self):
         """获取当前运行的策略ID"""
         return self._receive.getCurStId()
-
-    def getReportData(self):
-        return self._receive.getReportData()
 
     def getEditorText(self):
         return self._editor
@@ -51,19 +42,6 @@ class QuantModel(object):
             self._editor["code"] = load_file(path)
         else:
             self._editor["code"] = ""
-
-    # TODO:弃用
-    def getExecute(self):
-        """
-        获取运行策略列表
-        :return: 运行列表
-        """
-        executeList = self._stManager.getStrategyDict()
-        # tempList = []
-        # for id, value in executeList.items():
-        #     tempList.append(value)
-        # self._executeList = tempList
-        return executeList
 
     def getExchange(self):
         return self._receive.getExchange()
@@ -364,16 +342,16 @@ class GetEgData(object):
                 self._app.delUIStrategy(id)
 
     def handlerEgEvent(self):
-        while True:
-            try:
-                event = self._eg2uiQueue.get()
-                eventCode = event.getEventCode()
-                if eventCode not in self._egAskCallbackDict:
-                    self._logger.error("Unknown engine event(%d)"%(eventCode))
-                    continue
+        try:
+            # 如果不给出超时则会导致线程退出时阻塞
+            event = self._eg2uiQueue.get(timeout=0.1)
+            eventCode = event.getEventCode()
+            if eventCode not in self._egAskCallbackDict:
+                self._logger.error("Unknown engine event(%d)" % (eventCode))
+            else:
                 self._egAskCallbackDict[eventCode](event)
-            except Exception as e:
-                self._logger.error("handlerEgEvent error: %s" %(e))
+        except:
+            pass
 
     def getReportData(self):
         if self._reportData:

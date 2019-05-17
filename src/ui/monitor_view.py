@@ -20,6 +20,7 @@ class QuantMonitor(object):
     def __init__(self, frame, control, language):
         self.parentFrame = frame
         self._controller = control
+        self._logger = self._controller.get_logger()
         self.language = language
 
         # 初始化策略状态字典
@@ -152,7 +153,8 @@ class QuantMonitor(object):
             InitFund = dataDict['Config']['Money']['InitFunds']
 
             if 'RunningData' in dataDict:
-                Available =  "{:.2f}".format(dataDict['RunningData']['Fund'][-1]['Available'])
+                # Available =  "{:.2f}".format(dataDict['RunningData']['Fund'][-1]['Available'])
+                Available = 0
                 # 年化单利收益率
                 AnnualizedReturns = "{:.2f}".format(dataDict['RunningData']['Detail']['AnnualizedSimple'])
                 MaxRetrace = "{:.2f}".format((dataDict['RunningData']['Detail']['MaxRetrace']))
@@ -198,7 +200,7 @@ class QuantMonitor(object):
                 self.updateStatus(strategyId, dataDict)
                 return
         except Exception as e:
-            self.logger.warn("updateSingleExecute exception")
+            self._logger.warn("updateSingleExecute exception")
         self.executeListTree.insert("", END, iid=strategyId, values=tuple(values), tag=0)
 
     def createErr(self):
