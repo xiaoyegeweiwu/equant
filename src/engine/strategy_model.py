@@ -2633,13 +2633,16 @@ class StrategyQuote(QuoteModel):
     def onDepthNotice(self, event):
         QuoteModel.updateLv2(self, event)
 
-    def getLv1Data(self, contNo):
+    def getLv1DataAndUpdateTime(self, contNo):
         if not contNo:
             return
         if contNo in self._contractData:
             metaData = self._contractData[contNo]._metaData
-            return metaData['Lv1Data']
-        
+            resDict = { 'UpdateTime' : metaData['UpdateTime'],
+                       'Lv1Data' : deepcopy(metaData['Lv1Data'])
+            }
+            return resDict
+
     # ////////////////////////即时行情////////////////////////////
     # 参数验装饰器
     def paramValidatorFactory(abnormalRet):
