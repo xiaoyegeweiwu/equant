@@ -303,9 +303,8 @@ class StrategyModel(object):
 
         # 对于开仓，需要平掉反向持仓
         qty = self._calcCenter.needCover(userNo, contNo, dBuy, share, price)
-        qty = 0
         if qty > 0:
-            eSessionId = buySellOrder(userNo, contNo, otMarket, vtNone, dSell, oCover, hSpeculate, price, qty, curBar, 'Sell')
+            eSessionId = self.buySellOrder(userNo, contNo, otMarket, vtNone, dBuy, oCover, hSpeculate, price, qty, curBar, 'BuyToCover', False)
             if eSessionId != "": self._strategy.updateBarInfoInLocalOrder(eSessionId, curBar)
             
         eSessionId = self.buySellOrder(userNo, contNo, otMarket, vtNone, dBuy, oOpen, hSpeculate, price, share, curBar, 'Buy')
@@ -338,9 +337,8 @@ class StrategyModel(object):
         
         userNo = self._cfgModel.getUserNo() if self._cfgModel.isActualRun() else "Default"
         qty = self._calcCenter.needCover(userNo, contNo, dSell, share, price)
-        qty = 0
         if qty > 0:
-            eSessionId = buySellOrder(userNo, contNo, otMarket, vtNone, dBuy, oCover, hSpeculate, price, qty, curBar, 'BuyToCover')
+            eSessionId = self.buySellOrder(userNo, contNo, otMarket, vtNone, dSell, oCover, hSpeculate, price, qty, curBar, 'Sell', False)
             if eSessionId != "": self._strategy.updateBarInfoInLocalOrder(eSessionId, curBar)
 
         #交易计算、生成回测报告
@@ -572,7 +570,7 @@ class StrategyModel(object):
         return self._trdModel.deleteOrder(eSession)
         
     def buySellOrder(self, userNo, contNo, orderType, validType, orderDirct, \
-        entryOrExit, hedge, orderPrice, orderQty, curBar, singnalName):
+        entryOrExit, hedge, orderPrice, orderQty, curBar, singnalName, signal=True):
         '''
             1. buySell下单，经过calc模块，会判断虚拟资金，会产生平仓单
             2. 如果支持K线触发，会产生下单信号
@@ -605,18 +603,20 @@ class StrategyModel(object):
         }
 
         # K线触发，发送信号
-        if kilneTrigger:
+        if signal and kilneTrigger:
             self.sendSignalEvent(singnalName, contNo, orderDirct, entryOrExit, orderPrice, orderQty, curBar)
         self._calcCenter.addOrder(orderParam)
         return self.sendOrder(userNo, contNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty)
         
     def sendOrder(self, userNo, contNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty):
         '''A账户下单函数，不经过calc模块，不产生信号，直接发单'''
-    
         #发送下单信号,K线触发、即时行情触发
         # 未选择实盘运行
         if not self._cfgModel.isActualRun():
             return ""
+            
+        if not self._strategy.isRealTimeStatus():
+            return
                
         # 账户错误
         if not userNo or userNo == 'Default':

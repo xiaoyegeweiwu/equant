@@ -162,6 +162,8 @@ class CalcCenter(object):
         pInfo = self.getPositionInfo(contNo)
         availableFund = self.getAvailableFund()
         cost = self.getCostRate(contNo)
+        
+        ret = -1
 
         if direct == dBuy: # 买开
             if pInfo["TotalSell"] > 0:
@@ -188,20 +190,18 @@ class CalcCenter(object):
                         openCharge = orderQty * cost["OpenFixed"]
 
                     if availableFund - coverCharge < openCharge:
-                        return -2  # 开买开仓失败
+                        ret = -2  # 开买开仓失败
                     else:
-                        return pInfo["TotalSell"]
-        else:
-            return 0  # 没有对头仓
+                        ret = pInfo["TotalSell"]
 
-        if direct == dSell:  # 卖开
+        else:
             if pInfo["TotalBuy"] > 0:
                 if cost["CloseRatio"]:
                     coverCharge = orderPrice * pInfo["TotalBuy"] * cost["TradeDot"] * cost["CloseRatio"]
                 else:
                     coverCharge = pInfo["TotalBuy"] * cost["CloseFixed"]
                 if availableFund < coverCharge:
-                    return -1  # 平买开仓失败
+                    ret =  -1  # 平买开仓失败
                 else:
                     if cost["OpenRatio"]:
                         openCharge = orderPrice * orderQty * cost["TradeDot"] * cost["OpenRatio"]
@@ -209,11 +209,12 @@ class CalcCenter(object):
                         openCharge = orderQty * cost["OpenFixed"]
 
                     if availableFund - coverCharge < openCharge:
-                        return -2  # 开卖开仓失败
+                        ret = -2  # 开卖开仓失败
                     else:
-                        return pInfo["TotalBuy"]
-        else:
-            return 0  # 没有对头仓
+                        ret = pInfo["TotalBuy"]
+                        
+            
+        return ret
 
     def addOrder111(self, order):
         # 封装self._addOrder函数
@@ -293,7 +294,7 @@ class CalcCenter(object):
         self._costs[order["Cont"]] = self.getCostRate(order["Cont"])
         self._updateTradeDate(order["TradeDate"])
 
-        # self._logger.sig_info(order)
+        #self._logger.sig_info(order)
 
         contPrice = {
             "Cont": order["Cont"],
