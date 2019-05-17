@@ -211,18 +211,20 @@ _all_func_ = {
                     ['SetMargin'           , '设置保证金'],
                     ['SetTradeFee'         , '设置手续费'],
                     ['SetTradeMode'        , '设置运行方式'],
+                    ['SetOrderWay'         , '设置发单方式'],
                     ['SetTradeDirection'   , '设置交易方向'],
                     ['SetMinTradeQuantity' , '设置最小下单量'],
                     ['SetHedge'            , '设置投保标志'],
                     ['SetSlippage'         , '设置滑点损耗'],
-                    ['SetTriggerMode'      , '设置触发方式'],
+                    ['SetTriggerCont'      , '设置触发合约'],
+                    ['SetTriggerType'      , '设置触发方式'],
                 ],
 
-    '套利函数': [
-                    ['S_SetSpread'         , '设置套利合约列表'],
-                    ['S_SetSample'         , '设置套利合约历史回测样本数量'],
-                    ['S_SetBarInterval'    , '设置套利合约的K线类型'],
-                ],
+    # '套利函数': [
+    #                 ['S_SetSpread'         , '设置套利合约列表'],
+    #                 ['S_SetSample'         , '设置套利合约历史回测样本数量'],
+    #                 ['S_SetBarInterval'    , '设置套利合约的K线类型'],
+    #             ],
 
     '其他函数': [
                     ['PlotNumeric'          ,'绘制指标线'],

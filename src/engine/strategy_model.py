@@ -385,8 +385,8 @@ class StrategyModel(object):
     def setBarInterval(self, barType, barInterval, contNo):
         self._cfgModel.setBarInterval(barType, barInterval, contNo)
 
-    def setSample(self, sampleType, sampleValue, contNo):
-        return self._cfgModel.setSample(sampleType, sampleValue, contNo)
+    def setSample(self, sampleType, sampleValue):
+        return self._cfgModel.setSample(sampleType, sampleValue)
 
     def setInitCapital(self, capital, userNo):
         initFund = capital if capital else 1000000
@@ -412,38 +412,34 @@ class StrategyModel(object):
                 return -1
             return self._cfgModel.setMargin(EEQU_FEE_TYPE_FIXED, value, contNo)
 
-    def setTradeFee(self, type, rateFee, fixFee, contNo):
-        '''
-        :param type: 手续费类型，A-全部，O-开仓，C-平仓，T-平今
-        :param rateFee: 按比例收取手续费，为0表示按定额收取
-        :param fixFee: 按定额收取手续费，为0表示按比例收取，rateFee和fixFee都设置，按照fixFee * rateFee收取
-        :return: 返回整型，0成功，-1失败
-        '''
+    def setTradeFee(self, type, feeType, feeValue, contNo):
         if type not in ('A', 'O', 'C', 'T'):
             return -1
 
-        if rateFee == 0 and fixFee == 0:
+        if feeType not in (1, 2):
             return -1
 
-        if rateFee < 0 or fixFee < 0:
+        feeType = EEQU_FEE_TYPE_RATIO if feeType == 1 else EEQU_FEE_TYPE_FIXED
+        return self._cfgModel.setTradeFee(type, feeType, feeValue, contNo)
+
+    def setTriggerCont(self, contNoTuple):
+        if not contNoTuple or len(contNoTuple) == 0:
             return -1
-
-        if rateFee == 0:
-            self._cfgModel.setTradeFee(type, EEQU_FEE_TYPE_FIXED, fixFee, contNo)
-            return 0
-
-        if fixFee == 0:
-            self._cfgModel.setTradeFee(type, EEQU_FEE_TYPE_RATIO, rateFee, contNo)
-            return 0
-
-        self._cfgModel.setTradeFee(type, EEQU_FEE_TYPE_FIXED, rateFee*fixFee, contNo)
-        return 0
+        if len(contNoTuple) > 4:
+            contNoTuple = contNoTuple[:4]
+        return self._cfgModel.setTriggerCont(contNoTuple)
 
     def setTradeMode(self, inActual, sendOrderType, useSample, useReal):
         if sendOrderType not in (0, 1, 2):
             return -1
 
         self._cfgModel.setTradeMode(inActual, sendOrderType, useSample, useReal)
+        return 0
+
+    def setOrderWay(self, type):
+        if type not in (1, 2):
+            return -1
+        self._cfgModel.setOrderWay(type)
         return 0
 
     def setTradeDirection(self, tradeDirection):
@@ -471,8 +467,8 @@ class StrategyModel(object):
         self._cfgModel.setSlippage(slippage)
         return 0
 
-    def setTriggerMode(self, type, interval, timeList):
-        return self._cfgModel.setTrigger(type, interval, timeList)
+    def setTriggerMode(self, type, value):
+        return self._cfgModel.setTrigger(type, value)
 
     # ///////////////////////套利函数///////////////////////////
     def setSpread(self, contNo):
@@ -833,12 +829,14 @@ class StrategyModel(object):
         self.logger.error(logInfo)
 
     # ///////////////////////属性函数///////////////////////////
-    def getBarInterval(self):
+    def getBarInterval(self, contNo):
         if len(self._cfgModel._metaData) == 0 or 'Sample' not in self._cfgModel._metaData:
             return None
 
         sample = self._cfgModel.getSample()
-        return sample['KLineSlice'] if 'KLineSlice' in sample else None
+        if not contNo:
+            return [{'KLineType': sample['KLineSlice'], 'KLineSlice': sample['KLineSlice']},]
+        return sample[contNo]
 
     def getBarType(self):
         if len(self._cfgModel._metaData) == 0 or 'Sample' not in self._cfgModel._metaData:
@@ -1282,8 +1280,9 @@ class StrategyConfig(object):
     def setContract(self, contTuple):
         '''设置合约列表'''
         if not contTuple or not isinstance(contTuple, tuple):
-            return 0
+            return -1
         self._metaData['Contract'] = contTuple
+        return 0
 
     def setUserNo(self, userNo):
         '''设置交易使用的账户'''
@@ -1300,43 +1299,36 @@ class StrategyConfig(object):
         '''获取触发方式'''
         return self._metaData['Trigger']
 
-    def setTrigger(self, type, interval, timeList):
+    def setTrigger(self, type, value):
         '''设置触发方式'''
-        if type not in (1, 2, 3, 4):
+        if type not in (1, 2, 3, 4, 5):
             return -1
-        if interval%100 != 0:
+        if type == 4 and value%100 != 0:
             return -1
-        if timeList:
-            for timeStr in timeList:
+        if type == 5 and isinstance(value, list):
+            for timeStr in value:
                 if len(timeStr) != 14 or not self.isVaildDate(timeStr, "%Y%m%d%H%M%S"):
                     return -1
 
         trigger = self._metaData['Trigger']
-        if timeList:
-            trigger['Timer'] = timeList
         if type == 1:
             trigger['KLine'] = True
         elif type == 2:
             trigger['SnapShot'] = True
         elif type == 3:
             trigger['Trade'] = True
-        else:
-            trigger['Cycle'] = interval
+        elif type == 4:
+            trigger['Cycle'] = value
+        elif value:
+            trigger['Timer'] = value
         return 0
 
-    def setSample(self, sampleType, sampleValue, contNo=''):
+    def setSample(self, sampleType, sampleValue):
         '''设置样本数据'''
         if sampleType not in ('A', 'D', 'C', 'N'):
             return -1
 
-        sample = None
-        if not contNo:
-            sample = self._metaData['Sample']
-        elif contNo not in self._metaData['Sample']:
-            self._metaData['Sample'][contNo] = self.initSampleDict()
-            sample = self._metaData['Sample'][contNo]
-        else:
-            sample = self._metaData['Sample'][contNo]
+        sample = self._metaData['Sample']
 
         # 使用所有K线
         if sampleType == 'A':
@@ -1391,16 +1383,12 @@ class StrategyConfig(object):
             return self._metaData['Sample']['BeginTime']
         return 0
 
-    def getKLineType(self, contNo=''):
+    def getKLineType(self):
         '''获取K线类型'''
-        if contNo in self._metaData['Sample']:
-            return self._metaData['Sample'][contNo]['KLineType']
         return self._metaData['Sample']['KLineType']
 
-    def getKLineSlice(self, contNo=''):
+    def getKLineSlice(self):
         '''获取K线间隔'''
-        if contNo in self._metaData['Sample']:
-            return self._metaData['Sample'][contNo]['KLineSlice']
         return self._metaData['Sample']['KLineSlice']
 
     def setAllKTrueInSample(self, sample, setForSpread=False):
@@ -1451,16 +1439,24 @@ class StrategyConfig(object):
         '''设置K线类型和K线周期'''
         if barType not in ('t', 'T', 'S', 'M', 'H', 'D', 'W', 'm', 'Y'):
             return -1
-        if contNo in self._metaData['Sample']:
-            self.setBarIntervalInSample(barType, barInterval, self._metaData['Sample'][contNo])
-            return
-        self.setBarIntervalInSample(barType, barInterval, self._metaData['Sample'])
+        if not contNo:
+            contNo = self.getBenchmark()
 
-    def setBarIntervalInSample(self, barType, barInterval, sample):
-        if barType:
-            sample['KLineType'] = barType
-        if barInterval > 0:
-            sample['KLineSlice'] = barInterval
+        if contNo not in self._metaData['Sample']:
+            self._metaData['Sample'][contNo] = [{'KLineType' : barType, 'KLineSlice' : barInterval}, ]
+            return 0
+
+        isExist = False
+        barList = self._metaData['Sample'][contNo]
+        for barDict in barList:
+            if barDict['KLineType'] == barType and barDict['KLineSlice'] == barInterval:
+                isExist = True
+                break
+        if isExist:
+            return 0
+
+        barList.append({'KLineType': barType, 'KLineSlice': barInterval})
+        return 0
 
     def getInitCapital(self, userNo=''):
         '''获取初始资金'''
@@ -1583,18 +1579,28 @@ class StrategyConfig(object):
             feeDict[k] = deepcopy(initDict)
         return feeDict
 
-    def setTradeMode(self, inActual, sendOrderType, useSample, useReal):
+    def setTriggerCont(self, contNoTuple):
+        self._metaData['TriggerCont'] = contNoTuple
+
+    def getTriggerCont(self):
+        if 'TriggerCont' in self._metaData:
+            return self._metaData['TriggerCont']
+        return None
+
+    def setTradeMode(self, inActual, useSample, useReal):
         runMode = self._metaData['RunMode']
         if inActual:
             # 实盘运行
-            if sendOrderType not in (1, 2):
-                return -1
             runMode['Actual']['SendOrder2Actual'] = True
-            runMode['SendOrder'] = str(sendOrderType)
         else:
             # 模拟盘运行
             runMode['Simulate']['UseSample'] = useSample
             runMode['Simulate']['Continues'] = useReal
+
+    def setOrderWay(self, type):
+        if type not in (1, 2):
+            return -1
+        self._metaData['RunMode']['SendOrder'] = str(type)
 
     def setTradeDirection(self, tradeDirection):
         '''设置交易方向'''
@@ -1725,6 +1731,12 @@ class StrategyConfig(object):
         if barType not in ('t', 'T', 'S', 'M', 'H', 'D', 'W', 'm', 'Y'):
             return -1
         self.setBarIntervalInSample(barType, barInterval, self._metaData['Spread']['Sample'])
+
+    def setBarIntervalInSample(self, barType, barInterval, sample):
+        if barType:
+            sample['KLineType'] = barType
+        if barInterval > 0:
+            sample['KLineSlice'] = barInterval
 
     def getSpreadSample(self):
         if not self.isSetSpread():
