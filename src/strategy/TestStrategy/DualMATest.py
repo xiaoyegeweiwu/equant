@@ -23,3 +23,4 @@ def handle_data(context):
         Buy(1, Open()[-1])               # 买平开
     if ma1[-1] < ma2[-1]:
         SellShort(1, Open()[-1])         # 卖平开
+
