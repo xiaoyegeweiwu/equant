@@ -155,7 +155,7 @@ class QuantApplication(object):
         self.control.sendExitRequest()
         # 退出子线程
         self.control.quitThread()
-        self.root.destroy()
+        #self.root.destroy()
 
     def reportDisplay(self, data, id):
         """

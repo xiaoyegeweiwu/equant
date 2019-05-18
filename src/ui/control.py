@@ -67,6 +67,8 @@ class TkinterController(object):
         # 停止接收策略引擎队列数据
         self.receiveEgThread.stop()
         self.receiveEgThread.join()
+        
+        self.top.destroy()
 
     def run(self):
         #启动日志线程
