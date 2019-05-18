@@ -6,6 +6,7 @@ import talib
 import time
 import datetime
 import copy
+import math
 
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
@@ -1010,16 +1011,6 @@ class StrategyModel(object):
         ret['CommodityNo'] = contList[-1]
         return ret
 
-    def getBigPointValue(self, contNo):
-        commodityNo = self.getCommodityInfoFromContNo(contNo)['CommodityCode']
-
-
-        if commodityNo not in self._qteModel._commodityData:
-            return 0
-
-        commodityModel = self._qteModel._commodityData[commodityNo]
-        return commodityModel._metaData['PricePrec']
-
     def getCanTrade(self, contNo):
         return 0
 
@@ -1089,15 +1080,14 @@ class StrategyModel(object):
     def getMaxSingleTradeSize(self):
         return MAXSINGLETRADESIZE
 
-    def getMinMove(self, contNo):
+    def getPriceTick(self, contNo):
         commodityNo = self.getCommodityInfoFromContNo(contNo)['CommodityCode']
         if commodityNo not in self._qteModel._commodityData:
             return 0
 
         commodityModel = self._qteModel._commodityData[commodityNo]
         priceTick = commodityModel._metaData['PriceTick']
-        priceScale = commodityModel._metaData['PricePrec']
-        return  priceTick/priceScale if priceScale != 0 else 0
+        return priceTick
 
     def getOptionStyle(self, contNo):
         return 0
@@ -1128,7 +1118,9 @@ class StrategyModel(object):
             return 0
 
         commodityModel = self._qteModel._commodityData[commodityNo]
-        return commodityModel._metaData['PricePrec']
+        pricePrec = commodityModel._metaData['PricePrec']
+
+        return math.pow(0.1, pricePrec)
 
     def getRelativeSymbol(self):
         return 0

@@ -1113,27 +1113,6 @@ class BaseApi(object):
               郑商所棉花的买卖盘个数为1个，因此其BidAskSize等于1。 
         '''
         return self._dataModel.getBidAskSize(contNo)
-        
-    def BigPointValue(self, contNo):
-        '''
-        【说明】
-              合约一个整数点的价值
-
-        【语法】
-              float BigPointValue(contNo)
-
-        【参数】
-              contNo: 合约编号，为空时，取基准合约。
-
-        【备注】
-              返回浮点数，1个整数点的价值，默认为1
-
-        【示例】
-              郑商所期货品种一个点的价值为1人民币，因此其BigPointValue等于1；
-              港交所恒指期货一个点的价值为50港币，因此其BigPointValue等于50；
-              CME E-MINI一个点的价值为50美元，因此其BigPointValue等于50； 
-        '''
-        return self._dataModel.getBigPointValue(contNo)
 
     def CanTrade(self, contNo):
         '''
@@ -1329,25 +1308,25 @@ class BaseApi(object):
               无
         '''
         return self._dataModel.getMaxSingleTradeSize()
-        
-    def MinMove(self, contNo):
+
+    def PriceTick(self, contNo):
         '''
         【说明】
-              合约最小变动量
+              合约最小变动价
 
         【语法】
-              int MinMove(contNo)
+              int PriceTick(contNo)
 
         【参数】
               contNo 合约编号，为空时，取基准合约。
 
         【备注】
-              返回整型，MinMove = 最小变动价/ PriceScale
+              无
 
         【示例】
-              沪铝的最小变动价为5，其PriceScale =1，因此其MinMove等于5
+              沪铝的最小变动价为5，因此其PriceTick等于5
         '''
-        return self._dataModel.getMinMove(contNo)
+        return self._dataModel.getPriceTick(contNo)
         
     def OptionStyle(self, contNo):
         '''
@@ -4694,9 +4673,6 @@ def BarType(contNo=''):
 def BidAskSize(contNo=''):
     return baseApi.BidAskSize(contNo)
 
-def BigPointValue(contNo=''):
-    return baseApi.BigPointValue(contNo)
-
 def CanTrade(contNo=''):
     return baseApi.CanTrade(contNo)
 
@@ -4727,8 +4703,8 @@ def MaxBarsBack():
 def MaxSingleTradeSize():
     return baseApi.MaxSingleTradeSize()
 
-def MinMove(contNo=''):
-    return baseApi.MinMove(contNo)
+def PriceTick(contNo=''):
+    return baseApi.PriceTick(contNo)
 
 def OptionStyle(contNo=''):
     return baseApi.OptionStyle(contNo)
