@@ -9,8 +9,7 @@ import copy
 
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
-from report.calc import CalcCenter
-
+from engine.calc import CalcCenter
 
 class StrategyModel(object):
     def __init__(self, strategy):
