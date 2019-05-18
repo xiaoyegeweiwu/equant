@@ -154,7 +154,7 @@ class QuantMonitor(object):
 
             if 'RunningData' in dataDict:
                 # Available =  "{:.2f}".format(dataDict['RunningData']['Fund'][-1]['Available'])
-                Available = 0
+                Available = "{:.2f}".format(dataDict['RunningData']['Available'])
                 # 年化单利收益率
                 # AnnualizedReturns = "{:.2f}".format(dataDict['RunningData']['Detail']['AnnualizedSimple'])
                 MaxRetrace = "{:.2f}".format((dataDict['RunningData']['MaxRetrace']))

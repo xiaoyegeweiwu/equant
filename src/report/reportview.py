@@ -38,6 +38,7 @@ class ReportView(tk.Frame):
     def make_widgets(self):
         self.dir = Directory(self.data, self)
         self.dir.create_directory()
+        print("555555")
         # Detail(self.data, self)
 
     # def show(self):
@@ -419,7 +420,6 @@ class StageStatis(BaseFrame):
         self.monthDis   = None
         self.weekDis    = None
         self.dailyDis   = None
-
         self.create_graph_widgets()
 
     def create_graph_widgets(self):
