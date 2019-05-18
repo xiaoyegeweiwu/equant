@@ -251,12 +251,6 @@ _all_func_ = {
                     ['SetTriggerType'      , '设置触发方式'],
                 ],
 
-    # '套利函数': [
-    #                 ['S_SetSpread'         , '设置套利合约列表'],
-    #                 ['S_SetSample'         , '设置套利合约历史回测样本数量'],
-    #                 ['S_SetBarInterval'    , '设置套利合约的K线类型'],
-    #             ],
-
     '其他函数': [
                     ['PlotNumeric'          ,'绘制指标线'],
                     ['LogDebug'             ,'打印调试信息'],

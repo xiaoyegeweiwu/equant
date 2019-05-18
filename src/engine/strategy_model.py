@@ -480,16 +480,6 @@ class StrategyModel(object):
     def setTriggerMode(self, type, value):
         return self._cfgModel.setTrigger(type, value)
 
-    # ///////////////////////套利函数///////////////////////////
-    def setSpread(self, contNo):
-        return self._cfgModel.setSpread(contNo)
-
-    def setSpreadSample(self, sampleType, sampleValue):
-        return self._cfgModel.setSpreadSample(sampleType, sampleValue)
-
-    def setSpreadBarInterval(self, barType, barInterval):
-        return self._cfgModel.setSpreadBarInterval(barType, barInterval)
-
     # ///////////////////////账户函数///////////////////////////
     def getAccountId(self):
         return self._trdModel.getAccountId()
@@ -1779,90 +1769,6 @@ class StrategyConfig(object):
             return True
         except:
             return False
-
-    # ----------------- 设置套利函数相关 ---------------------
-    def setSpread(self, contList):
-        '''设置套利合约列表'''
-        if not contList:
-            return 0
-
-        contract = []
-        for cont in contList:
-            if cont in self.getContract():
-                contract.append(cont)
-
-        if not contract:
-            return -1
-        self._metaData['Spread'] = {'Contract' : tuple(contract)}
-
-    def getSpread(self):
-        '''获取套利合约列表'''
-        if self.isSetSpread():
-            return self._metaData['Spread']['Contract']
-
-    def isSetSpread(self):
-        '''是否设置套利合约列表'''
-        if 'Spread' in self._metaData and len(self._metaData['Spread']['Contract']) > 0:
-            return True
-        return False
-
-    def setSpreadSample(self, sampleType, sampleValue):
-        '''设置套利合约的样本数据'''
-        if not self.isSetSpread():
-            return -1
-
-        if sampleType not in ('A', 'D', 'C', 'N'):
-            return -1
-
-        if 'Sample' not in self._metaData['Spread']:
-            self._metaData['Spread']['Sample'] = self.initSampleDict()
-
-        # 使用所有K线
-        if sampleType == 'A':
-            self.setAllKTrueInSample(self._metaData['Spread']['Sample'], True)
-            return 0
-
-        # 指定日期开始触发
-        if sampleType == 'D':
-            if not sampleValue or not isinstance(sampleValue, str):
-                return -1
-            if not self.isVaildDate(sampleValue, "%Y%m%d"):
-                return -1
-            self.setBarPeriodInSample(sampleValue, self._metaData['Spread']['Sample'], True)
-            return 0
-
-        # 使用固定根数
-        if sampleType == 'C':
-            if not isinstance(sampleValue, int) or sampleValue <= 0:
-                return -1
-            self.setBarCountInSample(sampleValue, self._metaData['Spread']['Sample'], True)
-            return 0
-
-        # 不执行历史K线
-        if sampleType == 'N':
-            self._metaData['Spread']['Sample']['UseSample'] = False
-            return 0
-
-        return -1
-
-    def setSpreadBarInterval(self, barType, barInterval):
-        '''设置K线类型和K线周期'''
-        if not self.isSetSpread():
-            return -1
-        if barType not in ('t', 'T', 'S', 'M', 'H', 'D', 'W', 'm', 'Y'):
-            return -1
-        self.setBarIntervalInSample(barType, barInterval, self._metaData['Spread']['Sample'])
-
-    def setBarIntervalInSample(self, barType, barInterval, sample):
-        if barType:
-            sample['KLineType'] = barType
-        if barInterval > 0:
-            sample['KLineSlice'] = barInterval
-
-    def getSpreadSample(self):
-        if not self.isSetSpread():
-            return None
-        return self._metaData['Spread']['Sample']
 
     def getLimit(self):
         return self._metaData['Limit']

@@ -4020,74 +4020,6 @@ class BaseApi(object):
         '''
         return self._dataModel.setTriggerMode(type, value)
 
-    # //////////////////////套利函数////////////////////
-    def S_SetSpread(self, contractNo):
-        '''
-        【说明】
-              设置套利合约列表
-
-        【语法】
-              int S_SetSpread(contractNo1, contractNo2, contractNo3, ...)
-
-        【参数】
-              contractNo 合约编号，不能为空
-
-        【备注】
-              返回整型, 0成功，-1失败
-
-        【示例】
-              S_SetSpread('ZCE|F|SR|905')
-              S_SetSpread('ZCE|F|SR|905', 'ZCE|F|SR|912', 'ZCE|F|SR|001')
-        '''
-        return self._dataModel.setSpread(contractNo)
-
-    def S_SetSample(self, sampleType, sampleValue):
-        '''
-        【说明】
-              设置套利合约历史回测的样本数量，默认为使用2000根K线进行回测。
-
-        【语法】
-              int S_SetSample(char sampleType, int|string sampleValue)
-
-        【参数】
-              sampleType 历史回测起始点类型
-                A : 使用所有K线
-                D : 指定日期开始触发
-                C : 使用固定根数
-                N : 不执行历史K线
-              sampleValue 可选，设置历史回测起始点使用的数值
-                当sampleType为A或N时，sampleValue的值不设置；
-                当sampleType为D时，sampleValue为形如'20190430'的string型触发指定日期；
-                当sampleType为C时，sampleValue为int型历史回测使用的K线根数。
-
-        【备注】
-              返回整型，0成功，-1失败
-
-        【示例】
-              无
-        '''
-        return self._dataModel.setSpreadSample(sampleType, sampleValue)
-
-    def S_SetBarInterval(self, barType, barInterval):
-        '''
-        【说明】
-              设置套利合约的K线类型和K线周期
-
-        【语法】
-              int S_SetBarInterval(char barType, int barInterval)
-
-        【参数】
-              barType K线类型 t分时，T分笔，S秒线，M分钟，H小时，D日线，W周线，m月线，Y年线
-              barInterval K线周期
-
-        【备注】
-              返回整型, 0成功，-1失败
-
-        【示例】
-              S_SetBarInterval('M', 3) 表示对套利合约使用3分钟线
-        '''
-        return self._dataModel.setSpreadBarInterval(barType, barInterval)
-
     # //////////////////////其他函数////////////////////
 
     def PlotNumeric(self, name, value, locator=0, color=-1, barsback=0):
@@ -4751,16 +4683,6 @@ def SetTriggerCont(*contractNo):
 
 def SetTriggerType(type, value):
     return baseApi.SetTriggerType(type, value)
-
-# 套利函数
-def S_SetSpread(*contNo):
-    return baseApi.S_SetSpread(contNo)
-
-def S_SetSample(sampleType='C', sampleValue=2000):
-    return baseApi.S_SetSample(sampleType, sampleValue)
-
-def S_SetBarInterval(barType, barInterval):
-    return baseApi.S_SetBarInterval(barType, barInterval)
 
 # 属性函数
 def BarInterval(contNo=''):
