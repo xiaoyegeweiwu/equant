@@ -3,7 +3,7 @@ from capi.com_types import *
 from .engine_model import *
 from copy import deepcopy
 import talib
-import time
+import time, sys
 import datetime
 import copy
 import math
@@ -1917,7 +1917,7 @@ class StrategyHisQuote(object):
             }
             self._hisLength[contractNo] = 0
             self._pkgEarliestKLineDateTimeStamp[contractNo] = -1
-            self._curEarliestKLineDateTimeStamp[contractNo] = -1
+            self._curEarliestKLineDateTimeStamp[contractNo] = sys.maxsize
             self._lastEarliestKLineDateTimeStamp[contractNo] = -1
 
     # //////////////`////////////////////////////////////////////////////
@@ -2194,7 +2194,7 @@ class StrategyHisQuote(object):
 
     def _handleKLineRspData(self, event):
         contractNo = event.getContractNo()
-        self._updateHisRspData(event)
+        self._insertHisRspData(event)
         if self.isHisQuoteRspEnd(event):
             # print(contractNo," end ***************")
             self._reIndexHisRspData(contractNo)
@@ -2211,12 +2211,13 @@ class StrategyHisQuote(object):
         else:
             self._pkgEarliestKLineDateTimeStamp[contractNo] = dataList[-1]["DateTimeStamp"]
         # update current req earliest KLine DateTimeStamp
-        if event.isChainEnd() and self._curEarliestKLineDateTimeStamp[contractNo] < self._pkgEarliestKLineDateTimeStamp[contractNo]:
+        if event.isChainEnd() and self._pkgEarliestKLineDateTimeStamp[contractNo]<self._curEarliestKLineDateTimeStamp[contractNo]:
             self._curEarliestKLineDateTimeStamp[contractNo] = self._pkgEarliestKLineDateTimeStamp[contractNo]
 
     def _handleKLineRspByDate(self, event):
         contractNo = event.getContractNo()
-        if not self._reqByDateEnd:                  # 不存储
+        if not self._reqByDateEnd:
+            self._insertHisRspData(event)
             self._updateRspDataRefDTS(event)
             if event.isChainEnd():
                 self._isReqByDateContinue(event)
@@ -2244,10 +2245,13 @@ class StrategyHisQuote(object):
         else:
             raise IndexError("can't be this case")
 
+    def _handleKLineRspByCount(self, event):
+        self._handleKLineRspData(event)
+
     # response 数据
     def onHisQuoteRsp(self, event):
         if not self._reqByDate:                     # req by count
-            self._handleKLineRspData(event)
+            self._handleKLineRspByCount(event)
         else:                                       # req by date
             self._handleKLineRspByDate(event)
 
@@ -2259,7 +2263,7 @@ class StrategyHisQuote(object):
         return False
 
     # 更新response 数据
-    def _updateHisRspData(self, event):
+    def _insertHisRspData(self, event):
         contNo = event.getContractNo()
 
         dataDict = self._metaData[contNo]
@@ -2270,9 +2274,13 @@ class StrategyHisQuote(object):
         dataList = event.getData()
         # print("datalist is ", dataList)
         for kLineData in dataList:
-            kLineData["IsKLineStable"] = True
-            if len(rfdataList) == 0 or (len(rfdataList) >= 1 and kLineData["DateTimeStamp"] < rfdataList[0]["DateTimeStamp"]):
-                rfdataList.insert(0, kLineData)
+            if self._reqByDate:
+                if len(rfdataList) == 0 or (len(rfdataList) >= 1 and kLineData["DateTimeStamp"] < rfdataList[0]["DateTimeStamp"] and \
+                    kLineData["DateTimeStamp"] >= self._reqBeginDate):
+                    rfdataList.insert(0, kLineData)
+            else:
+                if len(rfdataList) == 0 or (len(rfdataList) >= 1 and kLineData["DateTimeStamp"] < rfdataList[0]["DateTimeStamp"]):
+                    rfdataList.insert(0, kLineData)
 
     def _reIndexHisRspData(self, contractNo):
         dataDict = self._metaData[contractNo]
