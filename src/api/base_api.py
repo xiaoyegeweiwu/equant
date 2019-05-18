@@ -3188,6 +3188,481 @@ class BaseApi(object):
         '''
         return self._dataModel.getEnumColorGray()
 
+    def Enum_Order_Market(self):
+        '''
+        【说明】
+              返回订单类型市价单的枚举值
+
+        【语法】
+              char Enum_Order_Market()
+
+        【参数】
+              无
+
+        【备注】
+              返回字符
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getEnumOrderMarket()
+
+    def Enum_Order_Limit(self):
+        '''
+        【说明】
+              返回订单类型限价单的枚举值
+
+        【语法】
+              char Enum_Order_Limit()
+
+        【参数】
+              无
+
+        【备注】
+              返回字符
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getEnumOrderLimit()
+
+    def Enum_Order_MarketStop(self):
+        '''
+        【说明】
+              返回订单类型市价止损单的枚举值
+
+        【语法】
+              char Enum_Order_MarketStop()
+
+        【参数】
+              无
+
+        【备注】
+              返回字符
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getEnumOrderMarketStop()
+
+    def Enum_Order_LimitStop(self):
+        '''
+        【说明】
+              返回订单类型限价止损单的枚举值
+
+        【语法】
+              char Enum_Order_LimitStop()
+
+        【参数】
+              无
+
+        【备注】
+              返回字符
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getEnumOrderLimitStop()
+
+    def Enum_Order_Execute(self):
+        '''
+        【说明】
+              返回订单类型行权单的枚举值
+
+        【语法】
+              char Enum_Order_Execute()
+
+        【参数】
+              无
+
+        【备注】
+              返回字符
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getEnumOrderExecute()
+
+    def Enum_Order_Abandon(self):
+        '''
+        【说明】
+              返回订单类型弃权单的枚举值
+
+        【语法】
+              char Enum_Order_Abandon()
+
+        【参数】
+              无
+
+        【备注】
+              返回字符
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getEnumOrderAbandon()
+
+    def Enum_Order_Enquiry(self):
+        '''
+        【说明】
+              返回订单类型询价单的枚举值
+
+        【语法】
+              char Enum_Order_Enquiry()
+
+        【参数】
+              无
+
+        【备注】
+              返回字符
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getEnumOrderEnquiry()
+
+    def Enum_Order_Offer(self):
+        '''
+        【说明】
+              返回订单类型应价单的枚举值
+
+        【语法】
+              char Enum_Order_Offer()
+
+        【参数】
+              无
+
+        【备注】
+              返回字符
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getEnumOrderOffer()
+
+    def Enum_Order_Iceberg(self):
+        '''
+        【说明】
+              返回订单类型冰山单的枚举值
+
+        【语法】
+              char Enum_Order_Iceberg()
+
+        【参数】
+              无
+
+        【备注】
+              返回字符
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getEnumOrderIceberg()
+
+    def Enum_Order_Ghost(self):
+        '''
+        【说明】
+              返回订单类型影子单的枚举值
+
+        【语法】
+              char Enum_Order_Ghost()
+
+        【参数】
+              无
+
+        【备注】
+              返回字符
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getEnumOrderGhost()
+
+    def Enum_Order_Swap(self):
+        '''
+        【说明】
+              返回订单类型互换单的枚举值
+
+        【语法】
+              char Enum_Order_Swap()
+
+        【参数】
+              无
+
+        【备注】
+              返回字符
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getEnumOrderSwap()
+
+    def Enum_Order_SpreadApply(self):
+        '''
+        【说明】
+              返回订单类型套利申请的枚举值
+
+        【语法】
+              char Enum_Order_SpreadApply()
+
+        【参数】
+              无
+
+        【备注】
+              返回字符
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getEnumOrderSpreadApply()
+
+    def Enum_Order_HedgApply(self):
+        '''
+        【说明】
+              返回订单类型套保申请的枚举值
+
+        【语法】
+              char Enum_Order_HedgApply()
+
+        【参数】
+              无
+
+        【备注】
+              返回字符
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getEnumOrderHedgApply()
+
+    def Enum_Order_OptionAutoClose(self):
+        '''
+        【说明】
+              返回订单类型行权前期权自对冲申请的枚举值
+
+        【语法】
+              char Enum_Order_OptionAutoClose()
+
+        【参数】
+              无
+
+        【备注】
+              返回字符
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getEnumOrderOptionAutoClose()
+
+    def Enum_Order_FutureAutoClose(self):
+        '''
+        【说明】
+              返回订单类型履约期货自对冲申请的枚举值
+
+        【语法】
+              char Enum_Order_FutureAutoClose()
+
+        【参数】
+              无
+
+        【备注】
+              返回字符
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getEnumOrderFutureAutoClose()
+
+    def Enum_Order_MarketOptionKeep(self):
+        '''
+        【说明】
+              返回订单类型做市商留仓的枚举值
+
+        【语法】
+              char Enum_Order_MarketOptionKeep()
+
+        【参数】
+              无
+
+        【备注】
+              返回字符
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getEnumOrderMarketOptionKeep()
+
+    def Enum_GFD(self):
+        '''
+        【说明】
+              返回订单有效类型当日有效的枚举值
+
+        【语法】
+              char Enum_GFD()
+
+        【参数】
+              无
+
+        【备注】
+              返回字符
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getEnumGFD()
+
+    def Enum_GTC(self):
+        '''
+        【说明】
+              返回订单有效类型当日有效的枚举值
+
+        【语法】
+              char Enum_GTC()
+
+        【参数】
+              无
+
+        【备注】
+              返回字符
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getEnumGTC()
+
+    def Enum_GTD(self):
+        '''
+        【说明】
+              返回订单有效类型限期有效的枚举值
+
+        【语法】
+              char Enum_GTD()
+
+        【参数】
+              无
+
+        【备注】
+              返回字符
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getEnumGTD()
+
+    def Enum_IOC(self):
+        '''
+        【说明】
+              返回订单有效类型即时部分有效的枚举值
+
+        【语法】
+              char Enum_IOC()
+
+        【参数】
+              无
+
+        【备注】
+              返回字符
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getEnumIOC()
+
+    def Enum_FOK(self):
+        '''
+        【说明】
+              返回订单有效类型即时全部有效的枚举值
+
+        【语法】
+              char Enum_FOK()
+
+        【参数】
+              无
+
+        【备注】
+              返回字符
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getEnumFOK()
+
+    def Enum_Speculate(self):
+        '''
+        【说明】
+              返回订单投保标记投机的枚举值
+
+        【语法】
+              char Enum_Speculate()
+
+        【参数】
+              无
+
+        【备注】
+              返回字符
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getEnumSpeculate()
+
+    def Enum_Hedge(self):
+        '''
+        【说明】
+              返回订单投保标记套保的枚举值
+
+        【语法】
+              char Enum_Hedge()
+
+        【参数】
+              无
+
+        【备注】
+              返回字符
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getEnumHedge()
+
+    def Enum_Spread(self):
+        '''
+        【说明】
+              返回订单投保标记套利的枚举值
+
+        【语法】
+              char Enum_Spread()
+
+        【参数】
+              无
+
+        【备注】
+              返回字符
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getEnumSpread()
+
+    def Enum_Market(self):
+        '''
+        【说明】
+              返回订单投保标记做市的枚举值
+
+        【语法】
+              char Enum_Market()
+
+        【参数】
+              无
+
+        【备注】
+              返回字符
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getEnumMarket()
+
     #//////////////////////设置函数////////////////////
     def GetConfig(self):
         return self._dataModel.getConfig()
@@ -4149,6 +4624,81 @@ def Enum_Color_Purple():
 
 def Enum_Color_Gray():
     return baseApi.Enum_Color_Gray()
+
+def Enum_Order_Market():
+    return baseApi.Enum_Order_Market()
+
+def Enum_Order_Limit():
+    return baseApi.Enum_Order_Limit()
+
+def Enum_Order_MarketStop():
+    return baseApi.Enum_Order_MarketStop()
+
+def Enum_Order_LimitStop():
+    return baseApi.Enum_Order_LimitStop()
+
+def Enum_Order_Execute():
+    return baseApi.Enum_Order_Execute()
+
+def Enum_Order_Abandon():
+    return baseApi.Enum_Order_Abandon()
+
+def Enum_Order_Enquiry():
+    return baseApi.Enum_Order_Enquiry()
+
+def Enum_Order_Offer():
+    return baseApi.Enum_Order_Offer()
+
+def Enum_Order_Iceberg():
+    return baseApi.Enum_Order_Iceberg()
+
+def Enum_Order_Ghost():
+    return baseApi.Enum_Order_Ghost()
+
+def Enum_Order_Swap():
+    return baseApi.Enum_Order_Swap()
+
+def Enum_Order_SpreadApply():
+    return baseApi.Enum_Order_SpreadApply()
+
+def Enum_Order_HedgApply():
+    return baseApi.Enum_Order_HedgApply()
+
+def Enum_Order_OptionAutoClose():
+    return baseApi.Enum_Order_OptionAutoClose()
+
+def Enum_Order_FutureAutoClose():
+    return baseApi.Enum_Order_FutureAutoClose()
+
+def Enum_Order_MarketOptionKeep():
+    return baseApi.Enum_Order_MarketOptionKeep()
+
+def Enum_GFD():
+    return baseApi.Enum_GFD()
+
+def Enum_GTC():
+    return baseApi.Enum_GTC()
+
+def Enum_GTD():
+    return baseApi.Enum_GTD()
+
+def Enum_IOC():
+    return baseApi.Enum_IOC()
+
+def Enum_FOK():
+    return baseApi.Enum_FOK()
+
+def Enum_Speculate():
+    return baseApi.Enum_Speculate()
+
+def Enum_Hedge():
+    return baseApi.Enum_Hedge()
+
+def Enum_Spread():
+    return baseApi.Enum_Spread()
+
+def Enum_Market():
+    return baseApi.Enum_Market()
 
 # 设置函数
 def GetConfig():

@@ -770,11 +770,86 @@ class StrategyModel(object):
     def getEnumPeriodDayX(self):
         return EEQU_KLINE_DayX
 
+    def getEnumOrderMarket(self):
+        return otMarket
+
+    def getEnumOrderLimit(self):
+        return otLimit
+
+    def getEnumOrderMarketStop(self):
+        return otMarketStop
+
+    def getEnumOrderLimitStop(self):
+        return otLimitStop
+
+    def getEnumOrderExecute(self):
+        return otExecute
+
+    def getEnumOrderAbandon(self):
+        return otAbandon
+
+    def getEnumOrderEnquiry(self):
+        return otEnquiry
+
+    def getEnumOrderOffer(self):
+        return otOffer
+
+    def getEnumOrderIceberg(self):
+        return otIceberg
+
+    def getEnumOrderGhost(self):
+        return otGhost
+
+    def getEnumOrderSwap(self):
+        return otSwap
+
+    def getEnumOrderSpreadApply(self):
+        return otSpreadApply
+
+    def getEnumOrderHedgApply(self):
+        return otHedgApply
+
+    def getEnumOrderOptionAutoClose(self):
+        return otOptionAutoClose
+
+    def getEnumOrderFutureAutoClose(self):
+        return otFutureAutoClose
+
+    def getEnumOrderMarketOptionKeep(self):
+        return otMarketOptionKeep
+
+    def getEnumGFD(self):
+        return vtGFD
+
+    def getEnumGTC(self):
+        return vtGTC
+
+    def getEnumGTD(self):
+        return vtGTD
+
+    def getEnumIOC(self):
+        return vtIOC
+
+    def getEnumFOK(self):
+        return vtFOK
+
+    def getEnumSpeculate(self):
+        return hSpeculate
+
+    def getEnumHedge(self):
+        return hHedge
+
+    def getEnumSpread(self):
+        return hSpread
+
+    def getEnumMarket(self):
+        return hMarket
+
     def getEnumColorRed(self):
         return 0xFF0000
 
     def getEnumColorGreen(self):
-        return 0x00FF00
+        return 0x00AA00
 
     def getEnumColorBlue(self):
         return 0x0000FF

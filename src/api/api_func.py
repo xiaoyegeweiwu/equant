@@ -185,6 +185,7 @@ _all_func_ = {
                     ['Enum_Fail'           , '指令失败'],
                     ['Enum_Suspended'      , '已挂起'],
                     ['Enum_Apply'          , '已申请'],
+
                     ['Enum_Period_Tick'    , '周期类型_分笔'],
                     ['Enum_Period_Dyna'    , '周期类型_分时'],
                     ['Enum_Period_Second'  , '周期类型_秒线'],
@@ -195,11 +196,40 @@ _all_func_ = {
                     ['Enum_Period_Month'   , '周期类型_月线'],
                     ['Enum_Period_Year'    , '周期类型_年线'],
                     ['Enum_Period_DayX'    , '周期类型_多日'],
+
                     ['Enum_Color_Red'      , '颜色类型_红色'],
                     ['Enum_Color_Green'    , '颜色类型_绿色'],
                     ['Enum_Color_Blue'     , '颜色类型_蓝色'],
                     ['Enum_Color_Purple'   , '颜色类型_紫色'],
                     ['Enum_Color_Gray'     , '颜色类型_灰色'],
+
+                    ['Enum_Order_Market'   , '订单类型_市价单'],
+                    ['Enum_Order_Limit'    , '订单类型_限价单'],
+                    ['Enum_Order_MarketStop','订单类型_市价止损单'],
+                    ['Enum_Order_LimitStop', '订单类型_限价止损单'],
+                    ['Enum_Order_Execute'  , '订单类型_行权单'],
+                    ['Enum_Order_Abandon'  , '订单类型_弃权单'],
+                    ['Enum_Order_Enquiry'  , '订单类型_询价单'],
+                    ['Enum_Order_Offer'    , '订单类型_应价单'],
+                    ['Enum_Order_Iceberg'  , '订单类型_冰山单'],
+                    ['Enum_Order_Ghost'    , '订单类型_影子单'],
+                    ['Enum_Order_Swap'     , '订单类型_互换'],
+                    ['Enum_Order_SpreadApply','订单类型_套利申请'],
+                    ['Enum_Order_HedgApply', '订单类型_套保申请'],
+                    ['Enum_Order_OptionAutoClose','订单类型_行权前期权自对冲申请'],
+                    ['Enum_Order_FutureAutoClose','订单类型_履约期货自对冲申请'],
+                    ['Enum_Order_MarketOptionKeep','订单类型_做市商留仓'],
+
+                    ['Enum_GFD'         , '订单有效类型_当日有效'],
+                    ['Enum_GTC'         , '订单有效类型_当日有效'],
+                    ['Enum_GTD'         , '订单有效类型_限期有效'],
+                    ['Enum_IOC'         , '订单有效类型_即时部分'],
+                    ['Enum_FOK'         , '订单有效类型_即时全部'],
+
+                    ['Enum_Speculate'   , '订单投保标记_投机'],
+                    ['Enum_Hedge'       , '订单投保标记_套保'],
+                    ['Enum_Spread'      , '订单投保标记_套利'],
+                    ['Enum_Market'      , '订单投保标记_做市'],
                 ],
 
     '设置函数': [
