@@ -9,6 +9,7 @@ from .com_view import QuantFrame, QuantToplevel
 from .editor import MonitorText, SignalText, ErrorText
 from .menu import RunMenu
 from capi.com_types import *
+from report.fieldConfigure import StrategyStatus, FrequencyDict
 
 
 class QuantMonitor(object):
@@ -22,11 +23,6 @@ class QuantMonitor(object):
         self._controller = control
         self._logger = self._controller.get_logger()
         self.language = language
-
-        # 初始化策略状态字典
-        self._initStrategyStatus()
-        # 初始化K线类型字典
-        self._initKLineType()
 
         # Monitor不同标签的背景色
         self.rColor = self.bgColorW
@@ -110,29 +106,6 @@ class QuantMonitor(object):
         """创建运行策略右键菜单"""
         RunMenu(self._controller, self.executeListTree).popupmenu(event)
 
-    def _initStrategyStatus(self):
-        self._statusDict = {
-            ST_STATUS_NONE:         "初始状态",
-            ST_STATUS_HISTORY:      "历史回测",
-            ST_STATUS_CONTINUES:    "实时触发",
-            ST_STATUS_PAUSE:        "暂停",
-            ST_STATUS_QUIT:         "停止",
-            ST_STATUS_REMOVE:       "移除"
-        }
-
-    def _initKLineType(self):
-        self._kLineTypeDict = {
-            "D": "日",
-            "M": "分钟",
-            "S": "秒",
-        }
-
-    def _getStrategyStatus(self, key):
-        return self._statusDict[key]
-
-    def _getKLineType(self, key):
-        return self._kLineTypeDict[key]
-
     def _formatMonitorInfo(self, dataDict):
         """
         格式化监控需要的信息
@@ -144,12 +117,12 @@ class QuantMonitor(object):
             StName = dataDict['StrategyName']
             BenchCon = dataDict['Config']['Contract'][0]
 
-            kLineType = self._getKLineType(dataDict['Config']['Sample']['KLineType'])
+            kLineType = FrequencyDict[dataDict['Config']['Sample']['KLineType']]
             kLineSlice = dataDict['Config']['Sample']['KLineSlice']
 
             Frequency = str(kLineSlice) + kLineType
             RunType = "是" if dataDict['Config']['RunMode']['Actual']['SendOrder2Actual'] else "否"
-            Status = self._getStrategyStatus(dataDict["StrategyState"])
+            Status = StrategyStatus[dataDict["StrategyState"]]
             InitFund = dataDict['Config']['Money']['InitFunds']
 
             if 'RunningData' in dataDict:

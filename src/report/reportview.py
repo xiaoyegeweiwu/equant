@@ -334,7 +334,7 @@ class Analyse(BaseFrame):
         detailFormatter = [
             '{:.2f}'.format(float(detail["InitialFund"])),
             detail["Contract"],
-            frequencyDict[detail["Period"]],
+            FrequencyDict[detail["Period"]],
             detail["StartTime"],
             detail["EndTime"],
             detail["TestDay"],

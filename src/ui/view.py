@@ -113,6 +113,9 @@ class QuantApplication(object):
         self.quant_monitor.createSignal()
         self.quant_monitor.createErr()
 
+        # 历史回测窗口
+        self.hisTop = None
+
     def updateLogText(self):
         self.quant_monitor.updateLogText()
 
@@ -153,8 +156,12 @@ class QuantApplication(object):
         """量化界面关闭处理"""
         # 向引擎发送主进程退出信号
         self.control.sendExitRequest()
-        # 退出子线程
+        if self.hisTop:
+            self.hisTop.destroy()
+
+        # 退出子线程和主线程
         self.control.quitThread()
+        # 主线程在子线程之后退出
         #self.root.destroy()
 
     def reportDisplay(self, data, id):
@@ -174,10 +181,9 @@ class QuantApplication(object):
         # 保存报告数据
         save(data, runMode, stName)
 
-        parent = HistoryToplevel(self, self.root)
-        parent.set_config()
-        ReportView(data, parent)
-        parent.display_()
+        self.hisTop = HistoryToplevel(self, self.root)
+        ReportView(data, self.hisTop)
+        self.hisTop.display_()
 
     def updateStatus(self, strategyId, dataDict):
         """
