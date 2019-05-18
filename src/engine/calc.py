@@ -1,12 +1,11 @@
 import copy
-import numpy
-import datetime
 from datetime import datetime
 from dateutil.parser import parse
 from collections import defaultdict
 
 from capi.com_types import *
 from report.reportdetail import ReportDetail
+from report.fieldConfigure import *
 
 
 class CalcCenter(object):
@@ -216,56 +215,6 @@ class CalcCenter(object):
             
         return ret
 
-    def addOrder111(self, order):
-        # 封装self._addOrder函数
-        pInfo = self.getPositionInfo(order["Cont"])
-
-        CoverOrder = {}  # 对头仓自动平
-
-        if order["Direct"] == dBuy and order["Offset"] == oOpen:  # 买入开仓(买开）
-            if pInfo["TotalSell"] > 0:
-                CoverOrder = {
-                    "UserNo":           order["UserNo"],
-                    "OrderType":        order["OrderType"],
-                    "ValidType":        order["ValidType"],
-                    "ValidTime":        order["ValidTime"],
-                    "Cont":             order["Cont"],
-                    "Direct":           dSell,
-                    "Offset":           oCover,
-                    "Hedge":            order["Hedge"],
-                    "OrderPrice":       order["OrderPrice"],
-                    "OrderQty":         pInfo["TotalSell"],
-                    "DateTimeStamp":    order["DateTimeStamp"],
-                    "TradeDate":        order["TradeDate"]
-                }
-                self._addOrder(CoverOrder)
-            self._addOrder(order)
-            if CoverOrder:
-                return [CoverOrder, order]
-            return [order]
-
-        if order["Direct"] == dSell and order["Offset"] == oOpen:  # 卖出开仓(卖开）
-            if pInfo["TotalBuy"] > 0:
-                CoverOrder = {
-                    "UserNo":           order["UserNo"],
-                    "OrderType":        order["OrderType"],
-                    "ValidType":        order["ValidType"],
-                    "ValidTime":        order["ValidTime"],
-                    "Cont":             order["Cont"],
-                    "Direct":           dBuy,
-                    "Offset":           oCover,
-                    "Hedge":            order["Hedge"],
-                    "OrderPrice":       order["OrderPrice"],
-                    "OrderQty":         pInfo["TotalBuy"],
-                    "DateTimeStamp":    order["DateTimeStamp"],
-                    "TradeDate":        order["TradeDate"]
-                }
-                self._addOrder(CoverOrder)
-            self._addOrder(order)
-            if CoverOrder:
-                return [CoverOrder, order]
-            return [order]
-
     def addOrder(self, order):
         """
         有订单时，触发此函数
@@ -284,7 +233,7 @@ class CalcCenter(object):
         "OrderPrice":     # 委托价格 或 期权应价买入价格
         "OrderQty" :      # 委托数量 或 期权应价数量
         "DateTimeStamp":  # 时间戳（基准合约）
-        TradeDate":       # 交易日（基准合约）
+        "TradeDate":       # 交易日（基准合约）
         }
         :return:
         """
@@ -294,7 +243,7 @@ class CalcCenter(object):
         self._costs[order["Cont"]] = self.getCostRate(order["Cont"])
         self._updateTradeDate(order["TradeDate"])
 
-        #self._logger.sig_info(order)
+        self._logger.sig_info(self._formatOrder(order))
 
         contPrice = {
             "Cont": order["Cont"],
@@ -331,6 +280,20 @@ class CalcCenter(object):
         # self._calcTradeInfo()
         self._updateFundRecord(order["DateTimeStamp"], eo["Profit"], eo["Cost"])
         # print("end:", datetime.now().strftime('%H:%M:%S.%f'))
+
+    def _formatOrder(self, order):
+
+        return [
+            order["OrderId"],
+            order["UserNo"],
+            order["Cont"],
+            DirectDict[order["Direct"]],
+            OffsetDict[order["Offset"]],
+            '{:.2f}'.format(order["OrderPrice"]),
+            order["OrderQty"],
+            OrderTypeDict[order["OrderType"]],
+            HedgeDict[order["Hedge"]]
+        ]
 
     def _calcOrder(self, order):
         """"

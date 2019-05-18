@@ -250,11 +250,12 @@ def Singleton(cls):
 class HistoryToplevel(QuantToplevel):
     def __init__(self, view, master=None):
         super().__init__(master)
-        self.withdraw()
+        # self.withdraw()
         self.wm_attributes("-topmost", 0)  # 窗口置顶
         self._view = view
         self._master = master
         self.set_config()
+        self.withdraw()
 
     def set_config(self):
         self.title('回测报告')

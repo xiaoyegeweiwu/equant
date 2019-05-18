@@ -38,19 +38,28 @@ class TkinterController(object):
         self.strategyManager = self.getStManager()
 
         # 创建日志更新线程
-        self.logThread = ChildThread(self.updateLog)
+        # self.logThread = ChildThread(self.updateLog, 0.001)
         # 创建策略信息更新线程
         self.monitorThread = ChildThread(self.updateMonitor, 1)
         # 创建接收引擎数据线程
         self.receiveEgThread = ChildThread(self.model.receiveEgEvent)
 
+        # 设置日志更新
+        self.update_log()
+
     def get_logger(self):
         return self.logger
 
-    def updateLog(self):
-        self.app.updateLogText()
-        self.app.updateSigText()
-        self.app.updateErrText()
+    def update_log(self):
+        try:
+            self.app.updateLogText()
+            self.app.updateSigText()
+            self.app.updateErrText()
+
+            self.top.after(10, self.update_log)
+        except Exception as e:
+            # self.logger.warn("异常", "程序退出异常")
+            pass
 
     def updateMonitor(self):
         # 更新监控界面策略信息
@@ -60,19 +69,15 @@ class TkinterController(object):
 
     def quitThread(self):
         # 停止更新界面子线程
-        self.logThread.stop()
-        self.logThread.join()
         self.monitorThread.stop()
         self.monitorThread.join()
         # 停止接收策略引擎队列数据
         self.receiveEgThread.stop()
         self.receiveEgThread.join()
-        
+
         self.top.destroy()
 
     def run(self):
-        #启动日志线程
-        self.logThread.start()
         #启动监控策略线程
         self.monitorThread.start()
         #启动接收数据线程

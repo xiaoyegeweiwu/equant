@@ -324,7 +324,7 @@ class ReportDetail(object):
             'FinalEquity': self.final_equity,
             'EmptyPeriod': self.empty_period,
             'MaxContinueEmpty': self.max_continue_empty,
-            'MaxTradePeriod': self.max_trade_period,
+            # 'MaxTradePeriod': self.max_trade_period,
             'StdDev': self.std_dev,
             'StdDevRate': self.std_dev_rate,
             'Sharpe': self.sharpe,
