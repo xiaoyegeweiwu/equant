@@ -1381,7 +1381,7 @@ class BaseApi(object):
               返回浮点数
 
         【示例】
-              上期沪金的报价精确到小数点2位，则PriceScale为1/100
+              上期沪金的报价精确到小数点2位，则PriceScale为1/100，PriceScale的返回值为0.01
         '''
         return self._dataModel.getPriceScale(contNo)
         
@@ -1498,16 +1498,16 @@ class BaseApi(object):
         return self._dataModel.getSymbolType(contNo)
 
     # //////////////////////策略状态////////////////////
-    def AvgEntryPrice(self):
+    def AvgEntryPrice(self, contNo):
         '''
         【说明】
-              获得当前持仓的平均建仓价格。
+              获得当前持仓指定合约的平均建仓价格。
 
         【语法】
-              float AvgEntryPrice()
+              float AvgEntryPrice(string contNo)
 
         【参数】
-              无
+              contNo 合约编号，为空时获得当前持仓全部合约的平均建仓价格。
 
         【备注】
               无
@@ -1515,7 +1515,7 @@ class BaseApi(object):
         【示例】
               无
         '''
-        return self._dataModel.getAvgEntryPrice()
+        return self._dataModel.getAvgEntryPrice(contNo)
 
     def BarsSinceEntry(self, contNo):
         '''
@@ -4278,8 +4278,8 @@ def QuoteDataExist(symbol=''):
     return baseApi.QuoteDataExist(symbol)
 
 #策略状态
-def AvgEntryPrice():
-    return baseApi.AvgEntryPrice()
+def AvgEntryPrice(contNo=''):
+    return baseApi.AvgEntryPrice(contNo)
 
 def BarsSinceEntry(contNo=''):
     return baseApi.BarsSinceEntry(contNo)
