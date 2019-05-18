@@ -7,8 +7,6 @@ sellPos = 0
 def initialize(context):
     SetBenchmark("SHFE|F|CU|1907")
     SetBarInterval('M',1)
-    SetUserNo("ET001")
-
 
 def handle_data(context):
     global buyPos, sellPos
@@ -31,6 +29,7 @@ def handle_data(context):
         SellShort(1, Open()[-1])         # 卖开仓
         sellPos += 1
         
+
 
 
 
