@@ -38,7 +38,6 @@ class ReportView(tk.Frame):
     def make_widgets(self):
         self.dir = Directory(self.data, self)
         self.dir.create_directory()
-        print("555555")
         # Detail(self.data, self)
 
     # def show(self):

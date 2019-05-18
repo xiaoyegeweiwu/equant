@@ -18,11 +18,10 @@ class CollapsibleFrame(tk.Frame):
         self.graphFrame.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
 
         self.label = tk.Label(header, text=labelText, bg='#2c6ead', fg='white')
-        iimage =tk.PhotoImage(file=self.upImage)
+        iimage = tk.PhotoImage(file=self.upImage)
         self.toggleLabel = tk.Label(header, bg='#2c6ead', height=19, width=20, image=iimage)
         self.toggleLabel.image = iimage
         self.toggleLabel.bind("<Button-1>", self.toggle)
-
         self.label.pack(side=tk.LEFT, fill=tk.X, expand=True)
         self.toggleLabel.pack(side=tk.LEFT)
 
