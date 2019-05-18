@@ -874,7 +874,7 @@ class CalcCenter(object):
                 "Cont": contract,
                 "Price": barInfo[contract]['LastPrice'],  # 收盘价格
                 "Time": barInfo[contract]["DateTimeStamp"],  # 当前时间戳
-                "CurrentBarIndex": barInfo[contract]["KLineIndex"],  # 基准合约的bar索引
+                # "CurrentBarIndex": barInfo[contract]["KLineIndex"],  # 基准合约的bar索引
                 "TradeDate": barInfo[contract]["TradeDate"],
             }
             contPrices.append(contPrice)
