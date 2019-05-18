@@ -685,6 +685,7 @@ class Strategy:
         self._dataModel.getHisQuoteModel()._switchKLine(contNo)
 
     def _onStrategyRemove(self, event):
+        self._strategyState = StrategyStatusExit
         responseEvent = Event({
             "EventCode": EV_EG2UI_STRATEGY_STATUS,
             "StrategyId": self._strategyId,

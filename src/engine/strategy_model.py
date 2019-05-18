@@ -2520,6 +2520,8 @@ class StrategyHisQuote(object):
             # # 填入基准合约bar info
             # otherContractDatas.update({self._contractNo:data})
             # 执行策略函数。历史回测期间, 按照k线最新价计算浮动盈亏, 过滤在sendOrder里面过滤
+            if self._strategy._isExit():
+                break
             if not self._config.hasKLineTrigger():
                 continue
             self._strategy.setTriggerType(ST_TRIGGER_HIS_KLINE)
