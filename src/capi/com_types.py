@@ -188,15 +188,15 @@ ST_STATUS_PAUSE                   = 'P'             #暂停状态
 ST_STATUS_QUIT                    = 'Q'             #停止状态
 ST_STATUS_REMOVE                  = 'R'             #移除状态
 
-#策略触发事件定义
+# 策略触发事件定义
 ST_TRIGGER_TIMER                  = 1               #定时触发
 ST_TRIGGER_CYCLE                  = 2               #周期性触发
 ST_TRIGGER_KLINE                  = 3               #K线触发
 ST_TRIGGER_SANPSHOT               = 4               #即时行情触发
 ST_TRIGGER_TRADE                  = 5               #交易触发
-ST_TRIGGER_FILL_DATA              = 6               #回测阶段中间数据
-ST_TRIGGER_MONEY                  = 7               #策略资金推送
-
+ST_TRIGGER_FILL_DATA              = 6
+ST_TRIGGER_NONE                   = 7
+ST_TRIGGER_HIS_KLINE              = 8
 
 #策略触发操作定义
 ST_EVENT_TRIGGER                  = 0               #触发操作
@@ -507,6 +507,13 @@ OrderLimitFromMaxTotalPosition = 1001
 # 当前k线最大开仓限制
 # 当前k线最大平仓限制
 
+# 最新价来源
+LastPriceFromQuote          = 10000
+LastPriceFromKLine          = 10001
+
+#
+KLineFromHis                = 20000
+KLineFromRealTime           = 20001
 
 class EEquExchangeReq(Structure):
     """交易所信息查询请求"""

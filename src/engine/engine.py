@@ -216,29 +216,24 @@ class StrategyEngine(object):
             
     # //////////////////////UI事件处理函数/////////////////////
     def _handleUIData(self):
-        try:
-            event = self._ui2egQueue.get()
-            if type(event) is dict:
-                event = Event(event)
-            code  = event.getEventCode()
+        event = self._ui2egQueue.get()
+        code  = event.getEventCode()
 
-            if code == EV_UI2EG_LOADSTRATEGY:
-                # 加载策略事件
-                self._loadStrategy(event)
-            elif code == EV_UI2EG_REPORT:
-                self._noticeStrategyReport(event)
-            elif code == EV_UI2EG_STRATEGY_QUIT:
-                self._onStrategyQuit(event)
-            elif code == EV_UI2EG_STRATEGY_RESUME:
-                self._onStrategyResume(event)
-            elif code == EV_UI2EG_EQUANT_EXIT:
-                self._onEquantExit(event)
-            elif code == EV_UI2EG_STRATEGY_REMOVE:
-                self._onStrategyRemove(event)
-            elif code == EV_UI2EG_STRATEGY_FIGURE:
-                self._switchStrategy(event)
-        except queue.Empty as e:
-            pass
+        if code == EV_UI2EG_LOADSTRATEGY:
+            # 加载策略事件
+            self._loadStrategy(event)
+        elif code == EV_UI2EG_REPORT:
+            self._noticeStrategyReport(event)
+        elif code == EV_UI2EG_STRATEGY_QUIT:
+            self._onStrategyQuit(event)
+        elif code == EV_UI2EG_STRATEGY_RESUME:
+            self._onStrategyResume(event)
+        elif code == EV_UI2EG_EQUANT_EXIT:
+            self._onEquantExit(event)
+        elif code == EV_UI2EG_STRATEGY_REMOVE:
+            self._onStrategyRemove(event)
+        elif code == EV_UI2EG_STRATEGY_FIGURE:
+            self._switchStrategy(event)
 
     #
     def _noticeStrategyReport(self, event):
