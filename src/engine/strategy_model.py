@@ -1145,15 +1145,20 @@ class StrategyModel(object):
         return self.getCommodityInfoFromContNo(contNo)['CommodityCode']
 
     # ///////////////////////策略状态///////////////////////////
-    def getAvgEntryPrice(self):
+    def getAvgEntryPrice(self, contNo):
         '''当前持仓的平均建仓价格'''
-        matchPrice = 0
-        matchQty = 0
-        for tradeRecord in self._strategy._localOrder.values():
-            if tradeRecord._offset == oOpen and tradeRecord._orderState in (osFillPart, osFilled):
-                matchPrice += tradeRecord._matchPrice
-                matchQty += tradeRecord._matchQty
-        return matchPrice/matchQty if matchQty != 0 else 0
+        posInfo = self._calcCenter.getPositionInfo(contNo)
+        totalPrice = 0
+        totalQty = 0
+        if not contNo:
+            for posDic in posInfo.values():
+                totalPrice += posDic['BuyPrice'] * posDic['TotalBuy'] + posDic['SellPrice'] * posDic['TotalSell']
+                totalQty += posDic['TotalBuy'] + posDic['TotalSell']
+        else :
+            totalPrice += posInfo['BuyPrice'] * posInfo['TotalBuy'] + posInfo['SellPrice'] * posInfo['TotalSell']
+            totalQty += posInfo['TotalBuy'] + posInfo['TotalSell']
+
+        return totalPrice/totalQty if totalQty > 0 else 0
 
     def getBarsSinceEntry(self, contNo):
         '''获得当前持仓中指定合约的第一个建仓位置到当前位置的Bar计数'''
