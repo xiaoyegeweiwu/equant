@@ -334,7 +334,7 @@ class Analyse(BaseFrame):
         detailFormatter = [
             '{:.2f}'.format(float(detail["InitialFund"])),
             detail["Contract"],
-            FrequencyDict[detail["Period"]],
+            detail["Period"],
             detail["StartTime"],
             detail["EndTime"],
             detail["TestDay"],
@@ -424,7 +424,7 @@ class StageStatis(BaseFrame):
     def create_graph_widgets(self):
         """创建五个treeview控件"""
         column = ('a', 'b', 'c', 'd', 'e', 'f', 'g')
-        title = ('年度分析', '季度分析', '月度分析', '周分析', '日分析')
+        # title = ('年度分析', '季度分析', '月度分析', '周分析', '日分析')
         yHead = ('年份', '权益', '净利润', '盈利率', '胜率', '平均盈利/亏损', '净利润增长速度')
         qHead = ('季', '权益', '净利润', '盈利率', '胜率', '平均盈利/亏损', '净利润增长速度')
         mHead = ('月份', '权益', '净利润', '盈利率', '胜率', '平均盈利/亏损', '净利润增长速度')
@@ -449,12 +449,6 @@ class StageStatis(BaseFrame):
             children = g.get_children()
             for child in children:
                 g.delete(child)
-            #
-            # length = len(sd)
-            # print(length)
-            # self.update_idletasks()
-            # print("height: ", self.winfo_height())
-            # print("width:  ", self.winfo_width())
 
             for d in sd:
                 g.insert('', 'end', values=(d['Time'],
@@ -464,6 +458,7 @@ class StageStatis(BaseFrame):
                                             '{:.2%}'.format(float(d['WinRate'])),
                                             '{:.2f}'.format(float(d['MeanReturns'])),
                                             '{:.2%}'.format(float(d['IncSpeed']))))
+
 
 class Trade(BaseFrame):
     '''
@@ -487,7 +482,8 @@ class Trade(BaseFrame):
         vbar.pack(side=tk.RIGHT, fill=tk.Y)
         self.tree.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
 
-        heading = ('时间', '合约', '交易类型', '下单类型', '成交数量', '成交价', '成交额', '委托数量', '平仓盈亏', '手续费', '滑点损耗')
+        heading = ('时间', '合约', '交易类型', '下单类型', '成交数量', '成交价', '成交额',
+                   '委托数量', '平仓盈亏', '手续费', '滑点损耗')
         for c, h in zip(column, heading):
             self.tree.heading(c, text=h)
 
@@ -506,7 +502,9 @@ class Trade(BaseFrame):
         kline_type = data['KLineType']
         for eo in orders:
             time = self.get_order_time(kline_type, eo['Order'])
-            trade_type = self.get_trade_type(eo['Order'])
+            direct = DirectDict[eo['Order']['Direct']]
+            offset = OffsetDict[eo['Order']['Offset']]
+            trade_type = direct + offset
             self.tree.insert('', 'end', values=(time,
                                                 eo['Order']['Cont'],
                                                 trade_type,
@@ -534,37 +532,6 @@ class Trade(BaseFrame):
             time = t[0:8] + " " + t[8:10] + ":" + t[10:12] + ":" + t[12:14] + '.' + t[-3:]
 
         return time
-
-    def get_trade_type(self, order):
-        direct = order['Direct']
-        offset = order['Offset']
-        if direct == dBuy:
-            if offset == oNone:
-                trade_type = "买"
-            elif offset == oOpen:
-                trade_type = "买开"
-            elif offset == oCover:
-                trade_type = "买平"
-            elif offset == oCoverT:
-                trade_type = "买平今"
-            elif offset == oOpenCover:
-                trade_type = "买开平"
-            elif offset == oCoverOpen:
-                trade_type = "买平开"
-        elif direct == dSell:
-            if offset == oNone:
-                trade_type = "卖"
-            elif offset == oOpen:
-                trade_type = "卖开"
-            elif offset == oCover:
-                trade_type = "卖平"
-            elif offset == oCoverT:
-                trade_type = "卖平今"
-            elif offset == oOpenCover:
-                trade_type = "卖开平"
-            elif offset == oCoverOpen:
-                trade_type = "卖平开"
-        return trade_type
 
     def focus_out_event(self, event):
         _item = self.tree.focus()
