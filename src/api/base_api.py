@@ -4001,19 +4001,21 @@ class BaseApi(object):
 
     # //////////////////////其他函数////////////////////
 
-    def PlotNumeric(self, name, value, locator=0, color=-1, barsback=0):
+    def PlotNumeric(self, name, value, color, main, axis, type, barsback):
         '''
         【说明】
             在当前Bar输出一个数值
 
         【语法】
-            float PlotNumeric(string Name,float Value,float Locator=0,int Color=-1,int BarsBack=0)
+            float PlotNumeric(string name,float value,int color,char main, char axis, int type, int barsback=0)
 
         【参数】
-            Name 输出值的名称，不区分大小写；
-            Number 输出的数值；
-            Locator 输出值的定位点，默认时输出单点，否则输出连接两个值线段，用法请看例3；
-            Color 输出值的显示颜色，默认表示使用属性设置框中的颜色；
+            name  输出值的名称，不区分大小写；
+            value 输出的数值；
+            color 输出值的显示颜色，默认表示使用属性设置框中的颜色；
+            main  指标是否加载到主图，'0'-主图，'1'-幅图，默认主图
+            axis  指标是否使用独立坐标，'0'-独立坐标，'1'-非独立坐标，默认独立坐标
+            type  指标线性，0-竖直直线，1-指标线，2-柱子，3-竖线段，4-变色K线，5-线段，6-图标，7-点，8-位置格式
             BarsBack 从当前Bar向前回溯的Bar数，默认值为当前Bar。
 
         【备注】
@@ -4023,8 +4025,9 @@ class BaseApi(object):
             例1：PlotNumeric ("MA1",Ma1Value);
             输出MA1的值。
         '''
-        return self._dataModel.setPlotNumeric(name, value, locator, color, barsback)
-
+        return self._dataModel.setPlotNumeric(name, value, color, main, axis, type, barsback)
+        
+    
     def LogDebug(self, args):
         '''
         【说明】
@@ -4731,8 +4734,8 @@ def SymbolType(contNo=''):
     return baseApi.SymbolType(contNo)
 
 #其他函数
-def PlotNumeric(name, value, locator=0, color=0xdd0000, barsback=0):
-    return baseApi.PlotNumeric(name, value, locator, color, barsback)
+def PlotNumeric(name, value, color=0xdd0000, main='0', axis='1', type=1, barsback=0):
+    return baseApi.PlotNumeric(name, value, color, main, axis, type, barsback)
 
 def LogDebug(*args):
     return baseApi.LogDebug(args)

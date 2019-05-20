@@ -862,37 +862,31 @@ class StrategyModel(object):
         return 0x999999
 
     #///////////////////////其他函数///////////////////////////
-    def _addSeries(self, name, value, locator, color, barsback):
+    def _addSeries(self, name, value, color, main, axis, type, barsback):
         addSeriesEvent = Event({
             "EventCode": EV_ST2EG_ADD_KLINESERIES,
             "StrategyId": self._strategy.getStrategyId(),
             "Data":{
                 'ItemName':name,
-                'Type': EEQU_INDICATOR,
+                'Type': type,
                 'Color': color,
                 'Thick': 1,
-                'OwnAxis': EEQU_ISNOT_AXIS,
+                'OwnAxis': axis,
                 'Param': [],
                 'ParamNum': 0,
                 'Groupid': 0,
                 'GroupName':name,
-                'Main': EEQU_IS_MAIN,
+                'Main': main,
             }
         })
         
         self._strategy.sendEvent2Engine(addSeriesEvent)
     
-    def setPlotNumeric(self, name, value, locator, color, barsback):
+    def setPlotNumeric(self, name, value, color, main, axis, type, barsback):
         curBar = self._hisModel.getCurBar()
-
-        # if self._strategy.isRealTimeStatus() and name == "MA_909_5":
-        #     print("Real Time ************* :", "name: ", name, "value:", value)
-        # if self._strategy.isRealTimeAsHisStatus() and name == "MA_909_5":
-        #     print("Real Time As History*** :", "name: ", name, "value:", value)
-
         if name not in self._plotedDict:
-            self._addSeries(name, value, locator, color, barsback)
-            self._plotedDict[name] = (name, value, locator, color, barsback)
+            self._addSeries(name, value, color, main, axis, type, barsback)
+            self._plotedDict[name] = (name, value, color, main, axis, type, barsback)
 
         data = [{
             'KLineIndex' : curBar['KLineIndex'],
@@ -907,8 +901,8 @@ class StrategyModel(object):
             "StrategyId": self._strategy.getStrategyId(),
             "Data":{
                 "SeriesName": name,
-                "SeriesType": EEQU_INDICATOR,
-                "IsMain"    : EEQU_IS_MAIN,
+                "SeriesType": type,
+                "IsMain"    : main,
                 "Count"     : len(data),
                 "Data"      : data
             }
