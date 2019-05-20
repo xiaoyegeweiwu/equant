@@ -298,6 +298,24 @@ EEQU_DOT                         = 7				 #点
 EEQU_ANY                         = 8				 #位置格式
 
 
+EQU_ICON_NORMAL                  = 0;	             #正常表情
+EQU_ICON_SMILE                   = 1;		         #笑脸
+EQU_ICON_CRYING                  = 2;	             #哭脸
+EQU_ICON_UP                      = 3;	             #上箭头
+EQU_ICON_DOWN                    = 4;		         #下箭头	
+EQU_ICON_UP2                     = 5;		         #上箭头2
+EQU_ICON_DOWN2                   = 6;		         #下箭头2
+EQU_ICON_HORN                    = 7;		         #喇叭
+EQU_ICON_LOCK                    = 8;		         #加锁
+EQU_ICON_UNLOCK                  = 9;	             #解锁
+EQU_ICON_MONEYADD                = 10;	             #货币+
+EQU_ICON_MONEYSUB                = 11;	             #货币-		
+EQU_ICON_ADD                     = 12;		         #加号
+EQU_ICON_SUB                     = 13;		         #减号
+EQU_ICON_WARNING                 = 14;	             #叹号
+EQU_ICON_ERROR                   = 15;	             #叉号
+
+
 # trade type
 EEQU_TRADE_TYPE_H                = 'H'
 EEQU_TRADE_TYPE_A                = 'A'
