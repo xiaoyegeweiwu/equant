@@ -889,17 +889,13 @@ class StrategyModel(object):
         })
         
         self._strategy.sendEvent2Engine(addSeriesEvent)
-    
-    def setPlotNumeric(self, name, value, color, main, axis, type, barsback):
-        curBar = self._hisModel.getCurBar()
+        
+    def _plotNumeric(self, name, value, color, main, axis, type, barsback, data):
         if name not in self._plotedDict:
             self._addSeries(name, value, color, main, axis, type, barsback)
             self._plotedDict[name] = (name, value, color, main, axis, type, barsback)
 
-        data = [{
-            'KLineIndex' : curBar['KLineIndex'],
-            'Value'      : value
-        }]
+        
         if self._strategy.isRealTimeStatus() or self._strategy.isRealTimeAsHisStatus():
             eventCode = EV_ST2EG_UPDATE_KLINESERIES
         else:
@@ -916,6 +912,23 @@ class StrategyModel(object):
             }
         })
         self._strategy.sendEvent2Engine(serialEvent)
+        
+    def setPlotIcon(self, value, icon, color, main, barsback):
+        data = [{
+            'KLineIndex' : 0,
+            'Value'      : value,
+            'Icon'       : icon
+        }]
+        self._plotNumeric("ICON", value, color, main, EEQU_ISNOT_AXIS, EEQU_ICON, barsback, data)
+    
+    def setPlotNumeric(self, name, value, color, main, axis, type, barsback):
+        curBar = self._hisModel.getCurBar()
+        data = [{
+            'KLineIndex' : curBar['KLineIndex'],
+            'Value'      : value
+        }]
+        self._plotNumeric(name, value, color, main, axis, type, barsback, data)
+        
 
     def formatArgs(self, args):
         if len(args) == 0:

@@ -4046,6 +4046,28 @@ class BaseApi(object):
         '''
         return self._dataModel.setPlotNumeric(name, value, color, main, axis, type, barsback)
         
+    def PlotIcon(self, value, icon, color, main, barsback):
+        '''
+        【说明】
+            在当前Bar输出一个图标
+
+        【语法】
+            float PlotIcon(float Value,int Icon=0, int color, char main, int BarsBack=0)
+
+        【参数】
+            Value 输出的值
+            Icon 图标类型，0表示默认图标
+            BarsBack 从当前Bar向前回溯的Bar数，默认值为当前Bar。
+
+        【备注】
+            在当前Bar输出一个数值，输出的值用于在上层调用模块显示。返回数值型，即输入的Number。
+
+        【示例】
+            例1：PlotIcon(10,14);
+            输出MA1的值。
+        '''
+        return self._dataModel.setPlotIcon(value, icon, color, main, barsback)
+        
     
     def LogDebug(self, args):
         '''
@@ -4758,6 +4780,9 @@ def SymbolType(contNo=''):
 #其他函数
 def PlotNumeric(name, value, color=0xdd0000, main='0', axis='1', type=1, barsback=0):
     return baseApi.PlotNumeric(name, value, color, main, axis, type, barsback)
+    
+def PlotIcon(value, icon=0, color=0xdd0000, main='1', barsback=0):
+    return baseApi.PlotIcon(value, icon, color, main, barsback) 
 
 def LogDebug(*args):
     return baseApi.LogDebug(args)
