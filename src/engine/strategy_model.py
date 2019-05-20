@@ -577,30 +577,35 @@ class StrategyModel(object):
         curTriggerType = self._strategy.getTriggerType()
         if curTriggerType in [ST_TRIGGER_NONE, ST_TRIGGER_KLINE, ST_TRIGGER_HIS_KLINE] and not self._cfgModel.hasKLineTrigger():
             return
-        datetime = '20190517090001001'
-        tradeDate = '20190517'
-        
+
         triggerDict = self._cfgModel.getTrigger()
         kilneTrigger = True if 'KLine' in triggerDict else False
-        #K线触发
-        if not curBar and kilneTrigger:
-            curBar = self._hisModel.getCurBar()
-            datetime = curBar['DateTimeStamp']
-            tradeDate = curBar['TradeDate']
-        
+
+        triggerTypeInfo = self._strategy.getTriggerTypeInfo()
+        dateTime = triggerTypeInfo["DateTimeStamp"]
+        tradeDate = triggerTypeInfo["TradeDate"]
+        triggerType = triggerTypeInfo["TriggerType"]
+        # K线触发
+        if triggerType == ST_TRIGGER_HIS_KLINE or triggerType == ST_TRIGGER_KLINE:
+            curBar = self.getHisQuoteModel().getCurBar(contNo)
+        else:
+            curBar = None
+
         orderParam = {
             "UserNo"         : userNo,                   # 账户编号
-            "OrderType"      : orderType,                 # 定单类型
-            "ValidType"      : validType,                   # 有效类型
+            "OrderType"      : orderType,                # 定单类型
+            "ValidType"      : validType,                # 有效类型
             "ValidTime"      : '0',                      # 有效日期时间(GTD情况下使用)
             "Cont"           : contNo,                   # 合约
-            "Direct"         : orderDirct,                   # 买卖方向：买、卖
-            "Offset"         : entryOrExit,                   # 开仓、平仓、平今
-            "Hedge"          : hedge,               # 投机套保
-            "OrderPrice"     : orderPrice,                    # 委托价格 或 期权应价买入价格
-            "OrderQty"       : orderQty,                    # 委托数量 或 期权应价数量
-            "DateTimeStamp"  : datetime,                 # 时间戳（基准合约）
+            "Direct"         : orderDirct,               # 买卖方向：买、卖
+            "Offset"         : entryOrExit,              # 开仓、平仓、平今
+            "Hedge"          : hedge,                    # 投机套保
+            "OrderPrice"     : orderPrice,               # 委托价格 或 期权应价买入价格
+            "OrderQty"       : orderQty,                 # 委托数量 或 期权应价数量
+            "DateTimeStamp"  : dateTime,                 # 时间戳（基准合约）
             "TradeDate"      : tradeDate,                # 交易日（基准合约）
+            "TriggerType"    : triggerType,
+            "CurBarIndex"    : None if curBar is None else curBar['KLineIndex']  #
         }
 
         # K线触发，发送信号
