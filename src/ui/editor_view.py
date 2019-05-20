@@ -106,7 +106,7 @@ class StrategyTree(QuantFrame):
 
     def strategyMenu(self, event):
         """右键弹出菜单"""
-        StrategyMenu(self.control, self.root_tree).popupmenu(event)
+        StrategyMenu(self.control, self).popupmenu(event)
 
     def loadTree(self, parent, rootpath):
         for path in os.listdir(rootpath):  # 遍历当前目录

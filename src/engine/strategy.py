@@ -665,6 +665,7 @@ class Strategy:
                 "Pid":os.getpid(),
                 "Path":self._filePath,
                 "StrategyName": self._strategyName,
+                "TestResult" : self._dataModel.getHisQuoteModel()._calc.testResult()
             }
         })
 

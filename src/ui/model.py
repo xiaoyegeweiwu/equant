@@ -285,7 +285,6 @@ class GetEgData(object):
 
     def _onEgMonitorInfo(self, event):
         """获取引擎实时推送监控信息"""
-        # TODO: data中包含的数据太多
         stId = event.getStrategyId()
         data = event.getData()
         # 实时更新监控界面信息
@@ -331,8 +330,9 @@ class GetEgData(object):
             dataDict = self._stManager.getSingleStrategy(id)
 
             self._app.updateStatus(id, dataDict)
-            # if sStatus == ST_STATUS_QUIT:
-            #     self._stManager.removeStrategy(id)
+            if sStatus == ST_STATUS_QUIT:
+                # 策略停止时接收策略数据
+                self._stManager.addResultData(id, event.getData()["TestResult"])
             if sStatus == ST_STATUS_REMOVE:
                 # 删除策略需要接到通知之后再进行删除
                 # 将策略管理器中的该策略也删除掉
@@ -383,6 +383,20 @@ class GetEgData(object):
 
 
 class StrategyManager(object):
+
+    """
+    self._strategyDict = {
+        "id" : {
+                "StrategyId": id,        # 策略Id
+                "StrategyName": None,    # 策略名
+                "StrategyState: None,    # 策略状态
+                "Config": {},            # 运行设置信息
+                "RunningData": {},       # 监控数据
+                "TestResult" :{},        # 回测结果数据
+
+    }
+    """
+
     def __init__(self, app):
         self._app = app
         self._strategyDict = {}
@@ -426,3 +440,7 @@ class StrategyManager(object):
     def getSingleStrategy(self, id):
         """获取某个运行策略"""
         return self._strategyDict[id]
+
+    def addResultData(self, id, data):
+        """用于保存策略停止时的测试数据"""
+        self._strategyDict[id].update({"ResultData": data})

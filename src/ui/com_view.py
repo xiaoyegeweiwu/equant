@@ -477,8 +477,8 @@ class RunWin(QuantToplevel, QuantFrame):
 
             self.isOpenTimes.set(conf[VIsOpenTimes]),
             self.openTimes.set(conf[VOpenTimes]),
-            self.isConOpenTimes.set(conf[VOpenTimes]),
-            self.conOpenTimes.set(conf[VOpenTimes]),
+            self.isConOpenTimes.set(conf[VIsConOpenTimes]),
+            self.conOpenTimes.set(conf[VConOpenTimes]),
             self.canClose.set(conf[VCanClose]),
             self.canOpen.set(conf[VCanOpen]),
 
@@ -761,10 +761,10 @@ class RunWin(QuantToplevel, QuantFrame):
         minQtyFrame.pack(side=tk.TOP, fill=tk.X, padx=15, pady=5)
         tk.Label(minQtyFrame, text='最小下单量: ', bg=rgb_to_hex(255, 255, 255), justif=tk.LEFT, anchor=tk.W, width=15) \
                  .pack(side=tk.LEFT)
-        minQtyEntry = tk.Entry(minQtyFrame, relief=tk.GROOVE, bd=2, width=10, textvariable=self.minQty,
+        self.minQtyEntry = tk.Entry(minQtyFrame, relief=tk.GROOVE, bd=2, width=10, textvariable=self.minQty,
                                validate="key", validatecommand=(self.testContent, "%P"))
         # minQtyEntry.insert(tk.END, 1)
-        minQtyEntry.pack(side=tk.LEFT, expand=tk.NO, padx=4)
+        self.minQtyEntry.pack(side=tk.LEFT, expand=tk.NO, padx=4)
         tk.Label(minQtyFrame, text='手(1-{})'.format(MAXSINGLETRADESIZE), bg=rgb_to_hex(255, 255, 255),
                  justif=tk.LEFT, anchor=tk.W, width=10).pack(side=tk.LEFT, expand=tk.NO, padx=4)
 
@@ -1205,9 +1205,9 @@ class RunWin(QuantToplevel, QuantFrame):
                                    validate="key", validatecommand=(self.testContent, "%P"))
         # self.timesEntry.insert(tk.END, 1)
         self.timesEntry.pack(side=tk.LEFT, fill=tk.X, padx=1)
-        self.timesLabel = tk.Label(self.openTimesFrame, text='次(1-100)', bg=rgb_to_hex(255, 255, 255),
+        timesLabel = tk.Label(self.openTimesFrame, text='次(1-100)', bg=rgb_to_hex(255, 255, 255),
                  justif=tk.LEFT, anchor=tk.W, width=10)
-        self.timesLabel.pack(side=tk.LEFT, expand=tk.NO, padx=1)
+        timesLabel.pack(side=tk.LEFT, expand=tk.NO, padx=1)
 
     def setContinueOpenTimes(self, frame):
         """最大连续同向开仓次数"""
@@ -1221,11 +1221,10 @@ class RunWin(QuantToplevel, QuantFrame):
 
         self.conTimesEntry = tk.Entry(self.conTimesFrame, relief=tk.GROOVE, bd=2, width=8, textvariable=self.conOpenTimes,
                                       validate="key", validatecommand=(self.testContent, "%P"))
-        # self.conTimesEntry.insert(tk.END, 1)
         self.conTimesEntry.pack(side=tk.LEFT, fill=tk.X, padx=1)
-        self.conTimesLabel = tk.Label(self.conTimesFrame, text='次(1-100)', bg=rgb_to_hex(255, 255, 255),
+        conTimesLabel = tk.Label(self.conTimesFrame, text='次(1-100)', bg=rgb_to_hex(255, 255, 255),
                  justif=tk.LEFT, anchor=tk.W, width=10)
-        self.conTimesLabel.pack(side=tk.LEFT, expand=tk.NO, padx=1)
+        conTimesLabel.pack(side=tk.LEFT, expand=tk.NO, padx=1)
 
     def setCanClose(self, frame):
         """开仓的当前K线不允许平仓"""
@@ -1389,11 +1388,22 @@ class RunWin(QuantToplevel, QuantFrame):
                 tempT = parseTime(t)
                 timerFormatter.append(tempT)
 
+        if float(initFund) < 1000:
+            messagebox.showinfo("极星量化", "初始资金不能小于1000元", parent=self)
+            self.initFundEntry.focus_set()
+            self.toFundFrame()
+            return
+
         if cycle =="":
             messagebox.showinfo("极星量化", "定时触发周期不能为空", parent=self)
+            self.cycleEntry.focus_set()
+            self.toRunFrame()
             return
         elif int(cycle) % 100 != 0:
             messagebox.showinfo("极星量化", "定时触发周期为100的整数倍", parent=self)
+            self.cycleEntry.focus_set()
+            self.toRunFrame()
+            return
         else:
             pass
 
@@ -1402,16 +1412,25 @@ class RunWin(QuantToplevel, QuantFrame):
             return
         elif int(minQty) > MAXSINGLETRADESIZE:
             messagebox.showinfo("极星量化", "最小下单量不能大于1000", parent=self)
+            self.minQtyEntry.focus_set()
+            self.toFundFrame()
             return
         else:
             pass
 
-        if isOpenTimes and (int(openTimes) < 1 or int(openTimes) > 100):
-            messagebox.showinfo("极星量化", "每根K线同向开仓次数必须介于1-100之间", parent=self)
-            return
-        if isConOpenTimes and (int(conOpenTimes) < 1 or int(conOpenTimes) > 100):
-            messagebox.showinfo("极星量化", "最大连续同向开仓次数必须介于1-100之间", parent=self)
-            return
+        if isConOpenTimes:
+            if conOpenTimes == '' or int(conOpenTimes) < 1 or int(conOpenTimes) > 100:
+                messagebox.showinfo("极星量化", "最大连续同向开仓次数必须介于1-100之间", parent=self)
+                self.conTimesEntry.focus_set()
+                self.toSampFrame()
+                return
+
+        if isOpenTimes:
+            if openTimes == '' or int(openTimes) < 1 or int(openTimes) > 100:
+                messagebox.showinfo("极星量化", "每根K线同向开仓次数必须介于1-100之间", parent=self)
+                self.timesEntry.focus_set()
+                self.toSampFrame()
+                return
 
         self.config["Contract"] = (contractInfo,)
         # self.config["Contract"] = tuple(contractInfo)

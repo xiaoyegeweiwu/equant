@@ -126,10 +126,10 @@ class TkinterController(object):
             status = self.strategyManager.queryStrategyStatus(id)
             strategyData = self.strategyManager.getSingleStrategy(id)
             if status == ST_STATUS_QUIT:  # 策略已停止，从本地获取数据
-                if "RunningData" not in strategyData:  # 程序启动时恢复的策略没有回测数据
+                if "ResultData" not in strategyData:  # 程序启动时恢复的策略没有回测数据
                     messagebox.showinfo("提示", "策略未启动，报告数据不存在", parent=self.top)
                     return
-                reportData = strategyData["RunningData"]
+                reportData = strategyData["ResultData"]
                 self.app.reportDisplay(reportData, id)
                 return
             self._request.reportRequest(id)
