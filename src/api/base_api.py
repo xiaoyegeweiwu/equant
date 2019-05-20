@@ -1507,7 +1507,7 @@ class BaseApi(object):
               float AvgEntryPrice(string contNo)
 
         【参数】
-              contNo 合约编号，为空时获得当前持仓全部合约的平均建仓价格。
+              contNo 合约编号，默认为基准合约。
 
         【备注】
               无
@@ -1526,7 +1526,7 @@ class BaseApi(object):
               int BarsSinceEntry(string contNo)
 
         【参数】
-              contNo 合约编号，默认为基础合约。
+              contNo 合约编号，默认为基准合约。
 
         【备注】
               获得当前持仓指定合约的第一个建仓位置到当前位置的Bar计数，返回值为整型。
@@ -1547,7 +1547,7 @@ class BaseApi(object):
               int MarketPosition(string contNo)
 
         【参数】
-              contNo 合约编号，默认为基础合约。
+              contNo 合约编号，默认为基准合约。
 
         【备注】
               获得当前持仓状态，返回值为整型。
@@ -1882,7 +1882,7 @@ class BaseApi(object):
 
         【备注】
               返回当前公式应用的交易帐户ID，返回值为字符串，无效时返回空串。
-              注：不能使用于历史测试，仅适用于实时行情交易。
+              注：不能用于历史测试，仅适用于实时行情交易。
 
         【示例】
               无
@@ -1993,11 +1993,10 @@ class BaseApi(object):
               返回当前公式应用的帐户下当前商品的买入持仓均价。
 
         【语法】
-              float A_BuyAvgPrice('ZCE|F|SR|905')
+              float A_BuyAvgPrice(string contNo)
 
         【参数】
-              contNo，指定商品的合约编号，
-              为空时，采用基准合约编号。
+              contNo，指定商品的合约编号，为空时采用基准合约编号。
 
         【备注】
               返回当前公式应用的帐户下当前商品的买入持仓均价，返回值为浮点数。
@@ -2014,11 +2013,10 @@ class BaseApi(object):
               返回当前公式应用的帐户下当前商品的买入持仓。
 
         【语法】
-              float A_BuyPosition()
+              float A_BuyPosition(string contNo)
 
         【参数】
-              contNo，指定商品的合约编号，
-              为空时，采用基准合约编号。
+              contNo，指定商品的合约编号，为空时采用基准合约编号。
 
         【备注】
               返回当前公式应用的帐户下当前商品的买入持仓，返回值为浮点数。
@@ -2035,11 +2033,10 @@ class BaseApi(object):
               返回当前公式应用的帐户下当前商品的买入持仓盈亏。
 
         【语法】
-              float A_BuyProfitLoss()
+              float A_BuyProfitLoss(string contNo)
 
         【参数】
-              contNo，指定商品的合约编号，
-              为空时，采用基准合约编号。
+              contNo，指定商品的合约编号，为空时采用基准合约编号。
 
         【备注】
               返回当前公式应用的帐户下当前商品的买入持仓盈亏，返回值为浮点数。
@@ -2056,11 +2053,10 @@ class BaseApi(object):
               返回当前公式应用的帐户下当前商品的卖出持仓均价。
 
         【语法】
-              float A_SellAvgPrice()
+              float A_SellAvgPrice(string contNo)
 
         【参数】
-              contNo，指定商品的合约编号，
-              为空时，采用基准合约编号。
+              contNo，指定商品的合约编号，为空时采用基准合约编号。
 
         【备注】
               返回当前公式应用的帐户下当前商品的卖出持仓均价，返回值为浮点数。
@@ -2077,11 +2073,10 @@ class BaseApi(object):
               返回当前公式应用的帐户下当前商品的卖出持仓。
 
         【语法】
-              float A_SellPosition()
+              float A_SellPosition(string contNo)
 
         【参数】
-              contNo，指定商品的合约编号，
-              为空时，采用基准合约编号。
+              contNo，指定商品的合约编号，为空时采用基准合约编号。
 
         【备注】
               返回当前公式应用的帐户下当前商品的卖出持仓，返回值为浮点数。
@@ -2098,11 +2093,10 @@ class BaseApi(object):
               返回当前公式应用的帐户下当前商品的卖出持仓盈亏。
 
         【语法】
-              float A_SellProfitLoss()
+              float A_SellProfitLoss(string contNo)
 
         【参数】
-              contNo，指定商品的合约编号，
-              为空时，采用基准合约编号。
+              contNo，指定商品的合约编号，为空时采用基准合约编号。
 
         【备注】
               返回当前公式应用的帐户下当前商品的卖出持仓盈亏，返回值为浮点数。
@@ -2119,11 +2113,10 @@ class BaseApi(object):
               返回当前公式应用的帐户下当前商品的持仓均价。
 
         【语法】
-              float A_TotalAvgPrice()
+              float A_TotalAvgPrice(string contNo)
 
         【参数】
-              contNo，指定商品的合约编号，
-              为空时，采用基准合约编号。
+              contNo，指定商品的合约编号，为空时采用基准合约编号。
 
         【备注】
               返回当前公式应用的帐户下当前商品的持仓均价，返回值为浮点数。
@@ -2140,11 +2133,10 @@ class BaseApi(object):
               返回当前公式应用的帐户下当前商品的总持仓。
 
         【语法】
-              contNo，指定商品的合约编号，
-              为空时，采用基准合约编号。
+              int A_TotalPosition(string contNo)
 
         【参数】
-              无
+              contNo，指定商品的合约编号，为空时采用基准合约编号。
 
         【备注】
               返回当前公式应用的帐户下当前商品的总持仓，返回值为浮点数。
@@ -2162,11 +2154,10 @@ class BaseApi(object):
               返回当前公式应用的帐户下当前商品的总持仓盈亏。
 
         【语法】
-              float A_TotalProfitLoss()
+              float A_TotalProfitLoss(string contNo)
 
         【参数】
-              contNo，指定商品的合约编号，
-              为空时，采用基准合约编号。
+              contNo，指定商品的合约编号，为空时采用基准合约编号。
 
         【备注】
               返回当前公式应用的帐户下当前商品的总持仓盈亏，返回值为浮点数。
@@ -2183,11 +2174,10 @@ class BaseApi(object):
               返回当前公式应用的帐户下当前商品的当日买入持仓。
 
         【语法】
-              float A_TodayBuyPosition()
+              float A_TodayBuyPosition(string contNo)
 
         【参数】
-              contNo，指定商品的合约编号，
-              为空时，采用基准合约编号。
+              contNo，指定商品的合约编号，为空时采用基准合约编号。
 
         【备注】
               返回当前公式应用的帐户下当前商品的当日买入持仓，返回值为浮点数。
@@ -2204,11 +2194,10 @@ class BaseApi(object):
               返回当前公式应用的帐户下当前商品的当日卖出持仓。
 
         【语法】
-              float A_TodaySellPosition()
+              float A_TodaySellPosition(string contNo)
 
         【参数】
-              contNo，指定商品的合约编号，
-              为空时，采用基准合约编号。
+              contNo，指定商品的合约编号，为空时采用基准合约编号。
 
         【备注】
               返回当前公式应用的帐户下当前商品的当日卖出持仓，返回值为浮点数。
@@ -2225,15 +2214,13 @@ class BaseApi(object):
               返回当前公式应用的帐户下当前商品的某个委托单的买卖类型。
 
         【语法】
-              char A_OrderBuyOrSell(eSession)
+              char A_OrderBuyOrSell(string eSession)
 
         【参数】
-              eSession 使用A_SendOrder返回的下单编号，
-              eSession 为空时，使用当日最后成交的委托编号作为查询依据。
+              eSession 使用A_SendOrder返回的下单编号。
 
         【备注】
               返回当前公式应用的帐户下当前商品的某个委托单的买卖类型，返回值为：
-              N : None
               B : 买入
               S : 卖出
               A : 双边
@@ -2253,11 +2240,10 @@ class BaseApi(object):
               返回当前公式应用的帐户下当前商品的某个委托单的开平仓状态。
 
         【语法】
-              char A_OrderEntryOrExit(eSession)
+              char A_OrderEntryOrExit(string eSession)
 
         【参数】
-              eSession 使用A_SendOrder返回的下单编号，
-              eSession 为空时，使用当日最后成交的委托编号作为查询依据。
+              eSession 使用A_SendOrder返回的下单编号。
 
         【备注】
               返回当前公式应用的帐户下当前商品的某个委托单的开平仓状态，返回值：
@@ -2283,11 +2269,10 @@ class BaseApi(object):
               返回当前公式应用的帐户下当前商品的某个委托单的成交数量。
 
         【语法】
-              float A_OrderFilledLot(orderNo)
+              float A_OrderFilledLot(string eSession)
 
         【参数】
-              eSession 使用A_SendOrder返回的下单编号，
-              eSession 为空时，使用当日最后成交的委托编号作为查询依据。
+              eSession 使用A_SendOrder返回的下单编号。
 
         【备注】
               返回当前公式应用的帐户下当前商品的某个委托单的成交数量，返回值为浮点数。
@@ -2304,11 +2289,10 @@ class BaseApi(object):
               返回当前公式应用的帐户下当前商品的某个委托单的成交价格。
 
         【语法】
-              float A_OrderFilledPrice(eSession)
+              float A_OrderFilledPrice(string eSession)
 
         【参数】
-              eSession 使用A_SendOrder返回的下单编号，
-              eSession 为空时，使用当日最后成交的委托编号作为查询依据。
+              eSession 使用A_SendOrder返回的下单编号。
 
         【备注】
               返回当前公式应用的帐户下当前商品的某个委托单的成交价格，返回值为浮点数。
@@ -2326,11 +2310,10 @@ class BaseApi(object):
               返回当前公式应用的帐户下当前商品的某个委托单的委托数量。
 
         【语法】
-              float A_OrderLot(eSession)
+              float A_OrderLot(string eSession)
 
         【参数】
-              eSession 使用A_SendOrder返回的下单编号，
-              eSession 为空时，使用当日最后成交的委托编号作为查询依据。
+              eSession 使用A_SendOrder返回的下单编号。
 
         【备注】
               返回当前公式应用的帐户下当前商品的某个委托单的委托数量，返回值为浮点数。
@@ -2347,11 +2330,10 @@ class BaseApi(object):
               返回当前公式应用的帐户下当前商品的某个委托单的委托价格。
 
         【语法】
-              float A_OrderPrice(eSession)
+              float A_OrderPrice(string eSession)
 
         【参数】
-              eSession 使用A_SendOrder返回的下单编号，
-              eSession 为空时，使用当日最后成交的委托编号作为查询依据。
+              eSession 使用A_SendOrder返回的下单编号。
 
         【备注】
               返回当前公式应用的帐户下当前商品的某个委托单的委托价格，返回值为浮点数。
@@ -2368,11 +2350,10 @@ class BaseApi(object):
               返回当前公式应用的帐户下当前商品的某个委托单的状态。
 
         【语法】
-              char A_OrderStatus(eSession)
+              char A_OrderStatus(string eSession)
 
         【参数】
-              eSession 使用A_SendOrder返回的下单编号，
-              eSession 为空时，使用当日最后成交的委托编号作为查询依据。
+              eSession 使用A_SendOrder返回的下单编号。
 
         【备注】
               返回当前公式应用的帐户下当前商品的某个委托单的状态，返回值：
@@ -2396,7 +2377,7 @@ class BaseApi(object):
               G : 部分触发
               H : 完全触发
               I : 余单失败
-              该函数返回值可以与委托状态枚举函数进行比较，根据类型不同分别处理。
+              该函数返回值可以与委托状态枚举函数Enum_Sended、Enum_Accept等函数进行比较，根据类型不同分别处理。
               注：不能使用于历史测试，仅适用于实时行情交易。
 
         【示例】
@@ -2410,11 +2391,10 @@ class BaseApi(object):
               返回当前公式应用的帐户下当前商品的某个委托单的委托时间。
 
         【语法】
-              struct_time A_OrderTime(eSession)
+              struct_time A_OrderTime(string eSession)
 
         【参数】
-              eSession 使用A_SendOrder返回的下单编号，
-              eSession 为空时，使用当日最后成交的委托编号作为查询依据。
+              eSession 使用A_SendOrder返回的下单编号。
 
         【备注】
               返回当前公式应用的帐户下当前商品的某个委托单的委托时间，返回值为格式化的时间。
@@ -2431,7 +2411,7 @@ class BaseApi(object):
               针对指定的帐户、商品发送委托单。
 
         【语法】
-              bool A_SendOrder(userNo, contNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty)
+              bool A_SendOrder(string userNo, string contNo, char orderType, char validType, char orderDirct, char entryOrExit, char hedge, float orderPrice, int orderQty)
 
         【参数】
               userNo 指定的账户名称，
@@ -2453,12 +2433,14 @@ class BaseApi(object):
                 'F' : 行权前期权自对冲申请
                 'G' : 履约期货自对冲申请
                 'H' : 做市商留仓
+                可使用如Enum_Order_Market、Enum_Order_Limit等订单类型枚举函数获取相应的类型，
               validType 订单有效类型，字符类型， 可选值为：
                 '0' : 当日有效
                 '1' : 长期有效
                 '2' : 限期有效
                 '3' : 即时部分
                 '4' : 即时全部
+                可使用如Enum_GFD、Enum_GTC等订单有效类型枚举函数获取相应的类型，
               orderDirct 发送委托单的买卖类型，取值为Enum_Buy或Enum_Sell之一，
               entryOrExit 发送委托单的开平仓类型，取值为Enum_Entry,Enum_Exit,Enum_ExitToday之一，
               hedge 投保标记，字符类型，可选值为：
@@ -2466,6 +2448,7 @@ class BaseApi(object):
                 'B' : 套保
                 'S' : 套利
                 'M' : 做市
+                可使用如Enum_Speculate、Enum_Hedge等订单投保标记枚举函数获取相应的类型，
               orderPrice 委托单的交易价格，
               orderQty 委托单的交易数量。
 
@@ -2485,11 +2468,10 @@ class BaseApi(object):
               针对当前公式应用的帐户、商品发送撤单指令。
 
         【语法】
-              bool A_DeleteOrder(eSession)
+              bool A_DeleteOrder(string eSession)
 
         【参数】
-              eSession 使用A_SendOrder返回的下单编号，
-              eSession 为空时，使用当日最后成交的委托编号作为查询依据。
+              eSession 使用A_SendOrder返回的下单编号，为空时使用当日最后成交的委托编号作为查询依据。
 
         【备注】
               针对当前公式应用的帐户、商品发送撤单指令，发送成功返回True, 发送失败返回False。
@@ -3166,6 +3148,25 @@ class BaseApi(object):
               无
         '''
         return self._dataModel.getEnumColorGray()
+
+    def Enum_Color_Brown(self):
+        '''
+        【说明】
+              返回颜色类型褐色的枚举值
+
+        【语法】
+              int Enum_Color_Brown()
+
+        【参数】
+              无
+
+        【备注】
+              返回16进制颜色代码
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getEnumColorBrown()
 
     def Enum_Order_Market(self):
         '''
@@ -4001,19 +4002,21 @@ class BaseApi(object):
 
     # //////////////////////其他函数////////////////////
 
-    def PlotNumeric(self, name, value, locator=0, color=-1, barsback=0):
+    def PlotNumeric(self, name, value, color, main, axis, type, barsback):
         '''
         【说明】
             在当前Bar输出一个数值
 
         【语法】
-            float PlotNumeric(string Name,float Value,float Locator=0,int Color=-1,int BarsBack=0)
+            float PlotNumeric(string name,float value,int color,char main, char axis, int type, int barsback=0)
 
         【参数】
-            Name 输出值的名称，不区分大小写；
-            Number 输出的数值；
-            Locator 输出值的定位点，默认时输出单点，否则输出连接两个值线段，用法请看例3；
-            Color 输出值的显示颜色，默认表示使用属性设置框中的颜色；
+            name  输出值的名称，不区分大小写；
+            value 输出的数值；
+            color 输出值的显示颜色，默认表示使用属性设置框中的颜色；
+            main  指标是否加载到主图，'0'-主图，'1'-幅图，默认主图
+            axis  指标是否使用独立坐标，'0'-独立坐标，'1'-非独立坐标，默认独立坐标
+            type  指标线性，0-竖直直线，1-指标线，2-柱子，3-竖线段，4-变色K线，5-线段，6-图标，7-点，8-位置格式
             BarsBack 从当前Bar向前回溯的Bar数，默认值为当前Bar。
 
         【备注】
@@ -4023,8 +4026,31 @@ class BaseApi(object):
             例1：PlotNumeric ("MA1",Ma1Value);
             输出MA1的值。
         '''
-        return self._dataModel.setPlotNumeric(name, value, locator, color, barsback)
+        return self._dataModel.setPlotNumeric(name, value, color, main, axis, type, barsback)
+        
+    def PlotIcon(self, value, icon, color, main, barsback):
+        '''
+        【说明】
+            在当前Bar输出一个图标
 
+        【语法】
+            float PlotIcon(float Value,int Icon=0, int color, char main, int BarsBack=0)
+
+        【参数】
+            Value 输出的值
+            Icon 图标类型，0表示默认图标
+            BarsBack 从当前Bar向前回溯的Bar数，默认值为当前Bar。
+
+        【备注】
+            在当前Bar输出一个数值，输出的值用于在上层调用模块显示。返回数值型，即输入的Number。
+
+        【示例】
+            例1：PlotIcon(10,14);
+            输出MA1的值。
+        '''
+        return self._dataModel.setPlotIcon(value, icon, color, main, barsback)
+        
+    
     def LogDebug(self, args):
         '''
         【说明】
@@ -4536,6 +4562,9 @@ def Enum_Color_Purple():
 def Enum_Color_Gray():
     return baseApi.Enum_Color_Gray()
 
+def Enum_Color_Brown():
+    return baseApi.Enum_Color_Brown()
+
 def Enum_Order_Market():
     return baseApi.Enum_Order_Market()
 
@@ -4731,8 +4760,11 @@ def SymbolType(contNo=''):
     return baseApi.SymbolType(contNo)
 
 #其他函数
-def PlotNumeric(name, value, locator=0, color=0xdd0000, barsback=0):
-    return baseApi.PlotNumeric(name, value, locator, color, barsback)
+def PlotNumeric(name, value, color=0xdd0000, main='0', axis='1', type=1, barsback=0):
+    return baseApi.PlotNumeric(name, value, color, main, axis, type, barsback)
+    
+def PlotIcon(value, icon=0, color=0xdd0000, main='1', barsback=0):
+    return baseApi.PlotIcon(value, icon, color, main, barsback) 
 
 def LogDebug(*args):
     return baseApi.LogDebug(args)

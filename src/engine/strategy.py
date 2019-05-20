@@ -140,6 +140,7 @@ class Strategy:
         self._runStatus = ST_STATUS_NONE
         self._runRealTimeStatus = ST_STATUS_NONE
         self._triggerType = ST_TRIGGER_NONE
+        self._triggerTypeInfo = None
 
         # self._strategyId+"-"+self._eSessionId 组成本地生成的eSessionId
         self._eSessionId = 1
@@ -392,7 +393,7 @@ class Strategy:
     def _reqTradeData(self):
         self._dataModel.reqTradeData()
         
-    #////////////////////////////内部数据应答接口////////////////////
+    # ////////////////////////////内部数据应答接口////////////////////
     def _onCommodity(self, event):
         '''品种查询应答'''
         self._dataModel.onCommodity(event)
@@ -409,11 +410,15 @@ class Strategy:
         # 阶段
         if self.isRealTimeStatus():
             try:
-                self._calcProfitByQuote()
+                self._calcProfitByQuote(event)
             except Exception as e:
                 self.logger.error("即时行情计算浮动盈亏出现错误")
 
-    def _calcProfitByQuote(self):
+    def _calcProfitByQuote(self, event):
+        data = event.getData()
+        if len(data) == 0 or (4 not in data[0]["FieldData"]):
+            # 4:最新价
+            return
         priceInfos = {}
         tradeDates = self._dataModel.getHisQuoteModel().getLastTradeDate()
         for contractNo in self._dataModel.getConfigModel().getContract():
@@ -700,10 +705,18 @@ class Strategy:
         self.sendEvent2Engine(responseEvent)
 
     def _snapShotTrigger(self, event):
+        # 未选择即时行情触发
         if not self._dataModel.getConfigModel().hasSnapShotTrigger():
             return
+        # 该合约不触发
         if event.getContractNo() not in self._dataModel.getConfigModel().getTriggerContract():
             return
+        # 对应字段没有变化不触发
+        data = event.getData()
+        if len(data)==0 or (not set(data[0]["FieldData"].keys())&set([4, 16, 17, 18, 19, 20])):
+            # 4:最新价 16:成交量 17:最优买价 18:买量 19:最优卖价 20:卖量
+            return
+
         if not self.isRealTimeStatus():
             return
         lv1DataAndUpdateTime = self._dataModel.getQuoteModel().getLv1DataAndUpdateTime(event.getContractNo())
@@ -719,9 +732,29 @@ class Strategy:
 
     def setTriggerType(self, status):
         self._triggerType = status
+        # todo thread safe, 区分即时行情的运行位置和存储位置
+        baseContract = self._dataModel.getConfigModel().getContract()[0]
+        if not self.isRealTimeStatus() or status == ST_TRIGGER_KLINE:
+            curBar = self._dataModel.getHisQuoteModel().getCurBar(baseContract)
+            self._triggerTypeInfo = {
+                "TriggerType": status,
+                "TradeDate"  : curBar["TradeDate"],
+                "DateTimeStamp": curBar["DateTimeStamp"]        # accurate, thread safe
+            }
+        else:
+            curBar = self._dataModel.getHisQuoteModel().getCurBar(baseContract)
+            contractQuote = self._dataModel.getQuoteModel().getLv1DataAndUpdateTime(baseContract)
+            self._triggerTypeInfo = {
+                "TriggerType": status,
+                "TradeDate": curBar["TradeDate"],
+                "DateTimeStamp": contractQuote["UpdateTime"]    # not accurate, todo thread safe
+            }
 
     def getTriggerType(self):
         return self._triggerType
+
+    def getTriggerTypeInfo(self):
+        return self._triggerTypeInfo
 
     def resetRealTimeStatus(self):
         if self._runStatus == ST_STATUS_CONTINUES and self._dataModel.getHisQuoteModel()._realTimeAsHistoryKLineCnt<=0:

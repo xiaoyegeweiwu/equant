@@ -577,30 +577,35 @@ class StrategyModel(object):
         curTriggerType = self._strategy.getTriggerType()
         if curTriggerType in [ST_TRIGGER_NONE, ST_TRIGGER_KLINE, ST_TRIGGER_HIS_KLINE] and not self._cfgModel.hasKLineTrigger():
             return
-        datetime = '20190517090001001'
-        tradeDate = '20190517'
-        
+
         triggerDict = self._cfgModel.getTrigger()
         kilneTrigger = True if 'KLine' in triggerDict else False
-        #K线触发
-        if not curBar and kilneTrigger:
-            curBar = self._hisModel.getCurBar()
-            datetime = curBar['DateTimeStamp']
-            tradeDate = curBar['TradeDate']
-        
+
+        triggerTypeInfo = self._strategy.getTriggerTypeInfo()
+        dateTime = triggerTypeInfo["DateTimeStamp"]
+        tradeDate = triggerTypeInfo["TradeDate"]
+        triggerType = triggerTypeInfo["TriggerType"]
+        # K线触发
+        if triggerType == ST_TRIGGER_HIS_KLINE or triggerType == ST_TRIGGER_KLINE:
+            curBar = self.getHisQuoteModel().getCurBar(contNo)
+        else:
+            curBar = None
+
         orderParam = {
             "UserNo"         : userNo,                   # 账户编号
-            "OrderType"      : orderType,                 # 定单类型
-            "ValidType"      : validType,                   # 有效类型
+            "OrderType"      : orderType,                # 定单类型
+            "ValidType"      : validType,                # 有效类型
             "ValidTime"      : '0',                      # 有效日期时间(GTD情况下使用)
             "Cont"           : contNo,                   # 合约
-            "Direct"         : orderDirct,                   # 买卖方向：买、卖
-            "Offset"         : entryOrExit,                   # 开仓、平仓、平今
-            "Hedge"          : hedge,               # 投机套保
-            "OrderPrice"     : orderPrice,                    # 委托价格 或 期权应价买入价格
-            "OrderQty"       : orderQty,                    # 委托数量 或 期权应价数量
-            "DateTimeStamp"  : datetime,                 # 时间戳（基准合约）
+            "Direct"         : orderDirct,               # 买卖方向：买、卖
+            "Offset"         : entryOrExit,              # 开仓、平仓、平今
+            "Hedge"          : hedge,                    # 投机套保
+            "OrderPrice"     : orderPrice,               # 委托价格 或 期权应价买入价格
+            "OrderQty"       : orderQty,                 # 委托数量 或 期权应价数量
+            "DateTimeStamp"  : dateTime,                 # 时间戳（基准合约）
             "TradeDate"      : tradeDate,                # 交易日（基准合约）
+            "TriggerType"    : triggerType,
+            "CurBarIndex"    : None if curBar is None else curBar['KLineIndex']  #
         }
 
         # K线触发，发送信号
@@ -861,43 +866,36 @@ class StrategyModel(object):
     def getEnumColorGray(self):
         return 0x999999
 
+    def getEnumColorBrown(self):
+        return 0x996600
+
     #///////////////////////其他函数///////////////////////////
-    def _addSeries(self, name, value, locator, color, barsback):
+    def _addSeries(self, name, value, color, main, axis, type, barsback):
         addSeriesEvent = Event({
             "EventCode": EV_ST2EG_ADD_KLINESERIES,
             "StrategyId": self._strategy.getStrategyId(),
             "Data":{
                 'ItemName':name,
-                'Type': EEQU_INDICATOR,
+                'Type': type,
                 'Color': color,
                 'Thick': 1,
-                'OwnAxis': EEQU_ISNOT_AXIS,
+                'OwnAxis': axis,
                 'Param': [],
                 'ParamNum': 0,
                 'Groupid': 0,
                 'GroupName':name,
-                'Main': EEQU_IS_MAIN,
+                'Main': main,
             }
         })
         
         self._strategy.sendEvent2Engine(addSeriesEvent)
-    
-    def setPlotNumeric(self, name, value, locator, color, barsback):
-        curBar = self._hisModel.getCurBar()
-
-        # if self._strategy.isRealTimeStatus() and name == "MA_909_5":
-        #     print("Real Time ************* :", "name: ", name, "value:", value)
-        # if self._strategy.isRealTimeAsHisStatus() and name == "MA_909_5":
-        #     print("Real Time As History*** :", "name: ", name, "value:", value)
-
+        
+    def _plotNumeric(self, name, value, color, main, axis, type, barsback, data):
         if name not in self._plotedDict:
-            self._addSeries(name, value, locator, color, barsback)
-            self._plotedDict[name] = (name, value, locator, color, barsback)
+            self._addSeries(name, value, color, main, axis, type, barsback)
+            self._plotedDict[name] = (name, value, color, main, axis, type, barsback)
 
-        data = [{
-            'KLineIndex' : curBar['KLineIndex'],
-            'Value'      : value
-        }]
+        
         if self._strategy.isRealTimeStatus() or self._strategy.isRealTimeAsHisStatus():
             eventCode = EV_ST2EG_UPDATE_KLINESERIES
         else:
@@ -907,13 +905,30 @@ class StrategyModel(object):
             "StrategyId": self._strategy.getStrategyId(),
             "Data":{
                 "SeriesName": name,
-                "SeriesType": EEQU_INDICATOR,
-                "IsMain"    : EEQU_IS_MAIN,
+                "SeriesType": type,
+                "IsMain"    : main,
                 "Count"     : len(data),
                 "Data"      : data
             }
         })
         self._strategy.sendEvent2Engine(serialEvent)
+        
+    def setPlotIcon(self, value, icon, color, main, barsback):
+        data = [{
+            'KLineIndex' : 0,
+            'Value'      : value,
+            'Icon'       : icon
+        }]
+        self._plotNumeric("ICON", value, color, main, EEQU_ISNOT_AXIS, EEQU_ICON, barsback, data)
+    
+    def setPlotNumeric(self, name, value, color, main, axis, type, barsback):
+        curBar = self._hisModel.getCurBar()
+        data = [{
+            'KLineIndex' : curBar['KLineIndex'],
+            'Value'      : value
+        }]
+        self._plotNumeric(name, value, color, main, axis, type, barsback, data)
+        
 
     def formatArgs(self, args):
         if len(args) == 0:

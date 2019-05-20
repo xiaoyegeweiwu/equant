@@ -422,8 +422,11 @@ class PyAPI(object):
         _data.Type = data['Type']                   # 线型
         _data.Color = data['Color']                 # 颜色
         _data.Thick = data['Thick']                 # 线宽
-        # _data.OwnAxis = ord(data['OwnAxis'])      # 是否独立坐标
-        # _data.Param = add                         # 参数 Max10 #
+        _data.OwnAxis = ord(data['OwnAxis'])        # 是否独立坐标
+        
+        for i in range(data['ParamNum']):
+            _data.Param[i] = data['Param'][i]       # 参数 Max10 #
+            
         _data.ParamNum = data['ParamNum']           # 参数个数
         _data.Groupid = data['Groupid']             # 组号
         _data.GroupName = data['GroupName'].encode()    # 组名（指标名）
@@ -467,8 +470,9 @@ class PyAPI(object):
         _data.Type = data['Type']                       # 线型
         _data.Color = data['Color']                     # 颜色
         _data.Thick = data['Thick']                     # 线宽
-        # _data.OwnAxis = ord(data['OwnAxis'])          # 是否独立坐标
-        # _data.Param = add                             # 参数 Max10 #
+        _data.OwnAxis = ord(data['OwnAxis'])            # 是否独立坐标
+        for i in range(data['ParamNum']):
+            _data.Param[i] = data['Param'][i]           # 参数 Max10 #
         _data.ParamNum = data['ParamNum']               # 参数个数
         _data.Groupid = data['Groupid']                 # 组号
         _data.GroupName = data['GroupName'].encode()    # 组名（指标名）
