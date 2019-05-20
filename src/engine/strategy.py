@@ -239,17 +239,22 @@ class Strategy:
         self._runStatus = ST_STATUS_HISTORY
         self._send2UIStatus(self._runStatus)
         # runReport中会有等待
-        self._dataModel.runReport(self._context, self._userModule.handle_data)
+        try:
+            self._dataModel.runReport(self._context, self._userModule.handle_data)
 
-        # 持续运行阶段
-        self._runStatus = ST_STATUS_CONTINUES
-        self._runRealTimeStatus = ST_STATUS_CONTINUES_AS_HISTORY
-        self._send2UIStatus(self._runStatus)
-        
-        while not self._isExit():
-            event = self._triggerQueue.get()
-            # 发单方式，实时发单、k线稳定后发单。
-            self._dataModel.runRealTime(self._context, self._userModule.handle_data, event)
+            # 持续运行阶段
+            self._runStatus = ST_STATUS_CONTINUES
+            self._runRealTimeStatus = ST_STATUS_CONTINUES_AS_HISTORY
+            self._send2UIStatus(self._runStatus)
+
+            while not self._isExit():
+                event = self._triggerQueue.get()
+                # 发单方式，实时发单、k线稳定后发单。
+                self._dataModel.runRealTime(self._context, self._userModule.handle_data, event)
+        except Exception as e:
+            errorText = traceback.format_exc()
+            # traceback.print_exc()
+            self._exit(-1, errorText)
 
     def _startStrategyThread(self):
         '''历史数据准备完成后，运行策略'''
@@ -640,18 +645,15 @@ class Strategy:
 
     def _exit(self, errorCode, errorText):
         event = Event({
-            "EventCode":EV_EG2UI_CHECK_RESULT,
-            "StrategyId":self._strategyId,
-            "Data":{
-                "ErrorCode":errorCode,
-                "ErrorText":errorText,
+            "EventCode": EV_EG2UI_CHECK_RESULT,
+            "StrategyId": self._strategyId,
+            "Data": {
+                "ErrorCode": errorCode,
+                "ErrorText": errorText,
             }
         })
-
         self.sendEvent2Engine(event)
-        import time,os
-        time.sleep(5)
-        os._exit(0)
+        self._onStrategyQuit(None)
 
     # 停止策略
     def _onStrategyQuit(self, event):
@@ -665,7 +667,6 @@ class Strategy:
                 "Pid":os.getpid(),
                 "Path":self._filePath,
                 "StrategyName": self._strategyName,
-                "TestResult" : self._dataModel.getHisQuoteModel()._calc.testResult()
             }
         })
 
@@ -726,29 +727,30 @@ class Strategy:
             "ContractNo": event.getContractNo(),
             "Data":{
                 "TriggerType":"SnapShot",
-                "Data":lv1DataAndUpdateTime
+                "Data":lv1DataAndUpdateTime["Lv1Data"],
+                "DateTimeStamp":lv1DataAndUpdateTime["UpdateTime"],
+                "TradeDate":self._dataModel.getHisQuoteModel().getCurBar(event.getContractNo())['TradeDate'],
             }
         })
         self.sendTriggerQueue(event)
 
-    def setTriggerType(self, status):
+    def setTriggerType(self, status, event):
         self._triggerType = status
-        # todo thread safe, 区分即时行情的运行位置和存储位置
+        #
         baseContract = self._dataModel.getConfigModel().getContract()[0]
         if not self.isRealTimeStatus() or status == ST_TRIGGER_KLINE:
             curBar = self._dataModel.getHisQuoteModel().getCurBar(baseContract)
             self._triggerTypeInfo = {
                 "TriggerType": status,
                 "TradeDate"  : curBar["TradeDate"],
-                "DateTimeStamp": curBar["DateTimeStamp"]        # accurate, thread safe
+                "DateTimeStamp": curBar["DateTimeStamp"]
             }
         else:
-            curBar = self._dataModel.getHisQuoteModel().getCurBar(baseContract)
-            contractQuote = self._dataModel.getQuoteModel().getLv1DataAndUpdateTime(baseContract)
+            data = event.getData()
             self._triggerTypeInfo = {
                 "TriggerType": status,
-                "TradeDate": curBar["TradeDate"],
-                "DateTimeStamp": contractQuote["UpdateTime"]    # not accurate, todo thread safe
+                "TradeDate": data["TradeDate"],
+                "DateTimeStamp": data["DateTimeStamp"]
             }
 
     def getTriggerType(self):

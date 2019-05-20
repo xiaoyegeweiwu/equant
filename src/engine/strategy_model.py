@@ -90,31 +90,10 @@ class StrategyModel(object):
     def runRealTime(self, context, handle_data, event):
         code = event.getEventCode()
         if code == ST_TRIGGER_FILL_DATA:
-            self._strategy.setTriggerType(ST_TRIGGER_FILL_DATA)
+            # self._strategy.setTriggerType(ST_TRIGGER_FILL_DATA, event)
             self._hisModel.runReportRealTime(context, handle_data, event)
         else:
             self._hisModel.runRealTime(context, handle_data, event)
-        # if code == ST_TRIGGER_KLINE:
-        #     self._strategy.setTriggerType(ST_TRIGGER_KLINE)
-        #     self._hisModel.runRealTime(context, handle_data, event)
-        #
-        # elif code == ST_TRIGGER_CYCLE or code == ST_TRIGGER_TIMER:
-        #     if not self._strategy.isRealTimeStatus():
-        #         return
-        #     else:
-        #         self._hisModel.runOtherTrigger(context, handle_data, event)
-        # elif code == ST_TRIGGER_TRADE:
-        #     self._strategy.setTriggerType(ST_TRIGGER_FILL_DATA)
-        #
-        #     # print("交易触发===================")
-        #     if not self._strategy.isRealTimeStatus():
-        #         return
-        #     else:
-        #         self.logger.info("交易触发")
-        #         self._hisModel.runOtherTrigger(context, handle_data, event)
-        # elif code == ST_TRIGGER_SANPSHOT:
-        #      self._strategy.setTriggerType(ST_TRIGGER_SANPSHOT)
-        #      self._hisModel.runSnapShotTrigger(context, handle_data, event)
 
     def reqHisQuote(self):
         self._hisModel.reqAndSubQuote()
@@ -2544,7 +2523,10 @@ class StrategyHisQuote(object):
                 break
             if not self._config.hasKLineTrigger():
                 continue
-            self._strategy.setTriggerType(ST_TRIGGER_HIS_KLINE)
+            event = Event({
+                "EventCode":ST_TRIGGER_HIS_KLINE,
+            })
+            self._strategy.setTriggerType(ST_TRIGGER_HIS_KLINE, event)
             handle_data(context)
             self._calcProfitWhenHis()
             if i%200==0:
@@ -2627,7 +2609,7 @@ class StrategyHisQuote(object):
         if self._config.hasKLineTrigger():
             data = event.getData()["Data"]
             self._addKLine(data)
-            self._strategy.setTriggerType(ST_TRIGGER_HIS_KLINE)
+            self._strategy.setTriggerType(ST_TRIGGER_HIS_KLINE, event)
             handle_data(context)
 
     # ST_STATUS_CONTINUES_AS_REALTIME 阶段
@@ -2651,21 +2633,22 @@ class StrategyHisQuote(object):
             self._updateCurBar(contNo, data)
             if self._config.hasKLineTrigger():
                 # print("实时k线触发")
-                self._strategy.setTriggerType(eventCode)
+                self._strategy.setTriggerType(eventCode, event)
                 handle_data(context)
         elif eventCode == ST_TRIGGER_TIMER and self._config.hasTimerTrigger():
             # print("定时触发")
-            self._strategy.setTriggerType(eventCode)
+            self._strategy.setTriggerType(eventCode, event)
             handle_data(context)
         elif eventCode == ST_TRIGGER_CYCLE and self._config.hasCycleTrigger():
             # print("循环触发")
-            self._strategy.setTriggerType(eventCode)
+            self._strategy.setTriggerType(eventCode, event)
             handle_data(context)
         elif eventCode == ST_TRIGGER_SANPSHOT and self._config.hasSnapShotTrigger():
-            self._strategy.setTriggerType(eventCode)
+            # print("即时行情触发")
+            self._strategy.setTriggerType(eventCode, event)
             handle_data(context)
         elif eventCode == ST_TRIGGER_TRADE and self._config.hasTradeTrigger():
-            self._strategy.setTriggerType(eventCode)
+            self._strategy.setTriggerType(eventCode, event)
             handle_data(context)
         self._sendFlushEvent()
 
