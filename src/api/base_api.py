@@ -3167,6 +3167,25 @@ class BaseApi(object):
         '''
         return self._dataModel.getEnumColorGray()
 
+    def Enum_Color_Brown(self):
+        '''
+        【说明】
+              返回颜色类型褐色的枚举值
+
+        【语法】
+              int Enum_Color_Brown()
+
+        【参数】
+              无
+
+        【备注】
+              返回16进制颜色代码
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getEnumColorBrown()
+
     def Enum_Order_Market(self):
         '''
         【说明】
@@ -4538,6 +4557,9 @@ def Enum_Color_Purple():
 
 def Enum_Color_Gray():
     return baseApi.Enum_Color_Gray()
+
+def Enum_Color_Brown():
+    return baseApi.Enum_Color_Brown()
 
 def Enum_Order_Market():
     return baseApi.Enum_Order_Market()

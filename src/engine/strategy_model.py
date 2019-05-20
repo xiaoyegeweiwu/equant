@@ -861,6 +861,9 @@ class StrategyModel(object):
     def getEnumColorGray(self):
         return 0x999999
 
+    def getEnumColorBrown(self):
+        return 0x996600
+
     #///////////////////////其他函数///////////////////////////
     def _addSeries(self, name, value, color, main, axis, type, barsback):
         addSeriesEvent = Event({

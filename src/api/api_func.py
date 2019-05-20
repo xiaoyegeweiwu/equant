@@ -201,6 +201,7 @@ _all_func_ = {
                     ['Enum_Color_Blue'     , '颜色类型_蓝色'],
                     ['Enum_Color_Purple'   , '颜色类型_紫色'],
                     ['Enum_Color_Gray'     , '颜色类型_灰色'],
+                    ['Enum_Color_Brown'    , '颜色类型_褐色'],
 
                     ['Enum_Order_Market'   , '订单类型_市价单'],
                     ['Enum_Order_Limit'    , '订单类型_限价单'],
