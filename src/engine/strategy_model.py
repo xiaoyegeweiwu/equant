@@ -1202,52 +1202,52 @@ class StrategyModel(object):
 
     def getNetProfit(self):
         '''平仓盈亏'''
-        return self._calcCenter._getProfit()["LiquidateProfit"]
+        return self._calcCenter.getProfit()["LiquidateProfit"]
 
     def getNumEvenTrades(self):
         '''保本交易总手数'''
-        # return self._calcCenter._getProfit()["EventTrade"]
+        # return self._calcCenter.getProfit()["EventTrade"]
         return 0
 
     def getNumLosTrades(self):
         '''亏损交易总手数'''
-        # return self._calcCenter._getProfit()["LoseTrade"]
+        # return self._calcCenter.getProfit()["LoseTrade"]
         return 0
 
     def getNumWinTrades(self):
         '''盈利交易的总手数'''
-        # return self._calcCenter._getProfit()["WinTrade"]
+        # return self._calcCenter.getProfit()["WinTrade"]
         return 0
 
     def getNumAllTimes(self):
         '''开仓次数'''
-        return self._calcCenter._getProfit()["AllTimes"]
+        return self._calcCenter.getProfit()["AllTimes"]
 
     def getNumWinTimes(self):
         '''盈利次数'''
-        return self._calcCenter._getProfit()["WinTimes"]
+        return self._calcCenter.getProfit()["WinTimes"]
 
     def getNumLoseTimes(self):
         '''亏损次数'''
-        return self._calcCenter._getProfit()["LoseTimes"]
+        return self._calcCenter.getProfit()["LoseTimes"]
 
     def getNumEventTimes(self):
         '''保本次数'''
-        return self._calcCenter._getProfit()["EventTimes"]
+        return self._calcCenter.getProfit()["EventTimes"]
 
     def getPercentProfit(self):
         '''盈利成功率'''
-        winTimes = self._calcCenter._getProfit()["WinTimes"]
-        allTimes = self._calcCenter._getProfit()["AllTimes"]
+        winTimes = self._calcCenter.getProfit()["WinTimes"]
+        allTimes = self._calcCenter.getProfit()["AllTimes"]
         return winTimes/allTimes if allTimes > 0 else 0
 
     def getTradeCost(self):
         '''交易产生的手续费'''
-        return self._calcCenter._getProfit()["Cost"]
+        return self._calcCenter.getProfit()["Cost"]
 
     def getTotalTrades(self):
         '''交易总开仓手数'''
-        # return self._calcCenter._getProfit()["AllTrade"]
+        # return self._calcCenter.getProfit()["AllTrade"]
         return 0
 
 class StrategyConfig(object):
