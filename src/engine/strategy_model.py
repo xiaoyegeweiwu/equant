@@ -833,22 +833,22 @@ class StrategyModel(object):
     def getEnumMarket(self):
         return hMarket
 
-    def getEnumColorRed(self):
+    def getRed(self):
         return 0xFF0000
 
-    def getEnumColorGreen(self):
+    def getGreen(self):
         return 0x00AA00
 
-    def getEnumColorBlue(self):
+    def getBlue(self):
         return 0x0000FF
 
-    def getEnumColorPurple(self):
+    def getPurple(self):
         return 0x9900FF
 
-    def getEnumColorGray(self):
+    def getGray(self):
         return 0x999999
 
-    def getEnumColorBrown(self):
+    def getBrown(self):
         return 0x996600
 
     #///////////////////////其他函数///////////////////////////

@@ -3075,13 +3075,13 @@ class BaseApi(object):
         '''
         return self._dataModel.getEnumPeriodDayX()
 
-    def Enum_Color_Red(self):
+    def RGB_Red(self):
         '''
         【说明】
              返回颜色类型红色的枚举值
 
         【语法】
-              int Enum_Color_Red()
+              int RGB_Red()
 
         【参数】
               无
@@ -3092,15 +3092,15 @@ class BaseApi(object):
         【示例】
               无
         '''
-        return self._dataModel.getEnumColorRed()
+        return self._dataModel.getRed()
 
-    def Enum_Color_Green(self):
+    def RGB_Green(self):
         '''
         【说明】
               返回颜色类型绿色的枚举值
 
         【语法】
-              int Enum_Color_Green()
+              int RGB_Green()
 
         【参数】
               无
@@ -3111,15 +3111,15 @@ class BaseApi(object):
         【示例】
               无
         '''
-        return self._dataModel.getEnumColorGreen()
+        return self._dataModel.getGreen()
 
-    def Enum_Color_Blue(self):
+    def RGB_Blue(self):
         '''
         【说明】
               返回颜色类型蓝色的枚举值
 
         【语法】
-              int Enum_Color_Blue()
+              int RGB_Blue()
 
         【参数】
               无
@@ -3130,15 +3130,15 @@ class BaseApi(object):
         【示例】
               无
         '''
-        return self._dataModel.getEnumColorBlue()
+        return self._dataModel.getBlue()
 
-    def Enum_Color_Purple(self):
+    def RGB_Purple(self):
         '''
         【说明】
               返回颜色类型紫色的枚举值
 
         【语法】
-              int Enum_Color_Purple()
+              int RGB_Purple()
 
         【参数】
               无
@@ -3149,15 +3149,15 @@ class BaseApi(object):
         【示例】
               无
         '''
-        return self._dataModel.getEnumColorPurple()
+        return self._dataModel.getPurple()
 
-    def Enum_Color_Gray(self):
+    def RGB_Gray(self):
         '''
         【说明】
               返回颜色类型灰色的枚举值
 
         【语法】
-              int Enum_Color_Gray()
+              int RGB_Gray()
 
         【参数】
               无
@@ -3168,15 +3168,15 @@ class BaseApi(object):
         【示例】
               无
         '''
-        return self._dataModel.getEnumColorGray()
+        return self._dataModel.getGray()
 
-    def Enum_Color_Brown(self):
+    def RGB_Brown(self):
         '''
         【说明】
               返回颜色类型褐色的枚举值
 
         【语法】
-              int Enum_Color_Brown()
+              int RGB_Brown()
 
         【参数】
               无
@@ -3187,7 +3187,7 @@ class BaseApi(object):
         【示例】
               无
         '''
-        return self._dataModel.getEnumColorBrown()
+        return self._dataModel.getBrown()
 
     def Enum_Order_Market(self):
         '''
@@ -4574,23 +4574,23 @@ def Enum_Period_Year():
 def Enum_Period_DayX():
     return baseApi.Enum_Period_DayX()
 
-def Enum_Color_Red():
-    return baseApi.Enum_Color_Red()
+def RGB_Red():
+    return baseApi.RGB_Red()
 
-def Enum_Color_Green():
-    return baseApi.Enum_Color_Green()
+def RGB_Green():
+    return baseApi.RGB_Green()
 
-def Enum_Color_Blue():
-    return baseApi.Enum_Color_Blue()
+def RGB_Blue():
+    return baseApi.RGB_Blue()
 
-def Enum_Color_Purple():
-    return baseApi.Enum_Color_Purple()
+def RGB_Purple():
+    return baseApi.RGB_Purple()
 
-def Enum_Color_Gray():
-    return baseApi.Enum_Color_Gray()
+def RGB_Gray():
+    return baseApi.RGB_Gray()
 
-def Enum_Color_Brown():
-    return baseApi.Enum_Color_Brown()
+def RGB_Brown():
+    return baseApi.RGB_Brown()
 
 def Enum_Order_Market():
     return baseApi.Enum_Order_Market()
