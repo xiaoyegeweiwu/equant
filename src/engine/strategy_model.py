@@ -17,6 +17,8 @@ class StrategyModel(object):
         self._strategy = strategy
         self.logger = strategy.logger
         self._argsDict = strategy._argsDict
+        
+        self._strategyName = strategy.getStrategyName()
        
         self._plotedDict = {}
         
@@ -900,7 +902,8 @@ class StrategyModel(object):
             'Value'      : value,
             'Icon'       : icon
         }]
-        self._plotNumeric("ICON", value, color, main, EEQU_ISNOT_AXIS, EEQU_ICON, barsback, data)
+
+        self._plotNumeric(self._strategyName, value, color, main, EEQU_ISNOT_AXIS, EEQU_ICON, barsback, data)
     
     def setPlotNumeric(self, name, value, color, main, axis, type, barsback):
         main = '0' if main else '1'
