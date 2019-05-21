@@ -30,16 +30,16 @@ class BaseApi(object):
               当前Bar的日期
 
         【语法】
-              int Date(string symbol)
+              string Date(string symbol)
 
         【参数】
               symbol 合约编号, 默认基准合约
 
         【备注】
-              简写D,返回格式为YYYYMMDD的整数
+              简写D,返回格式为YYYYMMDD的字符串
 
         【实例】
-              当前Bar日期为2019-03-25,Date返回值为20190325
+              当前Bar对应的日期为2019-03-25，则Date返回值为"20190325"
         '''
         return self._dataModel.getBarDate(symbol)
 
@@ -49,16 +49,18 @@ class BaseApi(object):
               当前Bar的时间
 
         【语法】
-              float Time(string symbol)
+              string Time(string symbol)
 
         【参数】
               symbol 合约编号, 默认基准合约
 
         【备注】
-              简写T, 返回格式为0.HHMMSSmmm的浮点数
+              简写T, 返回格式为HHMMSSmmm的字符串
 
         【实例】
-              当前时间为11:34:21.356，Time返回值为0.113421356
+              当前Bar对应的时间为11:34:21.356，Time返回值为"113421356"
+              当前Bar对应的时间为09:34:00.000，Time返回值为"093400000"
+              当前Bar对应的时间为11:34:00.000，Time返回值为"113400000"
         '''
         return self._dataModel.getBarTime(symbol)
 
@@ -191,16 +193,16 @@ class BaseApi(object):
               当前Bar的交易日
 
         【语法】
-              int TradeDate(string symbol)
+              string TradeDate(string symbol)
 
         【参数】
               symbol 合约编号, 默认基准合约
 
         【备注】
-              返回格式为YYYYMMDD的整数
+              返回格式为YYYYMMDD的字符串
 
         【实例】
-              当前Bar日期为2019-03-25,Date返回值为20190325
+              当前Bar对用的日期为2019-03-25，则Date返回值为"20190325"
         '''
         return self._dataModel.getBarTradeDate(symbol)
 
@@ -281,6 +283,26 @@ class BaseApi(object):
         return self._dataModel.isHistoryDataExist(symbol)
 
     #/////////////////////////即时行情/////////////////////////////
+    def Q_UpdateTime(self, symbol):
+        '''
+        【说明】
+              获取指定合约即时行情的更新时间
+
+        【语法】
+              string Q_UpdateTime(string symbol)
+
+        【参数】
+              symbol 合约编号, 默认当前合约
+
+        【备注】
+              返回格式为"YYYYMMDDHHMMSSmmm"的字符串，
+              若指定合约即时行情的更新时间为2019-05-21 10:07:46.000，则该函数放回为20190521100746000
+
+        【实例】
+              无
+        '''
+        return self._dataModel.getQUpdateTime(symbol)
+
     def Q_AskPrice(self, symbol='', level=1):
         '''
         【说明】
@@ -299,7 +321,6 @@ class BaseApi(object):
               无
         '''
         return self._dataModel.getQAskPrice(symbol, level)
-
 
     def Q_AskPriceFlag(self, symbol=''):
         '''
@@ -4207,6 +4228,9 @@ def HistoryDataExist(contNo=''):
     return baseApi.HistoryDataExist(contNo)
 
 #即时行情
+def Q_UpdateTime(symbol=''):
+    return baseApi.Q_UpdateTime(symbol)
+
 def Q_AskPrice(symbol='', level=1):
     return baseApi.Q_AskPrice(symbol, level)
 

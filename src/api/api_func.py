@@ -21,6 +21,7 @@ _all_func_ = {
                 ],
                 
     '即时行情': [
+                    ['Q_UpdateTime'        , '即时行情更新时间'],
                     ['Q_AskPrice'          , '最新卖价'],
                     # ['Q_AskPriceFlag'      , '卖价变化标志'],
                     ['Q_AskVol'            , '最新卖量'],
