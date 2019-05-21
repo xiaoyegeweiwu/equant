@@ -24,45 +24,47 @@ class BaseApi(object):
         self._dataModel = dataModel
 
     #/////////////////////////K线数据/////////////////////////////
-    def Date(self, symbol):
+    def Date(self, contractNo):
         '''
         【说明】
               当前Bar的日期
 
         【语法】
-              int Date(string symbol)
+              string Date(string contractNo)
 
         【参数】
-              symbol 合约编号, 默认基准合约
+              contractNo 合约编号, 默认基准合约
 
         【备注】
-              简写D,返回格式为YYYYMMDD的整数
+              简写D,返回格式为YYYYMMDD的字符串
 
         【实例】
-              当前Bar日期为2019-03-25,Date返回值为20190325
+              当前Bar对应的日期为2019-03-25，则Date返回值为"20190325"
         '''
-        return self._dataModel.getBarDate(symbol)
+        return self._dataModel.getBarDate(contractNo)
 
-    def Time(self, symbol):
+    def Time(self, contractNo):
         '''
         【说明】
               当前Bar的时间
 
         【语法】
-              float Time(string symbol)
+              string Time(string contractNo)
 
         【参数】
-              symbol 合约编号, 默认基准合约
+              contractNo 合约编号, 默认基准合约
 
         【备注】
-              简写T, 返回格式为0.HHMMSSmmm的浮点数
+              简写T, 返回格式为HHMMSSmmm的字符串
 
         【实例】
-              当前时间为11:34:21.356，Time返回值为0.113421356
+              当前Bar对应的时间为11:34:21.356，Time返回值为"113421356"
+              当前Bar对应的时间为09:34:00.000，Time返回值为"093400000"
+              当前Bar对应的时间为11:34:00.000，Time返回值为"113400000"
         '''
-        return self._dataModel.getBarTime(symbol)
+        return self._dataModel.getBarTime(contractNo)
 
-    def Open(self, symbol=''):
+    def Open(self, contractNo=''):
         '''
         【说明】
               当前Bar的开盘价
@@ -71,7 +73,7 @@ class BaseApi(object):
               numpy.array Open()
 
         【参数】
-              symbol 合约编号, 默认基准合约
+              contractNo 合约编号, 默认基准合约
 
         【备注】
               简写O, 返回值numpy数组包含截止当前Bar的所有开盘价
@@ -81,9 +83,9 @@ class BaseApi(object):
               Open() 获取基准合约的所有开盘价列表
               Open('ZCE|F|SR|905') 获取白糖905合约的所有开盘价列表
         '''
-        return self._dataModel.getBarOpen(symbol)
+        return self._dataModel.getBarOpen(contractNo)
 
-    def High(self, symbol=''):
+    def High(self, contractNo=''):
         '''
         【说明】
               当前Bar的最高价
@@ -92,7 +94,7 @@ class BaseApi(object):
               numpy.array High()
 
         【参数】
-              symbol 合约编号,默认基准合约
+              contractNo 合约编号,默认基准合约
 
         【备注】
               简写H, Tick时为当时的委托卖价
@@ -102,9 +104,9 @@ class BaseApi(object):
         【实例】
               无
         '''
-        return self._dataModel.getBarHigh(symbol)
+        return self._dataModel.getBarHigh(contractNo)
 
-    def Low(self, symbol=''):
+    def Low(self, contractNo=''):
         '''
         【说明】
               当前Bar的最低价
@@ -113,7 +115,7 @@ class BaseApi(object):
               numpy.array Low()
 
         【参数】
-              symbol 合约编号, 默认基准合约
+              contractNo 合约编号, 默认基准合约
 
         【备注】
               简写H, Tick时为当时的委托卖价
@@ -123,9 +125,9 @@ class BaseApi(object):
         【实例】
               无
         '''
-        return self._dataModel.getBarLow(symbol)
+        return self._dataModel.getBarLow(contractNo)
 
-    def Close(self, symbol):
+    def Close(self, contractNo):
         '''
         【说明】
               当前Bar的收盘价
@@ -134,7 +136,7 @@ class BaseApi(object):
               numpy.array Close()
 
         【参数】
-              symbol 合约编号, 默认基准合约
+              contractNo 合约编号, 默认基准合约
 
         【备注】
               简写C, 返回numpy数组，包括截止当前Bar的所有收盘价
@@ -143,18 +145,18 @@ class BaseApi(object):
         【实例】
               无
         '''
-        return self._dataModel.getBarClose(symbol)
+        return self._dataModel.getBarClose(contractNo)
 
-    def Vol(self, symbol):
+    def Vol(self, contractNo):
         '''
         【说明】
               当前Bar的成交量
 
         【语法】
-              numpy.array Vol(string symbol)
+              numpy.array Vol(string contractNo)
 
         【参数】
-              symbol 合约编号, 默认基准合约
+              contractNo 合约编号, 默认基准合约
 
         【备注】
               简写V, 返回numpy数组，包括截止当前Bar的所有成交量
@@ -163,18 +165,18 @@ class BaseApi(object):
         【实例】
               无
         '''
-        return self._dataModel.getBarVol(symbol)
+        return self._dataModel.getBarVol(contractNo)
 
-    def OpenInt(self, symbol):
+    def OpenInt(self, contractNo):
         '''
         【说明】
               当前Bar的持仓量
 
         【语法】
-              numpy.array OpenInt(string symbol)
+              numpy.array OpenInt(string contractNo)
 
         【参数】
-              symbol 合约编号, 默认基准合约
+              contractNo 合约编号, 默认基准合约
 
         【备注】
               返回numpy数组，包括截止当前Bar的所有持仓量
@@ -183,37 +185,37 @@ class BaseApi(object):
         【实例】
               无
         '''
-        return self._dataModel.getBarOpenInt(symbol)
+        return self._dataModel.getBarOpenInt(contractNo)
 
-    def TradeDate(self, symbol):
+    def TradeDate(self, contractNo):
         '''
         【说明】
               当前Bar的交易日
 
         【语法】
-              int TradeDate(string symbol)
+              string TradeDate(string contractNo)
 
         【参数】
-              symbol 合约编号, 默认基准合约
+              contractNo 合约编号, 默认基准合约
 
         【备注】
-              返回格式为YYYYMMDD的整数
+              返回格式为YYYYMMDD的字符串
 
         【实例】
-              当前Bar日期为2019-03-25,Date返回值为20190325
+              当前Bar对用的日期为2019-03-25，则Date返回值为"20190325"
         '''
-        return self._dataModel.getBarTradeDate(symbol)
+        return self._dataModel.getBarTradeDate(contractNo)
 
-    def BarCount(self, symbol):
+    def BarCount(self, contractNo):
         '''
         【说明】
               当前合约Bar的总数
 
         【语法】
-              int BarCount(string symbol)
+              int BarCount(string contractNo)
 
         【参数】
-              symbol 合约编号, 默认基准合约
+              contractNo 合约编号, 默认基准合约
 
         【备注】
               返回值为整型
@@ -221,18 +223,18 @@ class BaseApi(object):
         【实例】
               无
         '''
-        return self._dataModel.getBarCount(symbol)
+        return self._dataModel.getBarCount(contractNo)
 
-    def CurrentBar(self, symbol):
+    def CurrentBar(self, contractNo):
         '''
         【说明】
               当前Bar的索引值
 
         【语法】
-              int CurrentBar(string symbol)
+              int CurrentBar(string contractNo)
 
         【参数】
-              symbol 合约编号, 默认基准合约
+              contractNo 合约编号, 默认基准合约
 
         【备注】
               第一个Bar返回值为0，其他Bar递增
@@ -240,18 +242,18 @@ class BaseApi(object):
         【实例】
               无
         '''
-        return self._dataModel.getCurrentBar(symbol)
+        return self._dataModel.getCurrentBar(contractNo)
 
-    def BarStatus(self, symbol):
+    def BarStatus(self, contractNo):
         '''
         【说明】
               当前Bar的状态值
 
         【语法】
-              int BarStatus(string symbol)
+              int BarStatus(string contractNo)
 
         【参数】
-              symbol 合约编号, 默认基准合约
+              contractNo 合约编号, 默认基准合约
 
         【备注】
               返回值整型, 0表示第一个Bar,1表示中间普通Bar,2表示最后一个Bar
@@ -259,18 +261,18 @@ class BaseApi(object):
         【实例】
               无
         '''
-        return self._dataModel.getBarStatus(symbol)
+        return self._dataModel.getBarStatus(contractNo)
 
-    def HistoryDataExist(self, symbol):
+    def HistoryDataExist(self, contractNo):
         '''
         【说明】
               当前合约的历史数据是否有效
 
         【语法】
-              bool HistoryDataExist(string symbol)
+              bool HistoryDataExist(string contractNo)
 
         【参数】
-              symbol 合约编号, 默认基准合约
+              contractNo 合约编号, 默认基准合约
 
         【备注】
               返回Bool值，有效返回True，否则返回False
@@ -278,19 +280,39 @@ class BaseApi(object):
         【实例】
               无
         '''
-        return self._dataModel.isHistoryDataExist(symbol)
+        return self._dataModel.isHistoryDataExist(contractNo)
 
     #/////////////////////////即时行情/////////////////////////////
-    def Q_AskPrice(self, symbol='', level=1):
+    def Q_UpdateTime(self, contractNo):
+        '''
+        【说明】
+              获取指定合约即时行情的更新时间
+
+        【语法】
+              string Q_UpdateTime(string contractNo)
+
+        【参数】
+              contractNo 合约编号, 默认当前合约
+
+        【备注】
+              返回格式为"YYYYMMDDHHMMSSmmm"的字符串，
+              若指定合约即时行情的更新时间为2019-05-21 10:07:46.000，则该函数放回为20190521100746000
+
+        【实例】
+              无
+        '''
+        return self._dataModel.getQUpdateTime(contractNo)
+
+    def Q_AskPrice(self, contractNo='', level=1):
         '''
         【说明】
               合约最新卖价
 
         【语法】
-              float Q_AskPrice(string symbol, int level)
+              float Q_AskPrice(string contractNo, int level)
 
         【参数】
-              symbol 合约编号, 默认当前合约;level 档位数,默认1档
+              contractNo 合约编号, 默认当前合约;level 档位数,默认1档
 
         【备注】
               返回浮点数, 可获取指定合约,指定深度的最新卖价
@@ -298,19 +320,18 @@ class BaseApi(object):
         【实例】
               无
         '''
-        return self._dataModel.getQAskPrice(symbol, level)
+        return self._dataModel.getQAskPrice(contractNo, level)
 
-
-    def Q_AskPriceFlag(self, symbol=''):
+    def Q_AskPriceFlag(self, contractNo=''):
         '''
         【说明】
               卖盘价格变化标志
 
         【语法】
-              int Q_AskPriceFlag(string symbol)
+              int Q_AskPriceFlag(string contractNo)
 
         【参数】
-              symbol 合约编号, 默认当前合约
+              contractNo 合约编号, 默认当前合约
 
         【备注】
               返回整型，1为上涨，-1为下跌，0为不变
@@ -318,18 +339,18 @@ class BaseApi(object):
         【实例】
               无
         '''
-        return self._dataModel.getQAskPriceFlag(symbol)
+        return self._dataModel.getQAskPriceFlag(contractNo)
 
-    def Q_AskVol(self, symbol='', level=1):
+    def Q_AskVol(self, contractNo='', level=1):
         '''
         【说明】
               合约最新卖量
 
         【语法】
-              float Q_AskVol(string symbol, int level)
+              float Q_AskVol(string contractNo, int level)
 
         【参数】
-              symbol 合约编号, 默认当前合约;level 档位数,默认1档
+              contractNo 合约编号, 默认当前合约;level 档位数,默认1档
 
         【备注】
               返回浮点数, 可获取指定合约,指定深度的最新卖量
@@ -337,18 +358,18 @@ class BaseApi(object):
         【实例】
               无
         '''
-        return self._dataModel.getQAskVol(symbol, level)
+        return self._dataModel.getQAskVol(contractNo, level)
 
-    def Q_AvgPrice(self, symbol=''):
+    def Q_AvgPrice(self, contractNo=''):
         '''
         【说明】
               当前合约的历史数据是否有效
 
         【语法】
-              float Q_AvgPrice(string symbol)
+              float Q_AvgPrice(string contractNo)
 
         【参数】
-              symbol 合约编号, 默认当前合约
+              contractNo 合约编号, 默认当前合约
 
         【备注】
               返回浮点数，返回实时均价即结算价
@@ -356,18 +377,18 @@ class BaseApi(object):
         【实例】
               无
         '''
-        return self._dataModel.getQAvgPrice(symbol)
+        return self._dataModel.getQAvgPrice(contractNo)
 
-    def Q_BidPrice(self, symbol='', level=1):
+    def Q_BidPrice(self, contractNo='', level=1):
         '''
         【说明】
               合约最新买价
 
         【语法】
-              float Q_BidPrice(string symbol, int level)
+              float Q_BidPrice(string contractNo, int level)
 
         【参数】
-              symbol 合约编号, 默认当前合约;level 档位数,默认1档
+              contractNo 合约编号, 默认当前合约;level 档位数,默认1档
 
         【备注】
               返回浮点数, 可获取指定合约,指定深度的最新买价
@@ -375,18 +396,18 @@ class BaseApi(object):
         【实例】
               无
         '''
-        return self._dataModel.getQBidPrice(symbol, level)
+        return self._dataModel.getQBidPrice(contractNo, level)
 
-    def Q_BidPriceFlag(self, symbol=''):
+    def Q_BidPriceFlag(self, contractNo=''):
         '''
         【说明】
               买盘价格变化标志
 
         【语法】
-              int Q_AskPriceFlag(string symbol)
+              int Q_AskPriceFlag(string contractNo)
 
         【参数】
-              symbol 合约编号,  默认当前合约
+              contractNo 合约编号,  默认当前合约
 
         【备注】
               返回整型，1为上涨，-1为下跌，0为不变
@@ -394,19 +415,19 @@ class BaseApi(object):
         【实例】
               无
         '''
-        return self._dataModel.getQBidPriceFlag(symbol)
+        return self._dataModel.getQBidPriceFlag(contractNo)
 
 
-    def Q_BidVol(self, symbol='', level=1):
+    def Q_BidVol(self, contractNo='', level=1):
         '''
         【说明】
               合约最新买量
 
         【语法】
-              float Q_BidVol(string symbol, int level)
+              float Q_BidVol(string contractNo, int level)
 
         【参数】
-              symbol 合约编号, 默认当前合约;level 档位数,默认1档
+              contractNo 合约编号, 默认当前合约;level 档位数,默认1档
 
         【备注】
               返回浮点数, 可获取指定合约,指定深度的最新买量
@@ -414,18 +435,18 @@ class BaseApi(object):
         【实例】
               无
         '''
-        return self._dataModel.getQBidVol(symbol, level)
+        return self._dataModel.getQBidVol(contractNo, level)
 
-    def Q_Close(self, symbol=''):
+    def Q_Close(self, contractNo=''):
         '''
         【说明】
               当日收盘价，未收盘则取昨收盘
 
         【语法】
-              float Q_Close(string symbol)
+              float Q_Close(string contractNo)
 
         【参数】
-              symbol 合约编号,默认当前合约
+              contractNo 合约编号,默认当前合约
 
         【备注】
               返回浮点数
@@ -433,18 +454,18 @@ class BaseApi(object):
         【实例】
               无
         '''
-        return self._dataModel.getQClose(symbol)
+        return self._dataModel.getQClose(contractNo)
 
-    def Q_High(self, symbol=''):
+    def Q_High(self, contractNo=''):
         '''
         【说明】
               当日最高价
 
         【语法】
-              float Q_High(string symbol)
+              float Q_High(string contractNo)
 
         【参数】
-              symbol 合约编号
+              contractNo 合约编号
 
         【备注】
               返回浮点数
@@ -452,18 +473,18 @@ class BaseApi(object):
         【实例】
               无
         '''
-        return self._dataModel.getQHigh(symbol)
+        return self._dataModel.getQHigh(contractNo)
 
-    def Q_HisHigh(self, symbol=''):
+    def Q_HisHigh(self, contractNo=''):
         '''
         【说明】
               历史最高价
 
         【语法】
-              float Q_HisHigh(string symbol)
+              float Q_HisHigh(string contractNo)
 
         【参数】
-              symbol 合约编号
+              contractNo 合约编号
 
         【备注】
               返回浮点数
@@ -471,18 +492,18 @@ class BaseApi(object):
         【实例】
               无
         '''
-        return self._dataModel.getQHisHigh(symbol)
+        return self._dataModel.getQHisHigh(contractNo)
 
-    def Q_HisLow(self, symbol=''):
+    def Q_HisLow(self, contractNo=''):
         '''
         【说明】
               历史最低价
 
         【语法】
-              float Q_HisLow(string symbol)
+              float Q_HisLow(string contractNo)
 
         【参数】
-              symbol 合约编号
+              contractNo 合约编号
 
         【备注】
               返回浮点数
@@ -490,18 +511,18 @@ class BaseApi(object):
         【实例】
               无
         '''
-        return self._dataModel.getQHisLow(symbol)
+        return self._dataModel.getQHisLow(contractNo)
 
-    def Q_InsideVol(self, symbol=''):
+    def Q_InsideVol(self, contractNo=''):
         '''
         【说明】
               内盘量
 
         【语法】
-              float Q_InsideVol(string symbol)
+              float Q_InsideVol(string contractNo)
 
         【参数】
-              symbol 合约编号
+              contractNo 合约编号
 
         【备注】
               返回浮点数, 买入价成交为内盘
@@ -509,18 +530,18 @@ class BaseApi(object):
         【实例】
               无
         '''
-        return self._dataModel.getQInsideVol(symbol)
+        return self._dataModel.getQInsideVol(contractNo)
 
-    def Q_Last(self, symbol=''):
+    def Q_Last(self, contractNo=''):
         '''
         【说明】
               最新价
 
         【语法】
-              float Q_Last(string symbol)
+              float Q_Last(string contractNo)
 
         【参数】
-              symbol 合约编号
+              contractNo 合约编号
 
         【备注】
               返回浮点数
@@ -528,18 +549,18 @@ class BaseApi(object):
         【实例】
               无
         '''
-        return self._dataModel.getQLast(symbol)
+        return self._dataModel.getQLast(contractNo)
 
-    def Q_LastDate(self, symbol=''):
+    def Q_LastDate(self, contractNo=''):
         '''
         【说明】
               最新成交日期
 
         【语法】
-              int Q_LastDate(string symbol)
+              int Q_LastDate(string contractNo)
 
         【参数】
-              symbol 合约编号
+              contractNo 合约编号
 
         【备注】
               返回Date类型
@@ -547,18 +568,18 @@ class BaseApi(object):
         【实例】
               无
         '''
-        return self._dataModel.getQLastDate(symbol)
+        return self._dataModel.getQLastDate(contractNo)
 
-    def Q_LastFlag(self, symbol=''):
+    def Q_LastFlag(self, contractNo=''):
         '''
         【说明】
               最新价变化标志
 
         【语法】
-              int Q_LastFlag(string symbol)
+              int Q_LastFlag(string contractNo)
 
         【参数】
-              symbol 合约编号
+              contractNo 合约编号
 
         【备注】
               返回整型, 1为上涨, -1为下跌, 0为不变
@@ -566,18 +587,18 @@ class BaseApi(object):
         【实例】
               无
         '''
-        return self._dataModel.getQLastFlag(symbol)
+        return self._dataModel.getQLastFlag(contractNo)
 
-    def Q_LastTime(self, symbol=''):
+    def Q_LastTime(self, contractNo=''):
         '''
         【说明】
               最新成交时间
 
         【语法】
-              float Q_LastTime(string symbol)
+              float Q_LastTime(string contractNo)
 
         【参数】
-              symbol 合约编号
+              contractNo 合约编号
 
         【备注】
               返回Time类型
@@ -585,18 +606,18 @@ class BaseApi(object):
         【实例】
               无
         '''
-        return self._dataModel.getQLastTime(symbol)
+        return self._dataModel.getQLastTime(contractNo)
 
-    def Q_LastVol(self, symbol=''):
+    def Q_LastVol(self, contractNo=''):
         '''
         【说明】
               现手
 
         【语法】
-              float Q_LastVol(string symbol)
+              float Q_LastVol(string contractNo)
 
         【参数】
-              symbol 合约编号
+              contractNo 合约编号
 
         【备注】
               返回浮点数，单位为手
@@ -604,18 +625,18 @@ class BaseApi(object):
         【实例】
               无
         '''
-        return self._dataModel.getQLastVol(symbol)
+        return self._dataModel.getQLastVol(contractNo)
 
-    def Q_Low(self, symbol=''):
+    def Q_Low(self, contractNo=''):
         '''
         【说明】
               当日最低价
 
         【语法】
-              float Q_Low(string symbol)
+              float Q_Low(string contractNo)
 
         【参数】
-              symbol 合约编号
+              contractNo 合约编号
 
         【备注】
               返回浮点数
@@ -623,18 +644,18 @@ class BaseApi(object):
         【实例】
               无
         '''
-        return self._dataModel.getQLow(symbol)
+        return self._dataModel.getQLow(contractNo)
 
-    def Q_LowLimit(self, symbol=''):
+    def Q_LowLimit(self, contractNo=''):
         '''
         【说明】
               当日跌停板价
 
         【语法】
-              float Q_LowLimit(string symbol)
+              float Q_LowLimit(string contractNo)
 
         【参数】
-              symbol 合约编号
+              contractNo 合约编号
 
         【备注】
               返回浮点数
@@ -642,18 +663,18 @@ class BaseApi(object):
         【实例】
               无
         '''
-        return self._dataModel.getQLowLimit(symbol)
+        return self._dataModel.getQLowLimit(contractNo)
 
-    def Q_Open(self, symbol=''):
+    def Q_Open(self, contractNo=''):
         '''
         【说明】
               当日开盘价
 
         【语法】
-              float Q_Open(string symbol)
+              float Q_Open(string contractNo)
 
         【参数】
-              symbol 合约编号
+              contractNo 合约编号
 
         【备注】
               返回浮点数
@@ -661,18 +682,18 @@ class BaseApi(object):
         【实例】
               无
         '''
-        return self._dataModel.getQOpen(symbol)
+        return self._dataModel.getQOpen(contractNo)
 
-    def Q_OpenInt(self, symbol=''):
+    def Q_OpenInt(self, contractNo=''):
         '''
         【说明】
               持仓量
 
         【语法】
-              float Q_OpenInt(string symbol)
+              float Q_OpenInt(string contractNo)
 
         【参数】
-              symbol 合约编号
+              contractNo 合约编号
 
         【备注】
               返回浮点数, 单位为手
@@ -680,18 +701,18 @@ class BaseApi(object):
         【实例】
               无
         '''
-        return self._dataModel.getQOpenInt(symbol)
+        return self._dataModel.getQOpenInt(contractNo)
 
-    def Q_OpenIntFlag(self, symbol=''):
+    def Q_OpenIntFlag(self, contractNo=''):
         '''
         【说明】
               持仓量变化标志
 
         【语法】
-              int  Q_OpenIntFlag(string symbol)
+              int  Q_OpenIntFlag(string contractNo)
 
         【参数】
-              symbol 合约编号
+              contractNo 合约编号
 
         【备注】
               返回整型, 1为增加，-1为下降，0为不变
@@ -699,18 +720,18 @@ class BaseApi(object):
         【实例】
               无
         '''
-        return self._dataModel.getQOpenIntFlag(symbol)
+        return self._dataModel.getQOpenIntFlag(contractNo)
 
-    def Q_OutsideVol(self, symbol=''):
+    def Q_OutsideVol(self, contractNo=''):
         '''
         【说明】
               外盘量
 
         【语法】
-              float Q_OutsideVol(string symbol)
+              float Q_OutsideVol(string contractNo)
 
         【参数】
-              symbol 合约编号
+              contractNo 合约编号
 
         【备注】
               返回浮点数，卖出价成交为外盘
@@ -718,18 +739,18 @@ class BaseApi(object):
         【实例】
               无
         '''
-        return self._dataModel.getQOutsideVol(symbol)
+        return self._dataModel.getQOutsideVol(contractNo)
 
-    def Q_PreOpenInt(self, symbol=''):
+    def Q_PreOpenInt(self, contractNo=''):
         '''
         【说明】
               昨持仓量
 
         【语法】
-              float Q_PreOpenInt(string symbol)
+              float Q_PreOpenInt(string contractNo)
 
         【参数】
-              symbol 合约编号
+              contractNo 合约编号
 
         【备注】
               返回浮点数
@@ -737,18 +758,18 @@ class BaseApi(object):
         【实例】
               无
         '''
-        return self._dataModel.getQPreOpenInt(symbol)
+        return self._dataModel.getQPreOpenInt(contractNo)
 
-    def Q_PreSettlePrice(self, symbol=''):
+    def Q_PreSettlePrice(self, contractNo=''):
         '''
         【说明】
               昨结算
 
         【语法】
-              float Q_PreSettlePrice(string symbol)
+              float Q_PreSettlePrice(string contractNo)
 
         【参数】
-              symbol 合约编号
+              contractNo 合约编号
 
         【备注】
               返回浮点数
@@ -756,18 +777,18 @@ class BaseApi(object):
         【实例】
               无
         '''
-        return self._dataModel.getQPreSettlePrice(symbol)
+        return self._dataModel.getQPreSettlePrice(contractNo)
 
-    def Q_PriceChg(self, symbol=''):
+    def Q_PriceChg(self, contractNo=''):
         '''
         【说明】
               当日涨跌
 
         【语法】
-              float Q_PriceChg(string symbol)
+              float Q_PriceChg(string contractNo)
 
         【参数】
-              symbol 合约编号
+              contractNo 合约编号
 
         【备注】
               返回浮点数
@@ -775,19 +796,19 @@ class BaseApi(object):
         【实例】
               无
         '''
-        return self._dataModel.getQPriceChg(symbol)
+        return self._dataModel.getQPriceChg(contractNo)
 
 
-    def Q_PriceChgRadio(self, symbol=''):
+    def Q_PriceChgRadio(self, contractNo=''):
         '''
         【说明】
               当日涨跌幅
 
         【语法】
-              float Q_PriceChgRadio(string symbol)
+              float Q_PriceChgRadio(string contractNo)
 
         【参数】
-              symbol 合约编号
+              contractNo 合约编号
 
         【备注】
               返回浮点数
@@ -795,18 +816,18 @@ class BaseApi(object):
         【实例】
               无
         '''
-        return self._dataModel.getQPriceChgRadio(symbol)
+        return self._dataModel.getQPriceChgRadio(contractNo)
 
-    def Q_TodayEntryVol(self, symbol=''):
+    def Q_TodayEntryVol(self, contractNo=''):
         '''
         【说明】
               当日开仓量
 
         【语法】
-              float Q_TodayEntryVol(string symbol)
+              float Q_TodayEntryVol(string contractNo)
 
         【参数】
-              symbol 合约编号
+              contractNo 合约编号
 
         【备注】
               返回浮点数
@@ -814,18 +835,18 @@ class BaseApi(object):
         【实例】
               无
         '''
-        return self._dataModel.getQTodayEntryVol(symbol)
+        return self._dataModel.getQTodayEntryVol(contractNo)
 
-    def Q_TodayExitVol(self, symbol=''):
+    def Q_TodayExitVol(self, contractNo=''):
         '''
         【说明】
               当日平仓量
 
         【语法】
-              float Q_TodayExitVol(string symbol)
+              float Q_TodayExitVol(string contractNo)
 
         【参数】
-              symbol 合约编号
+              contractNo 合约编号
 
         【备注】
               返回浮点数
@@ -833,18 +854,18 @@ class BaseApi(object):
         【实例】
               无
         '''
-        return self._dataModel.getQTodayExitVol(symbol)
+        return self._dataModel.getQTodayExitVol(contractNo)
 
-    def Q_TotalVol(self, symbol=''):
+    def Q_TotalVol(self, contractNo=''):
         '''
         【说明】
               当日成交量
 
         【语法】
-              float Q_TotalVol(string symbol)
+              float Q_TotalVol(string contractNo)
 
         【参数】
-              symbol 合约编号
+              contractNo 合约编号
 
         【备注】
               返回浮点数
@@ -852,18 +873,18 @@ class BaseApi(object):
         【实例】
               无
         '''
-        return self._dataModel.getQTotalVol(symbol)
+        return self._dataModel.getQTotalVol(contractNo)
 
-    def Q_TurnOver(self, symbol=''):
+    def Q_TurnOver(self, contractNo=''):
         '''
         【说明】
               当日成交额
 
         【语法】
-              float Q_TurnOver(string symbol)
+              float Q_TurnOver(string contractNo)
 
         【参数】
-              symbol 合约编号
+              contractNo 合约编号
 
         【备注】
               返回浮点数
@@ -871,18 +892,18 @@ class BaseApi(object):
         【实例】
               无
         '''
-        return self._dataModel.getQTurnOver(symbol)
+        return self._dataModel.getQTurnOver(contractNo)
 
-    def Q_UpperLimit(self, symbol=''):
+    def Q_UpperLimit(self, contractNo=''):
         '''
         【说明】
               当日涨停板价
 
         【语法】
-              float Q_UpperLimit(string symbol)
+              float Q_UpperLimit(string contractNo)
 
         【参数】
-              symbol 合约编号
+              contractNo 合约编号
 
         【备注】
               返回浮点数
@@ -890,18 +911,18 @@ class BaseApi(object):
         【实例】
               无
         '''
-        return self._dataModel.getQUpperLimit(symbol)
+        return self._dataModel.getQUpperLimit(contractNo)
 
-    def QuoteDataExist(self, symbol=''):
+    def QuoteDataExist(self, contractNo=''):
         '''
         【说明】
               行情数据是否有效
 
         【语法】
-              Bool QuoteDataExist(string symbol)
+              Bool QuoteDataExist(string contractNo)
 
         【参数】
-              symbol 合约编号
+              contractNo 合约编号
 
         【备注】
               返回Bool值，数据有效返回True，否则False
@@ -909,7 +930,7 @@ class BaseApi(object):
         【示例】
               无
         '''
-        return self._dataModel.getQuoteDataExist(symbol)
+        return self._dataModel.getQuoteDataExist(contractNo)
 
     #/////////////////////////策略交易/////////////////////////////
     def Buy(self, contractNo, share=0, price=0):
@@ -1039,16 +1060,16 @@ class BaseApi(object):
         return self._dataModel.setSellShort(contractNo, share, price)
         
     #/////////////////////////属性函数/////////////////////////////
-    def BarInterval(self, contNo):
+    def BarInterval(self, contractNo):
         '''
         【说明】
               合约图表周期数值
 
         【语法】
-              list BarInterval(string contNo)
+              list BarInterval(string contractNo)
 
         【参数】
-              contNo 合约编号，为空时取的时设置界面设置的周期数值
+              contractNo 合约编号，为空时取的时设置界面设置的周期数值
 
         【备注】
               返回周期数值列表，通常和BarType一起使用进行数据周期的判别
@@ -1059,9 +1080,9 @@ class BaseApi(object):
               当前数据周期为60分钟线，BarInterval等于60；
               当前数据周期为1TICK线，BarInterval等于1；br> 当前数据周期为5000量线，BarInterval等于5000。
         '''
-        return self._dataModel.getBarInterval(contNo)
+        return self._dataModel.getBarInterval(contractNo)
         
-    def BarType(self, contNo):
+    def BarType(self, contractNo):
         '''
         【说明】
               合约图表周期类型值
@@ -1070,7 +1091,7 @@ class BaseApi(object):
               int BarType()
 
         【参数】
-              contNo 合约编号，为空时取的时设置界面设置的周期数值
+              contractNo 合约编号，为空时取的时设置界面设置的周期数值
 
         【备注】
               返回值为整型，通常和BarInterval一起使用进行数据周期的判别
@@ -1092,18 +1113,18 @@ class BaseApi(object):
               当前数据周期为1TICK线，BarType等于1；
               当前数据周期为3秒线，BarType等于2。
         '''
-        return self._dataModel.getBarType(contNo)
+        return self._dataModel.getBarType(contractNo)
         
-    def BidAskSize(self, contNo):
+    def BidAskSize(self, contractNo):
         '''
         【说明】
               买卖盘个数
 
         【语法】
-              int BidAskSize(contNo)
+              int BidAskSize(contractNo)
 
         【参数】
-              contNo: 合约编号，为空时，取基准合约。
+              contractNo: 合约编号，为空时，取基准合约。
 
         【备注】
               返回整型
@@ -1112,18 +1133,18 @@ class BaseApi(object):
               郑商所白糖的买卖盘个数为5个，因此其BidAskSize等于5；
               郑商所棉花的买卖盘个数为1个，因此其BidAskSize等于1。 
         '''
-        return self._dataModel.getBidAskSize(contNo)
+        return self._dataModel.getBidAskSize(contractNo)
 
-    def CanTrade(self, contNo):
+    def CanTrade(self, contractNo):
         '''
         【说明】
               合约是否支持交易
 
         【语法】
-              Bool CanTrade(contNo)
+              Bool CanTrade(contractNo)
 
         【参数】
-              contNo: 合约编号，为空时，取基准合约。
+              contractNo: 合约编号，为空时，取基准合约。
 
         【备注】
               返回Bool值，支持返回True，否则返回False
@@ -1131,18 +1152,18 @@ class BaseApi(object):
         【示例】
               无 
         '''
-        return self._dataModel.getCanTrade(contNo)
+        return self._dataModel.getCanTrade(contractNo)
         
-    def ContractUnit(self, contNo):
+    def ContractUnit(self, contractNo):
         '''
         【说明】
               每张合约包含的基本单位数量, 即每手乘数
 
         【语法】
-              int ContractUnit(contNo)
+              int ContractUnit(contractNo)
 
         【参数】
-              contNo: 合约编号，为空时，取基准合约。
+              contractNo: 合约编号，为空时，取基准合约。
 
         【备注】
               返回整型，1张合约包含多少标底物。
@@ -1150,18 +1171,18 @@ class BaseApi(object):
         【示例】
               无 
         '''
-        return self._dataModel.getContractUnit(contNo)
+        return self._dataModel.getContractUnit(contractNo)
         
-    def ExchangeName(self, contNo):
+    def ExchangeName(self, contractNo):
         '''
         【说明】
               合约对应交易所名称
 
         【语法】
-              string ExchangeName(contNo)
+              string ExchangeName(contractNo)
 
         【参数】
-              contNo: 合约编号，为空时，取基准合约。
+              contractNo: 合约编号，为空时，取基准合约。
 
         【备注】
               返回字符串
@@ -1169,18 +1190,18 @@ class BaseApi(object):
         【示例】
               郑商所下各合约的交易所名称为："郑州商品交易所"
         '''
-        return self._dataModel.getExchangeName(contNo)
+        return self._dataModel.getExchangeName(contractNo)
         
-    def ExpiredDate(self, contNo):
+    def ExpiredDate(self, contractNo):
         '''
         【说明】
               合约最后交易日
 
         【语法】
-              string ExpiredDate(contNo)
+              string ExpiredDate(contractNo)
 
         【参数】
-              contNo: 合约编号，为空时，取基准合约。
+              contractNo: 合约编号，为空时，取基准合约。
 
         【备注】
               返回字符串
@@ -1190,16 +1211,16 @@ class BaseApi(object):
         '''
         return self._dataModel.getExpiredDate()
         
-    def GetSessionCount(self, contNo):
+    def GetSessionCount(self, contractNo):
         '''
         【说明】
               获取交易时间段的个数
 
         【语法】
-              int GetSessionCount(contNo)
+              int GetSessionCount(contractNo)
 
         【参数】
-              contNo: 合约编号，为空时，取基准合约。
+              contractNo: 合约编号，为空时，取基准合约。
 
         【备注】
               返回整型
@@ -1207,41 +1228,41 @@ class BaseApi(object):
         【示例】
               无
         '''
-        return self._dataModel.getGetSessionCount(contNo)
+        return self._dataModel.getGetSessionCount(contractNo)
 
-    def GetSessionEndTime(self, contNo, index):
+    def GetSessionEndTime(self, contractNo, index):
         '''
         【说明】
               获取指定交易时间段的结束时间。
 
         【语法】
-              float GetSessionEndTime(contNo, index)
+              float GetSessionEndTime(contractNo, index)
 
         【参数】
-              contNo 合约编号，为空时，取基准合约。
+              contractNo 合约编号，为空时，取基准合约。
               index 交易时间段的索引值, 从0开始。
 
         【备注】
               返回浮点数
 
         【示例】
-              contNo = "ZCE|F|SR|905"
-              sessionCount = GetSessionCount(contNo)
+              contractNo = "ZCE|F|SR|905"
+              sessionCount = GetSessionCount(contractNo)
               for i in range(0, sessionCount-1):
-                sessionEndTime = GetSessionEndTime(contNo, i)
+                sessionEndTime = GetSessionEndTime(contractNo, i)
         '''
-        return self._dataModel.getSessionEndTime(contNo, index)
+        return self._dataModel.getSessionEndTime(contractNo, index)
 
-    def GetSessionStartTime(self, contNo, index):
+    def GetSessionStartTime(self, contractNo, index):
         '''
         【说明】
               获取指定交易时间段的开始时间。
 
         【语法】
-              float GetSessionStartTime(contNo, index)
+              float GetSessionStartTime(contractNo, index)
 
         【参数】
-              contNo 合约编号，为空时，取基准合约。
+              contractNo 合约编号，为空时，取基准合约。
               index 交易时间段的索引值, 从0开始。
 
         【备注】
@@ -1250,9 +1271,9 @@ class BaseApi(object):
         【示例】
               无
         '''
-        return self._dataModel.getGetSessionStartTime(contNo, index)
+        return self._dataModel.getGetSessionStartTime(contractNo, index)
 
-    def MarginRatio(self, contNo):
+    def MarginRatio(self, contractNo):
         '''
         【说明】
               获取合约默认保证金比率
@@ -1261,7 +1282,7 @@ class BaseApi(object):
               float MarginRatio()
 
         【参数】
-              contNo 合约编号，为空时，取基准合约。
+              contractNo 合约编号，为空时，取基准合约。
 
         【备注】
               返回浮点数
@@ -1269,7 +1290,7 @@ class BaseApi(object):
         【示例】
               无
         '''
-        return self._dataModel.getMarginRatio(contNo)
+        return self._dataModel.getMarginRatio(contractNo)
         
     def MaxBarsBack(self):
         '''
@@ -1309,16 +1330,16 @@ class BaseApi(object):
         '''
         return self._dataModel.getMaxSingleTradeSize()
 
-    def PriceTick(self, contNo):
+    def PriceTick(self, contractNo):
         '''
         【说明】
               合约最小变动价
 
         【语法】
-              int PriceTick(contNo)
+              int PriceTick(contractNo)
 
         【参数】
-              contNo 合约编号，为空时，取基准合约。
+              contractNo 合约编号，为空时，取基准合约。
 
         【备注】
               无
@@ -1326,9 +1347,9 @@ class BaseApi(object):
         【示例】
               沪铝的最小变动价为5，因此其PriceTick等于5
         '''
-        return self._dataModel.getPriceTick(contNo)
+        return self._dataModel.getPriceTick(contractNo)
         
-    def OptionStyle(self, contNo):
+    def OptionStyle(self, contractNo):
         '''
         【说明】
               期权类型，欧式还是美式
@@ -1337,7 +1358,7 @@ class BaseApi(object):
               int OptionStyle()
 
         【参数】
-              contNo 合约编号，为空时，取基准合约。
+              contractNo 合约编号，为空时，取基准合约。
 
         【备注】
               返回整型，0为欧式，1为美式
@@ -1345,9 +1366,9 @@ class BaseApi(object):
         【示例】
               无
         '''
-        return self._dataModel.getOptionStyle(contNo)
+        return self._dataModel.getOptionStyle(contractNo)
         
-    def OptionType(self, contNo):
+    def OptionType(self, contractNo):
         '''
         【说明】
               返回期权的类型，是看涨还是看跌期权
@@ -1364,9 +1385,9 @@ class BaseApi(object):
         【示例】
               无
         '''
-        return self._dataModel.getOptionType(contNo)
+        return self._dataModel.getOptionType(contractNo)
         
-    def PriceScale(self, contNo):
+    def PriceScale(self, contractNo):
         '''
         【说明】
               合约价格精度
@@ -1383,7 +1404,7 @@ class BaseApi(object):
         【示例】
               上期沪金的报价精确到小数点2位，则PriceScale为1/100，PriceScale的返回值为0.01
         '''
-        return self._dataModel.getPriceScale(contNo)
+        return self._dataModel.getPriceScale(contractNo)
         
     def RelativeSymbol(self):
         '''
@@ -1459,7 +1480,7 @@ class BaseApi(object):
         '''
         return self._dataModel.getSymbol()
         
-    def SymbolName(self, contNo):
+    def SymbolName(self, contractNo):
         '''
         【说明】
               获取合约名称
@@ -1476,9 +1497,9 @@ class BaseApi(object):
         【示例】
               "ZCE|F|SR|001"的合约名称为"白糖001"
         '''
-        return self._dataModel.getSymbolName(contNo)
+        return self._dataModel.getSymbolName(contractNo)
         
-    def SymbolType(self, contNo):
+    def SymbolType(self, contractNo):
         '''
         【说明】
               获取合约所属的品种编号
@@ -1495,19 +1516,19 @@ class BaseApi(object):
         【示例】
               "ZCE|F|SR|001"的品种编号为"ZCE|F|SR"
         '''
-        return self._dataModel.getSymbolType(contNo)
+        return self._dataModel.getSymbolType(contractNo)
 
     # //////////////////////策略状态////////////////////
-    def AvgEntryPrice(self, contNo):
+    def AvgEntryPrice(self, contractNo):
         '''
         【说明】
               获得当前持仓指定合约的平均建仓价格。
 
         【语法】
-              float AvgEntryPrice(string contNo)
+              float AvgEntryPrice(string contractNo)
 
         【参数】
-              contNo 合约编号，默认为基准合约。
+              contractNo 合约编号，默认为基准合约。
 
         【备注】
               无
@@ -1515,18 +1536,18 @@ class BaseApi(object):
         【示例】
               无
         '''
-        return self._dataModel.getAvgEntryPrice(contNo)
+        return self._dataModel.getAvgEntryPrice(contractNo)
 
-    def BarsSinceEntry(self, contNo):
+    def BarsSinceEntry(self, contractNo):
         '''
         【说明】
               获得当前持仓中指定合约的第一个建仓位置到当前位置的Bar计数。
 
         【语法】
-              int BarsSinceEntry(string contNo)
+              int BarsSinceEntry(string contractNo)
 
         【参数】
-              contNo 合约编号，默认为基准合约。
+              contractNo 合约编号，默认为基准合约。
 
         【备注】
               获得当前持仓指定合约的第一个建仓位置到当前位置的Bar计数，返回值为整型。
@@ -1536,18 +1557,18 @@ class BaseApi(object):
         【示例】
               无
         '''
-        return self._dataModel.getBarsSinceEntry(contNo)
+        return self._dataModel.getBarsSinceEntry(contractNo)
 
-    def MarketPosition(self, contNo):
+    def MarketPosition(self, contractNo):
         '''
         【说明】
                获得当前持仓状态 。
 
         【语法】
-              int MarketPosition(string contNo)
+              int MarketPosition(string contractNo)
 
         【参数】
-              contNo 合约编号，默认为基准合约。
+              contractNo 合约编号，默认为基准合约。
 
         【备注】
               获得当前持仓状态，返回值为整型。
@@ -1560,7 +1581,7 @@ class BaseApi(object):
               if(MarketPosition("ZCE|F|SR|905")==1)判断合约ZCE|F|SR|905当前是否持多仓
               if(MarketPosition("ZCE|F|SR|905")!=0)判断合约ZCE|F|SR|905当前是否有持仓，无论持空仓或多仓
         '''
-        return self._dataModel.getMarketPosition(contNo)
+        return self._dataModel.getMarketPosition(contractNo)
 
     #////////////////////////////策略性能/////////////////
     def Available(self):
@@ -1582,16 +1603,16 @@ class BaseApi(object):
         '''
         return self._dataModel.getAvailable()
 
-    def FloatProfit(self, contNo):
+    def FloatProfit(self, contractNo):
         '''
         【说明】
               返回某个合约或者所有合约的浮动盈亏。
 
         【语法】
-              float FloatProfit(string contNo)
+              float FloatProfit(string contractNo)
 
         【参数】
-              contNo 合约编号，为空时返回所有合约的浮动盈亏。
+              contractNo 合约编号，为空时返回所有合约的浮动盈亏。
 
         【备注】
               无
@@ -1599,7 +1620,7 @@ class BaseApi(object):
         【示例】
               无
         '''
-        return self._dataModel.getFloatProfit(contNo)
+        return self._dataModel.getFloatProfit(contractNo)
 
     def GrossLoss(self):
         '''
@@ -1639,16 +1660,16 @@ class BaseApi(object):
         '''
         return self._dataModel.getGrossProfit()
 
-    def Margin(self, contNo):
+    def Margin(self, contractNo):
         '''
         【说明】
               返回某个合约或者所有合约的持仓保证金。
 
         【语法】
-              float Margin(string contNo)
+              float Margin(string contractNo)
 
         【参数】
-              contNo 合约编号，为空时返回所有合约的浮动盈亏。
+              contractNo 合约编号，为空时返回所有合约的浮动盈亏。
 
         【备注】
               无
@@ -1656,7 +1677,7 @@ class BaseApi(object):
         【示例】
               无
         '''
-        return self._dataModel.getMargin(contNo)
+        return self._dataModel.getMargin(contractNo)
 
     def NetProfit(self):
         '''
@@ -1987,16 +2008,16 @@ class BaseApi(object):
         '''
         return self._dataModel.getTotalFreeze()
 
-    def A_BuyAvgPrice(self, contNo):
+    def A_BuyAvgPrice(self, contractNo):
         '''
         【说明】
               返回当前公式应用的帐户下当前商品的买入持仓均价。
 
         【语法】
-              float A_BuyAvgPrice(string contNo)
+              float A_BuyAvgPrice(string contractNo)
 
         【参数】
-              contNo，指定商品的合约编号，为空时采用基准合约编号。
+              contractNo，指定商品的合约编号，为空时采用基准合约编号。
 
         【备注】
               返回当前公式应用的帐户下当前商品的买入持仓均价，返回值为浮点数。
@@ -2005,18 +2026,18 @@ class BaseApi(object):
         【示例】
               无
          '''
-        return self._dataModel.getBuyAvgPrice(contNo)
+        return self._dataModel.getBuyAvgPrice(contractNo)
 
-    def A_BuyPosition(self, contNo):
+    def A_BuyPosition(self, contractNo):
         '''
         【说明】
               返回当前公式应用的帐户下当前商品的买入持仓。
 
         【语法】
-              float A_BuyPosition(string contNo)
+              float A_BuyPosition(string contractNo)
 
         【参数】
-              contNo，指定商品的合约编号，为空时采用基准合约编号。
+              contractNo，指定商品的合约编号，为空时采用基准合约编号。
 
         【备注】
               返回当前公式应用的帐户下当前商品的买入持仓，返回值为浮点数。
@@ -2025,18 +2046,18 @@ class BaseApi(object):
         【示例】
               当前持多仓2手，A_BuyPosition返回2。
          '''
-        return self._dataModel.getBuyPosition(contNo)
+        return self._dataModel.getBuyPosition(contractNo)
 
-    def A_BuyProfitLoss(self, contNo):
+    def A_BuyProfitLoss(self, contractNo):
         '''
         【说明】
               返回当前公式应用的帐户下当前商品的买入持仓盈亏。
 
         【语法】
-              float A_BuyProfitLoss(string contNo)
+              float A_BuyProfitLoss(string contractNo)
 
         【参数】
-              contNo，指定商品的合约编号，为空时采用基准合约编号。
+              contractNo，指定商品的合约编号，为空时采用基准合约编号。
 
         【备注】
               返回当前公式应用的帐户下当前商品的买入持仓盈亏，返回值为浮点数。
@@ -2045,18 +2066,18 @@ class BaseApi(object):
         【示例】
               无
          '''
-        return self._dataModel.getBuyProfitLoss(contNo)
+        return self._dataModel.getBuyProfitLoss(contractNo)
 
-    def A_SellAvgPrice(self, contNo):
+    def A_SellAvgPrice(self, contractNo):
         '''
         【说明】
               返回当前公式应用的帐户下当前商品的卖出持仓均价。
 
         【语法】
-              float A_SellAvgPrice(string contNo)
+              float A_SellAvgPrice(string contractNo)
 
         【参数】
-              contNo，指定商品的合约编号，为空时采用基准合约编号。
+              contractNo，指定商品的合约编号，为空时采用基准合约编号。
 
         【备注】
               返回当前公式应用的帐户下当前商品的卖出持仓均价，返回值为浮点数。
@@ -2065,18 +2086,18 @@ class BaseApi(object):
         【示例】
               无
          '''
-        return self._dataModel.getSellAvgPrice(contNo)
+        return self._dataModel.getSellAvgPrice(contractNo)
 
-    def A_SellPosition(self, contNo):
+    def A_SellPosition(self, contractNo):
         '''
         【说明】
               返回当前公式应用的帐户下当前商品的卖出持仓。
 
         【语法】
-              float A_SellPosition(string contNo)
+              float A_SellPosition(string contractNo)
 
         【参数】
-              contNo，指定商品的合约编号，为空时采用基准合约编号。
+              contractNo，指定商品的合约编号，为空时采用基准合约编号。
 
         【备注】
               返回当前公式应用的帐户下当前商品的卖出持仓，返回值为浮点数。
@@ -2085,18 +2106,18 @@ class BaseApi(object):
         【示例】
               当前持空仓3手，A_SellPosition返回3。
          '''
-        return self._dataModel.getSellPosition(contNo)
+        return self._dataModel.getSellPosition(contractNo)
 
-    def A_SellProfitLoss(self, contNo):
+    def A_SellProfitLoss(self, contractNo):
         '''
         【说明】
               返回当前公式应用的帐户下当前商品的卖出持仓盈亏。
 
         【语法】
-              float A_SellProfitLoss(string contNo)
+              float A_SellProfitLoss(string contractNo)
 
         【参数】
-              contNo，指定商品的合约编号，为空时采用基准合约编号。
+              contractNo，指定商品的合约编号，为空时采用基准合约编号。
 
         【备注】
               返回当前公式应用的帐户下当前商品的卖出持仓盈亏，返回值为浮点数。
@@ -2105,18 +2126,18 @@ class BaseApi(object):
         【示例】
               无
          '''
-        return self._dataModel.getSellProfitLoss(contNo)
+        return self._dataModel.getSellProfitLoss(contractNo)
 
-    def A_TotalAvgPrice(self, contNo):
+    def A_TotalAvgPrice(self, contractNo):
         '''
         【说明】
               返回当前公式应用的帐户下当前商品的持仓均价。
 
         【语法】
-              float A_TotalAvgPrice(string contNo)
+              float A_TotalAvgPrice(string contractNo)
 
         【参数】
-              contNo，指定商品的合约编号，为空时采用基准合约编号。
+              contractNo，指定商品的合约编号，为空时采用基准合约编号。
 
         【备注】
               返回当前公式应用的帐户下当前商品的持仓均价，返回值为浮点数。
@@ -2125,18 +2146,18 @@ class BaseApi(object):
         【示例】
               无
          '''
-        return self._dataModel.getTotalAvgPrice(contNo)
+        return self._dataModel.getTotalAvgPrice(contractNo)
 
-    def A_TotalPosition(self, contNo):
+    def A_TotalPosition(self, contractNo):
         '''
         【说明】
               返回当前公式应用的帐户下当前商品的总持仓。
 
         【语法】
-              int A_TotalPosition(string contNo)
+              int A_TotalPosition(string contractNo)
 
         【参数】
-              contNo，指定商品的合约编号，为空时采用基准合约编号。
+              contractNo，指定商品的合约编号，为空时采用基准合约编号。
 
         【备注】
               返回当前公式应用的帐户下当前商品的总持仓，返回值为浮点数。
@@ -2146,18 +2167,18 @@ class BaseApi(object):
         【示例】
               无
          '''
-        return self._dataModel.getTotalPosition(contNo)
+        return self._dataModel.getTotalPosition(contractNo)
 
-    def A_TotalProfitLoss(self, contNo):
+    def A_TotalProfitLoss(self, contractNo):
         '''
         【说明】
               返回当前公式应用的帐户下当前商品的总持仓盈亏。
 
         【语法】
-              float A_TotalProfitLoss(string contNo)
+              float A_TotalProfitLoss(string contractNo)
 
         【参数】
-              contNo，指定商品的合约编号，为空时采用基准合约编号。
+              contractNo，指定商品的合约编号，为空时采用基准合约编号。
 
         【备注】
               返回当前公式应用的帐户下当前商品的总持仓盈亏，返回值为浮点数。
@@ -2166,18 +2187,18 @@ class BaseApi(object):
         【示例】
               无
          '''
-        return self._dataModel.getTotalProfitLoss(contNo)
+        return self._dataModel.getTotalProfitLoss(contractNo)
 
-    def A_TodayBuyPosition(self, contNo):
+    def A_TodayBuyPosition(self, contractNo):
         '''
         【说明】
               返回当前公式应用的帐户下当前商品的当日买入持仓。
 
         【语法】
-              float A_TodayBuyPosition(string contNo)
+              float A_TodayBuyPosition(string contractNo)
 
         【参数】
-              contNo，指定商品的合约编号，为空时采用基准合约编号。
+              contractNo，指定商品的合约编号，为空时采用基准合约编号。
 
         【备注】
               返回当前公式应用的帐户下当前商品的当日买入持仓，返回值为浮点数。
@@ -2186,18 +2207,18 @@ class BaseApi(object):
         【示例】
               无
          '''
-        return self._dataModel.getTodayBuyPosition(contNo)
+        return self._dataModel.getTodayBuyPosition(contractNo)
 
-    def A_TodaySellPosition(self, contNo):
+    def A_TodaySellPosition(self, contractNo):
         '''
         【说明】
               返回当前公式应用的帐户下当前商品的当日卖出持仓。
 
         【语法】
-              float A_TodaySellPosition(string contNo)
+              float A_TodaySellPosition(string contractNo)
 
         【参数】
-              contNo，指定商品的合约编号，为空时采用基准合约编号。
+              contractNo，指定商品的合约编号，为空时采用基准合约编号。
 
         【备注】
               返回当前公式应用的帐户下当前商品的当日卖出持仓，返回值为浮点数。
@@ -2206,7 +2227,7 @@ class BaseApi(object):
         【示例】
               无
          '''
-        return self._dataModel.getTodaySellPosition(contNo)
+        return self._dataModel.getTodaySellPosition(contractNo)
 
     def A_OrderBuyOrSell(self, eSession):
         '''
@@ -2405,17 +2426,17 @@ class BaseApi(object):
          '''
         return self._dataModel.getOrderTime(eSession)
 
-    def A_SendOrder(self, userNo, contNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty):
+    def A_SendOrder(self, userNo, contractNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty):
         '''
         【说明】A_SendOrder
               针对指定的帐户、商品发送委托单。
 
         【语法】
-              bool A_SendOrder(string userNo, string contNo, char orderType, char validType, char orderDirct, char entryOrExit, char hedge, float orderPrice, int orderQty)
+              bool A_SendOrder(string userNo, string contractNo, char orderType, char validType, char orderDirct, char entryOrExit, char hedge, float orderPrice, int orderQty)
 
         【参数】
               userNo 指定的账户名称，
-              contNo 商品合约编号，
+              contractNo 商品合约编号，
               orderType 订单类型，字符类型，可选值为：
                 '1' : 市价单
                 '2' : 限价单
@@ -2460,7 +2481,7 @@ class BaseApi(object):
         【示例】
               无
          '''
-        return self._dataModel.sendOrder(userNo, contNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty)
+        return self._dataModel.sendOrder(userNo, contractNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty)
 
     def A_DeleteOrder(self, eSession):
         '''
@@ -3054,13 +3075,13 @@ class BaseApi(object):
         '''
         return self._dataModel.getEnumPeriodDayX()
 
-    def Enum_Color_Red(self):
+    def RGB_Red(self):
         '''
         【说明】
              返回颜色类型红色的枚举值
 
         【语法】
-              int Enum_Color_Red()
+              int RGB_Red()
 
         【参数】
               无
@@ -3071,15 +3092,15 @@ class BaseApi(object):
         【示例】
               无
         '''
-        return self._dataModel.getEnumColorRed()
+        return self._dataModel.getRed()
 
-    def Enum_Color_Green(self):
+    def RGB_Green(self):
         '''
         【说明】
               返回颜色类型绿色的枚举值
 
         【语法】
-              int Enum_Color_Green()
+              int RGB_Green()
 
         【参数】
               无
@@ -3090,15 +3111,15 @@ class BaseApi(object):
         【示例】
               无
         '''
-        return self._dataModel.getEnumColorGreen()
+        return self._dataModel.getGreen()
 
-    def Enum_Color_Blue(self):
+    def RGB_Blue(self):
         '''
         【说明】
               返回颜色类型蓝色的枚举值
 
         【语法】
-              int Enum_Color_Blue()
+              int RGB_Blue()
 
         【参数】
               无
@@ -3109,15 +3130,15 @@ class BaseApi(object):
         【示例】
               无
         '''
-        return self._dataModel.getEnumColorBlue()
+        return self._dataModel.getBlue()
 
-    def Enum_Color_Purple(self):
+    def RGB_Purple(self):
         '''
         【说明】
               返回颜色类型紫色的枚举值
 
         【语法】
-              int Enum_Color_Purple()
+              int RGB_Purple()
 
         【参数】
               无
@@ -3128,15 +3149,15 @@ class BaseApi(object):
         【示例】
               无
         '''
-        return self._dataModel.getEnumColorPurple()
+        return self._dataModel.getPurple()
 
-    def Enum_Color_Gray(self):
+    def RGB_Gray(self):
         '''
         【说明】
               返回颜色类型灰色的枚举值
 
         【语法】
-              int Enum_Color_Gray()
+              int RGB_Gray()
 
         【参数】
               无
@@ -3147,15 +3168,15 @@ class BaseApi(object):
         【示例】
               无
         '''
-        return self._dataModel.getEnumColorGray()
+        return self._dataModel.getGray()
 
-    def Enum_Color_Brown(self):
+    def RGB_Brown(self):
         '''
         【说明】
               返回颜色类型褐色的枚举值
 
         【语法】
-              int Enum_Color_Brown()
+              int RGB_Brown()
 
         【参数】
               无
@@ -3166,7 +3187,7 @@ class BaseApi(object):
         【示例】
               无
         '''
-        return self._dataModel.getEnumColorBrown()
+        return self._dataModel.getBrown()
 
     def Enum_Order_Market(self):
         '''
@@ -3688,18 +3709,18 @@ class BaseApi(object):
         '''
         return self._dataModel.setUserNo(userNo)
 
-    def SetBarInterval(self, type, interval, contNo):
+    def SetBarInterval(self, type, interval, contractNo):
         '''
         【说明】
               设置指定合约的K线类型和K线周期
 
         【语法】
-              int SetBarInterval(char type, int interval, string contNo)
+              int SetBarInterval(char type, int interval, string contractNo)
 
         【参数】
               type K线类型 t分时，T分笔，S秒线，M分钟，H小时，D日线，W周线，m月线，Y年线
               interval K线周期
-              contNo 合约编号，默认为基础合约
+              contractNo 合约编号，默认为基础合约
 
         【备注】
               返回整型, 0成功，-1失败
@@ -3709,7 +3730,7 @@ class BaseApi(object):
               SetBarInterval('M', 3) 表示对基础合约使用3分钟线
               SetBarInterval('M', 3, 'ZCE|F|SR|906') 表示对合约ZCE|F|SR|906使用3分钟线
         '''
-        return self._dataModel.setBarInterval(type, interval, contNo)
+        return self._dataModel.setBarInterval(type, interval, contractNo)
 
     def SetSample(self, sampleType, sampleValue):
         '''
@@ -3758,18 +3779,18 @@ class BaseApi(object):
         '''
         return self._dataModel.setInitCapital(capital, userNo)
         
-    def SetMargin(self, type, value, contNo):
+    def SetMargin(self, type, value, contractNo):
         '''
         【说明】
               设置保证金参数，不设置取交易所公布参数
 
         【语法】
-              int SetMargin(float type, float value, string contNo)
+              int SetMargin(float type, float value, string contractNo)
 
         【参数】
               type 0：按比例收取保证金， 1：按定额收取保证金，
               value 按比例收取保证金时的比例， 或者按定额收取保证金时的额度，
-              contNo 合约编号，默认为基础合约。
+              contractNo 合约编号，默认为基础合约。
 
         【备注】
               返回整型，0成功，-1失败
@@ -3778,21 +3799,21 @@ class BaseApi(object):
               SetMargin(0, 0.08) 设置基础合约的保证金按比例收取8%
               SetMargin(1, 80000, 'ZCE|F|SR|906') 设置合约ZCE|F|SR|906的保证金按额度收取80000
         '''
-        return self._dataModel.setMargin(type, value, contNo)
+        return self._dataModel.setMargin(type, value, contractNo)
         
-    def SetTradeFee(self, type, feeType, feeValue, contNo):
+    def SetTradeFee(self, type, feeType, feeValue, contractNo):
         '''
         【说明】
               设置手续费收取方式，不设置取交易所公布参数
 
         【语法】
-              int SetTradeFee(string type, int feeType, float feeValue, string contNo)
+              int SetTradeFee(string type, int feeType, float feeValue, string contractNo)
 
         【参数】
               type 手续费类型，A-全部，O-开仓，C-平仓，T-平今
               feeType 手续费收取方式，1-按比例收取，2-按定额收取
               feeValue 按比例收取手续费时，feeValue为收取比例；按定额收取手续费时，feeValue为收取额度
-              contNo 合约编号，默认为基础合约
+              contractNo 合约编号，默认为基础合约
         【备注】
               返回整型，0成功，-1失败
 
@@ -3801,7 +3822,7 @@ class BaseApi(object):
               SetTradeFee('O', 1， 0.02) 设置基础合约的开仓手续费为每笔2%
               SetTradeFee('T', 2， 5, "ZCE|F|SR|906") 设置合约ZCE|F|SR|906的平今手续费为5元/手
         '''
-        return self._dataModel.setTradeFee(type, feeType, feeValue, contNo)
+        return self._dataModel.setTradeFee(type, feeType, feeValue, contractNo)
 
     def SetTriggerCont(self, contractNo):
         '''
@@ -3927,13 +3948,13 @@ class BaseApi(object):
         '''
         return self._dataModel.setMinTradeQuantity(tradeQty)
 
-    def SetHedge(self, hedge, contNo):
+    def SetHedge(self, hedge, contractNo):
         '''
         【说明】
              设置投保标志
 
         【语法】
-              int SetHedge(char hedge, string contNo)
+              int SetHedge(char hedge, string contractNo)
 
         【参数】
               hedge 投保标志
@@ -3941,7 +3962,7 @@ class BaseApi(object):
               B : 套保
               S : 套利
               M : 做市
-              contNo 合约编号，默认为基础合约
+              contractNo 合约编号，默认为基础合约
 
         【备注】
               返回整型，0成功，-1失败
@@ -3950,7 +3971,7 @@ class BaseApi(object):
               SetHedge('T') # 设置基础合约的投保标志为投机
               SetHedge('T', 'ZCE|F|SR|906') # 设置合约ZCE|F|SR|906的投保标志为投机
         '''
-        return self._dataModel.setHedge(hedge, contNo)
+        return self._dataModel.setHedge(hedge, contractNo)
 
     def SetSlippage(self, slippage):
         '''
@@ -4146,181 +4167,184 @@ baseApi = BaseApi()
 
 #////////////////////全局函数定义//////////////
 #K线函数
-def Date(contNo=''):
-    return baseApi.Date(contNo)
+def Date(contractNo=''):
+    return baseApi.Date(contractNo)
 
-def D(contNo=''):
-    return baseApi.Date(contNo)
+def D(contractNo=''):
+    return baseApi.Date(contractNo)
 
-def Time(contNo=''):
-    return baseApi.Time(contNo)
+def Time(contractNo=''):
+    return baseApi.Time(contractNo)
 
-def T(contNo=''):
-    return baseApi.Time(contNo)
+def T(contractNo=''):
+    return baseApi.Time(contractNo)
 
-def Open(symbol=''):
-    return baseApi.Open(symbol)
+def Open(contractNo=''):
+    return baseApi.Open(contractNo)
 
-def O(symbol=''):
-    return baseApi.Open(symbol)
+def O(contractNo=''):
+    return baseApi.Open(contractNo)
 
-def High(symbol=''):
-    return baseApi.High(symbol)
+def High(contractNo=''):
+    return baseApi.High(contractNo)
 
-def H(symbol=''):
-    return baseApi.High(symbol)
+def H(contractNo=''):
+    return baseApi.High(contractNo)
 
-def Low(symbol=''):
-    return baseApi.Low(symbol)
+def Low(contractNo=''):
+    return baseApi.Low(contractNo)
 
-def L(symbol=''):
-    return baseApi.Low(symbol)
+def L(contractNo=''):
+    return baseApi.Low(contractNo)
 
-def Close(symbol=''):
-    return baseApi.Close(symbol)
+def Close(contractNo=''):
+    return baseApi.Close(contractNo)
 
-def C(symbol=''):
-    return baseApi.Close(symbol)
+def C(contractNo=''):
+    return baseApi.Close(contractNo)
 
-def Vol(symbol=''):
-    return baseApi.Vol(symbol)
+def Vol(contractNo=''):
+    return baseApi.Vol(contractNo)
 
-def V(symbol=''):
-    return baseApi.Vol(symbol)
+def V(contractNo=''):
+    return baseApi.Vol(contractNo)
 
-def OpenInt(symbol=''):
-    return baseApi.OpenInt(symbol)
+def OpenInt(contractNo=''):
+    return baseApi.OpenInt(contractNo)
 
-def TradeDate(symbol=''):
-    return baseApi.TradeDate(symbol)
+def TradeDate(contractNo=''):
+    return baseApi.TradeDate(contractNo)
 
-def BarCount(contNo=''):
-    return baseApi.BarCount(contNo)
+def BarCount(contractNo=''):
+    return baseApi.BarCount(contractNo)
 
-def CurrentBar(contNo=''):
-    return baseApi.CurrentBar(contNo)
+def CurrentBar(contractNo=''):
+    return baseApi.CurrentBar(contractNo)
 
-def BarStatus(contNo=''):
-    return baseApi.BarStatus(contNo)
+def BarStatus(contractNo=''):
+    return baseApi.BarStatus(contractNo)
 
-def HistoryDataExist(contNo=''):
-    return baseApi.HistoryDataExist(contNo)
+def HistoryDataExist(contractNo=''):
+    return baseApi.HistoryDataExist(contractNo)
 
 #即时行情
-def Q_AskPrice(symbol='', level=1):
-    return baseApi.Q_AskPrice(symbol, level)
+def Q_UpdateTime(contractNo=''):
+    return baseApi.Q_UpdateTime(contractNo)
 
-def Q_AskPriceFlag(symbol=''):
-    return baseApi.Q_AskPriceFlag(symbol)
+def Q_AskPrice(contractNo='', level=1):
+    return baseApi.Q_AskPrice(contractNo, level)
 
-def Q_AskVol(symbol='', level=1):
-    return baseApi.Q_AskVol(symbol, level)
+def Q_AskPriceFlag(contractNo=''):
+    return baseApi.Q_AskPriceFlag(contractNo)
 
-def Q_AvgPrice(symbol=''):
-    return baseApi.Q_AvgPrice(symbol)
+def Q_AskVol(contractNo='', level=1):
+    return baseApi.Q_AskVol(contractNo, level)
 
-def Q_BidPrice(symbol='', level=1):
-    return baseApi.Q_BidPrice(symbol, level)
+def Q_AvgPrice(contractNo=''):
+    return baseApi.Q_AvgPrice(contractNo)
 
-def Q_BidPriceFlag(symbol=''):
-    return baseApi.Q_BidPriceFlag(symbol)
+def Q_BidPrice(contractNo='', level=1):
+    return baseApi.Q_BidPrice(contractNo, level)
 
-def Q_BidVol(symbol='', level=1):
-    return baseApi.Q_BidVol(symbol, level)
+def Q_BidPriceFlag(contractNo=''):
+    return baseApi.Q_BidPriceFlag(contractNo)
 
-def Q_Close(symbol=''):
-    return baseApi.Q_Close(symbol)
+def Q_BidVol(contractNo='', level=1):
+    return baseApi.Q_BidVol(contractNo, level)
 
-def Q_High(symbol=''):
-    return baseApi.Q_High(symbol)
+def Q_Close(contractNo=''):
+    return baseApi.Q_Close(contractNo)
 
-def Q_HisHigh(symbol=''):
-    return baseApi.Q_HisHigh(symbol)
+def Q_High(contractNo=''):
+    return baseApi.Q_High(contractNo)
 
-def Q_HisLow(symbol=''):
-    return baseApi.Q_HisLow(symbol)
+def Q_HisHigh(contractNo=''):
+    return baseApi.Q_HisHigh(contractNo)
 
-def Q_InsideVol(symbol=''):
-    return baseApi.Q_InsideVol(symbol)
+def Q_HisLow(contractNo=''):
+    return baseApi.Q_HisLow(contractNo)
 
-def Q_Last(symbol=''):
-    return baseApi.Q_Last(symbol)
+def Q_InsideVol(contractNo=''):
+    return baseApi.Q_InsideVol(contractNo)
 
-def Q_LastDate(symbol=''):
-    return baseApi.Q_LastDate(symbol)
+def Q_Last(contractNo=''):
+    return baseApi.Q_Last(contractNo)
 
-def Q_LastFlag(symbol=''):
-    return baseApi.Q_LastFlag(symbol)
+def Q_LastDate(contractNo=''):
+    return baseApi.Q_LastDate(contractNo)
 
-def Q_LastTime(symbol=''):
-    return baseApi.Q_LastTime(symbol)
+def Q_LastFlag(contractNo=''):
+    return baseApi.Q_LastFlag(contractNo)
 
-def Q_LastVol(symbol=''):
-    return baseApi.Q_LastVol(symbol)
+def Q_LastTime(contractNo=''):
+    return baseApi.Q_LastTime(contractNo)
 
-def Q_Low(symbol=''):
-    return baseApi.Q_Low(symbol)
+def Q_LastVol(contractNo=''):
+    return baseApi.Q_LastVol(contractNo)
 
-def Q_LowLimit(symbol=''):
-    return baseApi.Q_LowLimit(symbol)
+def Q_Low(contractNo=''):
+    return baseApi.Q_Low(contractNo)
 
-def Q_Open(symbol=''):
-    return baseApi.Q_Open(symbol)
+def Q_LowLimit(contractNo=''):
+    return baseApi.Q_LowLimit(contractNo)
 
-def Q_OpenInt(symbol=''):
-    return baseApi.Q_OpenInt(symbol)
+def Q_Open(contractNo=''):
+    return baseApi.Q_Open(contractNo)
 
-def Q_OpenIntFlag(symbol=''):
-    return baseApi.Q_OpenIntFlag(symbol)
+def Q_OpenInt(contractNo=''):
+    return baseApi.Q_OpenInt(contractNo)
 
-def Q_OutsideVol(symbol=''):
-    return baseApi.Q_OutsideVol(symbol)
+def Q_OpenIntFlag(contractNo=''):
+    return baseApi.Q_OpenIntFlag(contractNo)
 
-def Q_PreOpenInt(symbol=''):
-    return baseApi.Q_PreOpenInt(symbol)
+def Q_OutsideVol(contractNo=''):
+    return baseApi.Q_OutsideVol(contractNo)
 
-def Q_PreSettlePrice(symbol=''):
-    return baseApi.Q_PreSettlePrice(symbol)
+def Q_PreOpenInt(contractNo=''):
+    return baseApi.Q_PreOpenInt(contractNo)
 
-def Q_PriceChg(symbol=''):
-    return baseApi.Q_PriceChg(symbol)
+def Q_PreSettlePrice(contractNo=''):
+    return baseApi.Q_PreSettlePrice(contractNo)
 
-def Q_PriceChgRadio(symbol=''):
-    return baseApi.Q_PriceChgRadio(symbol)
+def Q_PriceChg(contractNo=''):
+    return baseApi.Q_PriceChg(contractNo)
 
-def Q_TodayEntryVol(symbol=''):
-    return baseApi.Q_TodayEntryVol(symbol)
+def Q_PriceChgRadio(contractNo=''):
+    return baseApi.Q_PriceChgRadio(contractNo)
 
-def Q_TodayExitVol(symbol=''):
-    return baseApi.Q_TodayExitVol(symbol)
+def Q_TodayEntryVol(contractNo=''):
+    return baseApi.Q_TodayEntryVol(contractNo)
 
-def Q_TotalVol(symbol=''):
-    return baseApi.Q_TotalVol(symbol)
+def Q_TodayExitVol(contractNo=''):
+    return baseApi.Q_TodayExitVol(contractNo)
 
-def Q_TurnOver(symbol=''):
-    return baseApi.Q_TurnOver(symbol)
+def Q_TotalVol(contractNo=''):
+    return baseApi.Q_TotalVol(contractNo)
 
-def Q_UpperLimit(symbol=''):
-    return baseApi.Q_UpperLimit(symbol)
+def Q_TurnOver(contractNo=''):
+    return baseApi.Q_TurnOver(contractNo)
 
-def QuoteDataExist(symbol=''):
-    return baseApi.QuoteDataExist(symbol)
+def Q_UpperLimit(contractNo=''):
+    return baseApi.Q_UpperLimit(contractNo)
+
+def QuoteDataExist(contractNo=''):
+    return baseApi.QuoteDataExist(contractNo)
 
 #策略状态
-def AvgEntryPrice(contNo=''):
-    return baseApi.AvgEntryPrice(contNo)
+def AvgEntryPrice(contractNo=''):
+    return baseApi.AvgEntryPrice(contractNo)
 
-def BarsSinceEntry(contNo=''):
-    return baseApi.BarsSinceEntry(contNo)
+def BarsSinceEntry(contractNo=''):
+    return baseApi.BarsSinceEntry(contractNo)
 
-def MarketPosition(contNo=''):
-    return baseApi.MarketPosition(contNo)
+def MarketPosition(contractNo=''):
+    return baseApi.MarketPosition(contractNo)
 # 策略性能
 def Available():
     return baseApi.Available()
 
-def FloatProfit(contNo=''):
-    return baseApi.FloatProfit(contNo)
+def FloatProfit(contractNo=''):
+    return baseApi.FloatProfit(contractNo)
 
 def GrossLoss():
     return baseApi.GrossLoss()
@@ -4328,8 +4352,8 @@ def GrossLoss():
 def GrossProfit():
     return baseApi.GrossProfit()
 
-def Margin(contNo=''):
-    return baseApi.Margin(contNo)
+def Margin(contractNo=''):
+    return baseApi.Margin(contractNo)
 
 def NetProfit():
     return baseApi.NetProfit()
@@ -4383,38 +4407,38 @@ def A_ProfitLoss():
 def A_TotalFreeze():
     return baseApi.A_TotalFreeze()
 
-def A_BuyAvgPrice(contNo=''):
-    return baseApi.A_BuyAvgPrice(contNo)
+def A_BuyAvgPrice(contractNo=''):
+    return baseApi.A_BuyAvgPrice(contractNo)
 
-def A_BuyPosition(contNo=''):
-    return baseApi.A_BuyPosition(contNo)
+def A_BuyPosition(contractNo=''):
+    return baseApi.A_BuyPosition(contractNo)
 
-def A_BuyProfitLoss(contNo=''):
-    return baseApi.A_BuyProfitLoss(contNo)
+def A_BuyProfitLoss(contractNo=''):
+    return baseApi.A_BuyProfitLoss(contractNo)
 
-def A_SellAvgPrice(contNo=''):
-    return baseApi.A_SellAvgPrice(contNo)
+def A_SellAvgPrice(contractNo=''):
+    return baseApi.A_SellAvgPrice(contractNo)
 
-def A_SellPosition(contNo=''):
-    return baseApi.A_SellPosition(contNo)
+def A_SellPosition(contractNo=''):
+    return baseApi.A_SellPosition(contractNo)
 
-def A_SellProfitLoss(contNo=''):
-    return baseApi.A_SellProfitLoss(contNo)
+def A_SellProfitLoss(contractNo=''):
+    return baseApi.A_SellProfitLoss(contractNo)
 
-def A_TotalAvgPrice(contNo=''):
-    return baseApi.A_TotalAvgPrice(contNo)
+def A_TotalAvgPrice(contractNo=''):
+    return baseApi.A_TotalAvgPrice(contractNo)
 
-def A_TotalPosition(contNo=''):
-    return baseApi.A_TotalPosition(contNo)
+def A_TotalPosition(contractNo=''):
+    return baseApi.A_TotalPosition(contractNo)
 
-def A_TotalProfitLoss(contNo=''):
-    return baseApi.A_TotalProfitLoss(contNo)
+def A_TotalProfitLoss(contractNo=''):
+    return baseApi.A_TotalProfitLoss(contractNo)
 
-def A_TodayBuyPosition(contNo=''):
-    return baseApi.A_TodayBuyPosition(contNo)
+def A_TodayBuyPosition(contractNo=''):
+    return baseApi.A_TodayBuyPosition(contractNo)
 
-def A_TodaySellPosition(contNo=''):
-    return baseApi.A_TodaySellPosition(contNo)
+def A_TodaySellPosition(contractNo=''):
+    return baseApi.A_TodaySellPosition(contractNo)
 
 def A_OrderBuyOrSell(eSession=''):
     return baseApi.A_OrderBuyOrSell(eSession)
@@ -4440,8 +4464,8 @@ def A_OrderStatus(eSession=''):
 def A_OrderTime(eSession=''):
     return baseApi.A_OrderTime(eSession)
 
-def A_SendOrder(userNo, contNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty):
-    return baseApi.A_SendOrder(userNo, contNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty)
+def A_SendOrder(userNo, contractNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty):
+    return baseApi.A_SendOrder(userNo, contractNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty)
 
 def A_DeleteOrder(eSession):
     return baseApi.A_DeleteOrder(eSession)
@@ -4550,23 +4574,23 @@ def Enum_Period_Year():
 def Enum_Period_DayX():
     return baseApi.Enum_Period_DayX()
 
-def Enum_Color_Red():
-    return baseApi.Enum_Color_Red()
+def RGB_Red():
+    return baseApi.RGB_Red()
 
-def Enum_Color_Green():
-    return baseApi.Enum_Color_Green()
+def RGB_Green():
+    return baseApi.RGB_Green()
 
-def Enum_Color_Blue():
-    return baseApi.Enum_Color_Blue()
+def RGB_Blue():
+    return baseApi.RGB_Blue()
 
-def Enum_Color_Purple():
-    return baseApi.Enum_Color_Purple()
+def RGB_Purple():
+    return baseApi.RGB_Purple()
 
-def Enum_Color_Gray():
-    return baseApi.Enum_Color_Gray()
+def RGB_Gray():
+    return baseApi.RGB_Gray()
 
-def Enum_Color_Brown():
-    return baseApi.Enum_Color_Brown()
+def RGB_Brown():
+    return baseApi.RGB_Brown()
 
 def Enum_Order_Market():
     return baseApi.Enum_Order_Market()
@@ -4653,8 +4677,8 @@ def SetBenchmark(*contractNo):
 def SetUserNo(userNo=''):
     return baseApi.SetUserNo(userNo)
 
-def SetBarInterval(barType, barInterval, contNo=''):
-    return baseApi.SetBarInterval(barType, barInterval, contNo)
+def SetBarInterval(barType, barInterval, contractNo=''):
+    return baseApi.SetBarInterval(barType, barInterval, contractNo)
 
 def SetSample(sampleType='C', sampleValue=2000):
     return baseApi.SetSample(sampleType, sampleValue)
@@ -4662,11 +4686,11 @@ def SetSample(sampleType='C', sampleValue=2000):
 def SetInitCapital(capital='', userNo=''):
     return baseApi.SetInitCapital(capital, userNo)
 
-def SetMargin(type, value=0, contNo=''):
-    return baseApi.SetMargin(type, value, contNo)
+def SetMargin(type, value=0, contractNo=''):
+    return baseApi.SetMargin(type, value, contractNo)
 
-def SetTradeFee(type, feeType, feeValue, contNo=''):
-    return baseApi.SetTradeFee(type, feeType, feeValue, contNo)
+def SetTradeFee(type, feeType, feeValue, contractNo=''):
+    return baseApi.SetTradeFee(type, feeType, feeValue, contractNo)
 
 # def SetTradeMode(inActual, useSample, useReal):
 # #     return baseApi.SetTradeMode(inActual, useSample, useReal)
@@ -4683,8 +4707,8 @@ def SetTradeDirection(tradeDirection):
 def SetMinTradeQuantity(tradeQty=1):
     return baseApi.SetMinTradeQuantity(tradeQty)
 
-def SetHedge(hedge, contNo=''):
-    return baseApi.SetHedge(hedge, contNo)
+def SetHedge(hedge, contractNo=''):
+    return baseApi.SetHedge(hedge, contractNo)
 
 def SetSlippage(slippage):
     return baseApi.SetSlippage(slippage)
@@ -4696,38 +4720,38 @@ def SetTriggerType(type, value):
     return baseApi.SetTriggerType(type, value)
 
 # 属性函数
-def BarInterval(contNo=''):
-    return baseApi.BarInterval(contNo)
+def BarInterval(contractNo=''):
+    return baseApi.BarInterval(contractNo)
 
-def BarType(contNo=''):
-    return baseApi.BarType(contNo)
+def BarType(contractNo=''):
+    return baseApi.BarType(contractNo)
 
-def BidAskSize(contNo=''):
-    return baseApi.BidAskSize(contNo)
+def BidAskSize(contractNo=''):
+    return baseApi.BidAskSize(contractNo)
 
-def CanTrade(contNo=''):
-    return baseApi.CanTrade(contNo)
+def CanTrade(contractNo=''):
+    return baseApi.CanTrade(contractNo)
 
-def ContractUnit(contNo=''):
-    return baseApi.ContractUnit(contNo)
+def ContractUnit(contractNo=''):
+    return baseApi.ContractUnit(contractNo)
 
-def ExchangeName(contNo=''):
-    return baseApi.ExchangeName(contNo)
+def ExchangeName(contractNo=''):
+    return baseApi.ExchangeName(contractNo)
 
-def ExpiredDate(contNo=''):
-    return baseApi.ExpiredDate(contNo)
+def ExpiredDate(contractNo=''):
+    return baseApi.ExpiredDate(contractNo)
 
-def GetSessionCount(contNo=''):
-    return baseApi.GetSessionCount(contNo)
+def GetSessionCount(contractNo=''):
+    return baseApi.GetSessionCount(contractNo)
 
-def GetSessionEndTime(contNo='', index=0):
-    return baseApi.GetSessionEndTime(contNo, index)
+def GetSessionEndTime(contractNo='', index=0):
+    return baseApi.GetSessionEndTime(contractNo, index)
 
-def GetSessionStartTime(contNo='', index=0):
-    return baseApi.GetSessionStartTime(contNo, index)
+def GetSessionStartTime(contractNo='', index=0):
+    return baseApi.GetSessionStartTime(contractNo, index)
 
-def MarginRatio(contNo=''):
-    return baseApi.MarginRatio(contNo)
+def MarginRatio(contractNo=''):
+    return baseApi.MarginRatio(contractNo)
 
 def MaxBarsBack():
     return baseApi.MaxBarsBack()
@@ -4735,17 +4759,17 @@ def MaxBarsBack():
 def MaxSingleTradeSize():
     return baseApi.MaxSingleTradeSize()
 
-def PriceTick(contNo=''):
-    return baseApi.PriceTick(contNo)
+def PriceTick(contractNo=''):
+    return baseApi.PriceTick(contractNo)
 
-def OptionStyle(contNo=''):
-    return baseApi.OptionStyle(contNo)
+def OptionStyle(contractNo=''):
+    return baseApi.OptionStyle(contractNo)
 
-def OptionType(contNo=''):
-    return baseApi.OptionType(contNo)
+def OptionType(contractNo=''):
+    return baseApi.OptionType(contractNo)
 
-def PriceScale(contNo=''):
-    return baseApi.PriceScale(contNo)
+def PriceScale(contractNo=''):
+    return baseApi.PriceScale(contractNo)
 
 def RelativeSymbol():
     return baseApi.RelativeSymbol()
@@ -4756,11 +4780,11 @@ def StrikePrice():
 def Symbol():
     return baseApi.Symbol()
 
-def SymbolName(contNo=''):
-    return baseApi.SymbolName(contNo)
+def SymbolName(contractNo=''):
+    return baseApi.SymbolName(contractNo)
 
-def SymbolType(contNo=''):
-    return baseApi.SymbolType(contNo)
+def SymbolType(contractNo=''):
+    return baseApi.SymbolType(contractNo)
 
 #其他函数
 def PlotNumeric(name, value, color=0xdd0000, main=True, axis=False, type=1, barsback=0):

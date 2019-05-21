@@ -182,6 +182,9 @@ class StrategyModel(object):
         return self._hisModel.getBarLow(symbol)
 
     # ////////////////////////即时行情////////////////////////////
+    def getQUpdateTime(self, symbol):
+        return self._qteModel.getQUpdateTime(symbol)
+
     def getQAskPrice(self, symbol, level):
         return self._qteModel.getQAskPrice(symbol, level)
 
@@ -832,22 +835,22 @@ class StrategyModel(object):
     def getEnumMarket(self):
         return hMarket
 
-    def getEnumColorRed(self):
+    def getRed(self):
         return 0xFF0000
 
-    def getEnumColorGreen(self):
+    def getGreen(self):
         return 0x00AA00
 
-    def getEnumColorBlue(self):
+    def getBlue(self):
         return 0x0000FF
 
-    def getEnumColorPurple(self):
+    def getPurple(self):
         return 0x9900FF
 
-    def getEnumColorGray(self):
+    def getGray(self):
         return 0x999999
 
-    def getEnumColorBrown(self):
+    def getBrown(self):
         return 0x996600
 
     #///////////////////////其他函数///////////////////////////
@@ -1992,7 +1995,7 @@ class StrategyHisQuote(object):
             return 0
 
         curBar = self._curBarDict[contNo].getCurBar()
-        return curBar['TradeDate']
+        return str(curBar['TradeDate'])
 
     def getBarCount(self, contNo):
         if contNo == '':
@@ -2062,7 +2065,7 @@ class StrategyHisQuote(object):
         if contNo not in self._curBarDict:
             return 0
         curBar = self._curBarDict[contNo].getCurBar()
-        return (curBar['DateTimeStamp']//1000000000)
+        return str(curBar['DateTimeStamp']//1000000000)
 
     def getBarTime(self, contNo):
         if contNo == '':
@@ -2071,7 +2074,8 @@ class StrategyHisQuote(object):
         if contNo not in self._curBarDict:
             return 0
         curBar = self._curBarDict[contNo].getCurBar()
-        return (curBar['DateTimeStamp']%1000000000)/1000000000
+        timeStamp = str(curBar['DateTimeStamp'])
+        return timeStamp[-9:]
 
     def getBarOpen(self, contNo):
         if contNo == '':
@@ -2826,6 +2830,12 @@ class StrategyQuote(QuoteModel):
                     return func(model, contNo, args[2])
             return validator
         return paramValidator
+
+    # 即时行情的更新时间
+    @paramValidatorFactory("")
+    def getQUpdateTime(self, contNo):
+        quoteDataModel = self._contractData[contNo]
+        return str(quoteDataModel._metaData['UpdateTime'])
 
     # 合约最新卖价
     @paramValidatorFactory(0)
