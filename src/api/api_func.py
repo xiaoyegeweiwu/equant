@@ -247,7 +247,7 @@ _all_func_ = {
                     ['SetMinTradeQuantity' , '设置最小下单量'],
                     ['SetHedge'            , '设置投保标志'],
                     ['SetSlippage'         , '设置滑点损耗'],
-                    # ['SetTriggerCont'      , '设置触发合约'],
+                    ['SetTriggerCont'      , '设置触发合约'],
                     ['SetTriggerType'      , '设置触发方式'],
                 ],
 
