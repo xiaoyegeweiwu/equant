@@ -539,10 +539,9 @@ class PyAPI(object):
             data = EEquKLineSeries()
             data.KLineIndex  = d['KLineIndex']
             data.Value       = d['Value']
-            data.ClrK        = d['ClrK']
-            data.ClrBar      = d['ClrBar']
-            data.Filled      = d['Filled'].encode()
-            data.BarValue    = d['BarValue']
+            data.KLineSeriesUnion._KLineSeriesStructure3.ClrBar      = d['ClrBar']
+            data.KLineSeriesUnion._KLineSeriesStructure3.Filled      = d['Filled'].encode()
+            data.KLineSeriesUnion._KLineSeriesStructure3.BarValue    = d['BarValue']
             curBuf = cbuf + sizeof(EEquKLineSeries) * i
             cData = string_at(addressof(data), sizeof(EEquKLineSeries))
             memmove(curBuf, cData, sizeof(EEquKLineSeries))
@@ -563,7 +562,7 @@ class PyAPI(object):
             data = EEquKLineSeries()
             data.KLineIndex  = d['KLineIndex']
             data.Value       = d['Value']
-            data.Icon        = d['Icon']
+            data.KLineSeriesUnion._KLineSeriesStructure1.Icon = d['Icon']
             curBuf = cbuf + sizeof(EEquKLineSeries) * i
             cData = string_at(addressof(data), sizeof(EEquKLineSeries))
             memmove(curBuf, cData, sizeof(EEquKLineSeries)) 
@@ -585,8 +584,8 @@ class PyAPI(object):
             data = EEquKLineSeries()
             data.KLineIndex  = d['KLineIndex']
             data.Value       = d['Value']
-            data.ClrStick    = d['ClrStick']
-            data.StickValue  = d['StickValue']
+            data.KLineSeriesUnion._KLineSeriesStructure2.ClrStick    = d['ClrStick']
+            data.KLineSeriesUnion._KLineSeriesStructure2.StickValue  = d['StickValue']
             curBuf = cbuf + sizeof(EEquKLineSeries) * i
             cData = string_at(addressof(data), sizeof(EEquKLineSeries))
             memmove(curBuf, cData, sizeof(EEquKLineSeries)) 
@@ -610,10 +609,10 @@ class PyAPI(object):
             data = EEquKLineSeries()
             data.KLineIndex  = d['KLineIndex']
             data.Value       = d['Value']
-            data.Idx2        = d['Idx2']
-            data.ClrLine     = d['ClrLine']
-            data.LineValue   = d['LineValue']
-            data.LinWid      = d['LinWid']
+            data.KLineSeriesUnion._KLineSeriesStructure4.Idx2        = d['Idx2']
+            data.KLineSeriesUnion._KLineSeriesStructure4.ClrLine     = d['ClrLine']
+            data.KLineSeriesUnion._KLineSeriesStructure4.LineValue   = d['LineValue']
+            data.KLineSeriesUnion._KLineSeriesStructure4.LinWid      = d['LinWid']
             curBuf = cbuf + sizeof(EEquKLineSeries) * i
             cData = string_at(addressof(data), sizeof(EEquKLineSeries))
             memmove(curBuf, cData, sizeof(EEquKLineSeries)) 

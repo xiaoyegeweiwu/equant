@@ -893,8 +893,9 @@ class StrategyModel(object):
         self._strategy.sendEvent2Engine(serialEvent)
         
     def setPlotIcon(self, value, icon, color, main, barsback):
+        curBar = self._hisModel.getCurBar()
         data = [{
-            'KLineIndex' : 0,
+            'KLineIndex' : curBar['KLineIndex'],
             'Value'      : value,
             'Icon'       : icon
         }]
