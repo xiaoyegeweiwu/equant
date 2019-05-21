@@ -893,6 +893,7 @@ class StrategyModel(object):
         self._strategy.sendEvent2Engine(serialEvent)
         
     def setPlotIcon(self, value, icon, color, main, barsback):
+        main = '0' if main else '1'
         curBar = self._hisModel.getCurBar()
         data = [{
             'KLineIndex' : curBar['KLineIndex'],
@@ -902,6 +903,9 @@ class StrategyModel(object):
         self._plotNumeric("ICON", value, color, main, EEQU_ISNOT_AXIS, EEQU_ICON, barsback, data)
     
     def setPlotNumeric(self, name, value, color, main, axis, type, barsback):
+        main = '0' if main else '1'
+        axis = '0' if axis else '1'
+        
         curBar = self._hisModel.getCurBar()
         data = [{
             'KLineIndex' : curBar['KLineIndex'],

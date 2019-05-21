@@ -4014,10 +4014,10 @@ class BaseApi(object):
             name  输出值的名称，不区分大小写；
             value 输出的数值；
             color 输出值的显示颜色，默认表示使用属性设置框中的颜色；
-            main  指标是否加载到主图，'0'-主图，'1'-幅图，默认主图
-            axis  指标是否使用独立坐标，'0'-独立坐标，'1'-非独立坐标，默认独立坐标
+            main  指标是否加载到主图，True-主图，False-幅图，默认主图
+            axis  指标是否使用独立坐标，True-独立坐标，False-非独立坐标，默认非独立坐标
             type  指标线性，0-竖直直线，1-指标线，2-柱子，3-竖线段，4-变色K线，5-线段，6-图标，7-点，8-位置格式
-            BarsBack 从当前Bar向前回溯的Bar数，默认值为当前Bar。
+            barsback 从当前Bar向前回溯的Bar数，默认值为当前Bar。
 
         【备注】
             在当前Bar输出一个数值，输出的值用于在上层调用模块显示。返回数值型，即输入的Number。
@@ -4034,13 +4034,15 @@ class BaseApi(object):
             在当前Bar输出一个图标
 
         【语法】
-            float PlotIcon(float Value,int Icon=0, int color, char main, int BarsBack=0)
+            float PlotIcon(float Value,int Icon, int color, char main, int barsback=0)
 
         【参数】
-            Value 输出的值
-            Icon 图标类型，0-默认图标，1-笑脸，2-哭脸，3-上箭头，4-下箭头，5-上箭头2, 6-下箭头2
+            value 输出的值
+            icon 图标类型，0-默认图标，1-笑脸，2-哭脸，3-上箭头，4-下箭头，5-上箭头2, 6-下箭头2
                            7-喇叭，8-加锁，9-解锁，10-货币+，11-货币-，12-加号，13-减号，14-叹号，15-叉号
-            BarsBack 从当前Bar向前回溯的Bar数，默认值为当前Bar。
+            color 输出值的显示颜色，默认表示使用属性设置框中的颜色；
+            main  指标是否加载到主图，True-主图，False-幅图，默认主图
+            barsback 从当前Bar向前回溯的Bar数，默认值为当前Bar。
 
         【备注】
             在当前Bar输出一个数值，输出的值用于在上层调用模块显示。返回数值型，即输入的Number。
@@ -4761,10 +4763,10 @@ def SymbolType(contNo=''):
     return baseApi.SymbolType(contNo)
 
 #其他函数
-def PlotNumeric(name, value, color=0xdd0000, main='0', axis='1', type=1, barsback=0):
+def PlotNumeric(name, value, color=0xdd0000, main=True, axis=False, type=1, barsback=0):
     return baseApi.PlotNumeric(name, value, color, main, axis, type, barsback)
     
-def PlotIcon(value, icon=0, color=0xdd0000, main='1', barsback=0):
+def PlotIcon(value, icon=0, color=0xdd0000, main=False, barsback=0):
     return baseApi.PlotIcon(value, icon, color, main, barsback) 
 
 def LogDebug(*args):
