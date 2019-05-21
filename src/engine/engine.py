@@ -436,7 +436,7 @@ class StrategyEngine(object):
     def _onApiKlinedata(self, apiEvent, code):
         self._hisModel.updateKline(apiEvent)
         strategyId = apiEvent.getStrategyId()
-        #策略号为0，认为是推送数据
+        # 策略号为0，认为是推送数据
         apiData = apiEvent.getData()
         data = apiData[:]
         event = Event({
@@ -448,17 +448,13 @@ class StrategyEngine(object):
             'KLineSlice' : apiEvent.getKLineSlice(),
             'Data'       : data
         })
-        
-        if strategyId > 0:
-            self._sendEvent2Strategy(strategyId, event)
-            return
-            
-        #推送数据，分发
-        contNo = apiEvent.getContractNo()
-        if contNo not in self._hisContStrategyDict:
+
+        # 推送数据，分发
+        key = (apiEvent.getContractNo(), apiEvent.getKLineType(), apiEvent.getKLineSlice())
+        if key not in self._hisContStrategyDict:
             return
 
-        stDict = self._hisContStrategyDict[contNo]
+        stDict = self._hisContStrategyDict[key]
         for key in stDict:
             event.setStrategyId(key)
             self._sendEvent2Strategy(key, event)
@@ -687,36 +683,24 @@ class StrategyEngine(object):
         
         strategyId = event.getStrategyId()
         data = event.getData()
-        contNo = data['ContractNo']
+        key = (data['ContractNo'], data['KLineType'], data['KLineSlice'])
 
-        if contNo not in self._hisContStrategyDict:
-            self._hisContStrategyDict[contNo] = {strategyId:None}
-        
-        stDict = self._hisContStrategyDict[contNo]  
-        if strategyId not in stDict:
-            stDict[strategyId] = None
-            
+        if key not in self._hisContStrategyDict:
+            self._hisContStrategyDict[key] = {}
+
+        self._hisContStrategyDict[key].update({strategyId:True})
         self._pyApi.reqSubHisquote(event)
-        
+
     def _reqUnsubHisquote(self, event):
         '''退订历史行情'''
         strategyId = event.getStrategyId()
         data = event.getData()
-        contNo = data['ContractNo']
-        
-        if contNo not in self._hisContStrategyDict:
-            return #该合约没有订阅
-        stDict = self._hisContStrategyDict[contNo]
 
-        if strategyId not in stDict:
-            return #该策略没有订阅
+        key = (data['ContractNo'], data['KLineType'], data['KLineSlice'])
+        if key not in self._hisContStrategyDict or strategyId not in self._hisContStrategyDict[key]:
+            return
+        stDict = self._hisContStrategyDict[key]
         stDict.pop(strategyId)
-        #已经没有人订阅了，退订吧
-        unSubList = []
-        if len(stDict) <= 0:
-            unSubList.append(contNo)
-        if len(unSubList) > 0:
-            self._pyApi.reqUnsubHisquote(event)
         
     def _reqKLineStrategySwitch(self, event):
         '''切换策略图'''
