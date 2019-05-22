@@ -197,12 +197,12 @@ _all_func_ = {
                     ['Enum_Period_Year'    , '周期类型_年线'],
                     ['Enum_Period_DayX'    , '周期类型_多日'],
 
-                    ['Enum_Color_Red'      , '颜色类型_红色'],
-                    ['Enum_Color_Green'    , '颜色类型_绿色'],
-                    ['Enum_Color_Blue'     , '颜色类型_蓝色'],
-                    ['Enum_Color_Purple'   , '颜色类型_紫色'],
-                    ['Enum_Color_Gray'     , '颜色类型_灰色'],
-                    ['Enum_Color_Brown'    , '颜色类型_褐色'],
+                    ['RGB_Red'      , '颜色类型_红色'],
+                    ['RGB_Green'    , '颜色类型_绿色'],
+                    ['RGB_Blue'     , '颜色类型_蓝色'],
+                    ['RGB_Purple'   , '颜色类型_紫色'],
+                    ['RGB_Gray'     , '颜色类型_灰色'],
+                    ['RGB_Brown'    , '颜色类型_褐色'],
 
                     ['Enum_Order_Market'   , '订单类型_市价单'],
                     ['Enum_Order_Limit'    , '订单类型_限价单'],
