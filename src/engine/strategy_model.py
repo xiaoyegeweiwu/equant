@@ -19,6 +19,8 @@ class StrategyModel(object):
         self._argsDict = strategy._argsDict
         
         self._strategyName = strategy.getStrategyName()
+        self._signalName = self._strategyName + "_Signal"
+        self._textName = self._strategyName + "_Text"
        
         self._plotedDict = {}
         
@@ -296,10 +298,10 @@ class StrategyModel(object):
         # 对于开仓，需要平掉反向持仓
         qty = self._calcCenter.needCover(userNo, contNo, dBuy, share, price)
         if qty > 0:
-            eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtNone, dBuy, oCover, hSpeculate, price, qty, curBar, 'BuyToCover', False)
+            eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtNone, dBuy, oCover, hSpeculate, price, qty, curBar, False)
             if eSessionId != "": self._strategy.updateBarInfoInLocalOrder(eSessionId, curBar)
             
-        eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtNone, dBuy, oOpen, hSpeculate, price, share, curBar, 'Buy')
+        eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtNone, dBuy, oOpen, hSpeculate, price, share, curBar)
         if eSessionId != "": self._strategy.updateBarInfoInLocalOrder(eSessionId, curBar)
 
 
@@ -310,7 +312,7 @@ class StrategyModel(object):
         # 交易计算、生成回测报告
         # 产生信号
         userNo = self._cfgModel.getUserNo() if self._cfgModel.isActualRun() else "Default"
-        eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtNone, dBuy, oCover, hSpeculate, price, share, curBar, 'BuyToCover')
+        eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtNone, dBuy, oCover, hSpeculate, price, share, curBar)
         if eSessionId != "": self._strategy.updateBarInfoInLocalOrder(eSessionId, curBar)
 
     def setSell(self, contractNo, share, price):
@@ -320,7 +322,7 @@ class StrategyModel(object):
         # 交易计算、生成回测报告
         # 产生信号
         userNo = self._cfgModel.getUserNo() if self._cfgModel.isActualRun() else "Default"
-        eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtNone, dSell, oCover, hSpeculate, price, share, curBar, 'Sell')
+        eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtNone, dSell, oCover, hSpeculate, price, share, curBar)
         if eSessionId != "": self._strategy.updateBarInfoInLocalOrder(eSessionId, curBar)
 
     def setSellShort(self, contractNo, share, price):
@@ -330,13 +332,13 @@ class StrategyModel(object):
         userNo = self._cfgModel.getUserNo() if self._cfgModel.isActualRun() else "Default"
         qty = self._calcCenter.needCover(userNo, contNo, dSell, share, price)
         if qty > 0:
-            eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtNone, dSell, oCover, hSpeculate, price, qty, curBar, 'Sell', False)
+            eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtNone, dSell, oCover, hSpeculate, price, qty, curBar, False)
             if eSessionId != "": self._strategy.updateBarInfoInLocalOrder(eSessionId, curBar)
 
         #交易计算、生成回测报告
         #产生信号
         userNo = self._cfgModel.getUserNo() if self._cfgModel.isActualRun() else "Default"
-        eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtNone, dSell, oOpen, hSpeculate, price, share, curBar, 'SellShort')
+        eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtNone, dSell, oOpen, hSpeculate, price, share, curBar)
         if eSessionId != "": self._strategy.updateBarInfoInLocalOrder(eSessionId, curBar)
 
     def sendFlushEvent(self):
@@ -552,7 +554,7 @@ class StrategyModel(object):
         return self._trdModel.deleteOrder(eSession)
         
     def buySellOrder(self, userNo, contNo, orderType, validType, orderDirct, \
-        entryOrExit, hedge, orderPrice, orderQty, curBar, singnalName, signal=True):
+        entryOrExit, hedge, orderPrice, orderQty, curBar, signal=True):
         '''
             1. buySell下单，经过calc模块，会判断虚拟资金，会产生平仓单
             2. 如果支持K线触发，会产生下单信号
@@ -594,7 +596,7 @@ class StrategyModel(object):
 
         # K线触发，发送信号
         if signal and kilneTrigger:
-            self.sendSignalEvent(singnalName, contNo, orderDirct, entryOrExit, orderPrice, orderQty, curBar)
+            self.sendSignalEvent(self._signalName, contNo, orderDirct, entryOrExit, orderPrice, orderQty, curBar)
         self._calcCenter.addOrder(orderParam)
         return self.sendOrder(userNo, contNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty)
         
@@ -1874,6 +1876,10 @@ class StrategyHisQuote(object):
         self._config = config
         self._calc = calc
         
+        self._strategyName = strategy.getStrategyName()
+        self._signalName = self._strategyName + "_Signal"
+        self._textName = self._strategyName + "_Text"
+        
         # 运行位置的数据
         # 和存储位置的数据不一样，存储的数据 >= 运行的数据。
         self._curBarDict = {}
@@ -2450,7 +2456,7 @@ class StrategyHisQuote(object):
             "EventCode"  :EV_ST2EG_ADD_KLINESIGNAL,
             'StrategyId' :self._strategy.getStrategyId(),
             "Data":{
-                'ItemName':'EquantSignal',
+                'ItemName': self._signalName,
                 'Type': EEQU_INDICATOR,
                 'Color': 0,
                 'Thick': 1,
