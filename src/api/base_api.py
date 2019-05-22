@@ -4074,6 +4074,49 @@ class BaseApi(object):
         '''
         return self._dataModel.setPlotIcon(value, icon, color, main, barsback)
         
+    def PlotText(self, value, text, color, main, barsback):
+        '''
+        【说明】
+            在当前Bar输出字符串
+
+        【语法】
+            void PlotText(stirng value, text, int color, char main, int barsback=0)
+
+        【参数】
+            value 输出的价格
+            text 输出的字符串，最多支持19个英文字符
+            color 输出值的显示颜色，默认表示使用属性设置框中的颜色；
+            main  指标是否加载到主图，True-主图，False-幅图，默认主图
+            barsback 从当前Bar向前回溯的Bar数，默认值为当前Bar。
+
+        【备注】
+            在当前Bar输出字符串，输出的值用于在上层调用模块显示。返回数值型，即输入的Number。
+
+        【示例】
+            例1：PlotText("ORDER");
+        '''
+        return self._dataModel.setPlotText(value, text, color, main, barsback)
+        
+    def UnPlotText(self, main, barsback):
+        '''
+        【说明】
+            在当前Bar取消输出的字符串
+
+        【语法】
+            void PlotUnText(int barsback=0)
+
+        【参数】
+            main  指标是否加载到主图，True-主图，False-幅图，默认主图
+            barsback 从当前Bar向前回溯的Bar数，默认值为当前Bar。
+
+        【备注】
+            在当前Bar取消字符串输出，输出的值用于在上层调用模块显示。返回数值型，即输入的Number。
+
+        【示例】
+            UnPlotText();
+        '''
+        return self._dataModel.setUnPlotText(main, barsback)
+        
     
     def LogDebug(self, args):
         '''
@@ -4792,6 +4835,12 @@ def PlotNumeric(name, value, color=0xdd0000, main=True, axis=False, type=1, bars
     
 def PlotIcon(value, icon=0, color=0xdd0000, main=False, barsback=0):
     return baseApi.PlotIcon(value, icon, color, main, barsback) 
+    
+def PlotText(value, text, color=0xdd0000, main=False, barsback=0):
+    return baseApi.PlotText(value, text, color, main, barsback) 
+    
+def UnPlotText(value, main=False, barsback=0):
+    return baseApi.UnPlotText(main, barsback) 
 
 def LogDebug(*args):
     return baseApi.LogDebug(args)

@@ -899,6 +899,28 @@ class StrategyModel(object):
         })
         self._strategy.sendEvent2Engine(serialEvent)
         
+    def setPlotText(self, value, text, color, main, barsback):
+        main = '0' if main else '1'
+        curBar = self._hisModel.getCurBar()
+        data = [{
+            'KLineIndex' : curBar['KLineIndex'],
+            'Value'      : value,
+            'Text'       : text
+        }]
+
+        self._plotNumeric(self._textName, value, color, main, EEQU_ISNOT_AXIS, EEQU_TEXT, barsback, data)
+        
+    def setUnPlotText(self, main, barsback):
+        main = '0' if main else '1'
+        curBar = self._hisModel.getCurBar()
+        data = [{
+            'KLineIndex' : curBar['KLineIndex'],
+            'Value'      : np.nan,
+            'Text'       : ""
+        }]
+
+        self._plotNumeric(self._textName, np.nan, 0, main, EEQU_ISNOT_AXIS, EEQU_TEXT, barsback, data)
+        
     def setPlotIcon(self, value, icon, color, main, barsback):
         main = '0' if main else '1'
         curBar = self._hisModel.getCurBar()

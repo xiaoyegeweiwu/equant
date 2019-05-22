@@ -296,6 +296,7 @@ EEQU_PARTLINE                    = 5				 #线段
 EEQU_ICON                        = 6				 #图标
 EEQU_DOT                         = 7				 #点
 EEQU_ANY                         = 8				 #位置格式
+EEQU_TEXT                        = 9;				 #文本
 
 
 EQU_ICON_NORMAL                  = 0;	             #正常表情
@@ -813,6 +814,13 @@ class EEquKLineSeriesStruct4(Structure):
         ('LineValue', c_double),
         ('LinWid', c_uint),
     ]
+    
+class EEquKLineSeriesStruct5(Structure):
+    """图标类型,点类型"""
+    _pack_ = 1
+    _fields_ = [
+        ('Text', c_char*20)
+    ]
 
 
 class EEquKLineSeriesUnion(Union):
@@ -824,7 +832,7 @@ class EEquKLineSeriesUnion(Union):
         ('_KLineSeriesStructure2', EEquKLineSeriesStruct2),
         ('_KLineSeriesStructure3', EEquKLineSeriesStruct3),
         ('_KLineSeriesStructure4', EEquKLineSeriesStruct4),
-
+        ('_KLineSeriesStructure5', EEquKLineSeriesStruct5),
     ]
 
 

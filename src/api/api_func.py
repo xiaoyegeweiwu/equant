@@ -255,6 +255,8 @@ _all_func_ = {
     '其他函数': [
                     ['PlotNumeric'          ,'绘制指标线'],
                     ['PlotIcon'             ,'绘制系统图标'],
+                    ['PlotText'             ,'绘制字符串'],
+                    ['UnPlotText'           ,'取消绘制的字符串'],
                     ['LogDebug'             ,'打印调试信息'],
                     ['LogInfo'              ,'打印普通信息'],
                     ['LogWarn'              ,'打印警告信息'],

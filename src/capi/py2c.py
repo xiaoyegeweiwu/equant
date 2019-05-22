@@ -566,6 +566,27 @@ class PyAPI(object):
             curBuf = cbuf + sizeof(EEquKLineSeries) * i
             cData = string_at(addressof(data), sizeof(EEquKLineSeries))
             memmove(curBuf, cData, sizeof(EEquKLineSeries)) 
+            
+    def _reqTextSeries(self, dataList, cbuf):
+        '''
+        功能：创建C语言类型的字符串
+        参数：
+            dataList[
+            {
+                'KLineIndex'  : value, int
+                'Value'       : value, float
+                'Text'        : value, string
+            }]
+        '''
+        
+        for i, d in enumerate(dataList):
+            data = EEquKLineSeries()
+            data.KLineIndex  = d['KLineIndex']
+            data.Value       = d['Value']
+            data.KLineSeriesUnion._KLineSeriesStructure5.Text = d['Text'].encode()
+            curBuf = cbuf + sizeof(EEquKLineSeries) * i
+            cData = string_at(addressof(data), sizeof(EEquKLineSeries))
+            memmove(curBuf, cData, sizeof(EEquKLineSeries)) 
      
     def _reqStickLineSeries(self, dataList, cbuf):
         '''
@@ -665,6 +686,8 @@ class PyAPI(object):
             self._reqDotSeries(data['Data'], cbuf)
         elif seriesType == EEQU_DOT:                        # 点
             self._reqDotSeries(data['Data'], cbuf)
+        elif seriesType == EEQU_TEXT:
+            self._reqTextSeries(data['Data'], cbuf)
         else:
             self._reqIndicatorSeries(data['Data'], cbuf)
 
