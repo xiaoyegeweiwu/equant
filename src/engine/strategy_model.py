@@ -856,7 +856,7 @@ class StrategyModel(object):
         return 0x996600
 
     #///////////////////////其他函数///////////////////////////
-    def _addSeries(self, name, value, color, main, axis, type, barsback):
+    def _addSeries(self, name, value, color, main, axis, type):
         addSeriesEvent = Event({
             "EventCode": EV_ST2EG_ADD_KLINESERIES,
             "StrategyId": self._strategy.getStrategyId(),
@@ -878,7 +878,7 @@ class StrategyModel(object):
         
     def _plotNumeric(self, name, value, color, main, axis, type, barsback, data):
         if name not in self._plotedDict:
-            self._addSeries(name, value, color, main, axis, type, barsback)
+            self._addSeries(name, value, color, main, axis, type)
             self._plotedDict[name] = (name, value, color, main, axis, type, barsback)
 
         
@@ -902,8 +902,15 @@ class StrategyModel(object):
     def setPlotText(self, value, text, color, main, barsback):
         main = '0' if main else '1'
         curBar = self._hisModel.getCurBar()
+        
+        klineIndex = curBar['KLineIndex'] - barsback
+        
+        if klineIndex <= 0:
+            self.logger.error("setUnPlotText barsback(%d/%d) error!"%(barsback, curBar['KLineIndex']))
+            return
+        
         data = [{
-            'KLineIndex' : curBar['KLineIndex'],
+            'KLineIndex' : klineIndex,
             'Value'      : value,
             'Text'       : text
         }]
@@ -913,8 +920,15 @@ class StrategyModel(object):
     def setUnPlotText(self, main, barsback):
         main = '0' if main else '1'
         curBar = self._hisModel.getCurBar()
+        
+        klineIndex = curBar['KLineIndex'] - barsback
+        
+        if klineIndex <= 0:
+            self.logger.error("setUnPlotText barsback(%d/%d) error!"%(barsback, curBar['KLineIndex']))
+            return
+        
         data = [{
-            'KLineIndex' : curBar['KLineIndex'],
+            'KLineIndex' : klineIndex,
             'Value'      : np.nan,
             'Text'       : ""
         }]
@@ -924,8 +938,14 @@ class StrategyModel(object):
     def setPlotIcon(self, value, icon, color, main, barsback):
         main = '0' if main else '1'
         curBar = self._hisModel.getCurBar()
+        klineIndex = curBar['KLineIndex'] - barsback
+        
+        if klineIndex <= 0:
+            self.logger.error("setPlotIcon barsback(%d/%d) error!"%(barsback, curBar['KLineIndex']))
+            return
+            
         data = [{
-            'KLineIndex' : curBar['KLineIndex'],
+            'KLineIndex' : klineIndex,
             'Value'      : value,
             'Icon'       : icon
         }]
@@ -937,8 +957,14 @@ class StrategyModel(object):
         axis = '0' if axis else '1'
         
         curBar = self._hisModel.getCurBar()
+        klineIndex = curBar['KLineIndex'] - barsback
+        
+        if klineIndex <= 0:
+            self.logger.error("setPlotNumeric barsback(%d/%d) error!"%(barsback, urBar['KLineIndex']))
+            return
+                   
         data = [{
-            'KLineIndex' : curBar['KLineIndex'],
+            'KLineIndex' : klineIndex,
             'Value'      : value
         }]
         self._plotNumeric(name, value, color, main, axis, type, barsback, data)

@@ -4836,7 +4836,7 @@ def PlotNumeric(name, value, color=0xdd0000, main=True, axis=False, type=1, bars
 def PlotIcon(value, icon=0, color=0xdd0000, main=False, barsback=0):
     return baseApi.PlotIcon(value, icon, color, main, barsback) 
     
-def PlotText(value, text, color=0xdd0000, main=False, barsback=0):
+def PlotText(value, text, color=0x999999, main=False, barsback=0):
     return baseApi.PlotText(value, text, color, main, barsback) 
     
 def UnPlotText(value, main=False, barsback=0):
