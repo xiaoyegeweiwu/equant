@@ -1117,6 +1117,41 @@ class StrategyModel(object):
         timeBucket = self._qteModel._commodityData[commodity]._metaData['TimeBucket']
         return timeBucket[2 * index]["BeginTime"] if 2 * index < len(timeBucket) else 0
 
+    def getNextTimeInfo(self, contNo, timeStr):
+        commodity = self.getCommodityInfoFromContNo(contNo)['CommodityCode']
+        if commodity not in self._qteModel._commodityData:
+            return {}
+
+        timeInt = self.convertTime(timeStr)
+        if timeInt < 0:
+            return {}
+
+        timeBucket = self._qteModel._commodityData[commodity]._metaData['TimeBucket']
+        if len(timeBucket) == 0:
+            return {}
+
+        timeList = []
+        for timeDict in timeBucket:
+            timeList.append((timeDict['BeginTime'], timeDict['TradeState']))
+        list.sort(timeList, key=lambda t: t[0])
+
+        for timeTuple in timeList:
+            if timeTuple[0] >= timeInt:
+                return {'Time' : timeTuple[0], 'TradeState' : timeTuple[1]}
+
+        return {'Time' : timeList[0][0], 'TradeState' : timeList[0][1]}
+
+    def convertTime(self, timeStr):
+        # to millisecond
+        timeList = timeStr.split(':')
+        if len(timeList) != 3:
+            return -1
+
+        timeInt = 0
+        for t in timeList:
+            timeInt = timeInt*100 + int(t)
+        return timeInt*1000
+
     def getMarginRatio(self, contNo):
         contractNo = contNo
         if not contNo:

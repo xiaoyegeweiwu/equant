@@ -75,6 +75,7 @@ _all_func_ = {
                     ['GetSessionCount'     , '交易时段个数'],
                     ['GetSessionEndTime'   , '交易时段结束时间'],
                     ['GetSessionStartTime' , '交易时段起始时间'],
+                    ['GetNextTimeInfo'     , '获取下一个时间点信息'],
                     ['MarginRatio'         , '保证金比例'],
                     ['MaxBarsBack'         , '最大回溯Bar数'],
                     ['MaxSingleTradeSize'  , '单笔交易限量'],

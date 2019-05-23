@@ -1273,6 +1273,47 @@ class BaseApi(object):
         '''
         return self._dataModel.getGetSessionStartTime(contractNo, index)
 
+    def GetNextTimeInfo(self, contractNo, timeStr):
+        '''
+        【说明】
+              获取指定合约指定时间点的下一个时间点及交易状态。
+
+        【语法】
+              dict GetNextTimeInfo(contractNo, timeStr)
+
+        【参数】
+              contractNo 合约编号，为空时，取基准合约。
+              timeStr 指定的时间点，格式为HH:MM:SS。
+
+        【备注】
+              返回时间字典，结构如下：
+              {
+                'Time' : 210000000,
+                'TradeState' : 3
+              }
+              其中Time对应的值210000000表示指定时间timeStr的下一个时间点，格式化时间为21:00:00.000
+              TradeState表示对应时间点的交易状态，数据类型为字符串，可能出现的值及相应的状态含义如下：
+                1 : 集合竞价
+                2 : 集合竞价撮合
+                3 : 连续交易
+                4 : 暂停
+                5 : 闭市
+                6 : 闭市处理时间
+                0 : 交易日切换时间
+                N : 未知状态
+                I : 正初始化
+                R : 准备就绪
+              异常情况返回为空字典：{}
+
+        【示例】
+              GetNextTimeInfo('SHFE|F|CU|1907', '22:00:00') # 获取22:00:00后下一个时间点的时间和交易状态
+              获取当前时间下一个时间点的时间和交易状态
+              import time # 需要在策略头部添加time库
+              curTime = time.strftime('%H:%M:%S',time.localtime(time.time()))
+              timeInfoDict = GetNextTimeInfo("SHFE|F|CU|1907", curTime)
+        '''
+        return self._dataModel.getNextTimeInfo(contractNo, timeStr)
+
     def MarginRatio(self, contractNo):
         '''
         【说明】
@@ -4792,6 +4833,9 @@ def GetSessionEndTime(contractNo='', index=0):
 
 def GetSessionStartTime(contractNo='', index=0):
     return baseApi.GetSessionStartTime(contractNo, index)
+
+def GetNextTimeInfo(contractNo, timeStr):
+    return baseApi.GetNextTimeInfo(contractNo, timeStr)
 
 def MarginRatio(contractNo=''):
     return baseApi.MarginRatio(contractNo)
