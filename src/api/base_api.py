@@ -4071,7 +4071,7 @@ class BaseApi(object):
             在当前Bar输出一个数值
 
         【语法】
-            float PlotNumeric(string name,float value,int color,char main, char axis, int type, int barsback=0)
+            float PlotNumeric(string name,float value,int color,bool main, char axis, int type, int barsback=0)
 
         【参数】
             name  输出值的名称，不区分大小写；
@@ -4097,7 +4097,7 @@ class BaseApi(object):
             在当前Bar输出一个图标
 
         【语法】
-            float PlotIcon(float Value,int Icon, int color, char main, int barsback=0)
+            float PlotIcon(float Value,int Icon, int color, bool main, int barsback=0)
 
         【参数】
             value 输出的值
@@ -4122,7 +4122,7 @@ class BaseApi(object):
             在当前Bar输出字符串
 
         【语法】
-            void PlotText(stirng value, text, int color, char main, int barsback=0)
+            void PlotText(stirng value, text, int color, bool main, int barsback=0)
 
         【参数】
             value 输出的价格
@@ -4145,7 +4145,7 @@ class BaseApi(object):
             在当前Bar取消输出的字符串
 
         【语法】
-            void PlotUnText(int barsback=0)
+            void PlotUnText(bool main, int barsback=0)
 
         【参数】
             main  指标是否加载到主图，True-主图，False-幅图，默认主图
