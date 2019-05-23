@@ -2270,16 +2270,16 @@ class BaseApi(object):
          '''
         return self._dataModel.getTodaySellPosition(contractNo)
 
-    def A_OrderBuyOrSell(self, eSession):
+    def A_OrderBuyOrSell(self, orderId):
         '''
         【说明】
               返回当前公式应用的帐户下当前商品的某个委托单的买卖类型。
 
         【语法】
-              char A_OrderBuyOrSell(string eSession)
+              char A_OrderBuyOrSell(string orderId)
 
         【参数】
-              eSession 使用A_SendOrder返回的下单编号。
+              orderId 使用A_SendOrder返回的下单编号。
 
         【备注】
               返回当前公式应用的帐户下当前商品的某个委托单的买卖类型，返回值为：
@@ -2294,18 +2294,18 @@ class BaseApi(object):
               if nBorS == Enum_Buy():
                 ...
          '''
-        return self._dataModel.getOrderBuyOrSell(eSession)
+        return self._dataModel.getOrderBuyOrSell(orderId)
 
-    def A_OrderEntryOrExit(self, eSession):
+    def A_OrderEntryOrExit(self, orderId):
         '''
         【说明】
               返回当前公式应用的帐户下当前商品的某个委托单的开平仓状态。
 
         【语法】
-              char A_OrderEntryOrExit(string eSession)
+              char A_OrderEntryOrExit(string orderId)
 
         【参数】
-              eSession 使用A_SendOrder返回的下单编号。
+              orderId 使用A_SendOrder返回的下单编号。
 
         【备注】
               返回当前公式应用的帐户下当前商品的某个委托单的开平仓状态，返回值：
@@ -2323,18 +2323,18 @@ class BaseApi(object):
               if orderFlag == Enum_Exit():
                 ...
          '''
-        return self._dataModel.getOrderEntryOrExit(eSession)
+        return self._dataModel.getOrderEntryOrExit(orderId)
 
-    def A_OrderFilledLot(self, eSession):
+    def A_OrderFilledLot(self, orderId):
         '''
         【说明】
               返回当前公式应用的帐户下当前商品的某个委托单的成交数量。
 
         【语法】
-              float A_OrderFilledLot(string eSession)
+              float A_OrderFilledLot(string orderId)
 
         【参数】
-              eSession 使用A_SendOrder返回的下单编号。
+              orderId 使用A_SendOrder返回的下单编号。
 
         【备注】
               返回当前公式应用的帐户下当前商品的某个委托单的成交数量，返回值为浮点数。
@@ -2343,18 +2343,18 @@ class BaseApi(object):
         【示例】
               无
          '''
-        return self._dataModel.getOrderFilledLot(eSession)
+        return self._dataModel.getOrderFilledLot(orderId)
 
-    def A_OrderFilledPrice(self, eSession):
+    def A_OrderFilledPrice(self, orderId):
         '''
         【说明】
               返回当前公式应用的帐户下当前商品的某个委托单的成交价格。
 
         【语法】
-              float A_OrderFilledPrice(string eSession)
+              float A_OrderFilledPrice(string orderId)
 
         【参数】
-              eSession 使用A_SendOrder返回的下单编号。
+              orderId 使用A_SendOrder返回的下单编号。
 
         【备注】
               返回当前公式应用的帐户下当前商品的某个委托单的成交价格，返回值为浮点数。
@@ -2364,18 +2364,18 @@ class BaseApi(object):
         【示例】
               无
          '''
-        return self._dataModel.getOrderFilledPrice(eSession)
+        return self._dataModel.getOrderFilledPrice(orderId)
 
-    def A_OrderLot(self, eSession):
+    def A_OrderLot(self, orderId):
         '''
         【说明】
               返回当前公式应用的帐户下当前商品的某个委托单的委托数量。
 
         【语法】
-              float A_OrderLot(string eSession)
+              float A_OrderLot(string orderId)
 
         【参数】
-              eSession 使用A_SendOrder返回的下单编号。
+              orderId 使用A_SendOrder返回的下单编号。
 
         【备注】
               返回当前公式应用的帐户下当前商品的某个委托单的委托数量，返回值为浮点数。
@@ -2384,18 +2384,18 @@ class BaseApi(object):
         【示例】
               无
          '''
-        return self._dataModel.getOrderLot(eSession)
+        return self._dataModel.getOrderLot(orderId)
 
-    def A_OrderPrice(self, eSession):
+    def A_OrderPrice(self, orderId):
         '''
         【说明】
               返回当前公式应用的帐户下当前商品的某个委托单的委托价格。
 
         【语法】
-              float A_OrderPrice(string eSession)
+              float A_OrderPrice(string orderId)
 
         【参数】
-              eSession 使用A_SendOrder返回的下单编号。
+              orderId 使用A_SendOrder返回的下单编号。
 
         【备注】
               返回当前公式应用的帐户下当前商品的某个委托单的委托价格，返回值为浮点数。
@@ -2404,18 +2404,18 @@ class BaseApi(object):
         【示例】
               无
          '''
-        return self._dataModel.getOrderPrice(eSession)
+        return self._dataModel.getOrderPrice(orderId)
 
-    def A_OrderStatus(self, eSession):
+    def A_OrderStatus(self, orderId):
         '''
         【说明】
               返回当前公式应用的帐户下当前商品的某个委托单的状态。
 
         【语法】
-              char A_OrderStatus(string eSession)
+              char A_OrderStatus(string orderId)
 
         【参数】
-              eSession 使用A_SendOrder返回的下单编号。
+              orderId 使用A_SendOrder返回的下单编号。
 
         【备注】
               返回当前公式应用的帐户下当前商品的某个委托单的状态，返回值：
@@ -2445,18 +2445,18 @@ class BaseApi(object):
         【示例】
               无
          '''
-        return self._dataModel.getOrderStatus(eSession)
+        return self._dataModel.getOrderStatus(orderId)
 
-    def A_OrderTime(self, eSession):
+    def A_OrderTime(self, orderId):
         '''
         【说明】
               返回当前公式应用的帐户下当前商品的某个委托单的委托时间。
 
         【语法】
-              struct_time A_OrderTime(string eSession)
+              struct_time A_OrderTime(string orderId)
 
         【参数】
-              eSession 使用A_SendOrder返回的下单编号。
+              orderId 使用A_SendOrder返回的下单编号。
 
         【备注】
               返回当前公式应用的帐户下当前商品的某个委托单的委托时间，返回值为格式化的时间。
@@ -2465,7 +2465,7 @@ class BaseApi(object):
         【示例】
               无
          '''
-        return self._dataModel.getOrderTime(eSession)
+        return self._dataModel.getOrderTime(orderId)
 
     def A_SendOrder(self, userNo, contractNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty):
         '''
@@ -2515,7 +2515,8 @@ class BaseApi(object):
               orderQty 委托单的交易数量。
 
         【备注】
-              针对当前公式指定的帐户、商品发送委托单，发送成功返回如"1-1"的下单编号，发送失败返回-1。
+              针对当前公式指定的帐户、商品发送委托单，发送成功返回如"1-2"的下单编号，发送失败返回空字符串""。
+              其中发送成功时返回的下单编号组成规则为：策略id-该策略中发送委托单的次数，所以下单编号"1-2"表示在策略id为1的策略中的第2次发送委托单返回的下单编号。
               该函数直接发单，不经过任何确认，并会在每次公式计算时发送，一般需要配合着仓位头寸进行条件处理，在不清楚运行机制的情况下，请慎用。
               注：不能使用于历史测试，仅适用于实时行情交易。
 
@@ -2524,16 +2525,16 @@ class BaseApi(object):
          '''
         return self._dataModel.sendOrder(userNo, contractNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty)
 
-    def A_DeleteOrder(self, eSession):
+    def A_DeleteOrder(self, orderId):
         '''
         【说明】
               针对当前公式应用的帐户、商品发送撤单指令。
 
         【语法】
-              bool A_DeleteOrder(string eSession)
+              bool A_DeleteOrder(string orderId)
 
         【参数】
-              eSession 使用A_SendOrder返回的下单编号，为空时使用当日最后成交的委托编号作为查询依据。
+              orderId 使用A_SendOrder返回的下单编号，为空时使用当日最后成交的委托编号作为查询依据。
 
         【备注】
               针对当前公式应用的帐户、商品发送撤单指令，发送成功返回True, 发送失败返回False。
@@ -2543,7 +2544,7 @@ class BaseApi(object):
         【示例】
               无
          '''
-        return self._dataModel.deleteOrder(eSession)
+        return self._dataModel.deleteOrder(orderId)
         
     #/////////////////////////////枚举函数/////////////////
     def Enum_Buy(self):
@@ -4524,35 +4525,35 @@ def A_TodayBuyPosition(contractNo=''):
 def A_TodaySellPosition(contractNo=''):
     return baseApi.A_TodaySellPosition(contractNo)
 
-def A_OrderBuyOrSell(eSession=''):
-    return baseApi.A_OrderBuyOrSell(eSession)
+def A_OrderBuyOrSell(orderId=''):
+    return baseApi.A_OrderBuyOrSell(orderId)
 
-def A_OrderEntryOrExit(eSession=''):
-    return baseApi.A_OrderEntryOrExit(eSession)
+def A_OrderEntryOrExit(orderId=''):
+    return baseApi.A_OrderEntryOrExit(orderId)
 
-def A_OrderFilledLot(eSession=''):
-    return baseApi.A_OrderFilledLot(eSession)
+def A_OrderFilledLot(orderId=''):
+    return baseApi.A_OrderFilledLot(orderId)
 
-def A_OrderFilledPrice(eSession=''):
-    return baseApi.A_OrderFilledPrice(eSession)
+def A_OrderFilledPrice(orderId=''):
+    return baseApi.A_OrderFilledPrice(orderId)
 
-def A_OrderLot(eSession=''):
-    return baseApi.A_OrderLot(eSession)
+def A_OrderLot(orderId=''):
+    return baseApi.A_OrderLot(orderId)
 
-def A_OrderPrice(eSession=''):
-    return baseApi.A_OrderPrice(eSession)
+def A_OrderPrice(orderId=''):
+    return baseApi.A_OrderPrice(orderId)
 
-def A_OrderStatus(eSession=''):
-    return baseApi.A_OrderStatus(eSession)
+def A_OrderStatus(orderId=''):
+    return baseApi.A_OrderStatus(orderId)
 
-def A_OrderTime(eSession=''):
-    return baseApi.A_OrderTime(eSession)
+def A_OrderTime(orderId=''):
+    return baseApi.A_OrderTime(orderId)
 
 def A_SendOrder(userNo, contractNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty):
     return baseApi.A_SendOrder(userNo, contractNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty)
 
-def A_DeleteOrder(eSession):
-    return baseApi.A_DeleteOrder(eSession)
+def A_DeleteOrder(orderId):
+    return baseApi.A_DeleteOrder(orderId)
 
 #策略交易
 def Buy(share=0, price=0, contractNo=None):

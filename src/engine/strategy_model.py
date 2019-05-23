@@ -608,7 +608,7 @@ class StrategyModel(object):
             return ""
             
         if not self._strategy.isRealTimeStatus():
-            return
+            return ""
                
         # 账户错误
         if not userNo or userNo == 'Default':
@@ -1097,7 +1097,7 @@ class StrategyModel(object):
         sessionCount = 0
         timeBucket = self._qteModel._commodityData[commodity]._metaData['TimeBucket']
         for data in timeBucket:
-            if data['TradeState'] == EEQU_TRADESTATE_CONTINUOUS:
+            if data['TradeState'] == EEQU_TRADESTATE_BID or data['TradeState'] == EEQU_TRADESTATE_CONTINUOUS:
                 sessionCount += 1
         return sessionCount
 
