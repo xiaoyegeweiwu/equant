@@ -901,12 +901,9 @@ class StrategyModel(object):
         
     def setPlotText(self, value, text, color, main, barsback):
         main = '0' if main else '1'
-        curBar = self._hisModel.getCurBar()
-        
+        curBar = self._hisModel.getCurBar()  
         klineIndex = curBar['KLineIndex'] - barsback
-        
         if klineIndex <= 0:
-            self.logger.error("setUnPlotText barsback(%d/%d) error!"%(barsback, curBar['KLineIndex']))
             return
         
         data = [{
@@ -922,9 +919,7 @@ class StrategyModel(object):
         curBar = self._hisModel.getCurBar()
         
         klineIndex = curBar['KLineIndex'] - barsback
-        
         if klineIndex <= 0:
-            self.logger.error("setUnPlotText barsback(%d/%d) error!"%(barsback, curBar['KLineIndex']))
             return
         
         data = [{
@@ -941,7 +936,6 @@ class StrategyModel(object):
         klineIndex = curBar['KLineIndex'] - barsback
         
         if klineIndex <= 0:
-            self.logger.error("setPlotIcon barsback(%d/%d) error!"%(barsback, curBar['KLineIndex']))
             return
             
         data = [{
@@ -960,7 +954,6 @@ class StrategyModel(object):
         klineIndex = curBar['KLineIndex'] - barsback
         
         if klineIndex <= 0:
-            self.logger.error("setPlotNumeric barsback(%d/%d) error!"%(barsback, urBar['KLineIndex']))
             return
                    
         data = [{

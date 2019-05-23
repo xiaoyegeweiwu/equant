@@ -4884,7 +4884,7 @@ def PlotIcon(value, icon=0, color=0xdd0000, main=False, barsback=0):
 def PlotText(value, text, color=0x999999, main=False, barsback=0):
     return baseApi.PlotText(value, text, color, main, barsback) 
     
-def UnPlotText(value, main=False, barsback=0):
+def UnPlotText(main=False, barsback=0):
     return baseApi.UnPlotText(main, barsback) 
 
 def LogDebug(*args):
