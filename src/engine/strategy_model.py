@@ -1938,6 +1938,9 @@ class BarInfo(object):
         
     def getBarLow(self):
         return self._getBarValue('LowPrice')
+
+    def getBarTime(self):
+        return self._getBarValue('DateTimeStamp')
         
 class StrategyHisQuote(object):
     '''
@@ -2260,12 +2263,12 @@ class StrategyHisQuote(object):
             BarDataWeighted : self.getBarWeighted,
             BarDataVol      : self.getBarVol,
             BarDataOpi      : self.getBarOpenInt,
-            BarDataTime     : self.getBarTime,
+            BarDataTime     : self.getBarTimeList,
         }
 
         numArray = methodMap[dataType](contractNo)
 
-        return numArray if len(numArray) <= maxLength else numArray[(len(numArray) - maxLength - 1):]
+        return numArray if len(numArray) <= maxLength else numArray[-maxLength : ]
 
     def getBarMedian(self, contNo):
         high = self.getBarHigh(contNo)
@@ -2305,6 +2308,15 @@ class StrategyHisQuote(object):
             weighted = (high[i] + low[i] + open[i] + close[i]) / 4
             weightedList.append(weighted)
         return np.array(weightedList)
+
+    def getBarTimeList(self, contNo):
+        if contNo == '':
+            contNo = self._contractNo
+
+        if contNo not in self._curBarDict:
+            return []
+
+        return self._curBarDict[contNo].getBarTime()
 
     #////////////////////////参数设置类接口///////////////////////
         
