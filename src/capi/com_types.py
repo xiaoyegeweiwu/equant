@@ -1135,7 +1135,7 @@ class EEquPositionNotice(Structure):
     """持仓数据查询应答、通知"""
     _pack_ = 1
     _fields_ = [
-        ('PositionNo', c_char*21),
+        ('PositionNo', c_char*51),
         ('UserNo', c_char*21),
         ('Sign', c_char*21),
         ('Cont', c_char*101),				              # 行情合约
