@@ -1905,14 +1905,10 @@ class BarInfo(object):
         self._barList = []
         self._curBar = None
         
-    def _getBarValue(self, key, maxLength=0):
+    def _getBarValue(self, key):
         barValue = []
-        barCount = 0
         for bar in self._barList:
             barValue.append(bar[key])
-            barCount += 1
-            if maxLength > 0 and barCount >= maxLength:
-                break
         return np.array(barValue)
     
     def updateBar(self, data):
@@ -1925,23 +1921,23 @@ class BarInfo(object):
     def getCurBar(self):
         return self._curBar
 
-    def getBarOpen(self, maxLength):
-        return self._getBarValue('OpeningPrice', maxLength)
+    def getBarOpen(self):
+        return self._getBarValue('OpeningPrice')
         
-    def getBarClose(self, maxLength=-1):
-        return self._getBarValue('LastPrice', maxLength)
+    def getBarClose(self):
+        return self._getBarValue('LastPrice')
 
-    def getBarVol(self, maxLength=-1):
-        return self._getBarValue('TotalQty', maxLength)
+    def getBarVol(self):
+        return self._getBarValue('TotalQty')
 
-    def getBarOpenInt(self, maxLength=-1):
-        return self._getBarValue('PositionQty', maxLength)
+    def getBarOpenInt(self):
+        return self._getBarValue('PositionQty')
 
-    def getBarHigh(self, maxLength=-1):
-        return self._getBarValue('HighPrice', maxLength)
+    def getBarHigh(self):
+        return self._getBarValue('HighPrice')
         
-    def getBarLow(self, maxLength=-1):
-        return self._getBarValue('LowPrice', maxLength)
+    def getBarLow(self):
+        return self._getBarValue('LowPrice')
         
 class StrategyHisQuote(object):
     '''
@@ -2064,14 +2060,14 @@ class StrategyHisQuote(object):
     def getHisLength(self):
         return self._hisLength
     # ////////////////////////BaseApi类接口////////////////////////
-    def getBarOpenInt(self, contNo, maxLength=-1):
+    def getBarOpenInt(self, contNo):
         if contNo == '':
             contNo = self._contractNo
 
         if contNo not in self._metaData:
             return []
 
-        return self._curBarDict[contNo].getBarOpenInt(maxLength)
+        return self._curBarDict[contNo].getBarOpenInt()
 
     # 获取存储位置最后一根k线的交易日
     def getLastTradeDate(self):
@@ -2199,46 +2195,46 @@ class StrategyHisQuote(object):
         timeStamp = str(curBar['DateTimeStamp'])
         return timeStamp[-9:]
 
-    def getBarOpen(self, contNo, maxLength=-1):
+    def getBarOpen(self, contNo):
         if contNo == '':
             contNo = self._contractNo
 
         if contNo not in self._curBarDict:
             return []
-        return self._curBarDict[contNo].getBarOpen(maxLength)
+        return self._curBarDict[contNo].getBarOpen()
         
-    def getBarClose(self, contNo, maxLength=-1):
+    def getBarClose(self, contNo):
         if contNo == '':
             contNo = self._contractNo
 
         if contNo not in self._curBarDict:
             return []
-        return self._curBarDict[contNo].getBarClose(maxLength)
+        return self._curBarDict[contNo].getBarClose()
 
-    def getBarVol(self, contNo, maxLength=-1):
+    def getBarVol(self, contNo):
         if contNo == '':
             contNo = self._contractNo
 
         if contNo not in self._curBarDict:
             return []
 
-        return self._curBarDict[contNo].getBarVol(maxLength)
+        return self._curBarDict[contNo].getBarVol()
         
-    def getBarHigh(self, contNo, maxLength=-1):
+    def getBarHigh(self, contNo):
         if contNo == '':
             contNo = self._contractNo
 
         if contNo not in self._curBarDict:
             return []
-        return self._curBarDict[contNo].getBarHigh(maxLength)
+        return self._curBarDict[contNo].getBarHigh()
         
-    def getBarLow(self, contNo, maxLength=-1):
+    def getBarLow(self, contNo):
         if contNo == '':
             contNo = self._contractNo
 
         if contNo not in self._curBarDict:
             return []
-        return self._curBarDict[contNo].getBarLow(maxLength)
+        return self._curBarDict[contNo].getBarLow()
 
     def getHisData(self, dataType, periodType, interval, contractNo, maxLength):
         if dataType not in (BarDataClose, BarDataOpen, BarDataHigh,
@@ -2267,11 +2263,13 @@ class StrategyHisQuote(object):
             BarDataTime     : self.getBarTime,
         }
 
-        return methodMap[dataType](contractNo, maxLength)
+        numArray = methodMap[dataType](contractNo)
 
-    def getBarMedian(self, contNo, maxLength):
-        high = self.getBarHigh(contNo, maxLength)
-        low = self.getBarLow(contNo, maxLength)
+        return numArray if len(numArray) <= maxLength else numArray[(len(numArray) - maxLength - 1):]
+
+    def getBarMedian(self, contNo):
+        high = self.getBarHigh(contNo)
+        low = self.getBarLow(contNo)
         minLength = min(len(high), len(low))
         if minLength == 0:
             return []
@@ -2281,10 +2279,10 @@ class StrategyHisQuote(object):
             medianList.append(median)
         return np.array(medianList)
 
-    def getBarTypical(self, contNo, maxLength):
-        high = self.getBarHigh(contNo, maxLength)
-        low = self.getBarLow(contNo, maxLength)
-        close = self.getBarClose(contNo, maxLength)
+    def getBarTypical(self, contNo):
+        high = self.getBarHigh(contNo)
+        low = self.getBarLow(contNo)
+        close = self.getBarClose(contNo)
         minLength = min(len(high), min(low), len(close))
         if minLength == 0:
             return []
@@ -2294,11 +2292,11 @@ class StrategyHisQuote(object):
             typicalList.append(typical)
         return np.array(typicalList)
 
-    def getBarWeighted(self, contNo, maxLength):
-        high = self.getBarHigh(contNo, maxLength)
-        low = self.getBarLow(contNo, maxLength)
-        open = self.getBarOpen(contNo, maxLength)
-        close = self.getBarClose(contNo, maxLength)
+    def getBarWeighted(self, contNo):
+        high = self.getBarHigh(contNo)
+        low = self.getBarLow(contNo)
+        open = self.getBarOpen(contNo)
+        close = self.getBarClose(contNo)
         minLength = min(len(high), min(low), len(open), len(close))
         if minLength == 0:
             return []
