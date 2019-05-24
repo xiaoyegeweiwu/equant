@@ -6,18 +6,19 @@ _all_func_ = {
                 
     'K线数据': [
                     ['BarCount'            , 'Bar总数'],
-                    ['BarStatus'           , '当前Bar状态值'],
                     ['Close'               , '收盘价,简写C'],
+                    ['Open'                , '开盘价,简写O'],
+                    ['High'                , '最高价,简写H'],
+                    ['Low'                 , '最低价,简写L'],
+                    ['Vol'                 , '成交量,简写V'],
+                    ['OpenInt'             , '持仓量'],
+                    ['BarStatus'           , '当前Bar状态值'],
                     ['CurrentBar'          , '当前Bar索引值'],
                     ['Date'                , '当前Bar日期,简写D'],
-                    ['High'                , '最高价,简写H'],
-                    ['HistoryDataExist'    , '历史数据是否存在'],
-                    ['Low'                 , '最低价,简写L'],
-                    ['Open'                , '开盘价,简写O'],
-                    ['OpenInt'             , '持仓量'],
                     ['Time'                , '当前Bar时间,简写T'],
                     ['TradeDate'           , '当前Bar的交易日'],
-                    ['Vol'                 , '成交量,简写V'],
+                    ['HistoryDataExist'    , '历史数据是否存在'],
+                    ['HisData'             , '获取各种历史数据数组'],
                 ],
                 
     '即时行情': [
@@ -232,6 +233,17 @@ _all_func_ = {
                     ['Enum_Hedge'       , '订单投保标记_套保'],
                     ['Enum_Spread'      , '订单投保标记_套利'],
                     ['Enum_Market'      , '订单投保标记_做市'],
+
+                    ['Enum_Data_Close'      , '收盘价'],
+                    ['Enum_Data_Open'       , '开盘价'],
+                    ['Enum_Data_High'       , '最高价'],
+                    ['Enum_Data_Low'        , '最低价'],
+                    ['Enum_Data_Median'     , '中间价'],
+                    ['Enum_Data_Typical'    , '标准价'],
+                    ['Enum_Data_Weighted'   , '加权收盘价'],
+                    ['Enum_Data_Vol'        , '成交量'],
+                    ['Enum_Data_Opi'        , '持仓量'],
+                    ['Enum_Data_Time'       , 'K线时间'],
                 ],
 
     '设置函数': [

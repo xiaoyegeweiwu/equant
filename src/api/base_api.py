@@ -67,10 +67,10 @@ class BaseApi(object):
     def Open(self, contractNo=''):
         '''
         【说明】
-              当前Bar的开盘价
+              指定合约指定周期的开盘价
 
         【语法】
-              numpy.array Open()
+              numpy.array Open(string contractNo)
 
         【参数】
               contractNo 合约编号, 默认基准合约
@@ -88,10 +88,10 @@ class BaseApi(object):
     def High(self, contractNo=''):
         '''
         【说明】
-              当前Bar的最高价
+              指定合约指定周期的最高价
 
         【语法】
-              numpy.array High()
+              numpy.array High(string contractNo)
 
         【参数】
               contractNo 合约编号,默认基准合约
@@ -109,10 +109,10 @@ class BaseApi(object):
     def Low(self, contractNo=''):
         '''
         【说明】
-              当前Bar的最低价
+              指定合约指定周期的最低价
 
         【语法】
-              numpy.array Low()
+              numpy.array Low(string contractNo)
 
         【参数】
               contractNo 合约编号, 默认基准合约
@@ -130,10 +130,10 @@ class BaseApi(object):
     def Close(self, contractNo):
         '''
         【说明】
-              当前Bar的收盘价
+              指定合约指定周期的收盘价
 
         【语法】
-              numpy.array Close()
+              numpy.array Close(string contractNo)
 
         【参数】
               contractNo 合约编号, 默认基准合约
@@ -150,7 +150,7 @@ class BaseApi(object):
     def Vol(self, contractNo):
         '''
         【说明】
-              当前Bar的成交量
+              指定合约指定周期的成交量
 
         【语法】
               numpy.array Vol(string contractNo)
@@ -170,7 +170,7 @@ class BaseApi(object):
     def OpenInt(self, contractNo):
         '''
         【说明】
-              当前Bar的持仓量
+              指定合约指定周期的持仓量
 
         【语法】
               numpy.array OpenInt(string contractNo)
@@ -190,7 +190,7 @@ class BaseApi(object):
     def TradeDate(self, contractNo):
         '''
         【说明】
-              当前Bar的交易日
+              指定合约当前Bar的交易日
 
         【语法】
               string TradeDate(string contractNo)
@@ -209,7 +209,7 @@ class BaseApi(object):
     def BarCount(self, contractNo):
         '''
         【说明】
-              当前合约Bar的总数
+              指定合约Bar的总数
 
         【语法】
               int BarCount(string contractNo)
@@ -228,7 +228,7 @@ class BaseApi(object):
     def CurrentBar(self, contractNo):
         '''
         【说明】
-              当前Bar的索引值
+              指定合约当前Bar的索引值
 
         【语法】
               int CurrentBar(string contractNo)
@@ -247,7 +247,7 @@ class BaseApi(object):
     def BarStatus(self, contractNo):
         '''
         【说明】
-              当前Bar的状态值
+              指定合约当前Bar的状态值
 
         【语法】
               int BarStatus(string contractNo)
@@ -266,7 +266,7 @@ class BaseApi(object):
     def HistoryDataExist(self, contractNo):
         '''
         【说明】
-              当前合约的历史数据是否有效
+              指定合约的历史数据是否有效
 
         【语法】
               bool HistoryDataExist(string contractNo)
@@ -281,6 +281,50 @@ class BaseApi(object):
               无
         '''
         return self._dataModel.isHistoryDataExist(contractNo)
+
+    def HisData(self, dataType, periodType, interval, contractNo, maxLength):
+        '''
+        【说明】
+              获取各种历史数据数组
+
+        【语法】
+               numpy.array HisData(enum dataType, enum periodType, int interval, string contractNo, int maxLength)
+
+        【参数】
+              dataType 指定历史数据的种类，可选的枚举函数和相应含义为：
+                Enum_Data_Close         : 收盘价
+                Enum_Data_Open          : 开盘价
+                Enum_Data_High          : 最高价
+                Enum_Data_Low           : 最低价
+                Enum_Data_Median        : 中间价
+                Enum_Data_Typical       : 标准价
+                Enum_Data_Weighted      : 加权收盘价
+                Enum_Data_Vol           : 成交量
+                Enum_Data_Opi           : 持仓量
+                Enum_Data_Time          : K线时间
+              periodType 指定周期类型，可选的枚举函数和相应含义为：
+                Enum_Period_Tick        : 周期类型_分笔
+                Enum_Period_Dyna        : 周期类型_分时
+                Enum_Period_Second      : 周期类型_秒线
+                Enum_Period_Min         : 周期类型_分钟
+                Enum_Period_Hour        : 周期类型_小时
+                Enum_Period_Day         : 周期类型_日线
+                Enum_Period_Week        : 周期类型_周线
+                Enum_Period_Month       : 周期类型_月线
+                Enum_Period_Year        : 周期类型_年线
+              interval 周期数， 如：5分钟线，周期数就是5；50秒线，周期数为50
+              contractNo 合约编号, 为空时取当前合约
+              maxLength 定返回历史数据数组的最大长度，默认值为100
+
+        【备注】
+              返回numpy数组，包括截止当前Bar的最多maxLength个指定的种类的历史数据
+
+        【实例】
+              closeList = HisData(Enum_Data_Close(), Enum_Period_Min(), 5, "ZCE|F|SR|906", 1000) # 获取合约ZCE|F|SR|906包含当前Bar在内的之前1000个5分钟线的收盘价
+              closeList[-1] # 当前Bar的收盘价
+              closeList[-2] # 上一个Bar的收盘价
+        '''
+        return self._dataModel.getHisData(dataType, periodType, interval, contractNo, maxLength)
 
     #/////////////////////////即时行情/////////////////////////////
     def Q_UpdateTime(self, contractNo):
@@ -1291,8 +1335,8 @@ class BaseApi(object):
                 'Time' : 210000000,
                 'TradeState' : 3
               }
-              其中Time对应的值210000000表示指定时间timeStr的下一个时间点，格式化时间为21:00:00.000
-              TradeState表示对应时间点的交易状态，数据类型为字符串，可能出现的值及相应的状态含义如下：
+              其中Time对应的值表示指定时间timeStr的下一个时间点，数据格式为整数，例如210000000表示格式化的时间为21:00:00.000
+              TradeState表示对应时间点的交易状态，数据类型为字符，可能出现的值及相应的状态含义如下：
                 1 : 集合竞价
                 2 : 集合竞价撮合
                 3 : 连续交易
@@ -3706,6 +3750,196 @@ class BaseApi(object):
         '''
         return self._dataModel.getEnumMarket()
 
+    def Enum_Data_Close(self):
+        '''
+        【说明】
+              返回收盘价的枚举值
+
+        【语法】
+              char Enum_Data_Close()
+
+        【参数】
+              无
+
+        【备注】
+              返回字符
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getEnumClose()
+
+    def Enum_Data_Open(self):
+        '''
+        【说明】
+              返回开盘价的枚举值
+
+        【语法】
+              char Enum_Data_Open()
+
+        【参数】
+              无
+
+        【备注】
+              返回字符
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getEnumOpen()
+
+    def Enum_Data_High(self):
+        '''
+        【说明】
+              返回最高价的枚举值
+
+        【语法】
+              char Enum_Data_High()
+
+        【参数】
+              无
+
+        【备注】
+              返回字符
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getEnumHigh()
+
+    def Enum_Data_Low(self):
+        '''
+        【说明】
+              返回最低价的枚举值
+
+        【语法】
+              char Enum_Data_Low()
+
+        【参数】
+              无
+
+        【备注】
+              返回字符
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getEnumLow()
+
+    def Enum_Data_Median(self):
+        '''
+        【说明】
+              返回中间价的枚举值，中间价=（最高价+最低价）/ 2
+
+        【语法】
+              char Enum_Data_Median()
+
+        【参数】
+              无
+
+        【备注】
+              返回字符
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getEnumMedian()
+
+    def Enum_Data_Typical(self):
+        '''
+        【说明】
+              返回标准价的枚举值，标准价=（最高价+最低价+收盘价）/ 3
+
+        【语法】
+              char Enum_Data_Typical()
+
+        【参数】
+              无
+
+        【备注】
+              返回字符
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getEnumTypical()
+
+    def Enum_Data_Weighted(self):
+        '''
+        【说明】
+              返回加权收盘价的枚举值，加权收盘价=（最高价+最低价+开盘价+收盘价）/ 4
+
+        【语法】
+              char Enum_Data_Weighted()
+
+        【参数】
+              无
+
+        【备注】
+              返回字符
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getEnumWeighted()
+
+    def Enum_Data_Vol(self):
+        '''
+        【说明】
+              返回成交量的枚举值
+
+        【语法】
+              char Enum_Data_Vol()
+
+        【参数】
+              无
+
+        【备注】
+              返回字符
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getEnumVol()
+
+    def Enum_Data_Opi(self):
+        '''
+        【说明】
+              返回持仓量的枚举值
+
+        【语法】
+              char Enum_Data_Opi()
+
+        【参数】
+              无
+
+        【备注】
+              返回字符
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getEnumOpi()
+
+    def Enum_Data_Time(self):
+        '''
+        【说明】
+              返回K线时间的枚举值
+
+        【语法】
+              char Enum_Data_Time()
+
+        【参数】
+              无
+
+        【备注】
+              返回字符
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getEnumTime()
+
     #//////////////////////设置函数////////////////////
     def GetConfig(self):
         return self._dataModel.getConfig()
@@ -4312,6 +4546,8 @@ def BarStatus(contractNo=''):
 def HistoryDataExist(contractNo=''):
     return baseApi.HistoryDataExist(contractNo)
 
+def HisData(type, period, interval, contractNo='', maxLength=100):
+    return baseApi.HisData(type, period, interval, contractNo, maxLength)
 #即时行情
 def Q_UpdateTime(contractNo=''):
     return baseApi.Q_UpdateTime(contractNo)
@@ -4751,6 +4987,36 @@ def Enum_Spread():
 
 def Enum_Market():
     return baseApi.Enum_Market()
+
+def Enum_Data_Close():
+    return baseApi.Enum_Data_Close()
+
+def Enum_Data_Open():
+    return baseApi.Enum_Data_Open()
+
+def Enum_Data_High():
+    return baseApi.Enum_Data_High()
+
+def Enum_Data_Low():
+    return baseApi.Enum_Data_Low()
+
+def Enum_Data_Median():
+    return baseApi.Enum_Data_Median()
+
+def Enum_Data_Typical():
+    return baseApi.Enum_Data_Typical()
+
+def Enum_Data_Weighted():
+    return baseApi.Enum_Data_Weighted()
+
+def Enum_Data_Vol():
+    return baseApi.Enum_Data_Vol()
+
+def Enum_Data_Opi():
+    return baseApi.Enum_Data_Opi()
+
+def Enum_Data_Time():
+    return baseApi.Enum_Data_Time()
 
 # 设置函数
 def GetConfig():

@@ -513,6 +513,18 @@ VConOpenTimes                = "31"     # 最大连续同向开仓次数
 VCanClose                    = "32"     # 开仓的当前K线不允许平仓
 VCanOpen                     = "33"     # 平仓的当前K线不允许开仓
 
+# K线数据类型
+BarDataClose        = 'C' # 收盘价
+BarDataOpen         = 'O' # 开盘价
+BarDataHigh         = 'H' # 最高价
+BarDataLow          = 'L' # 最低价
+BarDataMedian       = 'M' # 中间价
+BarDataTypical      = 'B' # 标准价
+BarDataWeighted     = 'W' # 加权收盘价
+BarDataVol          = 'V' # 成交量
+BarDataOpi          = 'I' # 持仓量
+BarDataTime         = 'T' # Bar线时间
+
 #
 OrderSuccess                 = 0
 OrderFail                    = 1

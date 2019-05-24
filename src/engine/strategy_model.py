@@ -183,6 +183,9 @@ class StrategyModel(object):
     def getBarLow(self, symbol):
         return self._hisModel.getBarLow(symbol)
 
+    def getHisData(self, dataType, periodType, interval, contractNo, maxLength):
+        return self._hisModel.getHisData(dataType, periodType, interval, contractNo, maxLength)
+
     # ////////////////////////即时行情////////////////////////////
     def getQUpdateTime(self, symbol):
         return self._qteModel.getQUpdateTime(symbol)
@@ -854,6 +857,36 @@ class StrategyModel(object):
 
     def getBrown(self):
         return 0x996600
+
+    def getEnumClose(self):
+        return BarDataClose
+
+    def getEnumOpen(self):
+        return BarDataOpen
+
+    def getEnumHigh(self):
+        return BarDataHigh
+
+    def getEnumLow(self):
+        return BarDataLow
+
+    def getEnumMedian(self):
+        return BarDataMedian
+
+    def getEnumTypical(self):
+        return BarDataTypical
+
+    def getEnumWeighted(self):
+        return BarDataWeighted
+
+    def getEnumVol(self):
+        return BarDataVol
+
+    def getEnumOpi(self):
+        return BarDataOpi
+
+    def getEnumTime(self):
+        return BarDataTime
 
     #///////////////////////其他函数///////////////////////////
     def _addSeries(self, name, value, color, main, axis, type):
@@ -1872,10 +1905,14 @@ class BarInfo(object):
         self._barList = []
         self._curBar = None
         
-    def _getBarValue(self, key):
+    def _getBarValue(self, key, maxLength=0):
         barValue = []
+        barCount = 0
         for bar in self._barList:
             barValue.append(bar[key])
+            barCount += 1
+            if maxLength > 0 and barCount >= maxLength:
+                break
         return np.array(barValue)
     
     def updateBar(self, data):
@@ -1888,20 +1925,23 @@ class BarInfo(object):
     def getCurBar(self):
         return self._curBar
 
-    def getBarOpen(self):
-        return self._getBarValue('OpeningPrice')
+    def getBarOpen(self, maxLength):
+        return self._getBarValue('OpeningPrice', maxLength)
         
-    def getBarClose(self):
-        return self._getBarValue('LastPrice')
+    def getBarClose(self, maxLength=-1):
+        return self._getBarValue('LastPrice', maxLength)
 
-    def getBarOpenInt(self):
-        return self._getBarValue('PositionQty')
+    def getBarVol(self, maxLength=-1):
+        return self._getBarValue('TotalQty', maxLength)
 
-    def getBarHigh(self):
-        return self._getBarValue('HighPrice')
+    def getBarOpenInt(self, maxLength=-1):
+        return self._getBarValue('PositionQty', maxLength)
+
+    def getBarHigh(self, maxLength=-1):
+        return self._getBarValue('HighPrice', maxLength)
         
-    def getBarLow(self):
-        return self._getBarValue('LowPrice')
+    def getBarLow(self, maxLength=-1):
+        return self._getBarValue('LowPrice', maxLength)
         
 class StrategyHisQuote(object):
     '''
@@ -2024,14 +2064,14 @@ class StrategyHisQuote(object):
     def getHisLength(self):
         return self._hisLength
     # ////////////////////////BaseApi类接口////////////////////////
-    def getBarOpenInt(self, contNo):
+    def getBarOpenInt(self, contNo, maxLength=-1):
         if contNo == '':
             contNo = self._contractNo
 
         if contNo not in self._metaData:
             return []
 
-        return self._curBarDict[contNo].getBarOpenInt()
+        return self._curBarDict[contNo].getBarOpenInt(maxLength)
 
     # 获取存储位置最后一根k线的交易日
     def getLastTradeDate(self):
@@ -2159,48 +2199,115 @@ class StrategyHisQuote(object):
         timeStamp = str(curBar['DateTimeStamp'])
         return timeStamp[-9:]
 
-    def getBarOpen(self, contNo):
+    def getBarOpen(self, contNo, maxLength=-1):
         if contNo == '':
             contNo = self._contractNo
 
         if contNo not in self._curBarDict:
-            return 0
-        return self._curBarDict[contNo].getBarOpen()
+            return []
+        return self._curBarDict[contNo].getBarOpen(maxLength)
         
-    def getBarClose(self, contNo):
+    def getBarClose(self, contNo, maxLength=-1):
         if contNo == '':
             contNo = self._contractNo
 
         if contNo not in self._curBarDict:
-            return 0
-        return self._curBarDict[contNo].getBarClose()
+            return []
+        return self._curBarDict[contNo].getBarClose(maxLength)
 
-    def getBarVol(self, contNo):
+    def getBarVol(self, contNo, maxLength=-1):
         if contNo == '':
             contNo = self._contractNo
 
         if contNo not in self._curBarDict:
-            return 0
+            return []
 
-        curBar = self._curBarDict[contNo].getCurBar()
-        return curBar['TotalQty']
+        return self._curBarDict[contNo].getBarVol(maxLength)
         
-    def getBarHigh(self, contNo):
+    def getBarHigh(self, contNo, maxLength=-1):
         if contNo == '':
             contNo = self._contractNo
 
         if contNo not in self._curBarDict:
-            return 0
-        return self._curBarDict[contNo].getBarHigh()
+            return []
+        return self._curBarDict[contNo].getBarHigh(maxLength)
         
-    def getBarLow(self, contNo):
+    def getBarLow(self, contNo, maxLength=-1):
         if contNo == '':
             contNo = self._contractNo
 
         if contNo not in self._curBarDict:
-            return 0
-        return self._curBarDict[contNo].getBarLow()
-        
+            return []
+        return self._curBarDict[contNo].getBarLow(maxLength)
+
+    def getHisData(self, dataType, periodType, interval, contractNo, maxLength):
+        if dataType not in (BarDataClose, BarDataOpen, BarDataHigh,
+                            BarDataLow, BarDataMedian, BarDataTypical,
+                            BarDataWeighted, BarDataVol, BarDataOpi,
+                            BarDataTime):
+            return []
+
+        if periodType not in (EEQU_KLINE_TIMEDIVISION, EEQU_KLINE_TICK,
+                              EEQU_KLINE_SECOND, EEQU_KLINE_MINUTE,
+                              EEQU_KLINE_HOUR, EEQU_KLINE_DAY,
+                              EEQU_KLINE_WEEK, EEQU_KLINE_MONTH,
+                              EEQU_KLINE_YEAR):
+            return []
+
+        methodMap = {
+            BarDataClose    : self.getBarClose,
+            BarDataOpen     : self.getBarOpen,
+            BarDataHigh     : self.getBarHigh,
+            BarDataLow      : self.getBarLow,
+            BarDataMedian   : self.getBarMedian,
+            BarDataTypical  : self.getBarTypical,
+            BarDataWeighted : self.getBarWeighted,
+            BarDataVol      : self.getBarVol,
+            BarDataOpi      : self.getBarOpenInt,
+            BarDataTime     : self.getBarTime,
+        }
+
+        return methodMap[dataType](contractNo, maxLength)
+
+    def getBarMedian(self, contNo, maxLength):
+        high = self.getBarHigh(contNo, maxLength)
+        low = self.getBarLow(contNo, maxLength)
+        minLength = min(len(high), len(low))
+        if minLength == 0:
+            return []
+        medianList = []
+        for i in range(0, minLength):
+            median = (high[i] + low[i]) / 2
+            medianList.append(median)
+        return np.array(medianList)
+
+    def getBarTypical(self, contNo, maxLength):
+        high = self.getBarHigh(contNo, maxLength)
+        low = self.getBarLow(contNo, maxLength)
+        close = self.getBarClose(contNo, maxLength)
+        minLength = min(len(high), min(low), len(close))
+        if minLength == 0:
+            return []
+        typicalList = []
+        for i in range(0, minLength):
+            typical = (high[i] + low[i] + close[i]) / 3
+            typicalList.append(typical)
+        return np.array(typicalList)
+
+    def getBarWeighted(self, contNo, maxLength):
+        high = self.getBarHigh(contNo, maxLength)
+        low = self.getBarLow(contNo, maxLength)
+        open = self.getBarOpen(contNo, maxLength)
+        close = self.getBarClose(contNo, maxLength)
+        minLength = min(len(high), min(low), len(open), len(close))
+        if minLength == 0:
+            return []
+        weightedList = []
+        for i in range(0, minLength):
+            weighted = (high[i] + low[i] + open[i] + close[i]) / 4
+            weightedList.append(weighted)
+        return np.array(weightedList)
+
     #////////////////////////参数设置类接口///////////////////////
         
     def _getKLineType(self):
