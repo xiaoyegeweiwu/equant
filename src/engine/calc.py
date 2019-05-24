@@ -255,6 +255,8 @@ class CalcCenter(object):
                                                                     ftOrder["OrderType"],
                                                                     ftOrder["Hedge"]))
 
+        self._logger.sig_info(self._formatOrder(order))
+
         contPrice = {
             "Cont": order["Cont"],
             "Price": order["OrderPrice"],
