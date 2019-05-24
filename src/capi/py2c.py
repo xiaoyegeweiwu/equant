@@ -218,6 +218,8 @@ class PyAPI(object):
                     }
             }
         '''
+        # data = event.getData()
+        # print("in order k line ", data["ContractNo"], data["KLineType"], data["KLineSlice"], data["ReqCount"])
         self.logger.debug("%d request subscribe hisquote(%s)"%(event.getStrategyId(), event.getContractNo()))
         sessionId = c_uint()
         req = EEquKLineReq()
@@ -1270,6 +1272,7 @@ class PyAPI(object):
             dataList.append(idict)
         
         # 发送到引擎
+        # print("in py2c ", len(dataList), apiEvent.getSessionId(), apiEvent.getContractNo(), apiEvent.getKLineType(), apiEvent.getKLineSlice(), apiEvent.isChainEnd())
         apiEvent.setData(dataList)
         sid = apiEvent.getSessionId()
         apiEvent.setStrategyId(self._getStrategyId(sid))

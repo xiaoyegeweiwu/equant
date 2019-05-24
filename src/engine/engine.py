@@ -449,6 +449,10 @@ class StrategyEngine(object):
             'Data'       : data
         })
 
+        if strategyId > 0:
+            self._sendEvent2Strategy(strategyId, event)
+            return
+
         # 推送数据，分发
         key = (apiEvent.getContractNo(), apiEvent.getKLineType(), apiEvent.getKLineSlice())
         if key not in self._hisContStrategyDict:
@@ -682,7 +686,6 @@ class StrategyEngine(object):
             return
         
         strategyId = event.getStrategyId()
-        data = event.getData()
         key = (data['ContractNo'], data['KLineType'], data['KLineSlice'])
 
         if key not in self._hisContStrategyDict:
