@@ -436,7 +436,8 @@ class RunWin(QuantToplevel, QuantFrame):
 
     def setDefaultConfigure(self):
         conf = self.getTextConfigure()
-        if conf:
+        # if conf:
+        if None:
             # self.user.set(conf[VUser]),
             self.initFund.set(conf[VInitFund]),
             self.defaultType.set(conf[VDefaultType]),
@@ -482,7 +483,7 @@ class RunWin(QuantToplevel, QuantFrame):
             self.canClose.set(conf[VCanClose]),
             self.canOpen.set(conf[VCanOpen]),
 
-        else:
+        if True:
             # 设置默认值
             self.isCycle.set(0),
             self.cycle.set(200),
@@ -501,7 +502,7 @@ class RunWin(QuantToplevel, QuantFrame):
             # 账户
 
             # K线类型
-            self.kLineType.set("日")
+            self.kLineType.set("分钟")
             # K线周期
             self.kLineSlice.set("1")
 
@@ -993,6 +994,7 @@ class RunWin(QuantToplevel, QuantFrame):
         self.kLineCheck = tk.Checkbutton(kLineFrame, text="K线触发", bg=rgb_to_hex(255, 255, 255),
                                          anchor=tk.W, variable=self.isKLine)
         self.kLineCheck.pack(side=tk.LEFT, padx=5)
+        self.kLineCheck.config(state="disabled")
 
         # 即时行情触发
         self.marketCheck = tk.Checkbutton(marketFrame, text="即时行情触发", bg=rgb_to_hex(255, 255, 255),

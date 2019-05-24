@@ -265,6 +265,7 @@ class QuantEditor(StrategyTree):
             if os.path.isfile(path):
                 # 获取策略内容
                 # self.editor_file = path
+
                 self.control.setEditorTextCode(path)
                 header = self.root_tree.item(idx)['text']
                 # self.updateEditorHead(header)
@@ -381,7 +382,7 @@ class QuantEditor(StrategyTree):
     def insertEditorWidget(self, data):
 
         self.editor_text = EditorText(self.editor_text_frame, self, relief=FLAT, borderwidth=10,
-                                      background=rgb_to_hex(255, 255, 255), wrap='none')
+                                      background=rgb_to_hex(255, 255, 255), wrap='none', undo=True)
         self.editor_text_scroll = self.addScroll(self.editor_text_frame, self.editor_text)
         self.editor_text.pack(fill=BOTH, expand=YES)
         # ctrl+s
