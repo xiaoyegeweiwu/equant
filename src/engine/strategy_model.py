@@ -382,11 +382,11 @@ class StrategyModel(object):
     def setSetBenchmark(self, symbolTuple):
         self._cfgModel.setContract(symbolTuple)
 
-    def setUserNo(self, userNo):
-        self._cfgModel.setUserNo(userNo)
+    def addUserNo(self, userNo):
+        self._cfgModel.addUserNo(userNo)
 
-    def setBarInterval(self, barType, barInterval, contNo):
-        self._cfgModel.setBarInterval(barType, barInterval, contNo)
+    def setBarInterval(self, contractNo, barType, barInterval, sampleConfig):
+        self._cfgModel.setBarInterval(contractNo, barType, barInterval, sampleConfig)
 
     def setSample(self, sampleType, sampleValue):
         return self._cfgModel.setSample(sampleType, sampleValue)
@@ -1434,9 +1434,78 @@ class StrategyConfig(object):
         if ret > 0:
             raise Exception(ret)
 
-        # self._metaData = self.convertArgsDict(argsDict)
-        self._metaData = deepcopy(argsDict)
-        
+        self._metaData = self.convertArgsDict(argsDict)
+        # self.convertArgsDict(argsDict)
+        # self._metaData = deepcopy(argsDict)
+
+    def convertArgsDict(self, argsDict):
+        resDict = {}
+        contList = argsDict['Contract']
+        for key, value in argsDict.items():
+            if key in ('Sample'):
+                continue
+            resDict[key] = deepcopy(value)
+
+        # Sample
+        sample = argsDict['Sample']
+        resDict['BarInterval'] = {
+            'Default': [{'KLineType': sample['KLineType'], 'KLineSlice': sample['KLineSlice'], }],  # 界面设置信息
+        }
+        resDict['Sample'] = {
+            'Default': self.getSampleDict(sample),  # 界面设置信息
+        }
+        if len(contList) > 0 and len(contList[0]) > 0:
+            # 界面设置了基准合约和K线信息
+            self.updateBarInterval(contList[0], resDict, sample)
+            self.updateSample(contList[0], resDict, sample)
+
+        print("sun ------- ", resDict)
+        return resDict
+
+    def updateBarInterval(self, contNo, inDict, fromDict=None):
+        if contNo in inDict['BarInterval']:
+            if not fromDict:
+                return -1
+
+            isExist = False
+            for barDict in inDict['BarInterval'][contNo]:
+                if barDict['KLineType'] == fromDict['KLineType'] and barDict['KLineSlice'] == fromDict['KLineSlice']:
+                    isExist = True
+                    break
+
+            if not isExist:
+                inDict['BarInterval'][contNo].append({'KLineType': fromDict['KLineType'], 'KLineSlice': fromDict['KLineSlice'], })
+            return 0
+
+        if not fromDict:
+            inDict['BarInterval'][contNo] = inDict['BarInterval']['Default']
+        else:
+            inDict['BarInterval'][contNo] = [{'KLineType' : fromDict['KLineType'], 'KLineSlice' : fromDict['KLineSlice'],}]
+
+
+    def updateSample(self, contNo, inDict, fromDict=None):
+        if contNo in inDict['Sample']:
+            if not fromDict:
+                return -1
+            inDict['Sample'][contNo] = self.getSampleDict(fromDict)
+            return 0
+
+        if not fromDict:
+            inDict['Sample'][contNo] = inDict['Sample']['Default']
+        else:
+            inDict['Sample'][contNo] = self.getSampleDict(fromDict)
+
+
+    def getSampleDict(self, sample):
+        useSample = ('BeginTime' in sample) or ('KLineCount' in sample) or ('AllK' in sample)
+        sampleDict = {
+            'BeginTime' : sample['BeginTime'] if 'BeginTime' in sample else '',
+            'KLineCount' : sample['KLineCount'] if 'KLineCount' in sample else 0,
+            'AllK' : sample['AllK'] if 'AllK' in sample else False,
+            'UseSample' : useSample,
+        }
+        return deepcopy(sampleDict)
+
     def _chkConfig(self, argsDict):
         if 'Contract' not in argsDict:
             return 1
@@ -1457,18 +1526,6 @@ class StrategyConfig(object):
             return 6
             
         return 0
-
-    def continues(self):
-        runModeDict = self.getRunMode()
-        
-        #实盘默认继续运行
-        if 'Actual' in runModeDict:
-            return True
-            
-        if 'Simulate' in runModeDict:
-            return runModeDict['Simulate']['Continues']
-        
-        return False
 
     def getConfig(self):
         return self._metaData
@@ -1551,14 +1608,43 @@ class StrategyConfig(object):
         '''设置合约列表'''
         if not contTuple or not isinstance(contTuple, tuple):
             return -1
-        self._metaData['Contract'] = contTuple
-        return 0
 
-    def setUserNo(self, userNo):
+        self._metaData['Contract'] = contTuple
+        benchmark = contTuple[0]
+
+        self.cleanBarInterval(self._metaData)
+        self.cleanSample(self._metaData)
+
+        if benchmark not in self._metaData['BarInterval']:
+            # 基准合约未设置BarInterval信息
+            self.updateBarInterval(benchmark, self._metaData)
+
+        if benchmark not in self._metaData['Sample']:
+            # 基准合约未设置BarInterval信息
+            self.updateSample(benchmark, self._metaData)
+
+    def cleanBarInterval(self, inDict):
+        defaultBarInterval = inDict['BarInterval']['Default']
+        inDict['BarInterval'] = {'Default': deepcopy(defaultBarInterval)}
+
+    def cleanSample(self, inDict):
+        defaultSample = inDict['Sample']['Default']
+        inDict['Sample'] = {'Default': deepcopy(defaultSample)}
+
+    def addUserNo(self, userNo):
         '''设置交易使用的账户'''
-        if userNo:
-            self._metaData['Money']['UserNo'] = userNo
-            return 0
+        if isinstance(self._metaData['Money']['UserNo'], str):
+            userNoStr = self._metaData['Money']['UserNo']
+            if userNo == userNoStr:
+                self._metaData['Money']['UserNo'] = [userNo]
+            else:
+                self._metaData['Money']['UserNo'] = [userNoStr, userNo]
+
+        if isinstance(self._metaData['Money']['UserNo'], list):
+            if userNo in self._metaData['Money']['UserNo']:
+                return 0
+            else:
+                self._metaData['Money']['UserNo'].append(userNo)
         return -1
 
     def getUserNo(self):
@@ -1653,6 +1739,11 @@ class StrategyConfig(object):
             return self._metaData['Sample']['BeginTime']
         return 0
 
+    def getBarIntervalList(self, contNo):
+        if contNo not in self._metaData['BarInterval']:
+            return []
+        return self._metaData['BarInterval'][contNo]
+
     def getKLineType(self):
         '''获取K线类型'''
         return self._metaData['Sample']['KLineType']
@@ -1705,30 +1796,26 @@ class StrategyConfig(object):
     def setUseSample(self, isUseSample):
         self._metaData['RunMode']['Simulate']['UseSample'] = isUseSample
 
-    def setBarInterval(self, barType, barInterval, contNo=''):
+    def setBarInterval(self, contNo, barType, barInterval, sampleConfig):
         '''设置K线类型和K线周期'''
         if barType not in ('t', 'T', 'S', 'M', 'H', 'D', 'W', 'm', 'Y'):
             return -1
-        if not contNo or contNo == self.getBenchmark():
-            self._metaData['Sample']['KLineType'] = barType
-            self._metaData['Sample']['KLineSlice'] = barInterval
-            return 0
 
-        if contNo not in self._metaData['Sample']:
-            self._metaData['Sample'][contNo] = [{'KLineType' : barType, 'KLineSlice' : barInterval}, ]
-            return 0
+        if contNo not in self.getContract():
+            raise Exception("合约编号不在SetBenchmark方法或者设置界面所设置的合约列表中")
 
-        isExist = False
-        barList = self._metaData['Sample'][contNo]
-        for barDict in barList:
-            if barDict['KLineType'] == barType and barDict['KLineSlice'] == barInterval:
-                isExist = True
-                break
-        if isExist:
-            return 0
+        # 更新回测起始点信息
+        sampleInfo = {
+            'BeginTime' : sampleConfig if isinstance(sampleConfig, str) and self.isVaildDate(sampleConfig, "%Y%m%d") else '',
+            'KLineCount' : sampleConfig if isinstance(sampleConfig, int) and sampleConfig > 0 else 0,
+            'AllK' : True if sampleConfig == 'A' else False,
+            'UseSample' : True if sampleConfig != 'N' else False,
+        }
+        self.updateSample(contNo, self._metaData, sampleInfo)
 
-        barList.append({'KLineType': barType, 'KLineSlice': barInterval})
-        return 0
+        # 更新K线类型和周期
+        barInfo = {'KLineType' : barType, 'KLineSlice' : barInterval}
+        self.updateBarInterval(contNo, self._metaData, barInfo)
 
     def getInitCapital(self, userNo=''):
         '''获取初始资金'''
@@ -1976,6 +2063,9 @@ class BarInfo(object):
         
     def getBarLow(self):
         return self._getBarValue('LowPrice')
+
+    def getBarTime(self):
+        return self._getBarValue('DateTimeStamp')
         
 class StrategyHisQuote(object):
     '''
