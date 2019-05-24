@@ -2856,7 +2856,7 @@ class StrategyQuote(QuoteModel):
         if not isinstance(type(data), dict):
             return
 
-        contractNo = apiEvent.getContractNo()
+        contractNo = event.getContractNo()
         if contractNo not in self._contractData:
             contMsg = {
                 'ExchangeNo': data['ExchangeNo'],
