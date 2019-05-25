@@ -62,7 +62,6 @@ class StrategyModel(object):
         
     def initialize(self):
         '''加载完策略初始化函数之后再初始化'''
-        self._qteModel.initialize()
         self._hisModel.initialize()
         self._trdModel.initialize()
 
@@ -1471,7 +1470,7 @@ class StrategyConfig(object):
 
         resDict['Sample']['Display'] = {"ContractNo" : benchmark, "KLineType": sample['KLineType'], "KLineSlice": sample['KLineSlice']}
 
-        print("sun ------- ", resDict)
+        # print("sun ------- ", resDict)
         return resDict
 
     def updateBarInterval(self, contNo, inDict, fromDict):
@@ -3060,8 +3059,6 @@ class StrategyQuote(QuoteModel):
         self.logger = strategy.logger
         QuoteModel.__init__(self, self.logger)
         self._config = config
-        
-    def initialize(self):
         self._contractTuple = self._config.getContract()
         
     def subQuote(self):
@@ -3074,8 +3071,8 @@ class StrategyQuote(QuoteModel):
             'StrategyId'  : self._strategy.getStrategyId(),
             'Data'        : contList,
         })
-            
-        self._strategy.sendEvent2Engine(event) 
+
+        self._strategy.sendEvent2Engine(event)
 
     def reqExchange(self):
         event = Event({

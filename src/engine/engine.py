@@ -12,6 +12,7 @@ import copy
 import psutil
 import os, json
 from collections import OrderedDict
+import traceback
 
 
 class StrategyEngine(object):
@@ -888,4 +889,5 @@ class StrategyEngine(object):
             strategyProcess.wait(timeout=0.1)
             # print("策略进程已经退出", strategyProcess.name)
         except (psutil.NoSuchProcess, psutil.AccessDenied) as e:
+            traceback.print_exc()
             self.logger.info("pid %d exit fail" % pid)
