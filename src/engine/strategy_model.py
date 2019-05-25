@@ -1821,7 +1821,8 @@ class StrategyConfig(object):
             return -1
 
         # 清空界面设置的合约K线信息
-        defaultBenchmark = self.getContract()[0] if len(self.getContract()) > 0 and len(self.getContract()[0]) else ""
+        contract = self._metaData['Contract']
+        defaultBenchmark = contract[0] if len(contract) > 0 and len(contract[0]) else ""
         if len(defaultBenchmark) > 0:
             del self._metaData['Sample'][defaultBenchmark]
             self.setContract(("",))
