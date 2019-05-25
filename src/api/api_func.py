@@ -247,8 +247,8 @@ _all_func_ = {
                 ],
 
     '设置函数': [
-                    ['SetBenchmark'        , '设置基准合约'],
-                    ['AddUserNo'           , '添加交易账号'],
+                    ## ['SetBenchmark'        , '设置基准合约'],
+                    ## ['AddUserNo'           , '添加交易账号'],
                     ['SetBarInterval'      , '设置K线类型'],
                     ['SetInitCapital'      , '设置初始资金'],
                     ['SetMargin'           , '设置保证金'],

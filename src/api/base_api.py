@@ -4281,34 +4281,33 @@ class BaseApi(object):
         '''
         return self._dataModel.setSlippage(slippage)
 
-    def SetTriggerType(self, type, value):
+    def SetTriggerType(self, contractNo, type, value):
         '''
         【说明】
              设置触发方式
 
         【语法】
-              int SetTriggerType(int type, int|list value)
+              int SetTriggerType(string contractNo, int type, int|list value)
 
         【参数】
+              contractNo 合约编号，不能为空
               type 触发方式，可使用的值为：
-                1 : K线触发
-                2 : 即时行情触发
-                3 : 交易数据触发
-                4 : 每隔固定时间触发
-                5 : 指定时刻触发
-              value 当触发方式是为每隔固定时间触发(type=4)时，value为触发间隔，单位为毫秒，必须为100的整数倍，
-              当触发方式为指定时刻触发(type=5)时，value为触发时刻列表，时间的格式为'20190511121314'
+                1 : 即时行情触发
+                2 : 交易数据触发
+                3 : 每隔固定时间触发
+                4 : 指定时刻触发
+              value 当触发方式是为每隔固定时间触发(type=3)时，value为触发间隔，单位为毫秒，必须为100的整数倍，
+              当触发方式为指定时刻触发(type=4)时，value为触发时刻列表，时间的格式为'20190511121314'
               当type为其他值时，该值无效，可以不填
 
         【备注】
               返回整型，0成功，-1失败
 
         【示例】
-              SetTriggerType(1) # 使用K线触发
-              SetTriggerType(4, 1000) # 每隔1000毫秒触发一次
-              SetTriggerType(5, ['20190511121314', '20190511121315', '20190511121316']) # 指定时刻触发
+              SetTriggerType("ZCE|F|SR|910", 3, 1000) # 每隔1000毫秒触发一次
+              SetTriggerType("ZCE|F|SR|910", 4, ['20190511121314', '20190511121315', '20190511121316']) # 指定时刻触发
         '''
-        return self._dataModel.setTriggerMode(type, value)
+        return self._dataModel.setTriggerMode(contractNo, type, value)
 
     # //////////////////////其他函数////////////////////
 
@@ -5035,11 +5034,11 @@ def Enum_Data_Time():
 def GetConfig():
     return baseApi.GetConfig()
 
-def SetBenchmark(*contractNo):
-    return baseApi.SetBenchmark(contractNo)
+# def SetBenchmark(*contractNo):
+#     return baseApi.SetBenchmark(contractNo)
 
-def AddUserNo(userNo):
-    return baseApi.AddUserNo(userNo)
+# def AddUserNo(userNo):
+#     return baseApi.AddUserNo(userNo)
 
 def SetBarInterval(contractNo, barType, barInterval, barCount=2000):
     return baseApi.SetBarInterval(contractNo, barType, barInterval, barCount)
@@ -5080,8 +5079,8 @@ def SetSlippage(slippage):
 def SetTriggerCont(*contractNo):
     return baseApi.SetTriggerCont(contractNo)
 
-def SetTriggerType(type, value):
-    return baseApi.SetTriggerType(type, value)
+def SetTriggerType(contNo, type, value):
+    return baseApi.SetTriggerType(contNo, type, value)
 
 # 属性函数
 def BarInterval(contractNo=''):

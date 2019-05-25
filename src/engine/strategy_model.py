@@ -385,8 +385,8 @@ class StrategyModel(object):
     def addUserNo(self, userNo):
         self._cfgModel.addUserNo(userNo)
 
-    def setBarInterval(self, contractNo, barType, barInterval, sampleConfig):
-        self._cfgModel.setBarInterval(contractNo, barType, barInterval, sampleConfig)
+    def setBarInterval(self, contractNo, barType, barInterval, sampleConfig, trigger=True):
+        self._cfgModel.setBarInterval(contractNo, barType, barInterval, sampleConfig, trigger)
 
     def setSample(self, sampleType, sampleValue):
         return self._cfgModel.setSample(sampleType, sampleValue)
@@ -469,8 +469,8 @@ class StrategyModel(object):
         self._cfgModel.setSlippage(slippage)
         return 0
 
-    def setTriggerMode(self, type, value):
-        return self._cfgModel.setTrigger(type, value)
+    def setTriggerMode(self, contNo, type, value):
+        return self._cfgModel.setTrigger(contNo, type, value)
 
     # ///////////////////////账户函数///////////////////////////
     def getAccountId(self):
@@ -1435,8 +1435,6 @@ class StrategyConfig(object):
             raise Exception(ret)
 
         self._metaData = self.convertArgsDict(argsDict)
-        # self.convertArgsDict(argsDict)
-        # self._metaData = deepcopy(argsDict)
 
     def convertArgsDict(self, argsDict):
         resDict = {}
@@ -1448,63 +1446,55 @@ class StrategyConfig(object):
 
         # Sample
         sample = argsDict['Sample']
-        resDict['BarInterval'] = {
-            'Default': [{'KLineType': sample['KLineType'], 'KLineSlice': sample['KLineSlice'], }],  # 界面设置信息
-        }
+        useSample = ('BeginTime' in sample) or ('KLineCount' in sample) or ('AllK' in sample)
+        defaultSample = {
+            'KLineType' : sample['KLineType'],
+            'KLineSlice': sample['KLineSlice'],
+            'BeginTime' : sample['BeginTime'] if 'BeginTime' in sample else '',
+            'KLineCount': sample['KLineCount'] if 'KLineCount' in sample else 0,
+            'AllK'      : sample['AllK'] if 'AllK' in sample else False,
+            'UseSample' : useSample,
+            'Trigger': True,
+        }# 界面设置信息
         resDict['Sample'] = {
-            'Default': self.getSampleDict(sample),  # 界面设置信息
+            'Default': [deepcopy(defaultSample)],
         }
+
+        benchmark = ''
         if len(contList) > 0 and len(contList[0]) > 0:
             # 界面设置了基准合约和K线信息
-            self.updateBarInterval(contList[0], resDict, sample)
-            self.updateSample(contList[0], resDict, sample)
+            benchmark = contList[0]
+            resDict['Sample'][benchmark] = [deepcopy(defaultSample)]
+            resDict['SubContract'] = [benchmark]
+        else:
+            resDict['SubContract'] = []
+
+        resDict['Sample']['Display'] = {"ContractNo" : benchmark, "KLineType": sample['KLineType'], "KLineSlice": sample['KLineSlice']}
 
         print("sun ------- ", resDict)
         return resDict
 
-    def updateBarInterval(self, contNo, inDict, fromDict=None):
-        if contNo in inDict['BarInterval']:
+    def updateBarInterval(self, contNo, inDict, fromDict):
+        if contNo in inDict['Sample']:
             if not fromDict:
                 return -1
 
             isExist = False
-            for barDict in inDict['BarInterval'][contNo]:
-                if barDict['KLineType'] == fromDict['KLineType'] and barDict['KLineSlice'] == fromDict['KLineSlice']:
+            for barDict in inDict['Sample'][contNo]:
+                if barDict['KLineType'] == fromDict['KLineType'] \
+                        and barDict['KLineSlice'] == fromDict['KLineSlice']\
+                        and barDict['BeginTime'] == fromDict['BeginTime']\
+                        and barDict['KLineCount'] == fromDict['KLineCount']\
+                        and barDict['AllK'] == fromDict['AllK']\
+                        and barDict['UseSample'] == fromDict['UseSample']\
+                        and barDict['Trigger'] == fromDict['Trigger']:
                     isExist = True
                     break
 
             if not isExist:
-                inDict['BarInterval'][contNo].append({'KLineType': fromDict['KLineType'], 'KLineSlice': fromDict['KLineSlice'], })
-            return 0
-
-        if not fromDict:
-            inDict['BarInterval'][contNo] = inDict['BarInterval']['Default']
+                inDict['Sample'][contNo].append(fromDict)
         else:
-            inDict['BarInterval'][contNo] = [{'KLineType' : fromDict['KLineType'], 'KLineSlice' : fromDict['KLineSlice'],}]
-
-
-    def updateSample(self, contNo, inDict, fromDict=None):
-        if contNo in inDict['Sample']:
-            if not fromDict:
-                return -1
-            inDict['Sample'][contNo] = self.getSampleDict(fromDict)
-            return 0
-
-        if not fromDict:
-            inDict['Sample'][contNo] = inDict['Sample']['Default']
-        else:
-            inDict['Sample'][contNo] = self.getSampleDict(fromDict)
-
-
-    def getSampleDict(self, sample):
-        useSample = ('BeginTime' in sample) or ('KLineCount' in sample) or ('AllK' in sample)
-        sampleDict = {
-            'BeginTime' : sample['BeginTime'] if 'BeginTime' in sample else '',
-            'KLineCount' : sample['KLineCount'] if 'KLineCount' in sample else 0,
-            'AllK' : sample['AllK'] if 'AllK' in sample else False,
-            'UseSample' : useSample,
-        }
-        return deepcopy(sampleDict)
+            inDict['Sample'][contNo] = [fromDict]
 
     def _chkConfig(self, argsDict):
         if 'Contract' not in argsDict:
@@ -1537,55 +1527,98 @@ class StrategyConfig(object):
     # *******************************************************
     # gyt test interface
     def getTriggerContract(self):
-        return self._metaData['Contract']
+        return self._metaData['SubContract']
+
+    def getSampleInfo(self):
+        kLineTypetupleList = []
+        kLineTypeDictList = []
+        subDict = {}
+        for contNo, barList in self._metaData['Sample'].items():
+            if contNo in ('Default', 'Display'):
+                continue
+
+            for barInfo in barList:
+                triggerTuple = (contNo, barInfo['KLineType'], barInfo['KLineSlice'])
+                if triggerTuple not in kLineTypetupleList:
+                    kLineTypetupleList.append(triggerTuple)
+                    kLineTypeDictList.append({"ContractNo": contNo, "KLineType": barInfo['KLineType'], "KLineSlice": barInfo['KLineSlice']})
+
+                if barInfo['UseSample']:
+                    # 需要订阅历史K线
+                    sampleInfo = self._getKLineCount(barInfo)
+                    subDict[triggerTuple] = {"ContractNo": contNo, "KLineType": barInfo['KLineType'],
+                                             "KLineSlice": barInfo['KLineSlice'], "BarCount": sampleInfo}
+                elif triggerTuple in subDict:
+                    # 不需要
+                    del subDict[triggerTuple]
+
+        return kLineTypetupleList, kLineTypeDictList, subDict
 
     def getKLineSubsInfo(self):
-        return [
-            {"ContractNo": "NYMEX|F|CL|1907", "KLineType":"M", "KLineSlice":1, "BarCount": 1000},
-            {"ContractNo": "NYMEX|F|CL|1907", "KLineType": "M", "KLineSlice":5, "BarCount":"20190523"},
-            {"ContractNo": "NYMEX|F|CL|1908", "KLineType": "M", "KLineSlice":1, "BarCount":2000},
-            {"ContractNo": "NYMEX|F|CL|1908", "KLineType": "M", "KLineSlice":5, "BarCount": 2000},
-        ]
+        kLineTypetupleList, kLineTypeDictList, subDict = self.getSampleInfo()
+        return subDict.values()
 
     def getKLineKindsInfo(self):
-        return [
-            {"ContractNo": "NYMEX|F|CL|1907", "KLineType":"M", "KLineSlice":1},
-            {"ContractNo": "NYMEX|F|CL|1907", "KLineType": "M", "KLineSlice": 5},
-            {"ContractNo": "NYMEX|F|CL|1908", "KLineType": "M", "KLineSlice": 1},
-            {"ContractNo": "NYMEX|F|CL|1908", "KLineType": "M", "KLineSlice": 5}
-        ]
+        kLineTypetupleList, kLineTypeDictList, subDict = self.getSampleInfo()
+        for value in subDict.values():
+            del value['BarCount']
+
+        return subDict.values()
 
     def getKLineTriggerInfo(self):
-        return [
-            {"ContractNo": "NYMEX|F|CL|1907", "KLineType": "M", "KLineSlice": 1},
-            {"ContractNo": "NYMEX|F|CL|1907", "KLineType": "M", "KLineSlice": 5},
-            {"ContractNo": "NYMEX|F|CL|1908", "KLineType": "M", "KLineSlice": 1}
-        ]
+        kLineTypetupleList, kLineTypeDictList, subDict = self.getSampleInfo()
+        return kLineTypeDictList
 
     def getKLineTriggerInfoSimple(self):
-        return [
-            ("NYMEX|F|CL|1907", "M", 1),
-            ("NYMEX|F|CL|1907", "M", 5),
-            ("NYMEX|F|CL|1908", "M", 1),
-        ]
+        kLineTypetupleList, kLineTypeDictList, subDict = self.getSampleInfo()
+        return kLineTypetupleList
 
     def getKLineShowInfo(self):
-        return {"ContractNo": "NYMEX|F|CL|1907", "KLineType": "M", "KLineSlice": 1}
+        # 1、取界面设置的 2、取SetBarinterval第一个设置的
+        if not self._metaData['Sample']['Display']['ContractNo']:
+            raise Exception("请确保在设置界面或者在策略中调用SetBarInterval方法设置展示的合约、K线类型和周期")
+        return self._metaData['Sample']['Display']
 
     def getKLineShowInfoSimple(self):
-        return ("NYMEX|F|CL|1907", "M", 1)
+        showInfoSimple = []
+        showInfo = self.getKLineShowInfo()
+        for value in showInfo.values():
+            showInfoSimple.append(value)
+        return tuple(showInfoSimple)
 
     def getPriority(self, key):
-        if key == ("NYMEX|F|CL|1907", "M", 1):
-            return 1
-        elif key == ("NYMEX|F|CL|1907", "M", 5):
-            return 2
-        elif key == ("NYMEX|F|CL|1908", "M", 1):
-            return 3
-        elif key == ("NYMEX|F|CL|1908", "M", 5):
-            return 4
+        kLineTypetupleList = self.getKLineTriggerInfoSimple()
+        if key in kLineTypetupleList:
+            return 1 + kLineTypetupleList.index(key)
         else:
             raise IndexError
+
+    def _getKLineCount(self, sampleDict):
+        if not sampleDict['UseSample']:
+            return 1
+
+        if sampleDict['KLineCount'] > 0:
+            return sampleDict['KLineCount']
+
+        if len(sampleDict['BeginTime']) > 0:
+            return sampleDict['BeginTime']
+
+        if sampleDict['AllK']:
+            nowDateTime = datetime.now()
+            if self.getKLineType() == EEQU_KLINE_DAY:
+                threeYearsBeforeDateTime = nowDateTime - relativedelta(years=3)
+                threeYearsBeforeStr = datetime.strftime(threeYearsBeforeDateTime, "%Y%m%d")
+                return threeYearsBeforeStr
+            elif self.getKLineType() == EEQU_KLINE_HOUR or self._getKLineType() == EEQU_KLINE_MINUTE:
+                oneMonthBeforeDateTime = nowDateTime - relativedelta(months=1)
+                oneMonthBeforeStr = datetime.strftime(oneMonthBeforeDateTime, "%Y%m%d")
+                return oneMonthBeforeStr
+            elif self.getKLineType() == EEQU_KLINE_SECOND:
+                oneWeekBeforeDateTime = nowDateTime - relativedelta(days=7)
+                oneWeekBeforeStr = datetime.strftime(oneWeekBeforeDateTime, "%Y%m%d")
+                return oneWeekBeforeStr
+            else:
+                raise NotImplementedError
     # *******************************************************
 
     def setBenchmark(self, benchmark):
@@ -1602,34 +1635,18 @@ class StrategyConfig(object):
         
     def getContract(self):
         '''获取合约列表'''
-        return self._metaData['Contract']
+        return self._metaData['SubContract']
 
     def setContract(self, contTuple):
         '''设置合约列表'''
-        if not contTuple or not isinstance(contTuple, tuple):
-            return -1
-
-        self._metaData['Contract'] = contTuple
-        benchmark = contTuple[0]
-
-        self.cleanBarInterval(self._metaData)
-        self.cleanSample(self._metaData)
-
-        if benchmark not in self._metaData['BarInterval']:
-            # 基准合约未设置BarInterval信息
-            self.updateBarInterval(benchmark, self._metaData)
-
-        if benchmark not in self._metaData['Sample']:
-            # 基准合约未设置BarInterval信息
-            self.updateSample(benchmark, self._metaData)
-
-    def cleanBarInterval(self, inDict):
-        defaultBarInterval = inDict['BarInterval']['Default']
-        inDict['BarInterval'] = {'Default': deepcopy(defaultBarInterval)}
-
-    def cleanSample(self, inDict):
-        defaultSample = inDict['Sample']['Default']
-        inDict['Sample'] = {'Default': deepcopy(defaultSample)}
+        pass
+        # if not isinstance(contTuple, tuple):
+        #     return -1
+        #
+        # defaultBenchmark = self._metaData['Contract'][0] if len(self._metaData['Contract']) > 0 else ""
+        # if len(defaultBenchmark) > 0:
+        #     del self._metaData['Sample'][defaultBenchmark]
+        # self._metaData['Contract'] = contTuple
 
     def addUserNo(self, userNo):
         '''设置交易使用的账户'''
@@ -1655,25 +1672,27 @@ class StrategyConfig(object):
         '''获取触发方式'''
         return self._metaData['Trigger']
 
-    def setTrigger(self, type, value):
+    def setTrigger(self, contNo, type, value):
         '''设置触发方式'''
-        if type not in (1, 2, 3, 4, 5):
+        if type not in (1, 2, 3, 4):
             return -1
-        if type == 4 and value%100 != 0:
+        if type == 3 and value%100 != 0:
             return -1
-        if type == 5 and isinstance(value, list):
+        if type == 4 and isinstance(value, list):
             for timeStr in value:
                 if len(timeStr) != 14 or not self.isVaildDate(timeStr, "%Y%m%d%H%M%S"):
                     return -1
 
+        self._metaData['SubContract'].append(contNo)
         trigger = self._metaData['Trigger']
+        # if type == 1:
+        #     trigger['KLine'] = True
+        # el
         if type == 1:
-            trigger['KLine'] = True
-        elif type == 2:
             trigger['SnapShot'] = True
-        elif type == 3:
+        elif type == 2:
             trigger['Trade'] = True
-        elif type == 4:
+        elif type == 3:
             trigger['Cycle'] = value
         elif value:
             trigger['Timer'] = value
@@ -1681,6 +1700,8 @@ class StrategyConfig(object):
 
     def setSample(self, sampleType, sampleValue):
         '''设置样本数据'''
+        pass
+        '''
         if sampleType not in ('A', 'D', 'C', 'N'):
             return -1
 
@@ -1713,14 +1734,7 @@ class StrategyConfig(object):
             return 0
 
         return -1
-
-    def initSampleDict(self):
-        sample = {
-            'KLineType': 'D',
-            'KLineSlice': 1,
-            'KLineCount': 2000
-        }
-        return sample
+        '''
 
     def getSample(self, contNo=''):
         '''获取样本数据'''
@@ -1746,11 +1760,17 @@ class StrategyConfig(object):
 
     def getKLineType(self):
         '''获取K线类型'''
-        return self._metaData['Sample']['KLineType']
+        # return self._metaData['Sample']['KLineType']
+        kLineInfo = self.getKLineShowInfo()
+        if 'KLineType' in kLineInfo:
+            return kLineInfo['KLineType']
 
     def getKLineSlice(self):
         '''获取K线间隔'''
-        return self._metaData['Sample']['KLineSlice']
+        # return self._metaData['Sample']['KLineSlice']
+        kLineInfo = self.getKLineShowInfo()
+        if 'KLineSlice' in kLineInfo:
+            return kLineInfo['KLineSlice']
 
     def setAllKTrueInSample(self, sample, setForSpread=False):
         if 'BeginTime' in sample:
@@ -1796,26 +1816,38 @@ class StrategyConfig(object):
     def setUseSample(self, isUseSample):
         self._metaData['RunMode']['Simulate']['UseSample'] = isUseSample
 
-    def setBarInterval(self, contNo, barType, barInterval, sampleConfig):
+    def setBarInterval(self, contNo, barType, barInterval, sampleConfig, trigger=True):
         '''设置K线类型和K线周期'''
         if barType not in ('t', 'T', 'S', 'M', 'H', 'D', 'W', 'm', 'Y'):
             return -1
 
-        if contNo not in self.getContract():
-            raise Exception("合约编号不在SetBenchmark方法或者设置界面所设置的合约列表中")
+        # 清空界面设置的合约K线信息
+        defaultBenchmark = self.getContract()[0] if len(self.getContract()) > 0 and len(self.getContract()[0]) else ""
+        if len(defaultBenchmark) > 0:
+            del self._metaData['Sample'][defaultBenchmark]
+            self.setContract(("",))
+            self._metaData['Sample']['Display']['ContractNo'] = None
+            self._metaData['SubContract'] = []
+
+        # 添加订阅合约
+        self._metaData['SubContract'].append(contNo)
+
+        # 记录展示的合约和K线信息
+        if not self._metaData['Sample']['Display']['ContractNo']:
+            self._metaData['Sample']['Display'] = {"ContractNo" : contNo, "KLineType": barType, "KLineSlice": barInterval}
 
         # 更新回测起始点信息
         sampleInfo = {
+            'KLineType': barType,
+            'KLineSlice': barInterval,
             'BeginTime' : sampleConfig if isinstance(sampleConfig, str) and self.isVaildDate(sampleConfig, "%Y%m%d") else '',
             'KLineCount' : sampleConfig if isinstance(sampleConfig, int) and sampleConfig > 0 else 0,
             'AllK' : True if sampleConfig == 'A' else False,
             'UseSample' : False if sampleConfig == 'N' else True,
+            'Trigger' : trigger,
         }
-        self.updateSample(contNo, self._metaData, sampleInfo)
 
-        # 更新K线类型和周期
-        barInfo = {'KLineType' : barType, 'KLineSlice' : barInterval}
-        self.updateBarInterval(contNo, self._metaData, barInfo)
+        self.updateBarInterval(contNo, self._metaData, sampleInfo)
 
     def getInitCapital(self, userNo=''):
         '''获取初始资金'''
@@ -2408,26 +2440,28 @@ class StrategyHisQuote(object):
     #////////////////////////参数设置类接口///////////////////////
         
     def _getKLineType(self):
-        if not self._sampleDict:
-            return None
-        return self._sampleDict['KLineType']
+        # if not self._sampleDict:
+        #     return None
+        # return self._sampleDict['KLineType']
+        return self._config.getKLineType()
         
     def _getKLineSlice(self):
-        if not self._sampleDict:
-            return None
-        return self._sampleDict['KLineSlice']
-        
-    def _getKLineCount(self):
-        if not self._useSample:
+        # if not self._sampleDict:
+        #     return None
+        # return self._sampleDict['KLineSlice']
+        return self._config.getKLineSlice()
+
+    def _getKLineCount(self, sampleDict):
+        if not sampleDict['UseSample']:
             return 1
 
-        if 'KLineCount' in self._sampleDict:
-            return self._sampleDict['KLineCount']
+        if sampleDict['KLineCount'] > 0:
+            return sampleDict['KLineCount']
 
-        if 'BeginTime' in self._sampleDict:
-            return self._sampleDict['BeginTime']
+        if len(sampleDict['BeginTime']) > 0:
+            return sampleDict['BeginTime']
 
-        if 'AllK' in self._sampleDict:
+        if sampleDict['AllK']:
             nowDateTime = datetime.now()
             if self._getKLineType() == EEQU_KLINE_DAY:
                 threeYearsBeforeDateTime = nowDateTime - relativedelta(years = 3)
