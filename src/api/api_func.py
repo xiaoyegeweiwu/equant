@@ -247,9 +247,8 @@ _all_func_ = {
                 ],
 
     '设置函数': [
-                    ['SetBenchmark'        , '设置基准合约'],
-                    ['SetUserNo'           , '设置交易账号'],
-                    ['SetSample'           , '设置策略历史回测样本数量'],
+                    ## ['SetBenchmark'        , '设置基准合约'],
+                    ## ['AddUserNo'           , '添加交易账号'],
                     ['SetBarInterval'      , '设置K线类型'],
                     ['SetInitCapital'      , '设置初始资金'],
                     ['SetMargin'           , '设置保证金'],
@@ -261,7 +260,6 @@ _all_func_ = {
                     ['SetMinTradeQuantity' , '设置最小下单量'],
                     ['SetHedge'            , '设置投保标志'],
                     ['SetSlippage'         , '设置滑点损耗'],
-                    ['SetTriggerCont'      , '设置触发合约'],
                     ['SetTriggerType'      , '设置触发方式'],
                 ],
 

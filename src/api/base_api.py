@@ -3947,13 +3947,14 @@ class BaseApi(object):
     def SetBenchmark(self, contractNo):
         '''
         【说明】
-              设置基准合约及相关联的合约列表
+              设置基准合约及触发策略的合约列表，参数不能为空
 
         【语法】
               int SetBenchmark(string contractNo1, string contractNo2, string contractNo3, ...)
 
         【参数】
               contractNo 合约编号，第一个合约编号为基准合约
+              合约编号组成规则详见Symbol方法说明
 
         【备注】
               返回整型, 0成功，-1失败
@@ -3966,47 +3967,59 @@ class BaseApi(object):
         '''
         return self._dataModel.setSetBenchmark(contractNo)
 
-    def SetUserNo(self, userNo):
+    def AddUserNo(self, userNo):
         '''
         【说明】
-              设置实盘交易账户
+              添加实盘交易账户
 
         【语法】
-              int SetUserNo(str userNo)
+              int SetUserNo(string userNo)
 
         【参数】
-              userNo 实盘交易账户
+              userNo 实盘交易账户，不能为空字符串
 
         【备注】
               返回整型, 0成功，-1失败
+              若需要添加多个不同的交易账号，则可多次调用该账户
 
         【示例】
               SetUserNo('ET001')
         '''
-        return self._dataModel.setUserNo(userNo)
+        return self._dataModel.addUserNo(userNo)
 
-    def SetBarInterval(self, type, interval, contractNo):
+    def SetBarInterval(self, contractNo, barType, barInterval, sampleConfig):
         '''
         【说明】
-              设置指定合约的K线类型和K线周期
+              设置指定合约的K线类型和K线周期，以及策略历史回测的起始点信息
 
         【语法】
-              int SetBarInterval(char type, int interval, string contractNo)
+              int SetBarInterval(string contractNo, char barType, int barInterval, int|string|char sampleConfig)
 
         【参数】
-              type K线类型 t分时，T分笔，S秒线，M分钟，H小时，D日线，W周线，m月线，Y年线
-              interval K线周期
               contractNo 合约编号，默认为基础合约
+              barType K线类型 t分时，T分笔，S秒线，M分钟，H小时，D日线，W周线，m月线，Y年线
+              barInterval K线周期
+              sampleConfig 策略历史回测的起始点信息，可选的值为：
+                字符A : 使用所有K线
+                字符N : 不执行历史K线
+                整数 : 历史回测使用的K线根数
+                字符串 : 用于历史回测样本的起始日期，格式为YYYYMMDD，精确到日，例如2019-04-30的日期格式为'20190430'
+                默认为使用2000根K线进行回测
 
         【备注】
               返回整型, 0成功，-1失败
-              如果对于相同的合约，如果使用该函数设置不同的K线类型和周期，则系统会同时订阅指定的K线类型和周期的行情数据
+              通过该方法系统会订阅指定合约的K线数据，
+              对于相同的合约，如果使用该函数设置不同的K线类型(barType)和周期(barInterval)，则系统会同时订阅指定的K线类型和周期的行情数据
+              对于相同的合约，如果使用该函数设置不同的起始点信息(sampleConfig)，则以最后一个起始点信息为准
 
         【示例】
-              SetBarInterval('M', 3) 表示对基础合约使用3分钟线
-              SetBarInterval('M', 3, 'ZCE|F|SR|906') 表示对合约ZCE|F|SR|906使用3分钟线
+              SetBarInterval('ZCE|F|SR|906', 'M', 3, 'A') 订阅合约ZCE|F|SR|906的3分钟K线数据，并使用所有K线样本进行历史回测
+              SetBarInterval('ZCE|F|SR|906', 'M', 3, 'N') 订阅合约ZCE|F|SR|906的3分钟K线数据，并使用所有K线样本进行历史回测
+              SetBarInterval('ZCE|F|SR|906', 'M', 3, 2000) 订阅合约ZCE|F|SR|906的3分钟K线数据，并使用2000根K线样本进行历史回测
+              SetBarInterval('ZCE|F|SR|906', 'M', 3) 订阅合约ZCE|F|SR|906的3分钟K线数据，由于sampleConfig的默认值为2000，所以使用2000根K线样本进行历史回测
+              SetBarInterval('ZCE|F|SR|906', 'M', 3, '20190430') 订阅合约ZCE|F|SR|906的3分钟K线数据，并使用2019-04-30起的K线进行历史回测
         '''
-        return self._dataModel.setBarInterval(type, interval, contractNo)
+        return self._dataModel.setBarInterval(contractNo, barType, barInterval, sampleConfig)
 
     def SetSample(self, sampleType, sampleValue):
         '''
@@ -4268,34 +4281,33 @@ class BaseApi(object):
         '''
         return self._dataModel.setSlippage(slippage)
 
-    def SetTriggerType(self, type, value):
+    def SetTriggerType(self, contractNo, type, value):
         '''
         【说明】
              设置触发方式
 
         【语法】
-              int SetTriggerType(int type, int|list value)
+              int SetTriggerType(string contractNo, int type, int|list value)
 
         【参数】
+              contractNo 合约编号，不能为空
               type 触发方式，可使用的值为：
-                1 : K线触发
-                2 : 即时行情触发
-                3 : 交易数据触发
-                4 : 每隔固定时间触发
-                5 : 指定时刻触发
-              value 当触发方式是为每隔固定时间触发(type=4)时，value为触发间隔，单位为毫秒，必须为100的整数倍，
-              当触发方式为指定时刻触发(type=5)时，value为触发时刻列表，时间的格式为'20190511121314'
-              当type为其他值时，该值无效
+                1 : 即时行情触发
+                2 : 交易数据触发
+                3 : 每隔固定时间触发
+                4 : 指定时刻触发
+              value 当触发方式是为每隔固定时间触发(type=3)时，value为触发间隔，单位为毫秒，必须为100的整数倍，
+              当触发方式为指定时刻触发(type=4)时，value为触发时刻列表，时间的格式为'20190511121314'
+              当type为其他值时，该值无效，可以不填
 
         【备注】
               返回整型，0成功，-1失败
 
         【示例】
-              SetTriggerType(1, 0) # 使用K线触发
-              SetTriggerType(2, ['20190511121314', '20190511121315', '20190511121316']) # 指定时刻触发
-              SetTriggerType(4, 1000) # 每隔1000毫秒触发一次
+              SetTriggerType("ZCE|F|SR|910", 3, 1000) # 每隔1000毫秒触发一次
+              SetTriggerType("ZCE|F|SR|910", 4, ['20190511121314', '20190511121315', '20190511121316']) # 指定时刻触发
         '''
-        return self._dataModel.setTriggerMode(type, value)
+        return self._dataModel.setTriggerMode(contractNo, type, value)
 
     # //////////////////////其他函数////////////////////
 
@@ -5022,17 +5034,17 @@ def Enum_Data_Time():
 def GetConfig():
     return baseApi.GetConfig()
 
-def SetBenchmark(*contractNo):
-    return baseApi.SetBenchmark(contractNo)
+# def SetBenchmark(*contractNo):
+#     return baseApi.SetBenchmark(contractNo)
 
-def SetUserNo(userNo=''):
-    return baseApi.SetUserNo(userNo)
+# def AddUserNo(userNo):
+#     return baseApi.AddUserNo(userNo)
 
-def SetBarInterval(barType, barInterval, contractNo=''):
-    return baseApi.SetBarInterval(barType, barInterval, contractNo)
+def SetBarInterval(contractNo, barType, barInterval, barCount=2000):
+    return baseApi.SetBarInterval(contractNo, barType, barInterval, barCount)
 
-def SetSample(sampleType='C', sampleValue=2000):
-    return baseApi.SetSample(sampleType, sampleValue)
+# def SetSample(sampleType='C', sampleValue=2000):
+#     return baseApi.SetSample(sampleType, sampleValue)
 
 def SetInitCapital(capital='', userNo=''):
     return baseApi.SetInitCapital(capital, userNo)
@@ -5067,8 +5079,8 @@ def SetSlippage(slippage):
 def SetTriggerCont(*contractNo):
     return baseApi.SetTriggerCont(contractNo)
 
-def SetTriggerType(type, value):
-    return baseApi.SetTriggerType(type, value)
+def SetTriggerType(contNo, type, value):
+    return baseApi.SetTriggerType(contNo, type, value)
 
 # 属性函数
 def BarInterval(contractNo=''):
