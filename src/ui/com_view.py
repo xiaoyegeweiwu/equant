@@ -289,8 +289,9 @@ class RunWin(QuantToplevel, QuantFrame):
         self.setPos()
         self.protocol("WM_DELETE_WINDOW", self.cancel)
 
-        # 将函数包装一下(初始资金只能输入数字)
+        # 将函数包装一下(初始资金只能输入数字、浮点数)
         self.testContent = self.register(self.testDigit)
+        self.testFlt     = self.register(self.testFloat)
         # 新建属性设置变量
         self.initVariable()
         # 初始化config
@@ -733,6 +734,14 @@ class RunWin(QuantToplevel, QuantFrame):
             return True
         return False
 
+    def testFloat(self, content):
+        """判断Entry中是否为浮点数"""
+        try:
+            if content == "" or isinstance(float(content), float):
+                return True
+        except:
+            return False
+
     def setDefaultOrder(self, frame):
         defaultFrame = tk.Frame(frame, relief=tk.RAISED, bg=rgb_to_hex(255, 255, 255))
         defaultFrame.pack(side=tk.TOP, fill=tk.X, padx=15, pady=5)
@@ -831,9 +840,9 @@ class RunWin(QuantToplevel, QuantFrame):
         tk.Label(openFeeFrame, text='开仓手续费(率):', bg=rgb_to_hex(255, 255, 255),
                  justify=tk.LEFT, anchor=tk.W, width=15).pack(side=tk.LEFT)
         openFeeEntry = tk.Entry(openFeeFrame, relief=tk.GROOVE, bd=2, textvariable=self.openFee,
-                                validate="key", validatecommand=(self.testContent, "%P"))
-        # openFeeEntry.insert(tk.END, 1)
+                                validate="key", validatecommand=(self.testFlt, "%P"))
         openFeeEntry.pack(side=tk.LEFT, fill=tk.X, padx=5)
+
         openFeeUnit = tk.Label(openFeeFrame, text=' ', bg=rgb_to_hex(255, 255, 255),
                                textvariable=self.openTypeUnitVar, justify=tk.LEFT, anchor=tk.W, width=2)
         openFeeUnit.pack(side=tk.LEFT, padx=5)
@@ -854,8 +863,8 @@ class RunWin(QuantToplevel, QuantFrame):
         tk.Label(closeFeeFrame, text='平仓手续费(率):', bg=rgb_to_hex(255, 255, 255),
                  justify=tk.LEFT, anchor=tk.W, width=15).pack(side=tk.LEFT)
         closeFeeEntry = tk.Entry(closeFeeFrame, relief=tk.GROOVE, bd=2, textvariable=self.closeFee,
-                                 validate="key", validatecommand=(self.testContent, "%P"))
-        # closeFeeEntry.insert(tk.END, 1)
+                                 validate="key", validatecommand=(self.testFlt, "%P"))
+
         closeFeeEntry.pack(side=tk.LEFT, fill=tk.X, padx=5)
         closeFeeUnit = tk.Label(closeFeeFrame, text=' ', bg=rgb_to_hex(255, 255, 255),
                                      textvariable=self.closeTypeUnitVar, justify=tk.LEFT, anchor=tk.W, width=2)
@@ -866,9 +875,7 @@ class RunWin(QuantToplevel, QuantFrame):
         openType = self.openType.get()
         if openType == "固定值":
             self.openTypeUnitVar.set(" ")
-            # self.openFeeUnit.config(text=" ")
         if openType == "比例":
-            # self.openFeeUnit.config(text="%")
             self.openTypeUnitVar.set("%")
 
     def closeTypeUnitSet(self, event=None):
@@ -1189,7 +1196,7 @@ class RunWin(QuantToplevel, QuantFrame):
         klineSliceLabel.pack(side=tk.LEFT, padx=5)
 
         self.klineSliceChosen = ttk.Combobox(self.klineSliceFrame, state="readonly", textvariable=self.kLineSlice)
-        self.klineSliceChosen["values"] = ['1', '2', '3', '5', '10', '15', '30']
+        self.klineSliceChosen["values"] = ['1', '2', '3', '5', '10', '15', '30', '60', '120']
         # self.klineSliceChosen.current(0)
         self.klineSliceChosen.pack(side=tk.LEFT, fill=tk.X, padx=10)
 
