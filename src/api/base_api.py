@@ -64,16 +64,18 @@ class BaseApi(object):
         '''
         return self._dataModel.getBarTime(contractNo)
 
-    def Open(self, contractNo=''):
+    def Open(self, contractNo, kLineType, kLineValue):
         '''
         【说明】
               指定合约指定周期的开盘价
 
         【语法】
-              numpy.array Open(string contractNo)
+              numpy.array Open(string contractNo, char kLineType, int kLineValue)
 
         【参数】
               contractNo 合约编号, 默认基准合约
+              kLineType K线类型，可选值请参阅周期类型枚举函数
+              kLineValue K线周期
 
         【备注】
               简写O, 返回值numpy数组包含截止当前Bar的所有开盘价
@@ -81,32 +83,34 @@ class BaseApi(object):
 
         【实例】
               Open() 获取基准合约的所有开盘价列表
-              Open('ZCE|F|SR|905') 获取白糖905合约的所有开盘价列表
+              Open('ZCE|F|SR|905', 'M', 1) 获取白糖905合约1分钟K线的所有开盘价列表
         '''
-        return self._dataModel.getBarOpen(contractNo)
+        return self._dataModel.getBarOpen(contractNo, kLineType, kLineValue)
 
-    def High(self, contractNo=''):
+    def High(self, contractNo, kLineType, kLineValue):
         '''
         【说明】
               指定合约指定周期的最高价
 
         【语法】
-              numpy.array High(string contractNo)
+              numpy.array High(string contractNo, char kLineType, int kLineValue)
 
         【参数】
               contractNo 合约编号,默认基准合约
+              kLineType K线类型，可选值请参阅周期类型枚举函数
+              kLineValue K线周期
 
         【备注】
               简写H, Tick时为当时的委托卖价
               返回numpy数组，包括截止当前Bar的所有最高价
-              High()[-1] 表示当前Bar最高价，High()[-2]表示上一个Bar最高价，以此类推
+              High('ZCE|F|SR|905', 'M', 1)[-1] 表示当前Bar最高价，High('ZCE|F|SR|905', 'M', 1)[-2]表示上一个Bar最高价，以此类推
 
         【实例】
               无
         '''
-        return self._dataModel.getBarHigh(contractNo)
+        return self._dataModel.getBarHigh(contractNo, kLineType, kLineValue)
 
-    def Low(self, contractNo=''):
+    def Low(self, contractNo, kLineType, kLineValue):
         '''
         【说明】
               指定合约指定周期的最低价
@@ -125,18 +129,20 @@ class BaseApi(object):
         【实例】
               无
         '''
-        return self._dataModel.getBarLow(contractNo)
+        return self._dataModel.getBarLow(contractNo, kLineType, kLineValue)
 
-    def Close(self, contractNo):
+    def Close(self, contractNo, kLineType, kLineValue):
         '''
         【说明】
               指定合约指定周期的收盘价
 
         【语法】
-              numpy.array Close(string contractNo)
+              numpy.array Close(string contractNo, char kLineType, int kLineValue)
 
         【参数】
               contractNo 合约编号, 默认基准合约
+              kLineType K线类型，可选值请参阅周期类型枚举函数
+              kLineValue K线周期
 
         【备注】
               简写C, 返回numpy数组，包括截止当前Bar的所有收盘价
@@ -145,9 +151,9 @@ class BaseApi(object):
         【实例】
               无
         '''
-        return self._dataModel.getBarClose(contractNo)
+        return self._dataModel.getBarClose(contractNo, kLineType, kLineValue)
 
-    def Vol(self, contractNo):
+    def Vol(self, contractNo, kLineType, kLineValue):
         '''
         【说明】
               指定合约指定周期的成交量
@@ -165,9 +171,9 @@ class BaseApi(object):
         【实例】
               无
         '''
-        return self._dataModel.getBarVol(contractNo)
+        return self._dataModel.getBarVol(contractNo, kLineType, kLineValue)
 
-    def OpenInt(self, contractNo):
+    def OpenInt(self, contractNo, kLineType, kLineValue):
         '''
         【说明】
               指定合约指定周期的持仓量
@@ -185,7 +191,7 @@ class BaseApi(object):
         【实例】
               无
         '''
-        return self._dataModel.getBarOpenInt(contractNo)
+        return self._dataModel.getBarOpenInt(contractNo, kLineType, kLineValue)
 
     def TradeDate(self, contractNo):
         '''
@@ -206,16 +212,18 @@ class BaseApi(object):
         '''
         return self._dataModel.getBarTradeDate(contractNo)
 
-    def BarCount(self, contractNo):
+    def BarCount(self, contractNo, kLineType, kLineValue):
         '''
         【说明】
               指定合约Bar的总数
 
         【语法】
-              int BarCount(string contractNo)
+              int BarCount(string contractNo, char kLineType, int kLineValue)
 
         【参数】
               contractNo 合约编号, 默认基准合约
+              kLineType K线类型，可选值请参阅周期类型枚举函数
+              kLineValue K线周期
 
         【备注】
               返回值为整型
@@ -223,7 +231,7 @@ class BaseApi(object):
         【实例】
               无
         '''
-        return self._dataModel.getBarCount(contractNo)
+        return self._dataModel.getBarCount(contractNo, kLineType, kLineValue)
 
     def CurrentBar(self, contractNo):
         '''
@@ -4510,44 +4518,44 @@ def Time(contractNo=''):
 def T(contractNo=''):
     return baseApi.Time(contractNo)
 
-def Open(contractNo=''):
-    return baseApi.Open(contractNo)
+def Open(contractNo, kLineType, kLineValue):
+    return baseApi.Open(contractNo, kLineType, kLineValue)
 
-def O(contractNo=''):
-    return baseApi.Open(contractNo)
+def O(contractNo, kLineType, kLineValue):
+    return baseApi.Open(contractNo, kLineType, kLineValue)
 
-def High(contractNo=''):
-    return baseApi.High(contractNo)
+def High(contractNo, kLineType, kLineValue):
+    return baseApi.High(contractNo, kLineType, kLineValue)
 
-def H(contractNo=''):
-    return baseApi.High(contractNo)
+def H(contractNo, kLineType, kLineValue):
+    return baseApi.High(contractNo, kLineType, kLineValue)
 
-def Low(contractNo=''):
-    return baseApi.Low(contractNo)
+def Low(contractNo, kLineType, kLineValue):
+    return baseApi.Low(contractNo, kLineType, kLineValue)
 
 def L(contractNo=''):
     return baseApi.Low(contractNo)
 
-def Close(contractNo=''):
-    return baseApi.Close(contractNo)
+def Close(contractNo, kLineType, kLineValue):
+    return baseApi.Close(contractNo, kLineType, kLineValue)
 
 def C(contractNo=''):
     return baseApi.Close(contractNo)
 
-def Vol(contractNo=''):
-    return baseApi.Vol(contractNo)
+def Vol(contractNo, kLineType, kLineValue):
+    return baseApi.Vol(contractNo, kLineType, kLineValue)
 
-def V(contractNo=''):
-    return baseApi.Vol(contractNo)
+def V(contractNo, kLineType, kLineValue):
+    return baseApi.Vol(contractNo, kLineType, kLineValue)
 
-def OpenInt(contractNo=''):
-    return baseApi.OpenInt(contractNo)
+def OpenInt(contractNo, kLineType, kLineValue):
+    return baseApi.OpenInt(contractNo, kLineType, kLineValue)
 
 def TradeDate(contractNo=''):
     return baseApi.TradeDate(contractNo)
 
-def BarCount(contractNo=''):
-    return baseApi.BarCount(contractNo)
+def BarCount(contractNo, kLineType, kLineValue):
+    return baseApi.BarCount(contractNo, kLineType, kLineValue)
 
 def CurrentBar(contractNo=''):
     return baseApi.CurrentBar(contractNo)

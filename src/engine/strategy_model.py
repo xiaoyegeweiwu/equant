@@ -138,14 +138,28 @@ class StrategyModel(object):
 
     #++++++++++++++++++++++base api接口++++++++++++++++++++++++++
     #////////////////////////K线函数/////////////////////////////
-    def getBarOpenInt(self, contNo):
-        return self._hisModel.getBarOpenInt(contNo)
+    def getKey(self, contNo, kLineType, kLineValue):
+        # if contNo not in 合约没有订阅
+        if kLineType not in (EEQU_KLINE_TIMEDIVISION, EEQU_KLINE_TICK,
+                              EEQU_KLINE_SECOND, EEQU_KLINE_MINUTE,
+                              EEQU_KLINE_HOUR, EEQU_KLINE_DAY,
+                              EEQU_KLINE_WEEK, EEQU_KLINE_MONTH,
+                              EEQU_KLINE_YEAR):
+            raise Exception("输入K线类型异常，请参阅枚举函数-周期类型枚举函数")
+        if not isinstance(kLineValue, int) or kLineValue <= 0:
+            raise Exception("输入K线周期异常，请确保输入的K线周期是正整数")
+        return (contNo, kLineType, kLineValue)
+
+    def getBarOpenInt(self, contractNo, kLineType, kLineValue):
+        multiContKey = self.getKey(contNo, kLineType, kLineValue)
+        return self._hisModel.getBarOpenInt(multiContKey)
 
     def getBarTradeDate(self, contNo):
         return self._hisModel.getBarTradeDate(contNo)
 
-    def getBarCount(self, contNo):
-        return self._hisModel.getBarCount(contNo)
+    def getBarCount(self, contNo, kLineType, kLineValue):
+        multiContKey = self.getKey(contNo, kLineType, kLineValue)
+        return self._hisModel.getBarCount(multiContKey)
 
     def getCurrentBar(self, contNo):
         curBar = self._hisModel.getCurBar(contNo)
@@ -163,23 +177,29 @@ class StrategyModel(object):
     def getBarTime(self, contNo):
         return self._hisModel.getBarTime(contNo)
 
-    def getBarOpen(self, symbol):
-        return self._hisModel.getBarOpen(symbol)
+    def getBarOpen(self, contractNo, kLineType, kLineValue):
+        multiContKey = self.getKey(contractNo, kLineType, kLineValue)
+        return self._hisModel.getBarOpen(multiContKey)
         
-    def getBarClose(self, symbol):
-        return self._hisModel.getBarClose(symbol)
+    def getBarClose(self, contractNo, kLineType, kLineValue):
+        multiContKey = self.getKey(contractNo, kLineType, kLineValue)
+        return self._hisModel.getBarClose(multiContKey)
 
-    def getBarVol(self, contNo):
-        return self._hisModel.getBarVol(contNo)
+    def getBarVol(self, contractNo, kLineType, kLineValue):
+        multiContKey = self.getKey(contractNo, kLineType, kLineValue)
+        return self._hisModel.getBarVol(multiContKey)
 
-    def getBarHigh(self, symbol):
-        return self._hisModel.getBarHigh(symbol)
+    def getBarHigh(self, contractNo, kLineType, kLineValue):
+        multiContKey = self.getKey(contractNo, kLineType, kLineValue)
+        return self._hisModel.getBarHigh(multiContKey)
         
-    def getBarLow(self, symbol):
-        return self._hisModel.getBarLow(symbol)
+    def getBarLow(self, contractNo, kLineType, kLineValue):
+        multiContKey = self.getKey(contractNo, kLineType, kLineValue)
+        return self._hisModel.getBarLow(multiContKey)
 
-    def getHisData(self, dataType, periodType, interval, contractNo, maxLength):
-        return self._hisModel.getHisData(dataType, periodType, interval, contractNo, maxLength)
+    def getHisData(self, dataType, kLineType, kLineValue, contractNo, maxLength):
+        multiContKey = self.getKey(contractNo, kLineType, kLineValue)
+        return self._hisModel.getHisData(dataType, multiContKey, maxLength)
 
     # ////////////////////////即时行情////////////////////////////
     def getQUpdateTime(self, symbol):
@@ -1608,7 +1628,7 @@ class StrategyConfig(object):
                 threeYearsBeforeDateTime = nowDateTime - relativedelta(years=3)
                 threeYearsBeforeStr = datetime.strftime(threeYearsBeforeDateTime, "%Y%m%d")
                 return threeYearsBeforeStr
-            elif self.getKLineType() == EEQU_KLINE_HOUR or self._getKLineType() == EEQU_KLINE_MINUTE:
+            elif self.getKLineType() == EEQU_KLINE_HOUR or self.getKLineType() == EEQU_KLINE_MINUTE:
                 oneMonthBeforeDateTime = nowDateTime - relativedelta(months=1)
                 oneMonthBeforeStr = datetime.strftime(oneMonthBeforeDateTime, "%Y%m%d")
                 return oneMonthBeforeStr
@@ -2200,14 +2220,11 @@ class StrategyHisQuote(object):
     def getHisLength(self):
         return self._hisLength
     # ////////////////////////BaseApi类接口////////////////////////
-    def getBarOpenInt(self, contNo):
-        if contNo == '':
-            contNo = self._contractNo
-
-        if contNo not in self._metaData:
+    def getBarOpenInt(self, multiContKey):
+        if multiContKey not in self._metaData:
             return []
 
-        return self._curBarDict[contNo].getBarOpenInt()
+        return self._curBarDict[multiContKey].getBarOpenInt()
 
     # 获取存储位置最后一根k线的交易日
     def getLastTradeDate(self):
@@ -2252,19 +2269,16 @@ class StrategyHisQuote(object):
         curBar = self._curBarDict[contNo].getCurBar()
         return str(curBar['TradeDate'])
 
-    def getBarCount(self, contNo):
-        if contNo == '':
-            contNo = self._contractNo
-
-        if contNo not in self._metaData:
+    def getBarCount(self, multiContKey):
+        if multiContKey not in self._kLineRspData:
             return 0
 
-        kLineHisData = self._metaData[contNo]['KLineData']
+        kLineHisData = self._kLineRspData[multiContKey]['KLineData']
 
-        if contNo not in self._kLineNoticeData:
+        if multiContKey not in self._kLineNoticeData:
             return len(kLineHisData)
 
-        kLineNoticeData = self._kLineNoticeData[contNo]['KLineData']
+        kLineNoticeData = self._kLineNoticeData[multiContKey]['KLineData']
         if len(kLineNoticeData) == 0:
             return len(kLineHisData)
 
@@ -2332,53 +2346,33 @@ class StrategyHisQuote(object):
         timeStamp = str(curBar['DateTimeStamp'])
         return timeStamp[-9:]
 
-    # ************************************************
-    def getBarOpen(self, key=None):
-        key = self._config.getKLineShowInfoSimple()
-        return self._curBarDict[key].getBarOpen()
-        
-    def getBarClose(self, key):
-        key = self._config.getKLineShowInfoSimple()
-        return self._curBarDict[key].getBarClose()
-    # *********************************************** todo,
+    def getBarOpen(self, multiContKey):
+        return self._curBarDict[multiContKey].getBarOpen()
+
+    def getBarClose(self, multiContKey):
+        return self._curBarDict[multiContKey].getBarClose()
 
     def getBarVol(self, contNo):
-        if contNo == '':
-            contNo = self._contractNo
-
         if contNo not in self._curBarDict:
             return []
 
         return self._curBarDict[contNo].getBarVol()
         
-    def getBarHigh(self, contNo):
-        if contNo == '':
-            contNo = self._contractNo
-
-        if contNo not in self._curBarDict:
+    def getBarHigh(self, multiContKey):
+        if multiContKey not in self._curBarDict:
             return []
-        return self._curBarDict[contNo].getBarHigh()
+        return self._curBarDict[multiContKey].getBarHigh()
         
-    def getBarLow(self, contNo):
-        if contNo == '':
-            contNo = self._contractNo
-
-        if contNo not in self._curBarDict:
+    def getBarLow(self, multiContKey):
+        if multiContKey not in self._curBarDict:
             return []
-        return self._curBarDict[contNo].getBarLow()
+        return self._curBarDict[multiContKey].getBarLow()
 
-    def getHisData(self, dataType, periodType, interval, contractNo, maxLength):
+    def getHisData(self, dataType, multiContKey, maxLength):
         if dataType not in (BarDataClose, BarDataOpen, BarDataHigh,
                             BarDataLow, BarDataMedian, BarDataTypical,
                             BarDataWeighted, BarDataVol, BarDataOpi,
                             BarDataTime):
-            return []
-
-        if periodType not in (EEQU_KLINE_TIMEDIVISION, EEQU_KLINE_TICK,
-                              EEQU_KLINE_SECOND, EEQU_KLINE_MINUTE,
-                              EEQU_KLINE_HOUR, EEQU_KLINE_DAY,
-                              EEQU_KLINE_WEEK, EEQU_KLINE_MONTH,
-                              EEQU_KLINE_YEAR):
             return []
 
         methodMap = {
@@ -2394,7 +2388,7 @@ class StrategyHisQuote(object):
             BarDataTime     : self.getBarTime,
         }
 
-        numArray = methodMap[dataType](contractNo)
+        numArray = methodMap[dataType](multiContKey)
 
         return numArray if len(numArray) <= maxLength else numArray[(len(numArray) - maxLength - 1):]
 
