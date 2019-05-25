@@ -2884,7 +2884,7 @@ class StrategyHisQuote(object):
             lastBar = self.getCurBar(key)
             self._updateCurBar(key, row)
             curBar = self.getCurBar(key)
-            if lastBar is not None and math.fabs(curBar["LastPrice"]-lastBar["LastPrice"])>1e-4:
+            if lastBar is None or math.fabs(curBar["LastPrice"]-lastBar["LastPrice"])>1e-4:
                 self._calcProfitWhenHis()
             if not self._config.hasKLineTrigger():
                 continue
@@ -2941,7 +2941,7 @@ class StrategyHisQuote(object):
         lastBar = self.getCurBar(key)
         self._updateCurBar(key, kLineData)
         curBar = self.getCurBar(key)
-        if lastBar is not None and math.fabs(curBar["LastPrice"] - lastBar["LastPrice"])>1e-4:
+        if lastBar is None or math.fabs(curBar["LastPrice"] - lastBar["LastPrice"])>1e-4:
             self._calcProfitWhenHis()
         # **************************,
 
