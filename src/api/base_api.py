@@ -30,10 +30,12 @@ class BaseApi(object):
               当前Bar的日期
 
         【语法】
-              string Date(string contractNo)
+              string Date(string contractNo, kLineType, kLineValue)
 
         【参数】
-              contractNo 合约编号, 默认基准合约
+			  contractNo 合约编号, 默认基准合约
+              kLineType K线类型，可选值请参阅周期类型枚举函数
+              kLineValue K线周期
 
         【备注】
               简写D,返回格式为YYYYMMDD的字符串
@@ -41,18 +43,20 @@ class BaseApi(object):
         【实例】
               当前Bar对应的日期为2019-03-25，则Date返回值为"20190325"
         '''
-        return self._dataModel.getBarDate(contractNo)
+        return self._dataModel.getBarDate(contractNo, kLineType, kLineValue)
 
-    def Time(self, contractNo):
+    def Time(self, contractNo, kLineType, kLineValue):
         '''
         【说明】
               当前Bar的时间
 
         【语法】
-              string Time(string contractNo)
+              string Time(string contractNo, kLineType, kLineValue)
 
         【参数】
               contractNo 合约编号, 默认基准合约
+			  kLineType K线类型，可选值请参阅周期类型枚举函数
+              kLineValue K线周期
 
         【备注】
               简写T, 返回格式为HHMMSSmmm的字符串
@@ -62,7 +66,7 @@ class BaseApi(object):
               当前Bar对应的时间为09:34:00.000，Time返回值为"093400000"
               当前Bar对应的时间为11:34:00.000，Time返回值为"113400000"
         '''
-        return self._dataModel.getBarTime(contractNo)
+        return self._dataModel.getBarTime(contractNo, kLineType, kLineValue)
 
     def Open(self, contractNo, kLineType, kLineValue):
         '''
@@ -70,7 +74,7 @@ class BaseApi(object):
               指定合约指定周期的开盘价
 
         【语法】
-              numpy.array Open(string contractNo, char kLineType, int kLineValue)
+              array Open(string contractNo, char kLineType, int kLineValue)
 
         【参数】
               contractNo 合约编号, 默认基准合约
@@ -93,7 +97,7 @@ class BaseApi(object):
               指定合约指定周期的最高价
 
         【语法】
-              numpy.array High(string contractNo, char kLineType, int kLineValue)
+              array High(string contractNo, char kLineType, int kLineValue)
 
         【参数】
               contractNo 合约编号,默认基准合约
@@ -116,10 +120,12 @@ class BaseApi(object):
               指定合约指定周期的最低价
 
         【语法】
-              numpy.array Low(string contractNo)
+              array Low(string contractNo, char klineType, int kLineValue)
 
         【参数】
               contractNo 合约编号, 默认基准合约
+			  kLineType K线类型，可选值请参阅周期类型枚举函数
+              kLineValue K线周期
 
         【备注】
               简写H, Tick时为当时的委托卖价
@@ -137,7 +143,7 @@ class BaseApi(object):
               指定合约指定周期的收盘价
 
         【语法】
-              numpy.array Close(string contractNo, char kLineType, int kLineValue)
+              array Close(string contractNo, char kLineType, int kLineValue)
 
         【参数】
               contractNo 合约编号, 默认基准合约
@@ -159,10 +165,12 @@ class BaseApi(object):
               指定合约指定周期的成交量
 
         【语法】
-              numpy.array Vol(string contractNo)
+              array Vol(string contractNo, kLineType, kLineValue)
 
         【参数】
               contractNo 合约编号, 默认基准合约
+			  kLineType K线类型，可选值请参阅周期类型枚举函数
+              kLineValue K线周期
 
         【备注】
               简写V, 返回numpy数组，包括截止当前Bar的所有成交量
@@ -179,10 +187,12 @@ class BaseApi(object):
               指定合约指定周期的持仓量
 
         【语法】
-              numpy.array OpenInt(string contractNo)
+              numpy.array OpenInt(string contractNo, kLineType, kLineValue)
 
         【参数】
               contractNo 合约编号, 默认基准合约
+			  kLineType K线类型，可选值请参阅周期类型枚举函数
+              kLineValue K线周期
 
         【备注】
               返回numpy数组，包括截止当前Bar的所有持仓量
@@ -193,16 +203,18 @@ class BaseApi(object):
         '''
         return self._dataModel.getBarOpenInt(contractNo, kLineType, kLineValue)
 
-    def TradeDate(self, contractNo):
+    def TradeDate(self, contractNo, kLineType, kLineValue):
         '''
         【说明】
               指定合约当前Bar的交易日
 
         【语法】
-              string TradeDate(string contractNo)
+              string TradeDate(string contractNo, kLineType, kLineValue)
 
         【参数】
               contractNo 合约编号, 默认基准合约
+			  kLineType K线类型，可选值请参阅周期类型枚举函数
+              kLineValue K线周期
 
         【备注】
               返回格式为YYYYMMDD的字符串
@@ -210,7 +222,7 @@ class BaseApi(object):
         【实例】
               当前Bar对用的日期为2019-03-25，则Date返回值为"20190325"
         '''
-        return self._dataModel.getBarTradeDate(contractNo)
+        return self._dataModel.getBarTradeDate(contractNo, kLineType, kLineValue)
 
     def BarCount(self, contractNo, kLineType, kLineValue):
         '''
@@ -233,16 +245,18 @@ class BaseApi(object):
         '''
         return self._dataModel.getBarCount(contractNo, kLineType, kLineValue)
 
-    def CurrentBar(self, contractNo):
+    def CurrentBar(self, contractNo, kLineType, kLineValue):
         '''
         【说明】
               指定合约当前Bar的索引值
 
         【语法】
-              int CurrentBar(string contractNo)
+              int CurrentBar(string contractNo, kLineType, kLineValue)
 
         【参数】
               contractNo 合约编号, 默认基准合约
+			  kLineType K线类型，可选值请参阅周期类型枚举函数
+              kLineValue K线周期
 
         【备注】
               第一个Bar返回值为0，其他Bar递增
@@ -250,18 +264,20 @@ class BaseApi(object):
         【实例】
               无
         '''
-        return self._dataModel.getCurrentBar(contractNo)
+        return self._dataModel.getCurrentBar(contractNo, kLineType, kLineValue)
 
-    def BarStatus(self, contractNo):
+    def BarStatus(self, contractNo, kLineType, kLineValue):
         '''
         【说明】
               指定合约当前Bar的状态值
 
         【语法】
-              int BarStatus(string contractNo)
+              int BarStatus(string contractNo, kLineType, kLineValue)
 
         【参数】
               contractNo 合约编号, 默认基准合约
+			  kLineType K线类型，可选值请参阅周期类型枚举函数
+              kLineValue K线周期
 
         【备注】
               返回值整型, 0表示第一个Bar,1表示中间普通Bar,2表示最后一个Bar
@@ -269,18 +285,20 @@ class BaseApi(object):
         【实例】
               无
         '''
-        return self._dataModel.getBarStatus(contractNo)
+        return self._dataModel.getBarStatus(contractNo, kLineType, kLineValue)
 
-    def HistoryDataExist(self, contractNo):
+    def HistoryDataExist(self, contractNo, kLineType, kLineValue):
         '''
         【说明】
               指定合约的历史数据是否有效
 
         【语法】
-              bool HistoryDataExist(string contractNo)
+              bool HistoryDataExist(string contractNo, kLineType, kLineValue)
 
         【参数】
               contractNo 合约编号, 默认基准合约
+			  kLineType K线类型，可选值请参阅周期类型枚举函数
+              kLineValue K线周期
 
         【备注】
               返回Bool值，有效返回True，否则返回False
@@ -288,7 +306,7 @@ class BaseApi(object):
         【实例】
               无
         '''
-        return self._dataModel.isHistoryDataExist(contractNo)
+        return self._dataModel.isHistoryDataExist(contractNo, kLineType, kLineValue)
 
     def HisData(self, dataType, periodType, interval, contractNo, maxLength):
         '''
@@ -310,6 +328,7 @@ class BaseApi(object):
                 Enum_Data_Vol           : 成交量
                 Enum_Data_Opi           : 持仓量
                 Enum_Data_Time          : K线时间
+				
               periodType 指定周期类型，可选的枚举函数和相应含义为：
                 Enum_Period_Tick        : 周期类型_分笔
                 Enum_Period_Dyna        : 周期类型_分时
@@ -320,6 +339,7 @@ class BaseApi(object):
                 Enum_Period_Week        : 周期类型_周线
                 Enum_Period_Month       : 周期类型_月线
                 Enum_Period_Year        : 周期类型_年线
+				
               interval 周期数， 如：5分钟线，周期数就是5；50秒线，周期数为50
               contractNo 合约编号, 为空时取当前合约
               maxLength 定返回历史数据数组的最大长度，默认值为100
@@ -4506,65 +4526,65 @@ baseApi = BaseApi()
 
 #////////////////////全局函数定义//////////////
 #K线函数
-def Date(contractNo=''):
-    return baseApi.Date(contractNo)
+def Date(contractNo='', kLineType='', kLineValue=0):
+    return baseApi.Date(contractNo, kLineType, kLineValue)
 
-def D(contractNo=''):
-    return baseApi.Date(contractNo)
+def D(contractNo='', kLineType='', kLineValue=0):
+    return baseApi.Date(contractNo, kLineType, kLineValue)
 
-def Time(contractNo=''):
-    return baseApi.Time(contractNo)
+def Time(contractNo='', kLineType='', kLineValue=0):
+    return baseApi.Time(contractNo, kLineType, kLineValue)
 
-def T(contractNo=''):
-    return baseApi.Time(contractNo)
+def T(contractNo='', kLineType='', kLineValue=0):
+    return baseApi.Time(contractNo, kLineType, kLineValue)
 
-def Open(contractNo, kLineType, kLineValue):
+def Open(contractNo='', kLineType='', kLineValue=0):
     return baseApi.Open(contractNo, kLineType, kLineValue)
 
-def O(contractNo, kLineType, kLineValue):
+def O(contractNo='', kLineType='', kLineValue=0):
     return baseApi.Open(contractNo, kLineType, kLineValue)
 
-def High(contractNo, kLineType, kLineValue):
+def High(contractNo='', kLineType='', kLineValue=0):
     return baseApi.High(contractNo, kLineType, kLineValue)
 
-def H(contractNo, kLineType, kLineValue):
+def H(contractNo='', kLineType='', kLineValue=0):
     return baseApi.High(contractNo, kLineType, kLineValue)
 
-def Low(contractNo, kLineType, kLineValue):
+def Low(contractNo='', kLineType='', kLineValue=0):
     return baseApi.Low(contractNo, kLineType, kLineValue)
 
-def L(contractNo=''):
-    return baseApi.Low(contractNo)
+def L(contractNo='', kLineType='', kLineValue=0):
+    return baseApi.Low(contractNo, kLineType, kLineValue)
 
-def Close(contractNo, kLineType, kLineValue):
+def Close(contractNo='', kLineType='', kLineValue=0):
     return baseApi.Close(contractNo, kLineType, kLineValue)
 
-def C(contractNo=''):
-    return baseApi.Close(contractNo)
+def C(contractNo='', kLineType='', kLineValue=0):
+    return baseApi.Close(contractNo, kLineType, kLineValue)
 
-def Vol(contractNo, kLineType, kLineValue):
+def Vol(contractNo='', kLineType='', kLineValue=0):
     return baseApi.Vol(contractNo, kLineType, kLineValue)
 
-def V(contractNo, kLineType, kLineValue):
+def V(contractNo='', kLineType='', kLineValue=0):
     return baseApi.Vol(contractNo, kLineType, kLineValue)
 
-def OpenInt(contractNo, kLineType, kLineValue):
+def OpenInt(contractNo='', kLineType='', kLineValue=0):
     return baseApi.OpenInt(contractNo, kLineType, kLineValue)
 
-def TradeDate(contractNo=''):
-    return baseApi.TradeDate(contractNo)
+def TradeDate(contractNo='', kLineType='', kLineValue=0):
+    return baseApi.TradeDate(contractNo, kLineType, kLineValue)
 
-def BarCount(contractNo, kLineType, kLineValue):
+def BarCount(contractNo='', kLineType='', kLineValue=0):
     return baseApi.BarCount(contractNo, kLineType, kLineValue)
 
-def CurrentBar(contractNo=''):
-    return baseApi.CurrentBar(contractNo)
+def CurrentBar(contractNo='', kLineType='', kLineValue=0):
+    return baseApi.CurrentBar(contractNo, kLineType, kLineValue)
 
-def BarStatus(contractNo=''):
-    return baseApi.BarStatus(contractNo)
+def BarStatus(contractNo='', kLineType='', kLineValue=0):
+    return baseApi.BarStatus(contractNo, kLineType, kLineValue)
 
-def HistoryDataExist(contractNo=''):
-    return baseApi.HistoryDataExist(contractNo)
+def HistoryDataExist(contractNo='', kLineType='', kLineValue=0):
+    return baseApi.HistoryDataExist(contractNo, kLineType, kLineValue)
 
 def HisData(type, period, interval, contractNo='', maxLength=100):
     return baseApi.HisData(type, period, interval, contractNo, maxLength)

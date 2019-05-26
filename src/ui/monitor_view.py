@@ -115,9 +115,11 @@ class QuantMonitor(object):
         try:
             Id = dataDict['StrategyId']
             StName = dataDict['StrategyName']
-            BenchCon = dataDict['Config']['Contract'][0]
-
-            kLineType = FrequencyDict[dataDict['Config']['Sample']['Display']['KLineType']]
+            #BenchCon = dataDict['Config']['Contract'][0]
+            BenchCon = dataDict['Config']['Sample']['Display']['ContractNo']
+            #kLineType = FrequencyDict[dataDict['Config']['Sample']['Display']['KLineType']]
+            
+            kLineType = dataDict['Config']['Sample']['Display']['KLineType']
             kLineSlice = dataDict['Config']['Sample']['Display']['KLineSlice']
 
             Frequency = str(kLineSlice) + kLineType

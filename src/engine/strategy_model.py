@@ -139,6 +139,10 @@ class StrategyModel(object):
     #++++++++++++++++++++++base api接口++++++++++++++++++++++++++
     #////////////////////////K线函数/////////////////////////////
     def getKey(self, contNo, kLineType, kLineValue):
+        #空合约取默认展示的合约
+        if contNo == "":
+            return self._cfgModel.getDefaultKey()
+    
         # if contNo not in 合约没有订阅
         if kLineType not in (EEQU_KLINE_TIMEDIVISION, EEQU_KLINE_TICK,
                               EEQU_KLINE_SECOND, EEQU_KLINE_MINUTE,
@@ -150,32 +154,40 @@ class StrategyModel(object):
             raise Exception("输入K线周期异常，请确保输入的K线周期是正整数")
         return (contNo, kLineType, kLineValue)
 
-    def getBarOpenInt(self, contractNo, kLineType, kLineValue):
+    def getBarOpenInt(self, contNo, kLineType, kLineValue):
         multiContKey = self.getKey(contNo, kLineType, kLineValue)
         return self._hisModel.getBarOpenInt(multiContKey)
 
-    def getBarTradeDate(self, contNo):
-        return self._hisModel.getBarTradeDate(contNo)
+    def getBarTradeDate(self, contNo, kLineType, kLineValue):
+        multiContKey = self.getKey(contNo, kLineType, kLineValue)
+        return self._hisModel.getBarTradeDate(multiContKey)
 
     def getBarCount(self, contNo, kLineType, kLineValue):
         multiContKey = self.getKey(contNo, kLineType, kLineValue)
         return self._hisModel.getBarCount(multiContKey)
 
-    def getCurrentBar(self, contNo):
-        curBar = self._hisModel.getCurBar(contNo)
-        return curBar["KLineIndex"] - 1
+    def getCurrentBar(self, contNo, kLineType, kLineValue):
+        multiContKey = self.getKey(contNo, kLineType, kLineValue)
+        curBar = self._hisModel.getCurBar(multiContKey)
+        #TODO: 为什么要减1
+        #return curBar["KLineIndex"] - 1
+        return curBar['KLineIndex']
 
-    def getBarStatus(self, contNo):
-        return self._hisModel.getBarStatus(contNo)
+    def getBarStatus(self, contNo, kLineType, kLineValue):
+        multiContKey = self.getKey(contNo, kLineType, kLineValue)
+        return self._hisModel.getBarStatus(multiContKey)
 
-    def isHistoryDataExist(self, contNo):
-        return self._hisModel.isHistoryDataExist(contNo)
+    def isHistoryDataExist(self, contNo, kLineType, kLineValue):
+        multiContKey = self.getKey(contNo, kLineType, kLineValue)
+        return self._hisModel.isHistoryDataExist(multiContKey)
 
-    def getBarDate(self, contNo):
-        return self._hisModel.getBarDate(contNo)
+    def getBarDate(self, contNo, kLineType, kLineValue):
+        multiContKey = self.getKey(contNo, kLineType, kLineValue)
+        return self._hisModel.getBarDate(multiContKey)
 
-    def getBarTime(self, contNo):
-        return self._hisModel.getBarTime(contNo)
+    def getBarTime(self, contNo, kLineType, kLineValue):
+        multiContKey = self.getKey(contNo, kLineType, kLineValue)
+        return self._hisModel.getBarTime(multiContKey)
 
     def getBarOpen(self, contractNo, kLineType, kLineValue):
         multiContKey = self.getKey(contractNo, kLineType, kLineValue)
@@ -1542,6 +1554,11 @@ class StrategyConfig(object):
     def getBenchmark(self):
         '''获取基准合约'''
         return self._metaData['Contract'][0]
+        
+    def getDefaultKey(self):
+        '''获取基准合约配置'''
+        showInfo = self.getKLineShowInfo()
+        return (showInfo['ContractNo'], showInfo['KLineType'], showInfo['KLineSlice'])
 
     # *******************************************************
     # gyt test interface
@@ -2077,6 +2094,23 @@ class StrategyConfig(object):
         return self._metaData['Limit']
 
 class BarInfo(object):
+    '''
+    _curBar = 
+        {
+            'KLineIndex'    : value,
+            'TradeDate'     : value,
+            'DateTimeStamp' : value,
+            'TotalQty'      : value,
+            'PositionQty'   : value,
+            'LastPrice'     : value,
+            'KLineQty'      : value,
+            'OpeningPrice'  : value,
+            'HighPrice'     : value,
+            'LowPrice'      : value,
+            'SettlePrice'   : value,
+        }
+    '''
+    
     def __init__(self, logger):
         self._logger = logger
         self._barList = []
@@ -2118,6 +2152,10 @@ class BarInfo(object):
 
     def getBarTime(self):
         return self._getBarValue('DateTimeStamp')
+        
+    def getBarTradeDate(self):
+        return self._curBar['TradeDate']
+        
         
 class StrategyHisQuote(object):
     '''
@@ -2221,10 +2259,130 @@ class StrategyHisQuote(object):
         return self._hisLength
     # ////////////////////////BaseApi类接口////////////////////////
     def getBarOpenInt(self, multiContKey):
-        if multiContKey not in self._metaData:
+        if multiContKey not in self._curBarDict:
             return []
 
         return self._curBarDict[multiContKey].getBarOpenInt()
+
+    def getBarTradeDate(self, multiContKey):
+        if multiContKey not in self._curBarDict:
+            return 0
+
+        curBar = self._curBarDict[multiContKey].getCurBar()
+        return str(curBar['TradeDate'])
+
+    def getBarCount(self, multiContKey):
+        '''if multiContKey not in self._kLineRspData:
+            return 0'''
+
+        kLineHisData = self._kLineRspData[multiContKey]['KLineData']
+
+        if multiContKey not in self._kLineNoticeData:
+            return len(kLineHisData)
+
+        kLineNoticeData = self._kLineNoticeData[multiContKey]['KLineData']
+        if len(kLineNoticeData) == 0:
+            return len(kLineHisData)
+
+        lastHisBar = kLineHisData[-1]
+        lastNoticeBar = kLineNoticeData[-1]
+
+        return len(kLineHisData) + (lastNoticeBar['KLineIndex'] - lastHisBar['KLineIndex'])
+
+    def getBarStatus(self, multiContKey):
+        if multiContKey not in self._kLineRspData:
+            return -1
+        
+        kLineHisData = self._kLineRspData[multiContKey]['KLineData']
+        firstIndex = kLineHisData[0]['KLineIndex']
+        lastIndex  = KLineHisData[-1]['KLineIndex']
+        
+        if multiContKey in self._kLineNoticeData:
+            kLineNoticeData = self._kLineNoticeData[multiContKey]['KLineData']
+            lastIndex = kLineNoticeData[-1]['KLineIndex']
+
+        curBar = self._curBarDict[multiContKey].getCurBar()
+        curBarIndex = curBar['KLineIndex']
+        
+        if curBarIndex == firstIndex:
+            return 0
+        elif curBarIndex >= lastIndex:
+            return 2
+        else:
+            return 1
+
+    def isHistoryDataExist(self, multiContKey):
+        if multiContKey not in self._curBarDict:
+            return False
+
+        return True if len(self._kLineRspData[multiContKey]) else False
+
+    def getBarDate(self, multiContKey):
+        if multiContKey not in self._curBarDict:
+            return 0
+        curBar = self._curBarDict[multiContKey].getCurBar()
+        return str(curBar['DateTimeStamp'] / 1000000000)
+
+    def getBarTime(self, multiContKey):
+        if multiContKey not in self._curBarDict:
+            return 0
+        curBar = self._curBarDict[multiContKey].getCurBar()
+        timeStamp = str(curBar['DateTimeStamp'])
+        return timeStamp[-9:]
+
+    def getBarOpen(self, multiContKey):
+        if multiContKey not in self._curBarDict:
+            return np.array([])
+            
+        return self._curBarDict[multiContKey].getBarOpen()
+
+    def getBarClose(self, multiContKey):
+        if multiContKey not in self._curBarDict:
+            return np.array([])
+            
+        return self._curBarDict[multiContKey].getBarClose()
+
+    def getBarVol(self, multiContKey):
+        if multiContKey not in self._curBarDict:
+            return np.array([])
+            
+        return self._curBarDict[multiContKey].getBarVol()
+        
+    def getBarHigh(self, multiContKey):
+        if multiContKey not in self._curBarDict:
+            return np.array([])
+        return self._curBarDict[multiContKey].getBarHigh()
+        
+    def getBarLow(self, multiContKey):
+        if multiContKey not in self._curBarDict:
+            return np.array([])
+        return self._curBarDict[multiContKey].getBarLow()
+
+    def getHisData(self, dataType, multiContKey, maxLength):
+        if dataType not in (BarDataClose, BarDataOpen, BarDataHigh,
+                            BarDataLow, BarDataMedian, BarDataTypical,
+                            BarDataWeighted, BarDataVol, BarDataOpi,
+                            BarDataTime):
+            return []
+
+        methodMap = {
+            BarDataClose    : self.getBarClose,
+            BarDataOpen     : self.getBarOpen,
+            BarDataHigh     : self.getBarHigh,
+            BarDataLow      : self.getBarLow,
+            BarDataMedian   : self.getBarMedian,
+            BarDataTypical  : self.getBarTypical,
+            BarDataWeighted : self.getBarWeighted,
+            BarDataVol      : self.getBarVol,
+            BarDataOpi      : self.getBarOpenInt,
+            BarDataTime     : self.getBarTime,
+        }
+
+        numArray = methodMap[dataType](multiContKey)
+
+        return numArray if len(numArray) <= maxLength else numArray[(len(numArray) - maxLength - 1):]
+        
+    #//////////////////////////////////内部接口//////////////////////////////////
 
     # 获取存储位置最后一根k线的交易日
     def getLastTradeDate(self):
@@ -2258,139 +2416,6 @@ class StrategyHisQuote(object):
         assert contractNo in self._curBarDict, "error"
         barManager = self._curBarDict[contractNo]
         return barManager.getCurBar()
-
-    def getBarTradeDate(self, contNo):
-        if contNo == '':
-            contNo = self._contractNo
-
-        if contNo not in self._metaData:
-            return 0
-
-        curBar = self._curBarDict[contNo].getCurBar()
-        return str(curBar['TradeDate'])
-
-    def getBarCount(self, multiContKey):
-        if multiContKey not in self._kLineRspData:
-            return 0
-
-        kLineHisData = self._kLineRspData[multiContKey]['KLineData']
-
-        if multiContKey not in self._kLineNoticeData:
-            return len(kLineHisData)
-
-        kLineNoticeData = self._kLineNoticeData[multiContKey]['KLineData']
-        if len(kLineNoticeData) == 0:
-            return len(kLineHisData)
-
-        lastHisBar = kLineHisData[-1]
-        lastNoticeBar = kLineNoticeData[-1]
-
-        return len(kLineHisData) + (lastNoticeBar['KLineIndex'] - lastHisBar['KLineIndex'])
-
-    def getBarStatus(self, contNo):
-        if contNo == '':
-            contNo = self._contractNo
-
-        if contNo not in self._curBarDict:
-            return -1
-
-        curBar = self._curBarDict[contNo].getCurBar()
-        curBarIndex = curBar['KLineIndex']
-        firstHisBarIndex = self._metaData[contNo]['KLineData'][0]['KLineIndex']
-        lastHisBarIndex = self._metaData[contNo]['KLineData'][-1]['KLineIndex']
-
-        if contNo not in self._kLineNoticeData or len(self._kLineNoticeData[contNo]['KLineData']) == 0:
-            # 仅有历史K线
-            if curBarIndex == firstHisBarIndex:
-                return 0
-            elif curBarIndex < lastHisBarIndex:
-                return 1
-            elif curBarIndex == lastHisBarIndex:
-                return 2
-
-        # 既有历史K线，又有实时K线
-        lastNoticeBarIndex = self._kLineNoticeData[contNo]['KLineData'][-1]['KLineIndex']
-
-        if curBarIndex == firstHisBarIndex:
-            return 0
-        elif curBarIndex >= lastNoticeBarIndex:
-            return 2
-        else:
-            return 1
-
-    def isHistoryDataExist(self, contNo):
-        if contNo == '':
-            contNo = self._contractNo
-
-        if contNo not in self._curBarDict:
-            return False
-
-        return True if len(self._metaData[contNo]) else False
-
-    def getBarDate(self, contNo):
-        if contNo == '':
-            contNo = self._contractNo
-
-        if contNo not in self._curBarDict:
-            return 0
-        curBar = self._curBarDict[contNo].getCurBar()
-        return str(curBar['DateTimeStamp']//1000000000)
-
-    def getBarTime(self, contNo):
-        if contNo == '':
-            contNo = self._contractNo
-
-        if contNo not in self._curBarDict:
-            return 0
-        curBar = self._curBarDict[contNo].getCurBar()
-        timeStamp = str(curBar['DateTimeStamp'])
-        return timeStamp[-9:]
-
-    def getBarOpen(self, multiContKey):
-        return self._curBarDict[multiContKey].getBarOpen()
-
-    def getBarClose(self, multiContKey):
-        return self._curBarDict[multiContKey].getBarClose()
-
-    def getBarVol(self, contNo):
-        if contNo not in self._curBarDict:
-            return []
-
-        return self._curBarDict[contNo].getBarVol()
-        
-    def getBarHigh(self, multiContKey):
-        if multiContKey not in self._curBarDict:
-            return []
-        return self._curBarDict[multiContKey].getBarHigh()
-        
-    def getBarLow(self, multiContKey):
-        if multiContKey not in self._curBarDict:
-            return []
-        return self._curBarDict[multiContKey].getBarLow()
-
-    def getHisData(self, dataType, multiContKey, maxLength):
-        if dataType not in (BarDataClose, BarDataOpen, BarDataHigh,
-                            BarDataLow, BarDataMedian, BarDataTypical,
-                            BarDataWeighted, BarDataVol, BarDataOpi,
-                            BarDataTime):
-            return []
-
-        methodMap = {
-            BarDataClose    : self.getBarClose,
-            BarDataOpen     : self.getBarOpen,
-            BarDataHigh     : self.getBarHigh,
-            BarDataLow      : self.getBarLow,
-            BarDataMedian   : self.getBarMedian,
-            BarDataTypical  : self.getBarTypical,
-            BarDataWeighted : self.getBarWeighted,
-            BarDataVol      : self.getBarVol,
-            BarDataOpi      : self.getBarOpenInt,
-            BarDataTime     : self.getBarTime,
-        }
-
-        numArray = methodMap[dataType](multiContKey)
-
-        return numArray if len(numArray) <= maxLength else numArray[(len(numArray) - maxLength - 1):]
 
     def getBarMedian(self, contNo):
         high = self.getBarHigh(contNo)
