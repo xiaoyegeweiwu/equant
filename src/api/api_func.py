@@ -273,5 +273,16 @@ _all_func_ = {
                     ['LogWarn'              ,'打印警告信息'],
                     ['LogError'             ,'打印错误信息'],
                 ],
+                
+    'context函数': [
+                    ['strategyStatus'       ,'获取当前策略状态'],
+                    ['triggerType'          ,'获取当前触发类型'],
+                    ['contractNo'           ,'获取当前触发合约'],
+                    ['kLineType'            ,'获取当前触发的K线类型'],
+                    ['kLineSlice'           ,'获取当前触发的K线周期'],
+                    ['tradeDate'            ,'获取当前触发的交易日'],
+                    ['dateTimeStamp'        ,'获取当前触发的时间戳'],
+                    ['triggerData'          ,'获取当前触发类型对应的数据'],
+                ],
 
 }

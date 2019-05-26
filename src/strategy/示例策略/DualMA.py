@@ -26,7 +26,3 @@ def handle_data(context):
     if MarketPosition() != -1 and ma1[-1] < ma2[-1]:
         SellShort(1, Open()[-1])         # 卖开仓
         sellPos += 1
-
-
-
-

@@ -4521,6 +4521,160 @@ class BaseApi(object):
               LogError("当前使用的用户账户ID为 : %s，可用资金为 : %10.2f" % (accountId, freeMargin))
         '''
         return self._dataModel.LogError(args)
+        
+    def strategyStatus(self):
+        '''
+        【说明】
+             获取当前策略状态
+
+        【语法】
+              context.strategyStatus()
+
+        【参数】
+              无
+
+        【备注】
+              返回字符, 'H' 表示回测阶段; 'C' 表示实时数据阶段
+
+        【示例】
+              无
+        '''
+        pass
+        
+    def triggerType(self):
+        '''
+        【说明】
+             获取当前触发类型 
+
+        【语法】
+              context.triggerType()
+
+        【参数】
+              无
+
+        【备注】
+              返回字符, 'T' 定时触发; 'C' 周期性触发; 'K' 实时阶段K线触发; 'H' 回测阶段K线触发; 'S' 即时行情触发; 'O' 委托状态变化触发 ; 'M' 成交回报触发  
+
+        【示例】
+              无
+        '''
+        pass
+        
+    def contractNo(self):
+        '''
+        【说明】
+             获取当前触发合约
+
+        【语法】
+              context.contractNo()
+
+        【参数】
+              无
+
+        【备注】
+              返回字符串,例如: 'SHFE|F|CU|1907'
+
+        【示例】
+              无
+        '''
+        pass
+        
+    def kLineType(self):
+        '''
+        【说明】
+             获取当前触发的K线类型
+
+        【语法】
+              context.kLineType()
+
+        【参数】
+              无
+
+        【备注】
+              返回字符, 't' 分时; 'T' 分笔; 'S' 秒线; 'M' 分钟; 'H' 小时; 'D' 日线; 'W' 周线; 'm' 月线; 'Y'年线
+
+        【示例】
+              无
+        '''
+        pass
+        
+    def kLineSlice(self):
+        '''
+        【说明】
+             获取当前触发的K线周期
+
+        【语法】
+              context.kLineSlice()
+
+        【参数】
+              无
+
+        【备注】
+              返回整型，例如1
+
+        【示例】
+              无
+        '''
+        pass
+        
+    def tradeDate(self):
+        '''
+        【说明】
+             获取当前触发的交易日
+
+        【语法】
+              context.tradeDate()
+
+        【参数】
+              无
+
+        【备注】
+              返回字符串, YYYYMMDD格式, '20190524'
+
+        【示例】
+              无
+        '''
+        pass
+        
+    def dateTimeStamp(self):
+        '''
+        【说明】
+             获取当前触发的时间戳
+
+        【语法】
+              context.dateTimeStamp()
+
+        【参数】
+              无
+
+        【备注】
+              返回字符串, YYYYMMDD格式, '20190524'
+
+        【示例】
+              无
+        '''
+        pass
+        
+    def triggerData(self):
+        '''
+        【说明】
+             获取当前触发类型对应的数据
+
+        【语法】
+              context.triggerData()
+
+        【参数】
+              无
+
+        【备注】
+              K线触发返回的是K线数据
+              交易触发返回的是交易数据
+              即时行情触发返回的是即时行情数据
+
+        【示例】
+              无
+        '''
+        pass
 
 baseApi = BaseApi()
 
