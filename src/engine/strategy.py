@@ -97,11 +97,17 @@ class StrategyContext:
 
     @property
     def tradeDate(self):
-        return self._tradeDate
+        if self._tradeDate is not None:
+            return str(self._tradeDate)
+        else:
+            return None
 
     @property
     def dateTimeStamp(self):
-        return self._dateTimeStamp
+        if self._dateTimeStamp is not None:
+            return str(self._dateTimeStamp)
+        else:
+            return None
 
     @property
     def triggerData(self):
