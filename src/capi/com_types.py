@@ -285,6 +285,10 @@ EEQU_ISNOT_AXIS                  = '1'			     #非独立坐标
 EEQU_IS_MAIN                     = '0'		         #主图
 EEQU_ISNOT_MAIN                  = '1'			     #副图
 
+EEQU_STATE_RUN                   = '0';			     #运行
+EEQU_STATE_SUSPEND               = '1';		         #挂起
+EEQU_STATE_STOP                  = '2';			     #停止
+
 EEQU_VERTLINE                    = 0			     #竖直直线
 EEQU_INDICATOR                   = 1			     #指标线
 EEQU_BAR                         = 2				 #柱子
@@ -903,6 +907,14 @@ class EEquStrategyDataUpdateNotice(Structure):
     _pack_ = 1
     _fields_ = [
         ('StrategyId', c_uint)                            # 策略ID
+    ]
+    
+class EEquKlineStrategyStateNotice(Structure):
+    """策略状态推送"""
+    _pack_ = 1
+    _fields_ = [
+        ('StrategyId', c_uint),                            # 策略ID
+        ('StrategyState', c_ubyte)                         # 策略状态
     ]
 
 

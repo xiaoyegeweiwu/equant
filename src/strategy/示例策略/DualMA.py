@@ -2,7 +2,7 @@
 import talib
 
 def initialize(context):
-    SetBarInterval("SHFE|F|CU|1907", 'M', 1)
+    SetBarInterval("SHFE|F|CU|1907", 'M', 3)
 
 def handle_data(context):
     ma1 = talib.MA(Close(), timeperiod=5)
@@ -17,6 +17,10 @@ def handle_data(context):
         
     if MarketPosition() != -1 and ma1[-1] < ma2[-1]:
         SellShort(1, Open()[-1])         # 卖开仓
+
+
+
+
 
 
 

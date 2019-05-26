@@ -818,6 +818,10 @@ class StrategyEngine(object):
         # to solve broken pip error
         eg2stQueue = self._eg2stQueueDict[strategyId]
         eg2stQueue.put(event)
+        
+        #策略停止，通知9.5清理数据
+        apiEvent = Event({'StrategyId':strategyId, 'Data':EEQU_STATE_STOP})
+        self._pyApi.reqKLineStrategyStateNotice(apiEvent)
 
     # 启动当前策略
     def _onStrategyResume(self, event):
@@ -853,6 +857,10 @@ class StrategyEngine(object):
             self.saveStrategyContext2File()
         else:
             self._sendEvent2AllStrategy(event)
+            
+        for id in self._eg2stQueueDict:
+            apiEvent = Event({'StrategyId':id, 'Data':EEQU_STATE_STOP})
+            self._pyApi.reqKLineStrategyStateNotice(apiEvent)
 
     def _onStrategyRemove(self, event):
         strategyId = event.getStrategyId()

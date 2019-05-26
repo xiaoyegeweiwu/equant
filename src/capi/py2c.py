@@ -779,6 +779,24 @@ class PyAPI(object):
         self._cDll.E_StrategyDataUpdateNotice(byref(sessionId), byref(req))
         self._setSessionId(sessionId.value, event.getStrategyId())
         
+    def reqKLineStrategyStateNotice(self, event):
+        '''
+        功能：更新策略状态
+        参数：
+            {
+                'StrategyId'      : 策略id，int,
+                'Data'            : 策略状态,char
+            }
+        '''
+        self.logger.info("Strategy %d quit!"%event.getStrategyId())
+        sessionId = c_uint()
+        req = EEquKlineStrategyStateNotice()
+        req.StrategyId = event.getStrategyId()
+        req.StrategyStatus = ord(event.getData())
+        self._cDll.E_KLineStrategyStateNotice(byref(sessionId), byref(req))
+        self._setSessionId(sessionId.value, event.getStrategyId())    
+    
+        
     #////////////////////////////交易数据请求///////////////////////
     def reqQryLoginInfo(self, event):
         '''
