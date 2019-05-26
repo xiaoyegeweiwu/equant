@@ -68,6 +68,7 @@ class TkinterController(object):
             self.app.updateStatus(stId, strategyDict[stId])
 
     def quitThread(self):
+        self.logger.info("quitThread exit")
         # 停止更新界面子线程
         self.monitorThread.stop()
         self.monitorThread.join()
@@ -75,7 +76,9 @@ class TkinterController(object):
         self.receiveEgThread.stop()
         self.receiveEgThread.join()
 
+        self.logger.info("before top.destroy")
         self.top.destroy()
+        self.logger.info("after top.destroy")
 
     def run(self):
         #启动监控策略线程

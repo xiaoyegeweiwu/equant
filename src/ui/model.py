@@ -342,8 +342,9 @@ class GetEgData(object):
 
     def handlerEgEvent(self):
         try:
+            #self.logger.info("handlerEgEvent 1")
             # 如果不给出超时则会导致线程退出时阻塞
-            event = self._eg2uiQueue.get(timeout=0.1)
+            event = self._eg2uiQueue.get(timeout=0.01)
             eventCode = event.getEventCode()
             if eventCode not in self._egAskCallbackDict:
                 self._logger.error("Unknown engine event(%d)" % (eventCode))
