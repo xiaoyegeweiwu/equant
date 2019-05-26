@@ -27,6 +27,10 @@ class QuantModel(object):
     def receiveEgEvent(self):
         """处理engine事件"""
         self._receive.handlerEgEvent()
+        
+    def receiveExit(self):
+        '''处理队列退出'''
+        self._receive.handlerExit()
 
     def getCurStId(self):
         """获取当前运行的策略ID"""
@@ -339,12 +343,15 @@ class GetEgData(object):
                 self._stManager.removeStrategy(id)
                 # 更新界面
                 self._app.delUIStrategy(id)
+                
+    def handlerExit(self):
+        self._eg2uiQueue.put(Event({"EventCode":999}))
+        self._logger.info("handlerExit")
 
     def handlerEgEvent(self):
         try:
-            #self.logger.info("handlerEgEvent 1")
             # 如果不给出超时则会导致线程退出时阻塞
-            event = self._eg2uiQueue.get(timeout=0.01)
+            event = self._eg2uiQueue.get(timeout=0.1)
             eventCode = event.getEventCode()
             if eventCode not in self._egAskCallbackDict:
                 self._logger.error("Unknown engine event(%d)" % (eventCode))

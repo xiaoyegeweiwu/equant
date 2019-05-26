@@ -658,7 +658,9 @@ class StrategyHisQuote(object):
             "KLineType": key[1],
             "KLineSlice": key[2],
             'Data': {
-                "Data":data
+                "Data":data,
+                "TradeDate": data["TradeDate"],
+                "DateTimeStamp": data["DateTimeStamp"],
             }
         })
         self._strategy.sendTriggerQueue(event)
@@ -677,7 +679,9 @@ class StrategyHisQuote(object):
                 "KLineType": key[1],
                 "KLineSlice": key[2],
                 'Data': {
-                    "Data":data
+                    "Data":data,
+                    "TradeDate": data["TradeDate"],
+                    "DateTimeStamp":data["DateTimeStamp"],
                 }
             })
             self._strategy.sendTriggerQueue(event)
@@ -711,16 +715,18 @@ class StrategyHisQuote(object):
                 return False
         return True
 
-    def _switchKLine(self, contNo):
+    def _switchKLine(self, key=None):
+        if key is None:
+            key = self._config.getKLineShowInfoSimple()
         event = Event({
             "EventCode" :EV_ST2EG_SWITCH_STRATEGY,
             'StrategyId': self._strategy.getStrategyId(),
             'Data':
                 {
                     'StrategyName': self._strategy.getStrategyName(),
-                    'ContractNo'  : contNo,
-                    'KLineType'   : self._getKLineType(),
-                    'KLineSlice'  : self._getKLineSlice(),
+                    'ContractNo'  : key[0],
+                    'KLineType'   : key[1],
+                    'KLineSlice'  : key[2],
                 }
         })
         
@@ -789,7 +795,8 @@ class StrategyHisQuote(object):
     def runReport(self, context, handle_data):
         # 不使用历史K线，也需要切换
         # 切换K线
-        self._switchKLine(self._contractNo)
+        key = self._config.getKLineShowInfoSimple()
+        self._switchKLine(key)
         # 增加信号线
         self._addSignal()
         self._sendFlushEvent()
@@ -828,7 +835,7 @@ class StrategyHisQuote(object):
 
             # if key in self._config.getKLineTriggerInfoSimple():
             if key == self._config.getKLineShowInfoSimple():
-                self._strategy.setCurTriggerSourceInfo({
+                args = {
                     "Status": ST_STATUS_HISTORY,
                     "TriggerType":ST_TRIGGER_HIS_KLINE,
                     "ContractNo":key[0],
@@ -836,8 +843,10 @@ class StrategyHisQuote(object):
                     "KLineSlice":key[2],
                     "TradeDate":row["TradeDate"],
                     "DateTimeStamp":row["DateTimeStamp"],
-                    "KLineData":row
-                })
+                    "TriggerData":row,
+                }
+                self._strategy.setCurTriggerSourceInfo(args)
+                context.setCurTriggerSourceInfo(args)
                 handle_data(context)
 
             # 要显示的k线
@@ -855,7 +864,8 @@ class StrategyHisQuote(object):
         self._sendFlushEvent()
         endTime = datetime.now()
         endTimeStr = datetime.now().strftime('%H:%M:%S.%f')
-        self.logger.debug('[runReport] run report completed!, k线数量: {}, 耗时: {}s'.format(len(allHisData), endTime-beginTime))
+        self.logger.debug('[runReport] run report completed!')
+        # self.logger.debug('[runReport] run report completed!, k线数量: {}, 耗时: {}s'.format(len(allHisData), endTime-beginTime))
         # print('**************************** run his end')
 
     def runVirtualReport(self, context, handle_data, event):
@@ -863,7 +873,7 @@ class StrategyHisQuote(object):
         kLineData = event.getData()["Data"]
 
         if self._config.hasKLineTrigger() and key in self._config.getKLineTriggerInfoSimple():
-            self._strategy.setCurTriggerSourceInfo({
+            args = {
                 "Status": ST_STATUS_HISTORY,
                 "TriggerType": ST_TRIGGER_HIS_KLINE,
                 "ContractNo": event.getContractNo(),
@@ -871,8 +881,10 @@ class StrategyHisQuote(object):
                 "KLineSlice": event.getKLineSlice(),
                 "TradeDate": kLineData["TradeDate"],
                 "DateTimeStamp": kLineData["DateTimeStamp"],
-                "KLineData": kLineData
-            })
+                "TriggerData": kLineData
+            }
+            self._strategy.setCurTriggerSourceInfo(args)
+            context.setCurTriggerSourceInfo(args)
             handle_data(context)
         # **************************
         lastBar = self.getCurBar(key)
@@ -944,28 +956,23 @@ class StrategyHisQuote(object):
     def runRealTime(self, context, handle_data, event):
         assert self._strategy.isRealTimeStatus(), "Error"
         eventCode = event.getEventCode()
-        assert eventCode in [ST_TRIGGER_KLINE, ST_TRIGGER_TRADE, ST_TRIGGER_SANPSHOT, ST_TRIGGER_TIMER, ST_TRIGGER_CYCLE], "Error "
+        assert eventCode in [ST_TRIGGER_KLINE, ST_TRIGGER_TRADE_ORDER, ST_TRIGGER_TRADE_MATCH,\
+        ST_TRIGGER_SANPSHOT, ST_TRIGGER_TIMER, ST_TRIGGER_CYCLE],  "Error "
 
-        if eventCode == ST_TRIGGER_KLINE:
-            kLineData = event.getData()["Data"]
-            tradeDate = kLineData["TradeDate"]
-            dateTimeStamp = kLineData["DateTimeStamp"]
-        else:
-            snapShotQuote = event.getData()
-            kLineData = None
-            tradeDate = None
-            dateTimeStamp = None
+        allData = event.getData()
 
-        self._strategy.setCurTriggerSourceInfo({
+        args = {
             "Status": ST_STATUS_CONTINUES,
             "TriggerType": eventCode,
             "ContractNo": event.getContractNo(),
             "KLineType": event.getKLineType(),
             "KLineSlice": event.getKLineSlice(),
-            "TradeDate": tradeDate,
-            "DateTimeStamp": dateTimeStamp,
-            "KLineData": kLineData
-        })
+            "TradeDate": allData["TradeDate"],
+            "DateTimeStamp": allData["DateTimeStamp"],
+            "TriggerData": allData["Data"]
+        }
+        self._strategy.setCurTriggerSourceInfo(args)
+        context.setCurTriggerSourceInfo(args)
         handle_data(context)
         self._sendFlushEvent()
 

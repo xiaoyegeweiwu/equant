@@ -66,7 +66,56 @@ class StartegyManager(object):
 
 class StrategyContext:
     def __init__(self):
-        pass
+        self._strategyStatus = None
+        self._triggerType = None
+        self._conTractNo = None
+        self._kLineType = None
+        self._kLineSlice = None
+        self._tradeDate = None
+        self._dateTimeStamp = None
+        self._triggerData = None
+
+    @property
+    def strategyStatus(self):
+        return self._strategyStatus
+
+    @property
+    def triggerType(self):
+        return self._triggerType
+
+    @property
+    def contractNo(self):
+        return self._conTractNo
+
+    @property
+    def kLineType(self):
+        return self._kLineType
+
+    @property
+    def kLineSlice(self):
+        return self._kLineSlice
+
+    @property
+    def tradeDate(self):
+        return self._tradeDate
+
+    @property
+    def dateTimeStamp(self):
+        return self._dateTimeStamp
+
+    @property
+    def triggerData(self):
+        return self._triggerData
+
+    def setCurTriggerSourceInfo(self, args):
+        self._strategyStatus = args["Status"]
+        self._triggerType = args["TriggerType"]
+        self._conTractNo = args["ContractNo"]
+        self._kLineType = args["KLineType"]
+        self._kLineSlice = args["KLineSlice"]
+        self._tradeDate = args["TradeDate"]
+        self._dateTimeStamp = args["DateTimeStamp"]
+        self._triggerData = args["TriggerData"]
 
 
 class TradeRecord(object):
@@ -280,15 +329,17 @@ class Strategy:
         for i,timeSecond in enumerate(self._dataModel.getConfigData()['Trigger']['Timer']):
             if 0<=(int(nowStr)-int(timeSecond))<1 and not self._isTimeTriggered[i]:
                 self._isTimeTriggered[i] = True
+                key = self._dataModel.getConfigModel().getKLineShowInfoSimple()
+                dateTimeStamp, tradeDate, lv1Data = self.getTriggerTimeAndData(key[0])
                 event = Event({
                     "EventCode" : ST_TRIGGER_TIMER,
-                    "ContractNo": self._dataModel.getConfigModel().getBenchmark(),
+                    "ContractNo": None,
                     "KLineType" : None,
                     "KLineSlice": None,
                     "Data":{
-                        "TriggerType":"Timer",
-                        "TradeDate"  : None,
-                        "DateTimeStamp": None,
+                        "TradeDate"  : tradeDate,
+                        "DateTimeStamp": dateTimeStamp,
+                        "Data":timeSecond
                     }
                 })
                 self._triggerQueue.put(event)
@@ -305,11 +356,17 @@ class Strategy:
         cycle = self._dataModel.getConfigData()['Trigger']['Cycle']
         if (nowTime - self._nowTime).total_seconds()*1000>cycle:
             self._nowTime = nowTime
+            key = self._dataModel.getConfigModel().getKLineShowInfoSimple()
+            dateTimeStamp, tradeDate, lv1Data = self.getTriggerTimeAndData(key[0])
             event = Event({
                 "EventCode": ST_TRIGGER_CYCLE,
-                "ContractNo": self._dataModel.getConfigModel().getBenchmark(),
+                "ContractNo": None,
+                "KLineType" : None,
+                "KLineSlice": None,
                 "Data":{
-                    "TriggerType":"CYCLE"
+                    "TradeDate": tradeDate,
+                    "DateTimeStamp": dateTimeStamp,
+                    "Data": None,
                 }
             })
             self._triggerQueue.put(event)
@@ -523,7 +580,7 @@ class Strategy:
         eSessionId = apiEvent.getESessionId()
         for data in dataList:
             self.updateLocalOrder(eSessionId, data)
-        self._tradeTrigger(apiEvent)
+        self._tradeTriggerOrder(apiEvent)
 
     def _onTradeLoginQry(self, apiEvent):
         self._dataModel._trdModel.updateLoginInfo(apiEvent)
@@ -551,6 +608,7 @@ class Strategy:
         :return: None
         '''
         self._dataModel._trdModel.updateMatchData(apiEvent)
+        self._tradeTriggerMatch(apiEvent)
 
     def _onTradePosition(self, apiEvent):
         '''
@@ -673,8 +731,7 @@ class Strategy:
         self.sendEvent2Engine(responseEvent)
 
     def _switchStrategy(self, event):
-        contNo = self._dataModel.getConfigModel().getContract()[0]
-        self._dataModel.getHisQuoteModel()._switchKLine(contNo)
+        self._dataModel.getHisQuoteModel()._switchKLine()
 
     def _onStrategyRemove(self, event):
         self._strategyState = StrategyStatusExit
@@ -706,17 +763,16 @@ class Strategy:
             # 4:最新价 16:成交量 17:最优买价 18:买量 19:最优卖价 20:卖量
             return
 
-        lv1DataAndUpdateTime = self._dataModel.getQuoteModel().getLv1DataAndUpdateTime(event.getContractNo())
+        dateTimeStamp, tradeDate, lv1Data = self.getTriggerTimeAndData(event.getContractNo())
         event = Event({
             "EventCode" : ST_TRIGGER_SANPSHOT,
             "ContractNo": event.getContractNo(),
             "KLineType" : None,
             "KLineSlice": None,
             "Data":{
-                "TriggerType":"SnapShot",
-                "Data":lv1DataAndUpdateTime["Lv1Data"],
-                "DateTimeStamp":lv1DataAndUpdateTime["UpdateTime"],
-                "TradeDate":None,
+                "Data": lv1Data,
+                "DateTimeStamp": dateTimeStamp,
+                "TradeDate": tradeDate,
             }
         })
         self.sendTriggerQueue(event)
@@ -727,24 +783,61 @@ class Strategy:
     def getCurTriggerSourceInfo(self):
         return self._curTriggerSourceInfo
 
-    def _tradeTrigger(self, apiEvent):
+    #
+    def _tradeTriggerOrder(self, apiEvent):
         if not self._dataModel.getConfigModel().hasTradeTrigger() or len(apiEvent.getData()) == 0:
             return
 
         if apiEvent.getEventCode() == EEQU_SRVEVENT_TRADE_ORDER and str(apiEvent.getStrategyId()) == str(self._strategyId):
             contractNo = apiEvent.getData[0]["Cont"]
+            dateTimeStamp, tradeDate, lv1Data = self.getTriggerTimeAndData(contractNo)
+
             tradeTriggerEvent = Event({
-                "EventCode":ST_TRIGGER_TRADE,
+                "EventCode":ST_TRIGGER_TRADE_ORDER,
                 "ContractNo": contractNo,
                 "KLineType" : None,
                 "KLineSlice": None,
                 "Data":{
-                    "TriggerType":"Trade",
-                    "Data": apiEvent.getData(),
-                    "DateTimeStamp": None,
-                    "TradeDate": None,
+                    "Data": apiEvent.getData()[0],
+                    "DateTimeStamp": dateTimeStamp,
+                    "TradeDate": tradeDate,
+                }
+            })
+            # 交易触发
+            self.sendTriggerQueue(tradeTriggerEvent)
+
+    def _tradeTriggerMatch(self, apiEvent):
+        if not self._dataModel.getConfigModel().hasTradeTrigger() or len(apiEvent.getData()) == 0:
+            return
+
+        if apiEvent.getEventCode() == EEQU_SRVEVENT_TRADE_MATCH and str(apiEvent.getStrategyId()) == str(self._strategyId):
+            contractNo = apiEvent.getData[0]["Cont"]
+            dateTimeStamp, tradeDate, lv1Data = self.getTriggerTimeAndData(contractNo)
+
+            tradeTriggerEvent = Event({
+                "EventCode":ST_TRIGGER_TRADE_MATCH,
+                "ContractNo": contractNo,
+                "KLineType" : None,
+                "KLineSlice": None,
+                "Data":{
+                    "Data": apiEvent.getData()[0],
+                    "DateTimeStamp": dateTimeStamp,
+                    "TradeDate": tradeDate,
                 }
             })
 
             # 交易触发
             self.sendTriggerQueue(tradeTriggerEvent)
+
+    def getTriggerTimeAndData(self, contractNo):
+        lv1DataAndUpdateTime = self._dataModel.getQuoteModel().getLv1DataAndUpdateTime(contractNo)
+        if lv1DataAndUpdateTime is not None:
+            dateTimeStamp = lv1DataAndUpdateTime["UpdateTime"]
+            tradeDate = dateTimeStamp // 1000000000
+            lv1Data = lv1DataAndUpdateTime["Lv1Data"]
+        else:
+            dateTimeStamp = None
+            tradeDate = None
+            lv1Data = None
+
+        return dateTimeStamp, tradeDate, lv1Data

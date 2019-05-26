@@ -4,13 +4,15 @@ from .engine_model import *
 import talib
 import time, sys
 import math
-
+import pandas as pd
 from .strategy_cfg_model import StrategyConfig
 from .strategy_his_model import StrategyHisQuote
 from .strategy_qte_model import StrategyQuote
 from .strategy_trd_model import StrategyTrade
 
 from engine.calc import CalcCenter
+from datetime import datetime
+
 
 class StrategyModel(object):
     def __init__(self, strategy):
@@ -96,7 +98,6 @@ class StrategyModel(object):
         if code == ST_TRIGGER_FILL_DATA:
             self._hisModel.runFillData(context, handle_data, event)
         elif code == ST_TRIGGER_HIS_KLINE:
-            kLineData = event.getData()["Data"]
             self._hisModel.runVirtualReport(context, handle_data, event)
         else:
             self._hisModel.runRealTime(context, handle_data, event)
@@ -592,7 +593,13 @@ class StrategyModel(object):
         dateTime = triggerInfo["DateTimeStamp"]
         tradeDate = triggerInfo["TradeDate"]
         triggerType = triggerInfo["TriggerType"]
-        curBar = triggerInfo["KLineData"]
+        triggerData = triggerInfo["TriggerData"]
+
+        curBarIndex = None
+        curBar = None
+        if (triggerType == ST_TRIGGER_KLINE or triggerType == ST_TRIGGER_HIS_KLINE) and triggerData :
+            curBarIndex = triggerData["KLineIndex"]
+            curBar = triggerData
 
         orderParam = {
             "UserNo"         : userNo,                   # 账户编号
@@ -608,7 +615,7 @@ class StrategyModel(object):
             "DateTimeStamp"  : dateTime,                 # 时间戳（基准合约）
             "TradeDate"      : tradeDate,                # 交易日（基准合约）
             "TriggerType"    : triggerType,
-            "CurBarIndex"    : None if curBar is None else curBar['KLineIndex']  #
+            "CurBarIndex"    : curBarIndex #
         }
 
         key = (triggerInfo['ContractNo'], triggerInfo['KLineType'], triggerInfo['KLineSlice'])

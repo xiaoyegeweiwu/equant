@@ -187,14 +187,15 @@ ST_STATUS_QUIT                    = 'Q'             #停止状态
 ST_STATUS_REMOVE                  = 'R'             #移除状态
 
 # 策略触发事件定义
-ST_TRIGGER_TIMER                  = 1               #定时触发
-ST_TRIGGER_CYCLE                  = 2               #周期性触发
-ST_TRIGGER_KLINE                  = 3               #K线触发
-ST_TRIGGER_SANPSHOT               = 4               #即时行情触发
-ST_TRIGGER_TRADE                  = 5               #交易触发
-ST_TRIGGER_FILL_DATA              = 6
-ST_TRIGGER_NONE                   = 7
-ST_TRIGGER_HIS_KLINE              = 8
+ST_TRIGGER_TIMER                  = 'T'              # 定时触发
+ST_TRIGGER_CYCLE                  = 'C'              # 周期性触发
+ST_TRIGGER_KLINE                  = 'K'              # K线触发
+ST_TRIGGER_SANPSHOT               = 'S'              # 即时行情触发
+ST_TRIGGER_TRADE_ORDER            = 'O'              # 交易触发
+ST_TRIGGER_TRADE_MATCH            = 'M'              # 交易触发
+ST_TRIGGER_FILL_DATA              = 'F'
+ST_TRIGGER_NONE                   = 'N'
+ST_TRIGGER_HIS_KLINE              = 'H'
 
 #策略触发操作定义
 ST_EVENT_TRIGGER                  = 0               #触发操作

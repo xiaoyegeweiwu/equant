@@ -74,6 +74,7 @@ class TkinterController(object):
         self.monitorThread.join()
         # 停止接收策略引擎队列数据
         self.receiveEgThread.stop()
+        self.model.receiveExit()
         self.receiveEgThread.join()
 
         self.logger.info("before top.destroy")
