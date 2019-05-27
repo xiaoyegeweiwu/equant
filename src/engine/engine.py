@@ -509,7 +509,7 @@ class StrategyEngine(object):
             return
             
         self._trdModel.setStatus(TM_STATUS_ORDER)
-        #查询所有账户下成交信息
+        # 查询所有账户下成交信息
         eventList = self._trdModel.getMatchEvent()
         for event in eventList:
             self._reqMatch(event)
@@ -519,7 +519,11 @@ class StrategyEngine(object):
         self._trdModel.updateOrderData(apiEvent)
         # print("++++++ 订单信息 引擎 变化 ++++++", apiEvent.getData())
         # TODO: 分块传递
-        self._sendEvent2AllStrategy(apiEvent)
+        strategyId = apiEvent.getStrategyId()
+        if strategyId > 0:
+            self._sendEvent2Strategy(strategyId, apiEvent)
+        else:
+            self._sendEvent2AllStrategy(apiEvent)
         
     def _onApiMatchDataQry(self, apiEvent):
         self._trdModel.updateMatchData(apiEvent)
@@ -555,10 +559,10 @@ class StrategyEngine(object):
             return
         if not apiEvent.isSucceed():
             return
-            
+
         self._trdModel.setStatus(TM_STATUS_POSITION)
         
-        #交易基础数据查询完成，定时查询资金
+        # 交易基础数据查询完成，定时查询资金
         self._createMoneyTimer()
             
     def _onApiPosData(self, apiEvent):
