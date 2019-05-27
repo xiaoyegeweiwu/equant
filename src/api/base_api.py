@@ -30,12 +30,13 @@ class BaseApi(object):
               当前Bar的日期
 
         【语法】
-              string Date(string contractNo, kLineType, kLineValue)
+              string Date(string contractNo, char kLineType, int kLineValue)
 
         【参数】
-			  contractNo 合约编号, 默认基准合约
+			  contractNo 合约编号
               kLineType K线类型，可选值请参阅周期类型枚举函数
               kLineValue K线周期
+              contractNo、kLineType和kLineValue均可为空，为空时取界面设置或者SetbarInterval函数设置的第一个合约编号和K线类型周期
 
         【备注】
               简写D,返回格式为YYYYMMDD的字符串
@@ -51,12 +52,13 @@ class BaseApi(object):
               当前Bar的时间
 
         【语法】
-              string Time(string contractNo, kLineType, kLineValue)
+              string Time(string contractNo, char kLineType, int kLineValue)
 
         【参数】
-              contractNo 合约编号, 默认基准合约
-			  kLineType K线类型，可选值请参阅周期类型枚举函数
+              contractNo 合约编号
+              kLineType K线类型，可选值请参阅周期类型枚举函数
               kLineValue K线周期
+              contractNo、kLineType和kLineValue均可为空，为空时取界面设置或者SetbarInterval函数设置的第一个合约编号和K线类型周期
 
         【备注】
               简写T, 返回格式为HHMMSSmmm的字符串
@@ -77,16 +79,16 @@ class BaseApi(object):
               array Open(string contractNo, char kLineType, int kLineValue)
 
         【参数】
-              contractNo 合约编号, 默认基准合约
+              contractNo 合约编号
               kLineType K线类型，可选值请参阅周期类型枚举函数
               kLineValue K线周期
+              contractNo、kLineType和kLineValue均可为空，为空时取界面设置或者SetbarInterval函数设置的第一个合约编号和K线类型周期
 
         【备注】
               简写O, 返回值numpy数组包含截止当前Bar的所有开盘价
               Open()[-1] 表示当前Bar开盘价，Open()[-2]表示上一个Bar开盘价，以此类推
 
         【实例】
-              Open() 获取基准合约的所有开盘价列表
               Open('ZCE|F|SR|905', 'M', 1) 获取白糖905合约1分钟K线的所有开盘价列表
         '''
         return self._dataModel.getBarOpen(contractNo, kLineType, kLineValue)
@@ -100,9 +102,10 @@ class BaseApi(object):
               array High(string contractNo, char kLineType, int kLineValue)
 
         【参数】
-              contractNo 合约编号,默认基准合约
+              contractNo 合约编号
               kLineType K线类型，可选值请参阅周期类型枚举函数
               kLineValue K线周期
+              contractNo、kLineType和kLineValue均可为空，为空时取界面设置或者SetbarInterval函数设置的第一个合约编号和K线类型周期
 
         【备注】
               简写H, Tick时为当时的委托卖价
@@ -110,7 +113,7 @@ class BaseApi(object):
               High('ZCE|F|SR|905', 'M', 1)[-1] 表示当前Bar最高价，High('ZCE|F|SR|905', 'M', 1)[-2]表示上一个Bar最高价，以此类推
 
         【实例】
-              无
+              High('ZCE|F|SR|905', 'M', 1) 获取白糖905合约1分钟K线的所有最高价列表
         '''
         return self._dataModel.getBarHigh(contractNo, kLineType, kLineValue)
 
@@ -123,9 +126,10 @@ class BaseApi(object):
               array Low(string contractNo, char klineType, int kLineValue)
 
         【参数】
-              contractNo 合约编号, 默认基准合约
-			  kLineType K线类型，可选值请参阅周期类型枚举函数
+              contractNo 合约编号
+              kLineType K线类型，可选值请参阅周期类型枚举函数
               kLineValue K线周期
+              contractNo、kLineType和kLineValue均可为空，为空时取界面设置或者SetbarInterval函数设置的第一个合约编号和K线类型周期
 
         【备注】
               简写H, Tick时为当时的委托卖价
@@ -133,7 +137,7 @@ class BaseApi(object):
               Low()[-1] 表示当前Bar最低价，Low()[-2]表示上一个Bar最低价，以此类推
 
         【实例】
-              无
+              Low('ZCE|F|SR|905', 'M', 1) 获取白糖905合约1分钟K线的所有最低价列表
         '''
         return self._dataModel.getBarLow(contractNo, kLineType, kLineValue)
 
@@ -146,16 +150,17 @@ class BaseApi(object):
               array Close(string contractNo, char kLineType, int kLineValue)
 
         【参数】
-              contractNo 合约编号, 默认基准合约
+              contractNo 合约编号
               kLineType K线类型，可选值请参阅周期类型枚举函数
               kLineValue K线周期
+              contractNo、kLineType和kLineValue均可为空，为空时取界面设置或者SetbarInterval函数设置的第一个合约编号和K线类型周期
 
         【备注】
               简写C, 返回numpy数组，包括截止当前Bar的所有收盘价
               Close()[-1] 表示当前Bar收盘价，Close()[-2]表示上一个Bar收盘价，以此类推
 
         【实例】
-              无
+              Close('ZCE|F|SR|905', 'M', 1) 获取白糖905合约1分钟K线的所有收盘价列表
         '''
         return self._dataModel.getBarClose(contractNo, kLineType, kLineValue)
 
@@ -165,19 +170,20 @@ class BaseApi(object):
               指定合约指定周期的成交量
 
         【语法】
-              array Vol(string contractNo, kLineType, kLineValue)
+              array Vol(string contractNo, char kLineType, int kLineValue)
 
         【参数】
-              contractNo 合约编号, 默认基准合约
-			  kLineType K线类型，可选值请参阅周期类型枚举函数
+              contractNo 合约编号
+              kLineType K线类型，可选值请参阅周期类型枚举函数
               kLineValue K线周期
+              contractNo、kLineType和kLineValue均可为空，为空时取界面设置或者SetbarInterval函数设置的第一个合约编号和K线类型周期
 
         【备注】
               简写V, 返回numpy数组，包括截止当前Bar的所有成交量
               Vol()[-1] 表示当前Bar成交量，Vol()[-2]表示上一个Bar成交量，以此类推
 
         【实例】
-              无
+              Vol('ZCE|F|SR|905', 'M', 1) 获取白糖905合约1分钟K线的所有成交量列表
         '''
         return self._dataModel.getBarVol(contractNo, kLineType, kLineValue)
 
@@ -187,19 +193,20 @@ class BaseApi(object):
               指定合约指定周期的持仓量
 
         【语法】
-              numpy.array OpenInt(string contractNo, kLineType, kLineValue)
+              numpy.array OpenInt(string contractNo, char kLineType, int kLineValue)
 
         【参数】
-              contractNo 合约编号, 默认基准合约
-			  kLineType K线类型，可选值请参阅周期类型枚举函数
+              contractNo 合约编号
+              kLineType K线类型，可选值请参阅周期类型枚举函数
               kLineValue K线周期
+              contractNo、kLineType和kLineValue均可为空，为空时取界面设置或者SetbarInterval函数设置的第一个合约编号和K线类型周期
 
         【备注】
               返回numpy数组，包括截止当前Bar的所有持仓量
               OpenInt()[-1] 表示当前Bar持仓量，OpenInt()[-2]表示上一个Bar持仓量，以此类推
 
         【实例】
-              无
+              OpenInt('ZCE|F|SR|905', 'M', 1) 获取白糖905合约所有1分钟K线上的持仓量列表
         '''
         return self._dataModel.getBarOpenInt(contractNo, kLineType, kLineValue)
 
@@ -209,12 +216,13 @@ class BaseApi(object):
               指定合约当前Bar的交易日
 
         【语法】
-              string TradeDate(string contractNo, kLineType, kLineValue)
+              string TradeDate(string contractNo, char kLineType, int kLineValue)
 
         【参数】
-              contractNo 合约编号, 默认基准合约
-			  kLineType K线类型，可选值请参阅周期类型枚举函数
+              contractNo 合约编号
+              kLineType K线类型，可选值请参阅周期类型枚举函数
               kLineValue K线周期
+              contractNo、kLineType和kLineValue均可为空，为空时取界面设置或者SetbarInterval函数设置的第一个合约编号和K线类型周期
 
         【备注】
               返回格式为YYYYMMDD的字符串
@@ -233,9 +241,10 @@ class BaseApi(object):
               int BarCount(string contractNo, char kLineType, int kLineValue)
 
         【参数】
-              contractNo 合约编号, 默认基准合约
+              contractNo 合约编号
               kLineType K线类型，可选值请参阅周期类型枚举函数
               kLineValue K线周期
+              contractNo、kLineType和kLineValue均可为空，为空时取界面设置或者SetbarInterval函数设置的第一个合约编号和K线类型周期
 
         【备注】
               返回值为整型
@@ -251,12 +260,13 @@ class BaseApi(object):
               指定合约当前Bar的索引值
 
         【语法】
-              int CurrentBar(string contractNo, kLineType, kLineValue)
+              int CurrentBar(string contractNo, char kLineType, int kLineValue)
 
         【参数】
-              contractNo 合约编号, 默认基准合约
-			  kLineType K线类型，可选值请参阅周期类型枚举函数
+              contractNo 合约编号
+              kLineType K线类型，可选值请参阅周期类型枚举函数
               kLineValue K线周期
+              contractNo、kLineType和kLineValue均可为空，为空时取界面设置或者SetbarInterval函数设置的第一个合约编号和K线类型周期
 
         【备注】
               第一个Bar返回值为0，其他Bar递增
@@ -272,12 +282,13 @@ class BaseApi(object):
               指定合约当前Bar的状态值
 
         【语法】
-              int BarStatus(string contractNo, kLineType, kLineValue)
+              int BarStatus(string contractNo, char kLineType, int kLineValue)
 
         【参数】
-              contractNo 合约编号, 默认基准合约
-			  kLineType K线类型，可选值请参阅周期类型枚举函数
+              contractNo 合约编号
+              kLineType K线类型，可选值请参阅周期类型枚举函数
               kLineValue K线周期
+              contractNo、kLineType和kLineValue均可为空，为空时取界面设置或者SetbarInterval函数设置的第一个合约编号和K线类型周期
 
         【备注】
               返回值整型, 0表示第一个Bar,1表示中间普通Bar,2表示最后一个Bar
@@ -293,12 +304,13 @@ class BaseApi(object):
               指定合约的历史数据是否有效
 
         【语法】
-              bool HistoryDataExist(string contractNo, kLineType, kLineValue)
+              bool HistoryDataExist(string contractNo, char kLineType, int kLineValue)
 
         【参数】
-              contractNo 合约编号, 默认基准合约
-			  kLineType K线类型，可选值请参阅周期类型枚举函数
+              contractNo 合约编号
+              kLineType K线类型，可选值请参阅周期类型枚举函数
               kLineValue K线周期
+              contractNo、kLineType和kLineValue均可为空，为空时取界面设置或者SetbarInterval函数设置的第一个合约编号和K线类型周期
 
         【备注】
               返回Bool值，有效返回True，否则返回False
@@ -341,7 +353,7 @@ class BaseApi(object):
                 Enum_Period_Year        : 周期类型_年线
 				
               interval 周期数， 如：5分钟线，周期数就是5；50秒线，周期数为50
-              contractNo 合约编号, 为空时取当前合约
+              contractNo 合约编号, 为空时取界面设置或者SetbarInterval函数设置的第一个合约编号
               maxLength 定返回历史数据数组的最大长度，默认值为100
 
         【备注】
