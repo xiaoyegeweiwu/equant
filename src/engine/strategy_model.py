@@ -675,7 +675,7 @@ class StrategyModel(object):
         # 更新策略的订单信息
         self._strategy.setESessionId(self._strategy.getESessionId() + 1)
         self._strategy.updateLocalOrder(eId, aOrder)
-        return eId, ''
+        return 0, eId
 
     # def addOrder2CalcCenter(self, userNo, contNo, direct, offset, price, share, curBar):
     #     if not curBar:
