@@ -184,6 +184,8 @@ class StrategyEngine(object):
     def _sendEvent2Strategy(self, strategyId, event):
         if strategyId not in self._eg2stQueueDict or not self._isEffective[strategyId]:
             return
+        if event is None:
+            return
         eg2stQueue = self._eg2stQueueDict[strategyId]
         eg2stQueue.put(event)
         
