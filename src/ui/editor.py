@@ -270,9 +270,7 @@ class EditorText(ParentText, ModifiedMixin):
         # return None
 
     def beenModified(self, event=None):
-        print("hahahahahaah")
         if not self._view.doubleClickFlag():
-            print("1111111: ", self._view.doubleClickFlag())
             if self.edit_modified():
                 if not self._view.doubleClickFlag():
                     strategyPath = self._controller.getEditorText()["path"]

@@ -1168,7 +1168,6 @@ class PyAPI(object):
             fieldDataDict['FieldData'] = fieldDict
             
             dataList.append(fieldDataDict)
-        print("data list is ", dataList)
         # 发送到引擎
         apiEvent.setData(dataList)
         sid = apiEvent.getSessionId()
