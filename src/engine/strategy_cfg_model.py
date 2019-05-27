@@ -178,7 +178,8 @@ class StrategyConfig(object):
 
     def getBenchmark(self):
         '''获取基准合约'''
-        return self._metaData['Contract'][0]
+        showInfo = self.getKLineShowInfo()
+        return showInfo['ContractNo']
         
     def getDefaultKey(self):
         '''获取基准合约配置'''
