@@ -140,7 +140,7 @@ class StrategyModel(object):
     #////////////////////////K线函数/////////////////////////////
     def getKey(self, contNo, kLineType, kLineValue):
         #空合约取默认展示的合约
-        if contNo == "":
+        if contNo == "" or kLineType =='' or kLineValue == 0:
             return self._cfgModel.getDefaultKey()
     
         # if contNo not in 合约没有订阅
@@ -150,7 +150,7 @@ class StrategyModel(object):
                               EEQU_KLINE_WEEK, EEQU_KLINE_MONTH,
                               EEQU_KLINE_YEAR):
             raise Exception("输入K线类型异常，请参阅枚举函数-周期类型枚举函数")
-        if not isinstance(kLineValue, int) or kLineValue <= 0:
+        if not isinstance(kLineValue, int) or kLineValue < 0:
             raise Exception("输入K线周期异常，请确保输入的K线周期是正整数")
         return (contNo, kLineType, kLineValue)
 
