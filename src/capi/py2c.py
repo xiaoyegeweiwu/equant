@@ -1361,7 +1361,6 @@ class PyAPI(object):
             buf = string_at(dataAddr + fieldSize * i, fieldSize)
             data = EEquOrderDataNotice()
             memmove(addressof(data), buf, sizeof(EEquOrderDataNotice))
-            
             idict = {
                 'SessionId'        : data.SessionId,
                 'UserNo'           : data.UserNo.decode('utf-8'),
@@ -1405,6 +1404,8 @@ class PyAPI(object):
                 apiEvent.setStrategyId(strategyId)
                 apiEvent.setESessionId(eSessionId)
                 # print("Strategy id = ",apiEvent.getStrategyId(),"Esession id =", apiEvent.getESessionId())
+            else:
+                apiEvent.setStrategyId(0)
         self._api2egQueue.put(apiEvent)
 
     def _onMatchData(self, apiEvent):
