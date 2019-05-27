@@ -267,6 +267,7 @@ _all_func_ = {
                     ['PlotNumeric'          ,'绘制指标线'],
                     ['PlotIcon'             ,'绘制系统图标'],
                     ['PlotText'             ,'绘制字符串'],
+                    ['PlotVertLine'         ,'绘制竖线段'],
                     ['UnPlotText'           ,'取消绘制的字符串'],
                     ['LogDebug'             ,'打印调试信息'],
                     ['LogInfo'              ,'打印普通信息'],

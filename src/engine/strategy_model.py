@@ -1019,6 +1019,25 @@ class StrategyModel(object):
         }]
         self._plotNumeric(name, value, color, main, axis, type, barsback, data)
         
+    def setPlotVertLine(self, color, main, axis, barsback):
+        main = '0' if main else '1'
+        axis = '0' if axis else '1'
+        
+        curBar = self._hisModel.getCurBar()
+        klineIndex = curBar['KLineIndex'] - barsback
+        
+        if klineIndex <= 0:
+            return
+        
+        value = curBar['LastPrice']
+        data = [{
+            'KLineIndex' : klineIndex,
+            'Value'      : value,
+            'ClrK'       : color
+        }]
+
+        self._plotNumeric(self._strategyName, value, color, main, axis, EEQU_VERTLINE, barsback, data)
+        
 
     def formatArgs(self, args):
         if len(args) == 0:
