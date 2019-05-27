@@ -299,7 +299,7 @@ class StrategyHisQuote(object):
 
         numArray = methodMap[dataType](multiContKey)
 
-        return numArray if len(numArray) <= maxLength else numArray[(len(numArray) - maxLength - 1):]
+        return numArray if len(numArray) <= maxLength else numArray[-maxLength : ]
         
     #//////////////////////////////////内部接口//////////////////////////////////
 

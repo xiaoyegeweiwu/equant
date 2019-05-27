@@ -1005,7 +1005,7 @@ class StrategyHisQuote(object):
 
         numArray = methodMap[dataType](multiContKey)
 
-        return numArray if len(numArray) <= maxLength else numArray[(len(numArray) - maxLength - 1):]
+        return numArray if len(numArray) <= maxLength else numArray[-maxLength : ]
         
     #//////////////////////////////////内部接口//////////////////////////////////
 
@@ -1058,7 +1058,7 @@ class StrategyHisQuote(object):
         high = self.getBarHigh(contNo)
         low = self.getBarLow(contNo)
         close = self.getBarClose(contNo)
-        minLength = min(len(high), min(low), len(close))
+        minLength = min(len(high), len(low), len(close))
         if minLength == 0:
             return []
         typicalList = []
@@ -1072,7 +1072,7 @@ class StrategyHisQuote(object):
         low = self.getBarLow(contNo)
         open = self.getBarOpen(contNo)
         close = self.getBarClose(contNo)
-        minLength = min(len(high), min(low), len(open), len(close))
+        minLength = min(len(high), len(low), len(open), len(close))
         if minLength == 0:
             return []
         weightedList = []
