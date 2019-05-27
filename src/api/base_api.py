@@ -4443,6 +4443,29 @@ class BaseApi(object):
         '''
         return self._dataModel.setPlotText(value, text, color, main, barsback)
         
+    def PlotVertLine(self, color, main, axis, barsback):
+        '''
+        【说明】
+            在当前Bar输出一个图标
+
+        【语法】
+            float PlotVertLine(color, bool main, bool axis, int barsback=0)
+
+        【参数】
+            color 输出值的显示颜色，默认表示使用属性设置框中的颜色；
+            main  指标是否加载到主图，True-主图，False-幅图，默认主图
+            axis  指标是否使用独立坐标，True-独立坐标，False-非独立坐标，默认非独立坐标
+            barsback 从当前Bar向前回溯的Bar数，默认值为当前Bar。
+
+        【备注】
+            在当前Bar输出一个数值，输出的值用于在上层调用模块显示。返回数值型，即输入的Number。
+
+        【示例】
+            例1：PlotIcon(10,14);
+            输出MA1的值。
+        '''
+        return self._dataModel.setPlotVertLine(color, main, axis, barsback)
+        
     def UnPlotText(self, main, barsback):
         '''
         【说明】
@@ -5376,6 +5399,9 @@ def PlotIcon(value, icon=0, color=0xdd0000, main=False, barsback=0):
     
 def PlotText(value, text, color=0x999999, main=False, barsback=0):
     return baseApi.PlotText(value, text, color, main, barsback) 
+    
+def PlotVertLine(color=0xdd0000, main=False, axis=False, barsback=0):
+    return baseApi.PlotVertLine(color, main, axis, barsback) 
     
 def UnPlotText(main=False, barsback=0):
     return baseApi.UnPlotText(main, barsback) 
