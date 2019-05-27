@@ -2588,12 +2588,15 @@ class BaseApi(object):
 
         【备注】
               针对当前公式指定的帐户、商品发送委托单，发送成功返回如"1-2"的下单编号，发送失败返回空字符串""。
-              其中发送成功时返回的下单编号组成规则为：策略id-该策略中发送委托单的次数，所以下单编号"1-2"表示在策略id为1的策略中的第2次发送委托单返回的下单编号。
+              返回结果形式未：retCode, retMsg，retCode的数据类型为可以为负的整数, retMsg的数据类型为字符串。
+              其中发送成功时retCode为0，retMsg为返回的下单编号，其组成规则为：策略id-该策略中发送委托单的次数，所以下单编号"1-2"表示在策略id为1的策略中的第2次发送委托单返回的下单编号。
+              当发送失败时retCode为负数，retMsg为返回的发送失败的原因。
               该函数直接发单，不经过任何确认，并会在每次公式计算时发送，一般需要配合着仓位头寸进行条件处理，在不清楚运行机制的情况下，请慎用。
               注：不能使用于历史测试，仅适用于实时行情交易。
 
         【示例】
-              无
+              retCode, retMsg = A_SendOrder(UserId, ContractId, Enum_Order_Limit(), Enum_FOK(), Enum_Buy(), Enum_Exit(), Enum_Speculate(), Q_AskPrice(), OrderNum)
+              当retCode为0时表明发送订单信息成功。
          '''
         return self._dataModel.sendOrder(userNo, contractNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty)
 
@@ -4309,16 +4312,43 @@ class BaseApi(object):
         '''
         return self._dataModel.setSlippage(slippage)
 
-    def SetTriggerType(self, contractNo, type, value):
+    # def SetTriggerType(self, contractNo, type, value):
+    #     '''
+    #     【说明】
+    #          设置触发方式
+    #
+    #     【语法】
+    #           int SetTriggerType(string contractNo, int type, int|list value)
+    #
+    #     【参数】
+    #           contractNo 合约编号，不能为空
+    #           type 触发方式，可使用的值为：
+    #             1 : 即时行情触发
+    #             2 : 交易数据触发
+    #             3 : 每隔固定时间触发
+    #             4 : 指定时刻触发
+    #           value 当触发方式是为每隔固定时间触发(type=3)时，value为触发间隔，单位为毫秒，必须为100的整数倍，
+    #           当触发方式为指定时刻触发(type=4)时，value为触发时刻列表，时间的格式为'20190511121314'
+    #           当type为其他值时，该值无效，可以不填
+    #
+    #     【备注】
+    #           返回整型，0成功，-1失败
+    #
+    #     【示例】
+    #           SetTriggerType("ZCE|F|SR|910", 3, 1000) # 每隔1000毫秒触发一次
+    #           SetTriggerType("ZCE|F|SR|910", 4, ['20190511121314', '20190511121315', '20190511121316']) # 指定时刻触发
+    #     '''
+    #     return self._dataModel.setTriggerMode(contractNo, type, value)
+
+    def SetTriggerType(self, type, value):
         '''
         【说明】
              设置触发方式
 
         【语法】
-              int SetTriggerType(string contractNo, int type, int|list value)
+              int SetTriggerType(int type, int|list value)
 
         【参数】
-              contractNo 合约编号，不能为空
               type 触发方式，可使用的值为：
                 1 : 即时行情触发
                 2 : 交易数据触发
@@ -4332,10 +4362,10 @@ class BaseApi(object):
               返回整型，0成功，-1失败
 
         【示例】
-              SetTriggerType("ZCE|F|SR|910", 3, 1000) # 每隔1000毫秒触发一次
-              SetTriggerType("ZCE|F|SR|910", 4, ['20190511121314', '20190511121315', '20190511121316']) # 指定时刻触发
+              SetTriggerType(3, 1000) # 每隔1000毫秒触发一次
+              SetTriggerType(4, ['20190511121314', '20190511121315', '20190511121316']) # 指定时刻触发
         '''
-        return self._dataModel.setTriggerMode(contractNo, type, value)
+        return self._dataModel.setTriggerMode('', type, value)
 
     # //////////////////////其他函数////////////////////
 
@@ -5261,8 +5291,11 @@ def SetSlippage(slippage):
 def SetTriggerCont(*contractNo):
     return baseApi.SetTriggerCont(contractNo)
 
-def SetTriggerType(contNo, type, value):
-    return baseApi.SetTriggerType(contNo, type, value)
+# def SetTriggerType(contNo, type, value=None):
+#     return baseApi.SetTriggerType(contNo, type, value)
+
+def SetTriggerType(type, value=None):
+    return baseApi.SetTriggerType(type, value)
 
 # 属性函数
 def BarInterval(contractNo=''):

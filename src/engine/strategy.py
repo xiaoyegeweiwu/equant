@@ -14,6 +14,7 @@ import importlib
 import queue
 import datetime
 from datetime import datetime
+import copy
 
 
 class StartegyManager(object):
@@ -114,14 +115,14 @@ class StrategyContext:
         return self._triggerData
 
     def setCurTriggerSourceInfo(self, args):
-        self._strategyStatus = args["Status"]
-        self._triggerType = args["TriggerType"]
-        self._conTractNo = args["ContractNo"]
-        self._kLineType = args["KLineType"]
-        self._kLineSlice = args["KLineSlice"]
-        self._tradeDate = args["TradeDate"]
-        self._dateTimeStamp = args["DateTimeStamp"]
-        self._triggerData = args["TriggerData"]
+        self._strategyStatus = copy.deepcopy(args["Status"])
+        self._triggerType = copy.deepcopy(args["TriggerType"])
+        self._conTractNo = copy.deepcopy(args["ContractNo"])
+        self._kLineType = copy.deepcopy(args["KLineType"])
+        self._kLineSlice = copy.deepcopy(args["KLineSlice"])
+        self._tradeDate = copy.deepcopy(args["TradeDate"])
+        self._dateTimeStamp = copy.deepcopy(args["DateTimeStamp"])
+        self._triggerData = copy.deepcopy(args["TriggerData"])
 
 
 class TradeRecord(object):
@@ -524,8 +525,6 @@ class Strategy:
             "StrategyId":self._strategyId,
             "Data":{
                 "Result":data,
-                "BeginTradeDate":self._dataModel.getHisQuoteModel().getBeginDate(),
-                "EndTradeDate":self._dataModel.getHisQuoteModel().getEndDate(),
             }
         })
         self.sendEvent2UI(responseEvent)

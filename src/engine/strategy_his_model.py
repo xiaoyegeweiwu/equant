@@ -240,7 +240,7 @@ class StrategyHisQuote(object):
         if multiContKey not in self._curBarDict:
             return 0
         curBar = self._curBarDict[multiContKey].getCurBar()
-        return str(int(curBar['DateTimeStamp']) / 1000000000)
+        return str(curBar['DateTimeStamp'] // 1000000000)
 
     def getBarTime(self, multiContKey):
         if multiContKey not in self._curBarDict:
@@ -352,11 +352,11 @@ class StrategyHisQuote(object):
         high = self.getBarHigh(contNo)
         low = self.getBarLow(contNo)
         close = self.getBarClose(contNo)
-        minLength = min(len(high), min(low), len(close))
+        minLength = min(len(high), len(low), len(close))
         if minLength == 0:
             return []
         typicalList = []
-        for i in range(0, minLength):
+        for i in range(0, int(minLength)):
             typical = (high[i] + low[i] + close[i]) / 3
             typicalList.append(typical)
         return np.array(typicalList)
@@ -366,7 +366,7 @@ class StrategyHisQuote(object):
         low = self.getBarLow(contNo)
         open = self.getBarOpen(contNo)
         close = self.getBarClose(contNo)
-        minLength = min(len(high), min(low), len(open), len(close))
+        minLength = min(len(high), len(low), len(open), len(close))
         if minLength == 0:
             return []
         weightedList = []
