@@ -112,7 +112,7 @@ class StrategyTrade(TradeModel):
         if len(tUserInfoModel._position) == 0:
             return 0
 
-        contractNo = self._config._metaData['Contract'][0] if not contNo else contNo
+        contractNo = self._config.getBenchmark() if not contNo else contNo
         itemSum = 0.0
         for orderNo, tPositionModel in tUserInfoModel._position.items():
             if tPositionModel._metaData['Cont'] == contractNo and key in tPositionModel._metaData:
