@@ -14,6 +14,8 @@ bar=0
 def initialize(context):
     SetBarInterval(code1, 'M', 10, "20190310")
     SetBarInterval(code2, 'M', 10, "20190310")
+    SetTriggerType(code1, 1)
+    SetTriggerType(code2, 1)
     SetActual()
 
 def handle_data(context):
@@ -61,6 +63,9 @@ def handle_data(context):
         A_SendOrder(usr, code2, '2', '0', Enum_Buy() , offset, 'T', Q_BidPrice(code1) + PriceTick(), qty)
         
     bar == CurrentBar()
+
+
+
 
 
 

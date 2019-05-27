@@ -13,6 +13,8 @@ bar=0
 def initialize(context):
     SetBarInterval(code1, 'M', 1, "20190510")
     SetBarInterval(code2, 'M', 1, "20190510")
+    SetTriggerType(code1, 1)
+    SetTriggerType(code2, 1)
     
 def handle_data(context):
     if len(Close()) < p1:
@@ -58,23 +60,4 @@ def handle_data(context):
         
     bar == CurrentBar()
     
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    
