@@ -1288,6 +1288,9 @@ class StrategyModel(object):
     def getAvgEntryPrice(self, contNo):
         '''当前持仓的平均建仓价格'''
         posInfo = self._calcCenter.getPositionInfo(contNo)
+        if not posInfo:
+            return 0
+
         totalPrice = 0
         totalQty = 0
         if not contNo:
@@ -1324,6 +1327,9 @@ class StrategyModel(object):
             contNo = self._cfgModel.getBenchmark()
 
         positionInfo = self._calcCenter.getPositionInfo(contNo)
+        if not positionInfo:
+            return -1
+
         buy = positionInfo['TotalBuy']
         sell = positionInfo['TotalSell']
         if buy == sell:
