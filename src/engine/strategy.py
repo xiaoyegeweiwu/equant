@@ -76,41 +76,33 @@ class StrategyContext:
         self._dateTimeStamp = None
         self._triggerData = None
 
-    @property
     def strategyStatus(self):
         return self._strategyStatus
 
-    @property
     def triggerType(self):
         return self._triggerType
 
-    @property
     def contractNo(self):
         return self._conTractNo
 
-    @property
     def kLineType(self):
         return self._kLineType
 
-    @property
     def kLineSlice(self):
         return self._kLineSlice
 
-    @property
     def tradeDate(self):
         if self._tradeDate is not None:
             return str(self._tradeDate)
         else:
             return None
 
-    @property
     def dateTimeStamp(self):
         if self._dateTimeStamp is not None:
             return str(self._dateTimeStamp)
         else:
             return None
 
-    @property
     def triggerData(self):
         return self._triggerData
 
