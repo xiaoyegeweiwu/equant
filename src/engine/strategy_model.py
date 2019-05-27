@@ -641,7 +641,11 @@ class StrategyModel(object):
         # 账户错误
         if not userNo or userNo == 'Default':
             return -3, "未指定下单账户信息"
-        
+
+        # 指定的用户未登录
+        if self._trdModel.getSign(userNo) is None:
+            return -4, "输入的账户没有在极星客户端登录"
+
         # 发送定单到实盘
         aOrder = {
             'UserNo': userNo,
