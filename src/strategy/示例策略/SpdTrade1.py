@@ -17,9 +17,9 @@ def initialize(context):
 def handle_data(context):
     if len(Close()) < p1:
         return;
-    ma1 = talib.MA(Close(code1), timeperiod=p1, matype=0)
-    ma2 = talib.MA(Close(code2), timeperiod=p1, matype=0)    
-    LogInfo('ma1', Close(code1)[-1], '  ma2', Close(code2)[-1])
+    ma1 = talib.MA(Close(code1, 'M', 1), timeperiod=p1, matype=0)
+    ma2 = talib.MA(Close(code2, 'M', 1), timeperiod=p1, matype=0)    
+    LogInfo('ma1', Close(code1, 'M', 1)[-1], '  ma2', Close(code2, 'M', 1)[-1])
 
     ma= ma1[-1] - ma2[-1]
     prc = Close(code1)[-1] - Close(code2)[-1]       
@@ -27,6 +27,7 @@ def handle_data(context):
     PlotNumeric("ma1", ma1[-1], color=0xFF00FF)
     PlotNumeric("ma2", ma2[-1], color=0x0008FF)
     
+    print(ma1[-1], ma2[-1])
     PlotNumeric("prc", prc, 0xFF0000, False)
     PlotNumeric("high", ma + dot * PriceTick(), 0x00aa00, False)
     PlotNumeric("low", ma - dot * PriceTick(), 0x0000FF, False)    
