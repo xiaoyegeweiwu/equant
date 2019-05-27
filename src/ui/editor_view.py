@@ -269,7 +269,6 @@ class QuantEditor(StrategyTree):
             if os.path.isfile(path):
                 # 获取策略内容
                 # self.editor_file = path
-
                 self.control.setEditorTextCode(path)
                 header = self.root_tree.item(idx)['text']
                 # self.updateEditorHead(header)
@@ -293,11 +292,11 @@ class QuantEditor(StrategyTree):
         editor_text_code = text
         self.editor_text.delete(0.0, END+"-1c")
         self.editor_text.insert(END, editor_text_code)
+        self.editor_text.delete(END + "-1c")
         self.editor_text.update()
         self.editor_text.focus_set()
         self.editor_text.tag_add("TODO", "0.0", "end")
         self.editor_text.recolorize_main()
-        self.editor_text.delete(END+"-1c")
 
     def create_editor(self):
         editor_frame = Frame(self.parent_pane, bg=rgb_to_hex(255, 255, 255), width=self.parent_pane['width'])
