@@ -24,7 +24,7 @@ class BaseApi(object):
         self._dataModel = dataModel
 
     #/////////////////////////K线数据/////////////////////////////
-    def Date(self, contractNo):
+    def Date(self, contractNo, kLineType, kLineValue):
         '''
         【说明】
               当前Bar的日期
