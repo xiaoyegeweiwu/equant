@@ -203,13 +203,6 @@ class EditorText(ParentText, ModifiedMixin):
         self.config(state="normal")
 
     def beenModified(self, event=None):
-        # print("--------modified------")
-        # 获取选中的策略名
-        # if not self._view.doubleClickFlag():
-        #     strategyPath = self._controller.getEditorText()["path"]
-        #     text = os.path.basename(strategyPath)
-        #     self._view.updateEditorHead(text+"*")
-        # return
 
         if not self._view.doubleClickFlag():
 
@@ -247,7 +240,6 @@ class EditorText(ParentText, ModifiedMixin):
 
     def show_xterm_cursor(self, event):
         self.config(cursor='xterm')
-
 
     def click(self, event):
         index1 = self.index("current").split(".")

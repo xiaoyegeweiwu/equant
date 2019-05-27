@@ -155,12 +155,11 @@ class QuantApplication(object):
     def quantExit(self):
         """量化界面关闭处理"""
         # 向引擎发送主进程退出信号
-        self.control.sendExitRequest()
+        if messagebox.askokcancel("关闭?", "确定退出么?\n请确认保存当前的内容"):
+            self.control.sendExitRequest()
 
-        # 退出子线程和主线程
-        self.control.quitThread()
-        # 主线程在子线程之后退出
-        #self.root.destroy()
+            # 退出子线程和主线程
+            self.control.quitThread()
 
     def reportDisplay(self, data, id):
         """

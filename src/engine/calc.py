@@ -238,6 +238,10 @@ class CalcCenter(object):
         :return:
         """
         # print("begin:", datetime.now().strftime('%H:%M:%S.%f'))
+        if not self._beginDate:
+            self._beginDate = order["TradeDate"]
+        self._endDate = order["TradeDate"]
+
         order.update({"OrderId": self._orderId})
         self._orderId += 1
         self._costs[order["Cont"]] = self.getCostRate(order["Cont"])
@@ -296,15 +300,16 @@ class CalcCenter(object):
     def _formatOrder(self, order):
 
         return {
-           "OrderId"      : order["OrderId"],
-            "UserNo"      : order["UserNo"],
-           "Cont"         : order["Cont"],
-           "Direct"       : DirectDict[order["Direct"]],
-           "Offset"       : OffsetDict[order["Offset"]],
-           "OrderPrice"   : '{:.2f}'.format(order["OrderPrice"]),
-           "OrderQty"     : order["OrderQty"],
-           "OrderType"    : OrderTypeDict[order["OrderType"]],
-           "Hedge"        : HedgeDict[order["Hedge"]],
+           "OrderId"         : order["OrderId"],
+            "UserNo"         : order["UserNo"],
+           "Cont"            : order["Cont"],
+           "Direct"          : DirectDict[order["Direct"]],
+           "Offset"          : OffsetDict[order["Offset"]],
+           "OrderPrice"      : '{:.2f}'.format(order["OrderPrice"]),
+           "OrderQty"        : order["OrderQty"],
+            "DateTimeStamp"  : order["DateTimeStamp"],
+           "OrderType"       : OrderTypeDict[order["OrderType"]],
+           "Hedge"           : HedgeDict[order["Hedge"]],
         }
 
     def _calcOrder(self, order):
@@ -1323,12 +1328,17 @@ class CalcCenter(object):
                 pInfo["TodaySell"] = 0
                 return pInfo
 
+
     def _calcTestDay(self, start, end):
         """
         计算测试天使
         :param start: 信号计算开始时间
         :param end: 信号计算结束时间
         """
+        # 回测没有进行
+        if start is None or end is None:
+            return -1
+
         s = parse(str(start))
         e = parse(str(end))
         self._testDays = (e-s).days + 1
