@@ -29,7 +29,8 @@ class CalcCenter(object):
         self._costs = defaultdict()  # 费率，存放所有合约的费率
         self._profit = defaultdict(int)  # 策略收益统计信息
         # self._positions = self._strategy.runtime_data.initial_position   # 先不考虑初始持仓
-        self._positions = defaultdict()
+        # self._positions = defaultdict()
+        self._positions = {}
 
         self._orders = []  # 订单列表
         self._prices = defaultdict(dict)  # 每个合约的最新价信息
@@ -138,7 +139,8 @@ class CalcCenter(object):
         :return: 持仓信息
         """
         if contract is None:
-            return copy.deepcopy(self._positions)
+            if self._positions:
+                return copy.deepcopy(self._positions)
         elif contract in self._positions:
             return copy.deepcopy(self._positions[contract])
         else:
@@ -173,6 +175,7 @@ class CalcCenter(object):
                 if availableFund < coverCharge:
                     return -1   # 平卖开仓失败
                 else:
+                    #TODO: 需要计算资金变化
                     # beforePrice = pInfo["SellPrice"]  # 未平之前的持仓价
                     # afterPrice = self._getHoldPrice(contNo, 0, False)  # 平过之后的持仓价
                     #
