@@ -641,7 +641,11 @@ class StrategyModel(object):
         # 账户错误
         if not userNo or userNo == 'Default':
             return -3, "未指定下单账户信息"
-        
+
+        # 指定的用户未登录
+        if self._trdModel.getSign(userNo) is None:
+            return -4, "输入的账户没有在极星客户端登录"
+
         # 发送定单到实盘
         aOrder = {
             'UserNo': userNo,
@@ -1019,6 +1023,25 @@ class StrategyModel(object):
         }]
         self._plotNumeric(name, value, color, main, axis, type, barsback, data)
         
+    def setPlotVertLine(self, color, main, axis, barsback):
+        main = '0' if main else '1'
+        axis = '0' if axis else '1'
+        
+        curBar = self._hisModel.getCurBar()
+        klineIndex = curBar['KLineIndex'] - barsback
+        
+        if klineIndex <= 0:
+            return
+        
+        value = curBar['LastPrice']
+        data = [{
+            'KLineIndex' : klineIndex,
+            'Value'      : value,
+            'ClrK'       : color
+        }]
+
+        self._plotNumeric(self._strategyName, value, color, main, axis, EEQU_VERTLINE, barsback, data)
+        
 
     def formatArgs(self, args):
         if len(args) == 0:
@@ -1288,6 +1311,9 @@ class StrategyModel(object):
     def getAvgEntryPrice(self, contNo):
         '''当前持仓的平均建仓价格'''
         posInfo = self._calcCenter.getPositionInfo(contNo)
+        if not posInfo:
+            return 0
+
         totalPrice = 0
         totalQty = 0
         if not contNo:
@@ -1324,6 +1350,9 @@ class StrategyModel(object):
             contNo = self._cfgModel.getBenchmark()
 
         positionInfo = self._calcCenter.getPositionInfo(contNo)
+        if not positionInfo:
+            return -1
+
         buy = positionInfo['TotalBuy']
         sell = positionInfo['TotalSell']
         if buy == sell:

@@ -178,7 +178,8 @@ class StrategyConfig(object):
 
     def getBenchmark(self):
         '''获取基准合约'''
-        return self._metaData['Contract'][0]
+        showInfo = self.getKLineShowInfo()
+        return showInfo['ContractNo']
         
     def getDefaultKey(self):
         '''获取基准合约配置'''
@@ -2298,7 +2299,8 @@ class StrategyTrade(TradeModel):
         if not orderNo:
             # 委托单号 为空
             lastOrderTime = self.convertDateToTimeStamp('1970-01-01 08:00:00')
-            for orderModel in tUserInfoModel._order.values():
+            for orderNo in list(tUserInfoModel._order.keys()):
+                orderModel = tUserInfoModel._order[orderNo]
                 insertTimeStamp = self.convertDateToTimeStamp(orderModel._metaData['InsertTime'])
                 updateTimeStamp = self.convertDateToTimeStamp(orderModel._metaData['UpdateTime'])
                 orderTime = insertTimeStamp if insertTimeStamp >= updateTimeStamp else updateTimeStamp
