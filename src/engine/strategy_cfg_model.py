@@ -90,7 +90,10 @@ class StrategyConfig(object):
         if ret > 0:
             raise Exception(ret)
 
-        self._metaData = self.convertArgsDict(argsDict)
+        if 'Default' in argsDict['Sample']:
+            self._metaData = argsDict
+        else:
+            self._metaData = self.convertArgsDict(argsDict)
 
     def convertArgsDict(self, argsDict):
         resDict = {}
