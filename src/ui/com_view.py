@@ -35,7 +35,7 @@ class QuantFrame(object):
             xsb.pack(fill=tk.X, side=tk.BOTTOM)
 
         if yscroll:
-            ysb = tk.Scrollbar(frame,bg=rgb_to_hex(255,0,0))
+            ysb = tk.Scrollbar(frame, orient="vertical")
             widgets.config(yscrollcommand=ysb.set)
             ysb.config(command=widgets.yview, bg=rgb_to_hex(255,0,0))
             ysb.pack(fill=tk.Y, side=tk.RIGHT)
