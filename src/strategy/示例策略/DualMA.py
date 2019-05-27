@@ -4,7 +4,7 @@ p1=5
 p2=20
 
 def initialize(context): 
-    SetBarInterval("ZCE|F|TA|909", 'M', 20, "20190510")
+    SetBarInterval("ZCE|F|TA|909", 'M', 1, "20190510")
     SetActual()
 
 def handle_data(context):
