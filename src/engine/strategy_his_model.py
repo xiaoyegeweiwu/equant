@@ -240,7 +240,7 @@ class StrategyHisQuote(object):
         if multiContKey not in self._curBarDict:
             return 0
         curBar = self._curBarDict[multiContKey].getCurBar()
-        return str(int(curBar['DateTimeStamp']) / 1000000000)
+        return str(curBar['DateTimeStamp'] // 1000000000)
 
     def getBarTime(self, multiContKey):
         if multiContKey not in self._curBarDict:
