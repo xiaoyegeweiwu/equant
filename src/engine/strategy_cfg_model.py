@@ -9,6 +9,8 @@ import copy
 import math
 import pandas as pd
 
+from datetime import datetime, timedelta
+
 class StrategyConfig(object):
     '''
     功能：策略配置模块
