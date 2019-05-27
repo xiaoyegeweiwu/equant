@@ -1,4 +1,5 @@
-
+import threading
+import time
 import builtins
 import keyword
 import re
@@ -204,14 +205,15 @@ class TextLineNumbers(Canvas):
             self.create_text(2, y, anchor="nw", text=linenum)
             i = self.textwidget.index("%s+1line" % i)
 
+        self.after(200, self.redraw)
 
 class EditorText(ParentText, ModifiedMixin):
     def __init__(self, master, view, **kw):
         ParentText.__init__(self, master, **kw)
         self._init()
 
-        self.orig = self._w + "_orig"
-        self.tk.call("rename", self._w, self.orig)
+        self._orig = self._w + "_orig"
+        self.tk.call("rename", self._w, self._orig)
         self.tk.createcommand(self._w, self._proxy)
 
         self._view = view
@@ -243,7 +245,7 @@ class EditorText(ParentText, ModifiedMixin):
 
     def _proxy(self, *args):
         # let the actual widget perform the requested action
-        cmd = (self.orig,) + args
+        cmd = (self._orig,) + args
         try:
             result = self.tk.call(cmd)
         except Exception:

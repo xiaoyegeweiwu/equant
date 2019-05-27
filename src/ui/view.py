@@ -146,11 +146,13 @@ class QuantApplication(object):
 
     def createRunWin(self):
         """弹出量化设置界面"""
+        self.setLoadState("disabled")
         self.runWin = RunWin(self.control, self.root)
         self.runWin.display()
+        self.setLoadState("normal")
 
-    def setLoadState(self):
-        self.quant_editor.setLoadBtnState()
+    def setLoadState(self, state):
+        self.quant_editor.setLoadBtnState(state)
 
     def quantExit(self):
         """量化界面关闭处理"""
