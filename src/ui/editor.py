@@ -199,7 +199,7 @@ class TextLineNumbers(Canvas):
         while True :
             dline= self.textwidget.dlineinfo(i)
             if dline is None: break
-            y = dline[1] + 6
+            y = dline[1] + 7
             linenum = str(i).split(".")[0]
             self.create_text(2, y, anchor="nw", text=linenum)
             i = self.textwidget.index("%s+1line" % i)
@@ -210,8 +210,8 @@ class EditorText(ParentText, ModifiedMixin):
         ParentText.__init__(self, master, **kw)
         self._init()
 
-        self._orig = self._w + "_orig"
-        self.tk.call("rename", self._w, self._orig)
+        self.orig = self._w + "_orig"
+        self.tk.call("rename", self._w, self.orig)
         self.tk.createcommand(self._w, self._proxy)
 
         self._view = view
@@ -221,7 +221,7 @@ class EditorText(ParentText, ModifiedMixin):
         self.tagdefs = tagdefs
         color_config(self)
         self.config_colors()
-        # self.percolator = Percolator(self)
+        self.percolator = Percolator(self)
         self.bind("<Button-3>", self.create_menu)
 
         # TODO: 捕获modified需要修改
@@ -238,17 +238,12 @@ class EditorText(ParentText, ModifiedMixin):
         self.bind("<Configure>", self._onChange)
         self.linenumbers.pack(side=LEFT, fill="y")
 
-    def highlight_line(self):
-        self.tag_remove("active_line", 1.0, "end")
-        self.tag_add("active_line", "insert linestart", "insert lineend+1c")
-        self.after(100, self.highlight_line)
-
     def _onChange(self, event):
         self.linenumbers.redraw()
 
     def _proxy(self, *args):
         # let the actual widget perform the requested action
-        cmd = (self._orig,) + args
+        cmd = (self.orig,) + args
         try:
             result = self.tk.call(cmd)
         except Exception:
