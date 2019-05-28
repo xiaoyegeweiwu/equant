@@ -497,7 +497,6 @@ class StrategyConfig(object):
         # 记录展示的合约和K线信息
         if barType == EEQU_KLINE_SECOND:
             barType = EEQU_KLINE_TICK
-            barInterval = 0
         elif barType == EEQU_KLINE_HOUR:
             barType = EEQU_KLINE_MINUTE
             barInterval = barInterval * 60
