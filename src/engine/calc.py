@@ -138,9 +138,8 @@ class CalcCenter(object):
         :param contract: 合约
         :return: 持仓信息
         """
-        if contract is None:
-            if self._positions:
-                return copy.deepcopy(self._positions)
+        if not contract:
+            return copy.deepcopy(self._positions)
         elif contract in self._positions:
             return copy.deepcopy(self._positions[contract])
         else:
