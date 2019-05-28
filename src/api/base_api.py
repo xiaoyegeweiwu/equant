@@ -30,13 +30,12 @@ class BaseApi(object):
               当前Bar的日期
 
         【语法】
-              string Date(string contractNo, char kLineType, int kLineValue)
+              string Date(string contractNo, kLineType, kLineValue)
 
         【参数】
-			  contractNo 合约编号
+			  contractNo 合约编号, 默认基准合约
               kLineType K线类型，可选值请参阅周期类型枚举函数
               kLineValue K线周期
-              contractNo、kLineType和kLineValue均可为空，为空时取界面设置或者SetbarInterval函数设置的第一个合约编号和K线类型周期
 
         【备注】
               简写D,返回格式为YYYYMMDD的字符串
@@ -52,13 +51,12 @@ class BaseApi(object):
               当前Bar的时间
 
         【语法】
-              string Time(string contractNo, char kLineType, int kLineValue)
+              string Time(string contractNo, kLineType, kLineValue)
 
         【参数】
-              contractNo 合约编号
-              kLineType K线类型，可选值请参阅周期类型枚举函数
+              contractNo 合约编号, 默认基准合约
+			  kLineType K线类型，可选值请参阅周期类型枚举函数
               kLineValue K线周期
-              contractNo、kLineType和kLineValue均可为空，为空时取界面设置或者SetbarInterval函数设置的第一个合约编号和K线类型周期
 
         【备注】
               简写T, 返回格式为HHMMSSmmm的字符串
@@ -79,16 +77,16 @@ class BaseApi(object):
               array Open(string contractNo, char kLineType, int kLineValue)
 
         【参数】
-              contractNo 合约编号
+              contractNo 合约编号, 默认基准合约
               kLineType K线类型，可选值请参阅周期类型枚举函数
               kLineValue K线周期
-              contractNo、kLineType和kLineValue均可为空，为空时取界面设置或者SetbarInterval函数设置的第一个合约编号和K线类型周期
 
         【备注】
               简写O, 返回值numpy数组包含截止当前Bar的所有开盘价
               Open()[-1] 表示当前Bar开盘价，Open()[-2]表示上一个Bar开盘价，以此类推
 
         【实例】
+              Open() 获取基准合约的所有开盘价列表
               Open('ZCE|F|SR|905', 'M', 1) 获取白糖905合约1分钟K线的所有开盘价列表
         '''
         return self._dataModel.getBarOpen(contractNo, kLineType, kLineValue)
@@ -102,10 +100,9 @@ class BaseApi(object):
               array High(string contractNo, char kLineType, int kLineValue)
 
         【参数】
-              contractNo 合约编号
+              contractNo 合约编号,默认基准合约
               kLineType K线类型，可选值请参阅周期类型枚举函数
               kLineValue K线周期
-              contractNo、kLineType和kLineValue均可为空，为空时取界面设置或者SetbarInterval函数设置的第一个合约编号和K线类型周期
 
         【备注】
               简写H, Tick时为当时的委托卖价
@@ -113,7 +110,7 @@ class BaseApi(object):
               High('ZCE|F|SR|905', 'M', 1)[-1] 表示当前Bar最高价，High('ZCE|F|SR|905', 'M', 1)[-2]表示上一个Bar最高价，以此类推
 
         【实例】
-              High('ZCE|F|SR|905', 'M', 1) 获取白糖905合约1分钟K线的所有最高价列表
+              无
         '''
         return self._dataModel.getBarHigh(contractNo, kLineType, kLineValue)
 
@@ -126,10 +123,9 @@ class BaseApi(object):
               array Low(string contractNo, char klineType, int kLineValue)
 
         【参数】
-              contractNo 合约编号
-              kLineType K线类型，可选值请参阅周期类型枚举函数
+              contractNo 合约编号, 默认基准合约
+			  kLineType K线类型，可选值请参阅周期类型枚举函数
               kLineValue K线周期
-              contractNo、kLineType和kLineValue均可为空，为空时取界面设置或者SetbarInterval函数设置的第一个合约编号和K线类型周期
 
         【备注】
               简写H, Tick时为当时的委托卖价
@@ -137,7 +133,7 @@ class BaseApi(object):
               Low()[-1] 表示当前Bar最低价，Low()[-2]表示上一个Bar最低价，以此类推
 
         【实例】
-              Low('ZCE|F|SR|905', 'M', 1) 获取白糖905合约1分钟K线的所有最低价列表
+              无
         '''
         return self._dataModel.getBarLow(contractNo, kLineType, kLineValue)
 
@@ -150,17 +146,16 @@ class BaseApi(object):
               array Close(string contractNo, char kLineType, int kLineValue)
 
         【参数】
-              contractNo 合约编号
+              contractNo 合约编号, 默认基准合约
               kLineType K线类型，可选值请参阅周期类型枚举函数
               kLineValue K线周期
-              contractNo、kLineType和kLineValue均可为空，为空时取界面设置或者SetbarInterval函数设置的第一个合约编号和K线类型周期
 
         【备注】
               简写C, 返回numpy数组，包括截止当前Bar的所有收盘价
               Close()[-1] 表示当前Bar收盘价，Close()[-2]表示上一个Bar收盘价，以此类推
 
         【实例】
-              Close('ZCE|F|SR|905', 'M', 1) 获取白糖905合约1分钟K线的所有收盘价列表
+              无
         '''
         return self._dataModel.getBarClose(contractNo, kLineType, kLineValue)
 
@@ -170,20 +165,19 @@ class BaseApi(object):
               指定合约指定周期的成交量
 
         【语法】
-              array Vol(string contractNo, char kLineType, int kLineValue)
+              array Vol(string contractNo, kLineType, kLineValue)
 
         【参数】
-              contractNo 合约编号
-              kLineType K线类型，可选值请参阅周期类型枚举函数
+              contractNo 合约编号, 默认基准合约
+			  kLineType K线类型，可选值请参阅周期类型枚举函数
               kLineValue K线周期
-              contractNo、kLineType和kLineValue均可为空，为空时取界面设置或者SetbarInterval函数设置的第一个合约编号和K线类型周期
 
         【备注】
               简写V, 返回numpy数组，包括截止当前Bar的所有成交量
               Vol()[-1] 表示当前Bar成交量，Vol()[-2]表示上一个Bar成交量，以此类推
 
         【实例】
-              Vol('ZCE|F|SR|905', 'M', 1) 获取白糖905合约1分钟K线的所有成交量列表
+              无
         '''
         return self._dataModel.getBarVol(contractNo, kLineType, kLineValue)
 
@@ -193,20 +187,19 @@ class BaseApi(object):
               指定合约指定周期的持仓量
 
         【语法】
-              numpy.array OpenInt(string contractNo, char kLineType, int kLineValue)
+              numpy.array OpenInt(string contractNo, kLineType, kLineValue)
 
         【参数】
-              contractNo 合约编号
-              kLineType K线类型，可选值请参阅周期类型枚举函数
+              contractNo 合约编号, 默认基准合约
+			  kLineType K线类型，可选值请参阅周期类型枚举函数
               kLineValue K线周期
-              contractNo、kLineType和kLineValue均可为空，为空时取界面设置或者SetbarInterval函数设置的第一个合约编号和K线类型周期
 
         【备注】
               返回numpy数组，包括截止当前Bar的所有持仓量
               OpenInt()[-1] 表示当前Bar持仓量，OpenInt()[-2]表示上一个Bar持仓量，以此类推
 
         【实例】
-              OpenInt('ZCE|F|SR|905', 'M', 1) 获取白糖905合约所有1分钟K线上的持仓量列表
+              无
         '''
         return self._dataModel.getBarOpenInt(contractNo, kLineType, kLineValue)
 
@@ -216,13 +209,12 @@ class BaseApi(object):
               指定合约当前Bar的交易日
 
         【语法】
-              string TradeDate(string contractNo, char kLineType, int kLineValue)
+              string TradeDate(string contractNo, kLineType, kLineValue)
 
         【参数】
-              contractNo 合约编号
-              kLineType K线类型，可选值请参阅周期类型枚举函数
+              contractNo 合约编号, 默认基准合约
+			  kLineType K线类型，可选值请参阅周期类型枚举函数
               kLineValue K线周期
-              contractNo、kLineType和kLineValue均可为空，为空时取界面设置或者SetbarInterval函数设置的第一个合约编号和K线类型周期
 
         【备注】
               返回格式为YYYYMMDD的字符串
@@ -241,10 +233,9 @@ class BaseApi(object):
               int BarCount(string contractNo, char kLineType, int kLineValue)
 
         【参数】
-              contractNo 合约编号
+              contractNo 合约编号, 默认基准合约
               kLineType K线类型，可选值请参阅周期类型枚举函数
               kLineValue K线周期
-              contractNo、kLineType和kLineValue均可为空，为空时取界面设置或者SetbarInterval函数设置的第一个合约编号和K线类型周期
 
         【备注】
               返回值为整型
@@ -260,13 +251,12 @@ class BaseApi(object):
               指定合约当前Bar的索引值
 
         【语法】
-              int CurrentBar(string contractNo, char kLineType, int kLineValue)
+              int CurrentBar(string contractNo, kLineType, kLineValue)
 
         【参数】
-              contractNo 合约编号
-              kLineType K线类型，可选值请参阅周期类型枚举函数
+              contractNo 合约编号, 默认基准合约
+			  kLineType K线类型，可选值请参阅周期类型枚举函数
               kLineValue K线周期
-              contractNo、kLineType和kLineValue均可为空，为空时取界面设置或者SetbarInterval函数设置的第一个合约编号和K线类型周期
 
         【备注】
               第一个Bar返回值为0，其他Bar递增
@@ -282,13 +272,12 @@ class BaseApi(object):
               指定合约当前Bar的状态值
 
         【语法】
-              int BarStatus(string contractNo, char kLineType, int kLineValue)
+              int BarStatus(string contractNo, kLineType, kLineValue)
 
         【参数】
-              contractNo 合约编号
-              kLineType K线类型，可选值请参阅周期类型枚举函数
+              contractNo 合约编号, 默认基准合约
+			  kLineType K线类型，可选值请参阅周期类型枚举函数
               kLineValue K线周期
-              contractNo、kLineType和kLineValue均可为空，为空时取界面设置或者SetbarInterval函数设置的第一个合约编号和K线类型周期
 
         【备注】
               返回值整型, 0表示第一个Bar,1表示中间普通Bar,2表示最后一个Bar
@@ -304,13 +293,12 @@ class BaseApi(object):
               指定合约的历史数据是否有效
 
         【语法】
-              bool HistoryDataExist(string contractNo, char kLineType, int kLineValue)
+              bool HistoryDataExist(string contractNo, kLineType, kLineValue)
 
         【参数】
-              contractNo 合约编号
-              kLineType K线类型，可选值请参阅周期类型枚举函数
+              contractNo 合约编号, 默认基准合约
+			  kLineType K线类型，可选值请参阅周期类型枚举函数
               kLineValue K线周期
-              contractNo、kLineType和kLineValue均可为空，为空时取界面设置或者SetbarInterval函数设置的第一个合约编号和K线类型周期
 
         【备注】
               返回Bool值，有效返回True，否则返回False
@@ -353,7 +341,7 @@ class BaseApi(object):
                 Enum_Period_Year        : 周期类型_年线
 				
               interval 周期数， 如：5分钟线，周期数就是5；50秒线，周期数为50
-              contractNo 合约编号, 为空时取界面设置或者SetbarInterval函数设置的第一个合约编号
+              contractNo 合约编号, 为空时取当前合约
               maxLength 定返回历史数据数组的最大长度，默认值为100
 
         【备注】
@@ -4431,7 +4419,56 @@ class BaseApi(object):
             输出MA1的值。
         '''
         return self._dataModel.setPlotIcon(value, icon, color, main, barsback)
-        
+
+    def PlotDot(self, name, value, icon, color, main, barsback):
+        '''
+        【说明】
+            在当前Bar输出一个点
+
+        【语法】
+            PlotDot(self, name, value, icon, color, main, barsback)
+
+        【参数】
+            value 输出的值
+            icon 图标类型，0-默认图标，1-笑脸，2-哭脸，3-上箭头，4-下箭头，5-上箭头2, 6-下箭头2
+                           7-喇叭，8-加锁，9-解锁，10-货币+，11-货币-，12-加号，13-减号，14-叹号，15-叉号
+            color 输出值的显示颜色，默认表示使用属性设置框中的颜色；
+            main  指标是否加载到主图，True-主图，False-幅图，默认主图
+            barsback 从当前Bar向前回溯的Bar数，默认值为当前Bar。
+
+        【备注】
+            在当前Bar输出一个数值，输出的值用于在上层调用模块显示。返回数值型，即输入的Number。
+
+        【示例】
+            PlotDot(name="Dot", value=Close()[-1], main=True)
+        '''
+        return self._dataModel.setPlotDot(name, value, icon, color, main, barsback)
+
+    def PlotBar(self, name, vol1, vol2, color, main, filled, barsback):
+        '''
+        【说明】
+            绘制一根Bar
+
+        【语法】
+            PlotBar(self, name, vol1, vol2, color, main, filled, barsback)
+
+        【参数】
+            name  bar名称
+            vol1  柱子起始点
+            vol2  柱子结束点
+            color 输出值的显示颜色，默认表示使用属性设置框中的颜色；
+            main  指标是否加载到主图，True-主图，False-幅图，默认主图
+            filled 是否填充, 默认填充
+            barsback 从当前Bar向前回溯的Bar数，默认值为当前Bar。
+
+        【备注】
+            在当前Bar输出一个数值，输出的值用于在上层调用模块显示。返回数值型，即输入的Number。
+
+        【示例】
+            PlotBar("BarExample1", Vol()[-1], 0, RGB_Red())
+        '''
+        return self._dataModel.setPlotBar(name, vol1, vol2, color, main, filled, barsback)
+
     def PlotText(self, value, text, color, main, barsback):
         '''
         【说明】
@@ -4454,11 +4491,11 @@ class BaseApi(object):
             例1：PlotText("ORDER");
         '''
         return self._dataModel.setPlotText(value, text, color, main, barsback)
-        
+
     def PlotVertLine(self, color, main, axis, barsback):
         '''
         【说明】
-            在当前Bar输出一个图标
+            在当前Bar输出一个竖线
 
         【语法】
             float PlotVertLine(color, bool main, bool axis, int barsback=0)
@@ -4473,11 +4510,68 @@ class BaseApi(object):
             在当前Bar输出一个数值，输出的值用于在上层调用模块显示。返回数值型，即输入的Number。
 
         【示例】
-            例1：PlotIcon(10,14);
-            输出MA1的值。
+            PlotVertLine(main=True, axis = True)
         '''
         return self._dataModel.setPlotVertLine(color, main, axis, barsback)
-        
+
+    def PlotPartLine(self, name, index1, price1, index2, price2, color, main, axis, width):
+        '''
+        【说明】
+            绘制斜线段
+
+        【语法】
+            PlotPartLine(self, name, index1, price1, index2, price2, color, main, axis, width)
+
+        【参数】
+            name   名称
+            index1 起始索引, 目前只对当前Bar有效
+            price1 起始价格
+            index2 结束索引
+            price2 结束价格
+            color  输出值的显示颜色，默认表示使用属性设置框中的颜色；
+            main   指标是否加载到主图，True-主图，False-幅图，默认主图
+            axis   指标是否使用独立坐标，True-独立坐标，False-非独立坐标，默认非独立坐标
+            width  线段宽度，默认1
+
+        【备注】
+            在当前Bar输出一个数值，输出的值用于在上层调用模块显示。返回数值型，即输入的Number。
+
+        【示例】
+            idx1 = CurrentBar()
+            p1 = Close()[-1]
+            if idx1 >= 100:
+                idx2 = 1
+                p2 = Close()[-2]
+                PlotPartLine("PartLine", idx1, p1, idx2, p2, RGB_Red(), True, True, 1)
+        '''
+        return self._dataModel.setPlotPartLine(name, index1, price1, index2, price2, color, main, axis, width)
+
+    def PlotStickLine(self, name, price1, price2, color, main, axis, barsback):
+        '''
+        【说明】
+            绘制竖线段
+
+        【语法】
+            PlotStickLine(self, name, price1, price2, color, main, axis, barsback)
+
+        【参数】
+            name   名称
+            price1 起始价格
+            price2 结束价格
+            color 输出值的显示颜色，默认表示使用属性设置框中的颜色；
+            main  指标是否加载到主图，True-主图，False-幅图，默认主图
+            axis  指标是否使用独立坐标，True-独立坐标，False-非独立坐标，默认非独立坐标
+            barsback 从当前Bar向前回溯的Bar数，默认值为当前Bar。
+
+        【备注】
+            在当前Bar输出一个数值，输出的值用于在上层调用模块显示。返回数值型，即输入的Number。
+
+        【示例】
+            PlotStickLine("StickLine", Close()[-1], Open()[-1], RGB_Blue(), True, True, 0)
+
+        '''
+        return self._dataModel.setPlotStickLine(name, price1, price2, color, main, axis, barsback)
+
     def UnPlotText(self, main, barsback):
         '''
         【说明】
@@ -5407,14 +5501,26 @@ def PlotNumeric(name, value, color=0xdd0000, main=True, axis=False, type=1, bars
     return baseApi.PlotNumeric(name, value, color, main, axis, type, barsback)
     
 def PlotIcon(value, icon=0, color=0xdd0000, main=False, barsback=0):
-    return baseApi.PlotIcon(value, icon, color, main, barsback) 
-    
+    return baseApi.PlotIcon(value, icon, color, main, barsback)
+
+def PlotDot(name, value, icon=0, color=0xdd0000, main=False, barsback=0):
+    return baseApi.PlotDot(name, value, icon, color, main, barsback)
+
+def PlotBar(name, vol1, vol2, color=0xdd0000, main=False, filled=True, barsback=0):
+    return baseApi.PlotBar(name, vol1, vol2, color, main, filled, barsback)
+
 def PlotText(value, text, color=0x999999, main=False, barsback=0):
     return baseApi.PlotText(value, text, color, main, barsback) 
     
 def PlotVertLine(color=0xdd0000, main=False, axis=False, barsback=0):
-    return baseApi.PlotVertLine(color, main, axis, barsback) 
-    
+    return baseApi.PlotVertLine(color, main, axis, barsback)
+
+def PlotPartLine(name, index1, price1, index2, price2, color=0xdd0000, main=False, axis=False, width=1):
+    return baseApi.PlotPartLine(name, index1, price1, index2, price2, color, main, axis, width)
+
+def PlotStickLine(name, price1, price2, color=0xdd0000, main=False, axis=False, barsback=0):
+    return baseApi.PlotStickLine(name, price1, price2, color, main, axis, barsback)
+
 def UnPlotText(main=False, barsback=0):
     return baseApi.UnPlotText(main, barsback) 
 
