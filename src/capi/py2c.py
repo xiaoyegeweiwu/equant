@@ -340,7 +340,7 @@ class PyAPI(object):
             data.TotalQty                                    = d['TotalQty']
             data.PositionQty                                 = d['PositionQty']
             data.LastPrice                                   = d['LastPrice']
-            data.KLineData.KLineData0.KLineQty               = d['KLineQty']
+            data.KLineData.KLineData0.KLineQty               = int(d['KLineQty'])
             data.KLineData.KLineData0.OpeningPrice           = d['OpeningPrice']
             data.KLineData.KLineData0.HighPrice              = d['HighPrice']
             data.KLineData.KLineData0.LowPrice               = d['LowPrice']
