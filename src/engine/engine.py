@@ -905,6 +905,6 @@ class StrategyEngine(object):
             strategyProcess.terminate()
             strategyProcess.wait(timeout=0.1)
             # print("策略进程已经退出", strategyProcess.name)
-        except (psutil.NoSuchProcess, psutil.AccessDenied) as e:
+        except Exception as e:
             traceback.print_exc()
             self.logger.info("pid %d exit fail" % pid)
