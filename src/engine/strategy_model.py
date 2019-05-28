@@ -1382,19 +1382,21 @@ class StrategyModel(object):
     # ///////////////////////策略状态///////////////////////////
     def getAvgEntryPrice(self, contNo):
         '''当前持仓的平均建仓价格'''
+        subContracts = self._config.getContract()
+        if not contNo:
+            if len(subContracts) == 0:
+                raise Exception("请在设置界面或者调用SetBarInterval方法至少订阅一个合约！")
+            elif len(subContracts) == 1:
+                contNo = subContracts[0]
+            else:
+                raise Exception("由于您订阅了多个合约，请指定一个需要计算的合约！")
+
         posInfo = self._calcCenter.getPositionInfo(contNo)
         if not posInfo:
             return 0
 
-        totalPrice = 0
-        totalQty = 0
-        if not contNo:
-            for posDic in posInfo.values():
-                totalPrice += posDic['BuyPrice'] * posDic['TotalBuy'] + posDic['SellPrice'] * posDic['TotalSell']
-                totalQty += posDic['TotalBuy'] + posDic['TotalSell']
-        else :
-            totalPrice += posInfo['BuyPrice'] * posInfo['TotalBuy'] + posInfo['SellPrice'] * posInfo['TotalSell']
-            totalQty += posInfo['TotalBuy'] + posInfo['TotalSell']
+        totalPrice = posInfo['BuyPrice'] * posInfo['TotalBuy'] + posInfo['SellPrice'] * posInfo['TotalSell']
+        totalQty = posInfo['TotalBuy'] + posInfo['TotalSell']
 
         return totalPrice/totalQty if totalQty > 0 else 0
 
