@@ -542,7 +542,7 @@ class PyAPI(object):
             data.KLineIndex  = d['KLineIndex']
             data.Value       = d['Value']
             data.KLineSeriesUnion._KLineSeriesStructure3.ClrBar      = d['ClrBar']
-            data.KLineSeriesUnion._KLineSeriesStructure3.Filled      = d['Filled'].encode()
+            data.KLineSeriesUnion._KLineSeriesStructure3.Filled      = d['Filled']
             data.KLineSeriesUnion._KLineSeriesStructure3.BarValue    = d['BarValue']
             curBuf = cbuf + sizeof(EEquKLineSeries) * i
             cData = string_at(addressof(data), sizeof(EEquKLineSeries))
