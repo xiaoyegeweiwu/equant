@@ -652,7 +652,7 @@ class StrategyEngine(object):
                 self._contStrategyDict[contractNo] = {strategyId:None}
             else:
                 if strategyId in self._contStrategyDict[contractNo]:
-                    continue #重复订阅，不做任何处理
+                    continue  # 重复订阅，不做任何处理
                 self._contStrategyDict[contractNo][strategyId] = None
                 self._sendQuote(contractNo, strategyId)
         
@@ -824,8 +824,11 @@ class StrategyEngine(object):
         # to solve broken pip error
         eg2stQueue = self._eg2stQueueDict[strategyId]
         eg2stQueue.put(event)
-        
-        #策略停止，通知9.5清理数据
+        # 清除即时行情数据观察者
+        for k,v in self._contStrategyDict.items():
+            if strategyId in v:
+                v.pop(strategyId)
+        # 策略停止，通知9.5清理数据
         apiEvent = Event({'StrategyId':strategyId, 'Data':EEQU_STATE_STOP})
         self._pyApi.reqKLineStrategyStateNotice(apiEvent)
 
