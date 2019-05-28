@@ -178,9 +178,12 @@ class StrategyEngine(object):
         self._initialize()
         
         while True:
-            self._handleUIData()
-            time.sleep(0.1)
-            
+            try:
+                self._handleUIData()
+            except Exception as e:
+                errorText = traceback.format_exc()
+                self.sendErrorMsg(-1, errorText)
+
     def _sendEvent2Strategy(self, strategyId, event):
         if strategyId not in self._eg2stQueueDict or not self._isEffective[strategyId]:
             return
@@ -325,12 +328,16 @@ class StrategyEngine(object):
 
     maxContinuousIdleTimes = 0
     def _mainThreadFunc(self):
-        while True:
-            self._handleApiData()
-            self._handleStData()
-            if self.maxContinuousIdleTimes >= 1000:
-                time.sleep(0.1)
-            self.maxContinuousIdleTimes %= 1000
+        try:
+            while True:
+                self._handleApiData()
+                self._handleStData()
+                if self.maxContinuousIdleTimes >= 1000:
+                    time.sleep(0.1)
+                self.maxContinuousIdleTimes %= 1000
+        except Exception as e:
+            errorText = traceback.format_exc()
+            self.sendErrorMsg(-1, errorText)
             
     def _startMainThread(self):
         '''从api队列及策略队列中接收数据'''
@@ -908,3 +915,14 @@ class StrategyEngine(object):
         except Exception as e:
             traceback.print_exc()
             self.logger.info("pid %d exit fail" % pid)
+
+    def sendErrorMsg(self, errorCode, errorText):
+        event = Event({
+            "EventCode": EV_EG2UI_CHECK_RESULT,
+            "StrategyId": 0,
+            "Data": {
+                "ErrorCode": errorCode,
+                "ErrorText": errorText,
+            }
+        })
+        self._eg2uiQueue.put(event)
