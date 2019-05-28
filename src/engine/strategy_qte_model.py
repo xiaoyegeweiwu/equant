@@ -95,7 +95,7 @@ class StrategyQuote(QuoteModel):
         '''
         data = event.getData()
 
-        if not isinstance(type(data), dict):
+        if not isinstance(data, dict):
             return
 
         contractNo = event.getContractNo()
