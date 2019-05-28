@@ -328,10 +328,10 @@ class StrategyModel(object):
         # 对于开仓，需要平掉反向持仓
         qty = self._calcCenter.needCover(userNo, contNo, dBuy, share, price)
         if qty > 0:
-            eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtNone, dBuy, oCover, hSpeculate, price, qty, curBar, False)
+            eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtGFD, dBuy, oCover, hSpeculate, price, qty, curBar, False)
             if eSessionId != "": self._strategy.updateBarInfoInLocalOrder(eSessionId, curBar)
             
-        eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtNone, dBuy, oOpen, hSpeculate, price, share, curBar)
+        eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtGFD, dBuy, oOpen, hSpeculate, price, share, curBar)
         if eSessionId != "": self._strategy.updateBarInfoInLocalOrder(eSessionId, curBar)
 
     def setBuyToCover(self, contractNo, share, price):
@@ -341,7 +341,7 @@ class StrategyModel(object):
         # 交易计算、生成回测报告
         # 产生信号
         userNo = self._cfgModel.getUserNo() if self._cfgModel.isActualRun() else "Default"
-        eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtNone, dBuy, oCover, hSpeculate, price, share, curBar)
+        eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtGFD, dBuy, oCover, hSpeculate, price, share, curBar)
         if eSessionId != "": self._strategy.updateBarInfoInLocalOrder(eSessionId, curBar)
 
     def setSell(self, contractNo, share, price):
@@ -351,7 +351,7 @@ class StrategyModel(object):
         # 交易计算、生成回测报告
         # 产生信号
         userNo = self._cfgModel.getUserNo() if self._cfgModel.isActualRun() else "Default"
-        eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtNone, dSell, oCover, hSpeculate, price, share, curBar)
+        eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtGFD, dSell, oCover, hSpeculate, price, share, curBar)
         if eSessionId != "": self._strategy.updateBarInfoInLocalOrder(eSessionId, curBar)
 
     def setSellShort(self, contractNo, share, price):
@@ -361,13 +361,13 @@ class StrategyModel(object):
         userNo = self._cfgModel.getUserNo() if self._cfgModel.isActualRun() else "Default"
         qty = self._calcCenter.needCover(userNo, contNo, dSell, share, price)
         if qty > 0:
-            eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtNone, dSell, oCover, hSpeculate, price, qty, curBar, False)
+            eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtGFD, dSell, oCover, hSpeculate, price, qty, curBar, False)
             if eSessionId != "": self._strategy.updateBarInfoInLocalOrder(eSessionId, curBar)
 
         #交易计算、生成回测报告
         #产生信号
         userNo = self._cfgModel.getUserNo() if self._cfgModel.isActualRun() else "Default"
-        eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtNone, dSell, oOpen, hSpeculate, price, share, curBar)
+        eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtGFD, dSell, oOpen, hSpeculate, price, share, curBar)
         if eSessionId != "": self._strategy.updateBarInfoInLocalOrder(eSessionId, curBar)
 
     def sendFlushEvent(self):
@@ -688,7 +688,7 @@ class StrategyModel(object):
     #     orderParam = {
     #         "UserNo": userNo,  # 账户编号
     #         "OrderType": otMarket,  # 定单类型
-    #         "ValidType": vtNone,  # 有效类型
+    #         "ValidType": vtGFD,  # 有效类型
     #         "ValidTime": '0',  # 有效日期时间(GTD情况下使用)
     #         "Cont": contNo,  # 合约
     #         "Direct": direct,  # 买卖方向：买、卖
