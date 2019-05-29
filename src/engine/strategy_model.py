@@ -1382,14 +1382,8 @@ class StrategyModel(object):
     # ///////////////////////策略状态///////////////////////////
     def getAvgEntryPrice(self, contNo):
         '''当前持仓的平均建仓价格'''
-        subContracts = self._config.getContract()
         if not contNo:
-            if len(subContracts) == 0:
-                raise Exception("请在设置界面或者调用SetBarInterval方法至少订阅一个合约！")
-            elif len(subContracts) == 1:
-                contNo = subContracts[0]
-            else:
-                raise Exception("由于您订阅了多个合约，请指定一个需要计算的合约！")
+            contNo = self._config.getBenchmark()
 
         posInfo = self._calcCenter.getPositionInfo(contNo)
         if not posInfo:
