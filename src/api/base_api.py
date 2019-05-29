@@ -378,7 +378,7 @@ class BaseApi(object):
     def Q_AskPrice(self, contractNo='', level=1):
         '''
         【说明】
-              合约最新卖价
+              合约最优卖价
 
         【语法】
               float Q_AskPrice(string contractNo, int level)
@@ -387,7 +387,7 @@ class BaseApi(object):
               contractNo 合约编号, 默认当前合约;level 档位数,默认1档
 
         【备注】
-              返回浮点数, 可获取指定合约,指定深度的最新卖价
+              返回浮点数, 可获取指定合约,指定深度的最优卖价
 
         【实例】
               无
@@ -416,7 +416,7 @@ class BaseApi(object):
     def Q_AskVol(self, contractNo='', level=1):
         '''
         【说明】
-              合约最新卖量
+              合约最优卖量
 
         【语法】
               float Q_AskVol(string contractNo, int level)
@@ -425,7 +425,7 @@ class BaseApi(object):
               contractNo 合约编号, 默认当前合约;level 档位数,默认1档
 
         【备注】
-              返回浮点数, 可获取指定合约,指定深度的最新卖量
+              返回浮点数, 可获取指定合约,指定深度的最优卖量
 
         【实例】
               无
@@ -435,7 +435,7 @@ class BaseApi(object):
     def Q_AvgPrice(self, contractNo=''):
         '''
         【说明】
-              当前合约的历史数据是否有效
+              当前合约的实时均价
 
         【语法】
               float Q_AvgPrice(string contractNo)
@@ -454,7 +454,7 @@ class BaseApi(object):
     def Q_BidPrice(self, contractNo='', level=1):
         '''
         【说明】
-              合约最新买价
+              合约最优买价
 
         【语法】
               float Q_BidPrice(string contractNo, int level)
@@ -463,7 +463,7 @@ class BaseApi(object):
               contractNo 合约编号, 默认当前合约;level 档位数,默认1档
 
         【备注】
-              返回浮点数, 可获取指定合约,指定深度的最新买价
+              返回浮点数, 可获取指定合约,指定深度的最优买价
 
         【实例】
               无
@@ -493,7 +493,7 @@ class BaseApi(object):
     def Q_BidVol(self, contractNo='', level=1):
         '''
         【说明】
-              合约最新买量
+              合约最优买量
 
         【语法】
               float Q_BidVol(string contractNo, int level)
@@ -502,7 +502,7 @@ class BaseApi(object):
               contractNo 合约编号, 默认当前合约;level 档位数,默认1档
 
         【备注】
-              返回浮点数, 可获取指定合约,指定深度的最新买量
+              返回浮点数, 可获取指定合约,指定深度的最优买量
 
         【实例】
               无
