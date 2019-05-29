@@ -18,12 +18,15 @@ class CalcCenter(object):
         self._beginDate = None     # 回测开始日期
         self._endDate   = None     # 回测结束日期
 
-        self._firstHoldPosition = 0  # 所有合约第一个有仓未平的开仓单位置
         self._continueWin = 0  # 当前连续盈利次数
         self._continueLose = 0  # 当前连续亏损次数
         self._continueEmptyPeriod = 0  # 连续空仓周期数
         self._testDays = 0  # 测试天数
-        self._firstOpenOrder = {}  # 交易合约第一个有持仓的订单
+
+        self._firstHoldPosition = 0  # 所有合约第一个有仓未平的开仓单位置
+        self._firstOpenOrder = {}    # 交易合约第一个有持仓的订单
+        self._latestOpenOrder = {}   # 交易合约最近一个有持仓的订单
+        self._latestCoverOrder = {}  # 交易合约最近一个平仓单
 
         self._runSet = defaultdict(int)  # 配置
         self._costs = defaultdict()  # 费率，存放所有合约的费率
@@ -282,6 +285,10 @@ class CalcCenter(object):
         #TODO: 暂时先不用self._firstOpenOrder信息，屏蔽掉
         self._updateFirstOrder(order["Cont"])
         # -------------------4ms----------------------------------
+        # 更新最近一笔开仓单
+        self._updateLatestOpenOrder(order["Cont"])
+        # 更新最近一笔平仓单
+        self._updateLatestCoverOrder(order["Cont"])
 
         eo = self._orders[-1]
         self._calcOrderProfit(eo)   # self._calcSingleReturns（eo)是不是可以放在calcOrderProfit中呢？？？
@@ -499,17 +506,12 @@ class CalcCenter(object):
 
     def _updateFirstOrder(self, contract):
         pInfo = self.getPositionInfo(contract)
-        if pInfo["TotalBuy"] > 0:
+        if pInfo["TotalBuy"] > 0 or pInfo["TotalSell"] > 0:
             for eo in self._orders[self._firstHoldPosition:]:
                 if eo["Order"]["Cont"] == contract and eo["LeftNum"] > 0:
                     self._firstOpenOrder[contract] = eo["Order"]
                     return
 
-        elif pInfo["TotalSell"] > 0:
-            for eo in self._orders[self._firstHoldPosition:]:
-                if eo["Order"]["Cont"] == contract and eo["LeftNum"] > 0:
-                    self._firstOpenOrder[contract] = eo["Order"]
-                    return
         else:
             self._firstOpenOrder[contract] = {}
             return
@@ -522,6 +524,61 @@ class CalcCenter(object):
         """
         if contract in self._firstOpenOrder:
             return self._firstOpenOrder[contract]
+        return {}
+
+    def _updateLatestOpenOrder(self, contract):
+        pInfo = self.getPositionInfo(contract)
+        if pInfo["TotalBuy"] > 0 or pInfo["TotalSell"] > 0:
+            for eo in self._orders[:(-len(self._orders)+1-self._firstHoldPosition):-1]:
+                if eo["Order"]["Cont"] == contract and eo["LeftNum"] > 0:
+                    self._latestOpenOrder[contract] = eo["Order"]
+                    return
+        pass
+
+    def getLatestOpenOrder(self, contract):
+        """
+        获取最近一个有仓未平的开仓单
+        :param contract: 合约代码
+        :return: 开仓单的订单详情
+        """
+        if contract in self._latestOpenOrder:
+            return self._latestOpenOrder[contract]
+        return {}
+
+    def _updateLatestCoverOrder(self, contract):
+        """更新最近一笔平仓单"""
+        tempOrder = {}
+
+        for eo in self._orders[::-1]:
+            if eo["Order"]["Cont"] == contract:
+                if eo["Order"]["Direct"] == dBuy and eo["Order"]["Offset"] == oCover \
+                        or eo["Order"]["Direct"] == dSell and eo["Order"]["Offset"] == oCover:   # 内盘平仓单
+                    self._latestCoverOrder[contract] = eo["Order"]
+                    return
+                elif eo["Order"]["Direct"] == dBuy and eo["Order"]["Offset"] == oNone \
+                        or eo["Order"]["Direct"] == dSell and eo["Order"]["Offset"] == oNone:   # 外盘订单
+                    if not tempOrder:
+                        tempOrder = eo["Order"]
+                        continue
+
+                    if eo["Order"]["Direct"] != tempOrder["Direct"]:
+                        self._latestCoverOrder[contract] = tempOrder
+                        return
+                    else:
+                        tempOrder = eo["Order"]
+                else:
+                    continue
+
+        return
+
+    def getLatestCoverOrder(self, contract):
+        """
+        获取最近一个平仓单
+        :param contract: 合约代码
+        :return: 开仓单的订单详情
+        """
+        if contract in self._latestCoverOrder:
+            return self._latestCoverOrder[contract]
         return {}
 
     def _getOpenCharge(self, contract, num, offset, flag, linkList):
