@@ -1671,6 +1671,27 @@ class BaseApi(object):
         '''
         return self._dataModel.getBarsSinceEntry(contractNo)
 
+    def BarsSinceExit(self, contractNo):
+        '''
+        【说明】
+              获得当前持仓中指定合约的最近平仓位置到当前位置的Bar计数。
+
+        【语法】
+              int BarsSinceExit(string contractNo)
+
+        【参数】
+              contractNo 合约编号，默认为基准合约。
+
+        【备注】
+              获得当前持仓指定合约的最近平仓位置到当前位置的Bar计数，返回值为整型。
+              只有当MarketPosition != 0时，即有持仓的状况下，该函数才有意义，否则返回-1。
+              注意：在平仓Bar上为0。
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getBarsSinceExit(contractNo)
+
     def MarketPosition(self, contractNo):
         '''
         【说明】
@@ -5030,6 +5051,9 @@ def AvgEntryPrice(contractNo=''):
 
 def BarsSinceEntry(contractNo=''):
     return baseApi.BarsSinceEntry(contractNo)
+
+def BarsSinceExit(contractNo=''):
+    return baseApi.BarsSinceExit(contractNo)
 
 def MarketPosition(contractNo=''):
     return baseApi.MarketPosition(contractNo)

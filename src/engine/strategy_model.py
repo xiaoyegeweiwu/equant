@@ -1405,6 +1405,22 @@ class StrategyModel(object):
         curBar = self._hisModel.getCurBar()
         return (curBar['KLineIndex'] - barIndex)
 
+    def getBarsSinceExit(self, contNo):
+        '''获得当前持仓中指定合约的最近平仓位置到当前位置的Bar计数'''
+        if not contNo:
+            contNo = self._cfgModel.getBenchmark()
+
+        if self.getMarketPosition(contNo) == 0:
+            return -1
+
+        orderInfo = self._calcCenter.getLatestCoverOrder(contNo)
+        if not orderInfo or 'CurBarIndex' not in orderInfo:
+            return -1
+
+        barIndex = orderInfo['CurBarIndex']
+        curBar = self._hisModel.getCurBar()
+        return (curBar['KLineIndex'] - barIndex)
+
     def getMarketPosition(self, contNo):
         if not contNo:
             contNo = self._cfgModel.getBenchmark()
