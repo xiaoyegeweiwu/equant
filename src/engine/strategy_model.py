@@ -1145,24 +1145,16 @@ class StrategyModel(object):
         self.logger.error(logInfo)
 
     # ///////////////////////属性函数///////////////////////////
-    def getBarInterval(self, contNo):
-        if len(self._cfgModel._metaData) == 0 or 'Sample' not in self._cfgModel._metaData:
+    def getBarInterval(self):
+        barInfo = self._cfgModel.getKLineShowInfo()
+        if 'KLineSlice' not in barInfo:
             return None
-
-        sample = self._cfgModel.getSample()
-        if not contNo:
-            return sample['KLineSlice']
-        barInfo = sample[contNo][-1]
         return barInfo['KLineSlice']
 
-    def getBarType(self,contNo):
-        if len(self._cfgModel._metaData) == 0 or 'Sample' not in self._cfgModel._metaData:
+    def getBarType(self):
+        barInfo = self._cfgModel.getKLineShowInfo()
+        if 'KLineType' not in barInfo:
             return None
-
-        sample = self._cfgModel.getSample()
-        if not contNo:
-            return sample['KLineType']
-        barInfo = sample[contNo][-1]
         return barInfo['KLineType']
 
     def getBidAskSize(self, contNo):
