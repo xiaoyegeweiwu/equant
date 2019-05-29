@@ -23,13 +23,11 @@ class CalcCenter(object):
         self._continueLose = 0  # 当前连续亏损次数
         self._continueEmptyPeriod = 0  # 连续空仓周期数
         self._testDays = 0  # 测试天数
-        self._firstOpenOrder = defaultdict(dict)  # 交易合约第一个有持仓的订单
+        self._firstOpenOrder = {}  # 交易合约第一个有持仓的订单
 
         self._runSet = defaultdict(int)  # 配置
         self._costs = defaultdict()  # 费率，存放所有合约的费率
         self._profit = defaultdict(int)  # 策略收益统计信息
-        # self._positions = self._strategy.runtime_data.initial_position   # 先不考虑初始持仓
-        # self._positions = defaultdict()
         self._positions = {}
 
         self._orders = []  # 订单列表
@@ -261,7 +259,7 @@ class CalcCenter(object):
                                                                     ftOrder["OrderType"],
                                                                     ftOrder["Hedge"]))
 
-        self._logger.sig_info(self._formatOrder(order))
+        # self._logger.sig_info(self._formatOrder(order))
 
         contPrice = {
             "Cont": order["Cont"],
@@ -270,9 +268,7 @@ class CalcCenter(object):
             #"bar": order["CurrentBarIndex"]
         }
 
-        # 11ms
         self._calcOrder(order)
-        # -------------11ms-----------------------
 
         # self._updateOrderPrice(contPrice)
 
@@ -284,7 +280,7 @@ class CalcCenter(object):
 
         # 4ms
         #TODO: 暂时先不用self._firstOpenOrder信息，屏蔽掉
-        # self._updateFirstOrder(order["Cont"])
+        self._updateFirstOrder(order["Cont"])
         # -------------------4ms----------------------------------
 
         eo = self._orders[-1]
@@ -504,21 +500,29 @@ class CalcCenter(object):
     def _updateFirstOrder(self, contract):
         pInfo = self.getPositionInfo(contract)
         if pInfo["TotalBuy"] > 0:
-            for eo in self._orders:
+            for eo in self._orders[self._firstHoldPosition:]:
                 if eo["Order"]["Cont"] == contract and eo["LeftNum"] > 0:
-                    self._firstOpenOrder[contract]["Long"] = eo["Order"]
-                    break
-        else:
-            self._firstOpenOrder[contract]["Long"] = defaultdict()
+                    self._firstOpenOrder[contract] = eo["Order"]
+                    return
 
-        if pInfo["TotalSell"] > 0:
-            for eo in self._orders:
+        elif pInfo["TotalSell"] > 0:
+            for eo in self._orders[self._firstHoldPosition:]:
                 if eo["Order"]["Cont"] == contract and eo["LeftNum"] > 0:
-                    # if eo["Order"]["Direct"] == dSell and eo["Order"]["Offset"] == oOpen:
-                    self._firstOpenOrder[contract]["Short"] = eo["Order"]
-                    break
+                    self._firstOpenOrder[contract] = eo["Order"]
+                    return
         else:
-            self._firstOpenOrder[contract]["Short"] = defaultdict()
+            self._firstOpenOrder[contract] = {}
+            return
+
+    def getFirstOpenOrder(self, contract):
+        """
+        获取第一个有仓未平的开仓单
+        :param contract: 合约代码
+        :return: 开仓单的订单详情
+        """
+        if contract in self._firstOpenOrder:
+            return self._firstOpenOrder[contract]
+        return {}
 
     def _getOpenCharge(self, contract, num, offset, flag, linkList):
         """
@@ -658,9 +662,10 @@ class CalcCenter(object):
                 break
             self._firstHoldPosition += 1
 
+    # 弃用
     def _getFirstOpenOrder(self, contract):
         if not self._orders:
-            return None
+            return []
         else:
             for eo in self._orders:
                 if eo["Order"]["Cont"] == contract \
