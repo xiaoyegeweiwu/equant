@@ -9,6 +9,7 @@ from .strategy_cfg_model import StrategyConfig
 from .strategy_his_model import StrategyHisQuote
 from .strategy_qte_model import StrategyQuote
 from .strategy_trd_model import StrategyTrade
+from .statistics_model   import StatisticsModel
 
 from engine.calc import CalcCenter
 from datetime import datetime
@@ -35,6 +36,7 @@ class StrategyModel(object):
         self._qteModel = StrategyQuote(strategy, self._cfgModel)
         self._hisModel = StrategyHisQuote(strategy, self._cfgModel, self._calcCenter)
         self._trdModel = StrategyTrade(strategy, self._cfgModel)
+        self._staModel = StatisticsModel(strategy, self._cfgModel)
 
     def setRunStatus(self, status):
         self._runStatus = status
@@ -1493,3 +1495,6 @@ class StrategyModel(object):
         # return self._calcCenter.getProfit()["AllTrade"]
         return 0
 
+    def SMA(self, price, period, weight):
+        '''计算加权移动平均值'''
+        return self._staModel.SMA(price, period, weight)

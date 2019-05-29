@@ -4426,7 +4426,7 @@ class BaseApi(object):
             在当前Bar输出一个点
 
         【语法】
-            PlotDot(self, name, value, icon, color, main, barsback)
+            PlotDot(string name, float value, int icon, int color, bool main, int barsback=0)
 
         【参数】
             value 输出的值
@@ -4450,7 +4450,7 @@ class BaseApi(object):
             绘制一根Bar
 
         【语法】
-            PlotBar(self, name, vol1, vol2, color, main, filled, barsback)
+            PlotBar(string name, int vol1, int vol2, int color, bool main, bool filled, int barsback=0)
 
         【参数】
             name  bar名称
@@ -4520,7 +4520,7 @@ class BaseApi(object):
             绘制斜线段
 
         【语法】
-            PlotPartLine(self, name, index1, price1, index2, price2, color, main, axis, width)
+            PlotPartLine(string name, int index1, float price1, int index2, float price2, int color, bool main, bool axis, int width)
 
         【参数】
             name   名称
@@ -4552,7 +4552,7 @@ class BaseApi(object):
             绘制竖线段
 
         【语法】
-            PlotStickLine(self, name, price1, price2, color, main, axis, barsback)
+            PlotStickLine(string name, float price1, float price2, int color, bool main, bool axis, int barsback=0)
 
         【参数】
             name   名称
@@ -4680,7 +4680,28 @@ class BaseApi(object):
               LogError("当前使用的用户账户ID为 : %s，可用资金为 : %10.2f" % (accountId, freeMargin))
         '''
         return self._dataModel.LogError(args)
-        
+
+    def SMA(self, price, period, weight):
+        '''
+        【说明】
+            获取加权移动平均值
+        【语法】
+            SMA(self, numpy.array price, int period, int weight)
+        【参数】
+            price   序列值，numpy数组
+            period  周期
+            weight  权重
+
+        【备注】
+            返回值为两个值，第一个为整型，第二个为浮点型
+            当第一个值为0时，此时第二个值是计算出的sma值
+            当第一个值小于0时，此时计算失败，此时第二个值为numpy.nan
+
+        【示例】
+            SMA(Close(), 12, 2)
+        '''
+        return self._dataModel.SMA(price, period, weight)
+
     def strategyStatus(self):
         '''
         【说明】
@@ -5536,3 +5557,5 @@ def LogWarn(*args):
 def LogError(*args):
     return baseApi.LogError(args)
 
+def SMA(price, period, weight):
+    return baseApi.SMA(price, period, weight)
