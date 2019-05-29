@@ -286,6 +286,9 @@ EEQU_ISNOT_AXIS                  = '1'			     #非独立坐标
 EEQU_IS_MAIN                     = '0'		         #主图
 EEQU_ISNOT_MAIN                  = '1'			     #副图
 
+EEQU_IS_FILLED                   = 1;			     #填充
+EEQU_ISNOT_FILLED                = 0;		         #非填充
+
 EEQU_STATE_RUN                   = '0';			     #运行
 EEQU_STATE_SUSPEND               = '1';		         #挂起
 EEQU_STATE_STOP                  = '2';			     #停止

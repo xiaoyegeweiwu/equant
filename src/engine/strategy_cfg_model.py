@@ -495,6 +495,13 @@ class StrategyConfig(object):
         self._metaData['SubContract'].append(contNo)
 
         # 记录展示的合约和K线信息
+        if barType == EEQU_KLINE_SECOND:
+            barType = EEQU_KLINE_TICK
+        elif barType == EEQU_KLINE_HOUR:
+            barType = EEQU_KLINE_MINUTE
+            barInterval = barInterval * 60
+        elif barType == EEQU_KLINE_TICK:
+            barInterval = 0
         if not self._metaData['Sample']['Display']['ContractNo']:
             self._metaData['Sample']['Display'] = {"ContractNo" : contNo, "KLineType": barType, "KLineSlice": barInterval}
 
@@ -1005,7 +1012,7 @@ class StrategyHisQuote(object):
 
         numArray = methodMap[dataType](multiContKey)
 
-        return numArray if len(numArray) <= maxLength else numArray[(len(numArray) - maxLength - 1):]
+        return numArray if len(numArray) <= maxLength else numArray[-maxLength : ]
         
     #//////////////////////////////////内部接口//////////////////////////////////
 
@@ -1058,7 +1065,7 @@ class StrategyHisQuote(object):
         high = self.getBarHigh(contNo)
         low = self.getBarLow(contNo)
         close = self.getBarClose(contNo)
-        minLength = min(len(high), min(low), len(close))
+        minLength = min(len(high), len(low), len(close))
         if minLength == 0:
             return []
         typicalList = []
@@ -1072,7 +1079,7 @@ class StrategyHisQuote(object):
         low = self.getBarLow(contNo)
         open = self.getBarOpen(contNo)
         close = self.getBarClose(contNo)
-        minLength = min(len(high), min(low), len(open), len(close))
+        minLength = min(len(high), len(low), len(open), len(close))
         if minLength == 0:
             return []
         weightedList = []

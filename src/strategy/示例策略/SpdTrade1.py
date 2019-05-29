@@ -3,7 +3,7 @@
 import talib
 
 code1="ZCE|F|TA|909"
-code2="ZCE|F|AT|001"
+code2="ZCE|F|TA|001"
 p1=20
 dot=2
 qty=1
@@ -11,20 +11,20 @@ qty=1
 bar=0
 
 def initialize(context):
-    SetBarInterval(code1, 'M', 1, "20190510")
-    SetBarInterval(code2, 'M', 1, "20190510")
-    SetTriggerType(code1, 1)
-    SetTriggerType(code2, 1)
+    SetBarInterval(code1, 'M', 1, 1000)
+    SetBarInterval(code2, 'M', 1, 2000)
     
 def handle_data(context):
-    if len(Close()) < p1:
+    if len(Close(code1, 'M', 1)) < p1 or len(Close(code2, 'M', 1)) < p1:
         return;
-    ma1 = talib.MA(Close(code1), timeperiod=p1, matype=0)
-    ma2 = talib.MA(Close(code2), timeperiod=p1, matype=0)    
-    LogInfo('ma1', Close(code1)[-1], '  ma2', Close(code2)[-1])
 
+    ma1 = talib.MA(Close(code1, 'M', 1), timeperiod=p1, matype=0)
+    ma2 = talib.MA(Close(code2, 'M', 1), timeperiod=p1, matype=0)    
+    LogInfo('ma1', Close(code1, 'M', 1)[-1], '  ma2', Close(code2, 'M', 1)[-1])
+    
+    print("ma1:", ma1[-1], "ma2:",ma2[-1]) 
     ma= ma1[-1] - ma2[-1]
-    prc = Close(code1)[-1] - Close(code2)[-1]       
+    prc = Close(code1, 'M', 1)[-1] - Close(code2, 'M', 1)[-1]       
     
     PlotNumeric("ma1", ma1[-1], color=0xFF00FF)
     PlotNumeric("ma2", ma2[-1], color=0x0008FF)
@@ -58,6 +58,25 @@ def handle_data(context):
         else:
             return
         
-    bar == CurrentBar()
+    bar = CurrentBar()
     
-    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

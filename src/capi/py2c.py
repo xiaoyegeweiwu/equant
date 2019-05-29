@@ -340,7 +340,7 @@ class PyAPI(object):
             data.TotalQty                                    = d['TotalQty']
             data.PositionQty                                 = d['PositionQty']
             data.LastPrice                                   = d['LastPrice']
-            data.KLineData.KLineData0.KLineQty               = d['KLineQty']
+            data.KLineData.KLineData0.KLineQty               = int(d['KLineQty'])
             data.KLineData.KLineData0.OpeningPrice           = d['OpeningPrice']
             data.KLineData.KLineData0.HighPrice              = d['HighPrice']
             data.KLineData.KLineData0.LowPrice               = d['LowPrice']
@@ -542,7 +542,7 @@ class PyAPI(object):
             data.KLineIndex  = d['KLineIndex']
             data.Value       = d['Value']
             data.KLineSeriesUnion._KLineSeriesStructure3.ClrBar      = d['ClrBar']
-            data.KLineSeriesUnion._KLineSeriesStructure3.Filled      = d['Filled'].encode()
+            data.KLineSeriesUnion._KLineSeriesStructure3.Filled      = d['Filled']
             data.KLineSeriesUnion._KLineSeriesStructure3.BarValue    = d['BarValue']
             curBuf = cbuf + sizeof(EEquKLineSeries) * i
             cData = string_at(addressof(data), sizeof(EEquKLineSeries))
@@ -1168,7 +1168,6 @@ class PyAPI(object):
             fieldDataDict['FieldData'] = fieldDict
             
             dataList.append(fieldDataDict)
-        print("data list is ", dataList)
         # 发送到引擎
         apiEvent.setData(dataList)
         sid = apiEvent.getSessionId()

@@ -4,7 +4,7 @@ p1=5
 p2=20
 
 def initialize(context): 
-    SetBarInterval("ZCE|F|TA|909", 'M', 20, "20190510")
+    SetBarInterval("ZCE|F|TA|909", 'M', 1, "20190510")
     SetActual()
 
 def handle_data(context):
@@ -26,8 +26,6 @@ def handle_data(context):
         Buy(1, Close()[-1])
     if MarketPosition() >= 0 and ma1[-1] < ma2[-1]:
         SellShort(1, Close()[-1])
-
-
 
 
 

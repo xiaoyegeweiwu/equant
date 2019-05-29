@@ -1,4 +1,5 @@
-
+import threading
+import time
 import builtins
 import keyword
 import re
@@ -199,11 +200,12 @@ class TextLineNumbers(Canvas):
         while True :
             dline= self.textwidget.dlineinfo(i)
             if dline is None: break
-            y = dline[1] + 6
+            y = dline[1] + 7
             linenum = str(i).split(".")[0]
             self.create_text(2, y, anchor="nw", text=linenum)
             i = self.textwidget.index("%s+1line" % i)
 
+        self.after(200, self.redraw)
 
 class EditorText(ParentText, ModifiedMixin):
     def __init__(self, master, view, **kw):
@@ -221,7 +223,7 @@ class EditorText(ParentText, ModifiedMixin):
         self.tagdefs = tagdefs
         color_config(self)
         self.config_colors()
-        # self.percolator = Percolator(self)
+        self.percolator = Percolator(self)
         self.bind("<Button-3>", self.create_menu)
 
         # TODO: 捕获modified需要修改
@@ -237,11 +239,6 @@ class EditorText(ParentText, ModifiedMixin):
         self.bind("<<Change>>", self._onChange)
         self.bind("<Configure>", self._onChange)
         self.linenumbers.pack(side=LEFT, fill="y")
-
-    def highlight_line(self):
-        self.tag_remove("active_line", 1.0, "end")
-        self.tag_add("active_line", "insert linestart", "insert lineend+1c")
-        self.after(100, self.highlight_line)
 
     def _onChange(self, event):
         self.linenumbers.redraw()
@@ -270,9 +267,7 @@ class EditorText(ParentText, ModifiedMixin):
         # return None
 
     def beenModified(self, event=None):
-        print("hahahahahaah")
         if not self._view.doubleClickFlag():
-            print("1111111: ", self._view.doubleClickFlag())
             if self.edit_modified():
                 if not self._view.doubleClickFlag():
                     strategyPath = self._controller.getEditorText()["path"]

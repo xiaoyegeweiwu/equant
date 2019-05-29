@@ -328,10 +328,10 @@ class StrategyModel(object):
         # 对于开仓，需要平掉反向持仓
         qty = self._calcCenter.needCover(userNo, contNo, dBuy, share, price)
         if qty > 0:
-            eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtNone, dBuy, oCover, hSpeculate, price, qty, curBar, False)
+            eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtGFD, dBuy, oCover, hSpeculate, price, qty, curBar, False)
             if eSessionId != "": self._strategy.updateBarInfoInLocalOrder(eSessionId, curBar)
             
-        eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtNone, dBuy, oOpen, hSpeculate, price, share, curBar)
+        eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtGFD, dBuy, oOpen, hSpeculate, price, share, curBar)
         if eSessionId != "": self._strategy.updateBarInfoInLocalOrder(eSessionId, curBar)
 
     def setBuyToCover(self, contractNo, share, price):
@@ -341,7 +341,7 @@ class StrategyModel(object):
         # 交易计算、生成回测报告
         # 产生信号
         userNo = self._cfgModel.getUserNo() if self._cfgModel.isActualRun() else "Default"
-        eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtNone, dBuy, oCover, hSpeculate, price, share, curBar)
+        eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtGFD, dBuy, oCover, hSpeculate, price, share, curBar)
         if eSessionId != "": self._strategy.updateBarInfoInLocalOrder(eSessionId, curBar)
 
     def setSell(self, contractNo, share, price):
@@ -351,7 +351,7 @@ class StrategyModel(object):
         # 交易计算、生成回测报告
         # 产生信号
         userNo = self._cfgModel.getUserNo() if self._cfgModel.isActualRun() else "Default"
-        eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtNone, dSell, oCover, hSpeculate, price, share, curBar)
+        eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtGFD, dSell, oCover, hSpeculate, price, share, curBar)
         if eSessionId != "": self._strategy.updateBarInfoInLocalOrder(eSessionId, curBar)
 
     def setSellShort(self, contractNo, share, price):
@@ -361,13 +361,13 @@ class StrategyModel(object):
         userNo = self._cfgModel.getUserNo() if self._cfgModel.isActualRun() else "Default"
         qty = self._calcCenter.needCover(userNo, contNo, dSell, share, price)
         if qty > 0:
-            eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtNone, dSell, oCover, hSpeculate, price, qty, curBar, False)
+            eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtGFD, dSell, oCover, hSpeculate, price, qty, curBar, False)
             if eSessionId != "": self._strategy.updateBarInfoInLocalOrder(eSessionId, curBar)
 
         #交易计算、生成回测报告
         #产生信号
         userNo = self._cfgModel.getUserNo() if self._cfgModel.isActualRun() else "Default"
-        eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtNone, dSell, oOpen, hSpeculate, price, share, curBar)
+        eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtGFD, dSell, oOpen, hSpeculate, price, share, curBar)
         if eSessionId != "": self._strategy.updateBarInfoInLocalOrder(eSessionId, curBar)
 
     def sendFlushEvent(self):
@@ -688,7 +688,7 @@ class StrategyModel(object):
     #     orderParam = {
     #         "UserNo": userNo,  # 账户编号
     #         "OrderType": otMarket,  # 定单类型
-    #         "ValidType": vtNone,  # 有效类型
+    #         "ValidType": vtGFD,  # 有效类型
     #         "ValidTime": '0',  # 有效日期时间(GTD情况下使用)
     #         "Cont": contNo,  # 合约
     #         "Direct": direct,  # 买卖方向：买、卖
@@ -1006,7 +1006,42 @@ class StrategyModel(object):
         }]
 
         self._plotNumeric(self._strategyName, value, color, main, EEQU_ISNOT_AXIS, EEQU_ICON, barsback, data)
-    
+
+    def setPlotDot(self, name, value, icon, color, main, barsback):
+        main = '0' if main else '1'
+        curBar = self._hisModel.getCurBar()
+        klineIndex = curBar['KLineIndex'] - barsback
+
+        if klineIndex <= 0:
+            return
+
+        data = [{
+            'KLineIndex' : klineIndex,
+            'Value'      : value,
+            'Icon'       : icon
+        }]
+
+        self._plotNumeric(name, value, color, main, EEQU_ISNOT_AXIS, EEQU_DOT, barsback, data)
+
+    def setPlotBar(self, name, vol1, vol2, color, main, filled, barsback):
+        main = '0' if main else '1'
+        filled = 1 if filled else 0
+        curBar = self._hisModel.getCurBar()
+        klineIndex = curBar['KLineIndex'] - barsback
+
+        if klineIndex <= 0:
+            return
+
+        data = [{
+            'KLineIndex' : klineIndex,
+            'Value'      : vol1,
+            'ClrBar'     : color,
+            'BarValue'   : vol2,
+            'Filled'     : filled
+        }]
+
+        self._plotNumeric(name, 0, color, main, EEQU_ISNOT_AXIS, EEQU_BAR, barsback, data)
+
     def setPlotNumeric(self, name, value, color, main, axis, type, barsback):
         main = '0' if main else '1'
         axis = '0' if axis else '1'
@@ -1041,7 +1076,44 @@ class StrategyModel(object):
         }]
 
         self._plotNumeric(self._strategyName, value, color, main, axis, EEQU_VERTLINE, barsback, data)
-        
+
+    def setPlotPartLine(self, name, index1, price1, index2, price2, color, main, axis, width):
+        main = '0' if main else '1'
+        axis = '0' if axis else '1'
+
+        if index1<= 0 or index2 <= 0:
+            return
+
+        data = [{
+            'KLineIndex' : index1,
+            'Value'      : price1,
+            'Idx2'       : index2,
+            'LineValue'  : price2,
+            'ClrLine'    : color,
+            'LinWid'     : width
+        }]
+
+        self._plotNumeric(name, 0, color, main, axis, EEQU_PARTLINE, 0, data)
+
+    def setPlotStickLine(self, name, price1, price2, color, main, axis, barsback):
+
+        main = '0' if main else '1'
+        axis = '0' if axis else '1'
+
+        curBar = self._hisModel.getCurBar()
+        klineIndex = curBar['KLineIndex'] - barsback
+
+        if klineIndex <= 0:
+            return
+
+        data = [{
+            'KLineIndex' : klineIndex,
+            'Value'      : price1,
+            'StickValue' : price2,
+            'ClrStick'   : color
+        }]
+
+        self._plotNumeric(name, 0, color, main, axis, EEQU_STICKLINE, barsback, data)
 
     def formatArgs(self, args):
         if len(args) == 0:

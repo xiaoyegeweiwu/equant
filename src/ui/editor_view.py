@@ -348,8 +348,8 @@ class QuantEditor(StrategyTree):
         saveBtn.pack(side=RIGHT)
         self.loadingBtn.pack(side=RIGHT)
 
-    def setLoadBtnState(self):
-        self.loadingBtn.config(state="normal")
+    def setLoadBtnState(self, state):
+        self.loadingBtn.config(state=state)
 
     def tab_key(self, event):
         self.editor_text.insert(INSERT, " " * 4)
