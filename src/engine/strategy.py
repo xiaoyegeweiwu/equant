@@ -210,42 +210,42 @@ class Strategy:
         try:
             # 1. 加载用户策略
             userModule = importlib.import_module(moduleName)
-            
-            # 2. 创建策略上下文
-            self._context = StrategyContext()
-            
-            # 3. 创建数据模块
-            self._dataModel = StrategyModel(self)
-            
-            # 4. 初始化系统函数
-            self._baseApi = base_api.baseApi.updateData(self, self._dataModel)
-            userModule.__dict__.update(base_api.__dict__)
-            
-            # 5. 初始化用户策略参数
-            if self._isInitialize:
-                userModule.initialize(self._context)
-                # print("strategy config is ")
-                # print(self._dataModel.getConfigModel().getConfig())
-            self._userModule = userModule
-            
-            # 6. 初始化model
-            self._dataModel.initialize()
-
-            # 7.  注册处理函数
-            self._regEgCallback()
-            
-            # 8. 启动策略运行线程
-            self._triggerQueue = queue.Queue()
-            self._startStrategyThread()
-            
-            # 9. 启动策略心跳线程
-            self._startStrategyTimer()
-
         except Exception as e:
             errorText = traceback.format_exc()
             # traceback.print_exc()
             self._strategyState = StrategyStatusExit
             self._exit(-1, errorText)
+            return
+
+        # 2. 创建策略上下文
+        self._context = StrategyContext()
+
+        # 3. 创建数据模块
+        self._dataModel = StrategyModel(self)
+
+        # 4. 初始化系统函数
+        self._baseApi = base_api.baseApi.updateData(self, self._dataModel)
+        userModule.__dict__.update(base_api.__dict__)
+
+        # 5. 初始化用户策略参数
+        if self._isInitialize:
+            userModule.initialize(self._context)
+            # print("strategy config is ")
+            # print(self._dataModel.getConfigModel().getConfig())
+        self._userModule = userModule
+
+        # 6. 初始化model
+        self._dataModel.initialize()
+
+        # 7.  注册处理函数
+        self._regEgCallback()
+
+        # 8. 启动策略运行线程
+        self._triggerQueue = queue.Queue()
+        self._startStrategyThread()
+
+        # 9. 启动策略心跳线程
+        self._startStrategyTimer()
 
     def run(self):
         try:
