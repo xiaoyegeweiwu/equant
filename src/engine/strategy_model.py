@@ -1392,19 +1392,16 @@ class StrategyModel(object):
         if not contNo:
             contNo = self._cfgModel.getBenchmark()
 
-        barInfo = None
-        for eSessionId in self._strategy._eSessionIdList:
-            tradeRecord = self._strategy._localOrder[eSessionId]
-            # if contNo == tradeRecord._contNo and tradeRecord._offset == oOpen:
-            if contNo == tradeRecord._contNo and tradeRecord._offset == 'N':
-                barInfo = tradeRecord.getBarInfo()
-                break
+        if self.getMarketPosition(contNo) == 0:
+            return -1
 
-        if not barInfo:
-            return 0
+        orderInfo = self._calcCenter.getFirstOpenOrder(contNo)
+        if 'CurBarIndex' not in orderInfo:
+            return -1
 
+        barIndex = orderInfo['CurBarIndex']
         curBar = self._hisModel.getCurBar()
-        return (curBar['KLineIndex'] - barInfo['KLineIndex'])
+        return (curBar['KLineIndex'] - barIndex)
 
     def getMarketPosition(self, contNo):
         if not contNo:
