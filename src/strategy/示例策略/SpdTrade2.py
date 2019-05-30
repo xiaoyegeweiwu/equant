@@ -12,8 +12,8 @@ qty=1
 bar=0
 
 def initialize(context):
-    SetBarInterval(code1, 'M', 10, "20190310")
-    SetBarInterval(code2, 'M', 10, "20190310")
+    SetBarInterval(code1, 'M', 10, 'N')
+    SetBarInterval(code2, 'M', 10, 'N')
     SetTriggerType(code1, 1)
     SetTriggerType(code2, 1)
     SetActual()
