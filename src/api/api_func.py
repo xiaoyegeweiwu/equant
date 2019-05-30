@@ -93,8 +93,8 @@ _all_func_ = {
                 
     '策略状态': [
                     ['AvgEntryPrice'       , '当前持仓平均建仓价格'],
-                    ## ['BarsSinceEntry'      , '当前持仓的第一个建仓位置到当前位置的Bar计数'],
-                    # ['BarsSinceExit'       , '最近平仓位置到当前位置的Bar计数'],
+                    ['BarsSinceEntry'      , '当前持仓的第一个建仓位置到当前位置的Bar计数'],
+                    ['BarsSinceExit'       , '最近平仓位置到当前位置的Bar计数'],
     #                 ['BarsSinceLastEntry'  , '当前持仓的最后一个建仓位置到当前位置的Bar计数'],
     #                 ['ContractProfit'      , '当前持仓位置的每手浮动盈亏'],
     #                 ['CurrentContracts'    , '当前持仓的持仓合约数'],
@@ -288,6 +288,10 @@ _all_func_ = {
                     ['tradeDate'            ,'获取当前触发的交易日'],
                     ['dateTimeStamp'        ,'获取当前触发的时间戳'],
                     ['triggerData'          ,'获取当前触发类型对应的数据'],
+                ],
+
+    '金融及统计函数': [
+                    ['SMA'           ,'计算加权移动平均值'],
                 ],
 
 }

@@ -166,6 +166,7 @@ class Strategy:
     def __init__(self, logger, id, args, event):
         self._strategyId = id
         self.logger = logger
+        self._dataModel = None
         
         data = event.getData()
         self._filePath = data['Path']
@@ -207,15 +208,9 @@ class Strategy:
 
         if moduleDir not in sys.path:
             sys.path.insert(0, moduleDir)
-        try:
-            # 1. 加载用户策略
-            userModule = importlib.import_module(moduleName)
-        except Exception as e:
-            errorText = traceback.format_exc()
-            # traceback.print_exc()
-            self._strategyState = StrategyStatusExit
-            self._exit(-1, errorText)
-            return
+
+        # 1. 加载用户策略
+        userModule = importlib.import_module(moduleName)
 
         # 2. 创建策略上下文
         self._context = StrategyContext()
@@ -699,12 +694,13 @@ class Strategy:
     # 停止策略
     def _onStrategyQuit(self, event):
         self._strategyState = StrategyStatusExit
+        config = None if self._dataModel is None else self._dataModel.getConfigData()
         quitEvent = Event({
             "EventCode": EV_EG2UI_STRATEGY_STATUS,
             "StrategyId": self._strategyId,
             "Data":{
                 "Status":ST_STATUS_QUIT,
-                "Config":self._dataModel.getConfigData(),
+                "Config":config,
                 "Pid":os.getpid(),
                 "Path":self._filePath,
                 "StrategyName": self._strategyName,

@@ -378,7 +378,7 @@ class BaseApi(object):
     def Q_AskPrice(self, contractNo='', level=1):
         '''
         【说明】
-              合约最新卖价
+              合约最优卖价
 
         【语法】
               float Q_AskPrice(string contractNo, int level)
@@ -387,7 +387,7 @@ class BaseApi(object):
               contractNo 合约编号, 默认当前合约;level 档位数,默认1档
 
         【备注】
-              返回浮点数, 可获取指定合约,指定深度的最新卖价
+              返回浮点数, 可获取指定合约,指定深度的最优卖价
 
         【实例】
               无
@@ -416,7 +416,7 @@ class BaseApi(object):
     def Q_AskVol(self, contractNo='', level=1):
         '''
         【说明】
-              合约最新卖量
+              合约最优卖量
 
         【语法】
               float Q_AskVol(string contractNo, int level)
@@ -425,7 +425,7 @@ class BaseApi(object):
               contractNo 合约编号, 默认当前合约;level 档位数,默认1档
 
         【备注】
-              返回浮点数, 可获取指定合约,指定深度的最新卖量
+              返回浮点数, 可获取指定合约,指定深度的最优卖量
 
         【实例】
               无
@@ -435,7 +435,7 @@ class BaseApi(object):
     def Q_AvgPrice(self, contractNo=''):
         '''
         【说明】
-              当前合约的历史数据是否有效
+              当前合约的实时均价
 
         【语法】
               float Q_AvgPrice(string contractNo)
@@ -454,7 +454,7 @@ class BaseApi(object):
     def Q_BidPrice(self, contractNo='', level=1):
         '''
         【说明】
-              合约最新买价
+              合约最优买价
 
         【语法】
               float Q_BidPrice(string contractNo, int level)
@@ -463,7 +463,7 @@ class BaseApi(object):
               contractNo 合约编号, 默认当前合约;level 档位数,默认1档
 
         【备注】
-              返回浮点数, 可获取指定合约,指定深度的最新买价
+              返回浮点数, 可获取指定合约,指定深度的最优买价
 
         【实例】
               无
@@ -493,7 +493,7 @@ class BaseApi(object):
     def Q_BidVol(self, contractNo='', level=1):
         '''
         【说明】
-              合约最新买量
+              合约最优买量
 
         【语法】
               float Q_BidVol(string contractNo, int level)
@@ -502,7 +502,7 @@ class BaseApi(object):
               contractNo 合约编号, 默认当前合约;level 档位数,默认1档
 
         【备注】
-              返回浮点数, 可获取指定合约,指定深度的最新买量
+              返回浮点数, 可获取指定合约,指定深度的最优买量
 
         【实例】
               无
@@ -1132,16 +1132,16 @@ class BaseApi(object):
         return self._dataModel.setSellShort(contractNo, share, price)
         
     #/////////////////////////属性函数/////////////////////////////
-    def BarInterval(self, contractNo):
+    def BarInterval(self):
         '''
         【说明】
               合约图表周期数值
 
         【语法】
-              list BarInterval(string contractNo)
+              list BarInterval()
 
         【参数】
-              contractNo 合约编号，为空时取的时设置界面设置的周期数值
+              无
 
         【备注】
               返回周期数值列表，通常和BarType一起使用进行数据周期的判别
@@ -1152,40 +1152,39 @@ class BaseApi(object):
               当前数据周期为60分钟线，BarInterval等于60；
               当前数据周期为1TICK线，BarInterval等于1；br> 当前数据周期为5000量线，BarInterval等于5000。
         '''
-        return self._dataModel.getBarInterval(contractNo)
+        return self._dataModel.getBarInterval()
         
-    def BarType(self, contractNo):
+    def BarType(self):
         '''
         【说明】
               合约图表周期类型值
 
         【语法】
-              int BarType()
+              char BarType()
 
         【参数】
-              contractNo 合约编号，为空时取的时设置界面设置的周期数值
+              无
 
         【备注】
-              返回值为整型，通常和BarInterval一起使用进行数据周期的判别
+              返回值为字符，通常和BarInterval一起使用进行数据周期的判别
               返回值如下定义：
-              0 分时
-              1 TICK线
-              2 秒线
-              3 分钟线
-              4 小时线
-              5 日线
-              6 周线
-              7 月线
-              8 年线
-
+              t 分时
+              T 分笔
+              S 秒线
+              M 分钟
+              H 小时
+              D 日线
+              W 周线
+              m 月线
+              Y 年线
 
         【示例】
-              当前数据周期为22日线，BarType等于5；
-              当前数据周期为60分钟线，BarType等于3；
-              当前数据周期为1TICK线，BarType等于1；
-              当前数据周期为3秒线，BarType等于2。
+              当前数据周期为22日线，BarType等于D；
+              当前数据周期为60分钟线，BarType等于M；
+              当前数据周期为1TICK线，BarType等于T；
+              当前数据周期为3秒线，BarType等于S。
         '''
-        return self._dataModel.getBarType(contractNo)
+        return self._dataModel.getBarType()
         
     def BidAskSize(self, contractNo):
         '''
@@ -1664,13 +1663,34 @@ class BaseApi(object):
 
         【备注】
               获得当前持仓指定合约的第一个建仓位置到当前位置的Bar计数，返回值为整型。
-              只有当MarketPosition != 0时，即有持仓的状况下，该函数才有意义，否则返回0。
+              只有当MarketPosition != 0时，即有持仓的状况下，该函数才有意义，否则返回-1。
               注意：在开仓Bar上为0。
 
         【示例】
               无
         '''
         return self._dataModel.getBarsSinceEntry(contractNo)
+
+    def BarsSinceExit(self, contractNo):
+        '''
+        【说明】
+              获得当前持仓中指定合约的最近平仓位置到当前位置的Bar计数。
+
+        【语法】
+              int BarsSinceExit(string contractNo)
+
+        【参数】
+              contractNo 合约编号，默认为基准合约。
+
+        【备注】
+              获得当前持仓指定合约的最近平仓位置到当前位置的Bar计数，返回值为整型。
+              只有当MarketPosition != 0时，即有持仓的状况下，该函数才有意义，否则返回-1。
+              注意：在平仓Bar上为0。
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getBarsSinceExit(contractNo)
 
     def MarketPosition(self, contractNo):
         '''
@@ -4426,7 +4446,7 @@ class BaseApi(object):
             在当前Bar输出一个点
 
         【语法】
-            PlotDot(self, name, value, icon, color, main, barsback)
+            PlotDot(string name, float value, int icon, int color, bool main, int barsback=0)
 
         【参数】
             value 输出的值
@@ -4450,7 +4470,7 @@ class BaseApi(object):
             绘制一根Bar
 
         【语法】
-            PlotBar(self, name, vol1, vol2, color, main, filled, barsback)
+            PlotBar(string name, int vol1, int vol2, int color, bool main, bool filled, int barsback=0)
 
         【参数】
             name  bar名称
@@ -4520,7 +4540,7 @@ class BaseApi(object):
             绘制斜线段
 
         【语法】
-            PlotPartLine(self, name, index1, price1, index2, price2, color, main, axis, width)
+            PlotPartLine(string name, int index1, float price1, int index2, float price2, int color, bool main, bool axis, int width)
 
         【参数】
             name   名称
@@ -4552,7 +4572,7 @@ class BaseApi(object):
             绘制竖线段
 
         【语法】
-            PlotStickLine(self, name, price1, price2, color, main, axis, barsback)
+            PlotStickLine(string name, float price1, float price2, int color, bool main, bool axis, int barsback=0)
 
         【参数】
             name   名称
@@ -4680,7 +4700,28 @@ class BaseApi(object):
               LogError("当前使用的用户账户ID为 : %s，可用资金为 : %10.2f" % (accountId, freeMargin))
         '''
         return self._dataModel.LogError(args)
-        
+
+    def SMA(self, price, period, weight):
+        '''
+        【说明】
+            获取加权移动平均值
+        【语法】
+            SMA(self, numpy.array price, int period, int weight)
+        【参数】
+            price   序列值，numpy数组
+            period  周期
+            weight  权重
+
+        【备注】
+            返回值为两个值，第一个为整型，第二个为浮点型
+            当第一个值为0时，此时第二个值是计算出的sma值
+            当第一个值小于0时，此时计算失败，此时第二个值为numpy.nan
+
+        【示例】
+            SMA(Close(), 12, 2)
+        '''
+        return self._dataModel.SMA(price, period, weight)
+
     def strategyStatus(self):
         '''
         【说明】
@@ -5010,6 +5051,9 @@ def AvgEntryPrice(contractNo=''):
 
 def BarsSinceEntry(contractNo=''):
     return baseApi.BarsSinceEntry(contractNo)
+
+def BarsSinceExit(contractNo=''):
+    return baseApi.BarsSinceExit(contractNo)
 
 def MarketPosition(contractNo=''):
     return baseApi.MarketPosition(contractNo)
@@ -5427,11 +5471,11 @@ def SetTriggerType(type, value=None):
     return baseApi.SetTriggerType(type, value)
 
 # 属性函数
-def BarInterval(contractNo=''):
-    return baseApi.BarInterval(contractNo)
+def BarInterval():
+    return baseApi.BarInterval()
 
-def BarType(contractNo=''):
-    return baseApi.BarType(contractNo)
+def BarType():
+    return baseApi.BarType()
 
 def BidAskSize(contractNo=''):
     return baseApi.BidAskSize(contractNo)
@@ -5536,3 +5580,5 @@ def LogWarn(*args):
 def LogError(*args):
     return baseApi.LogError(args)
 
+def SMA(price, period, weight):
+    return baseApi.SMA(price, period, weight)

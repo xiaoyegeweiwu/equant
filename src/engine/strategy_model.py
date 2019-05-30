@@ -9,6 +9,7 @@ from .strategy_cfg_model import StrategyConfig
 from .strategy_his_model import StrategyHisQuote
 from .strategy_qte_model import StrategyQuote
 from .strategy_trd_model import StrategyTrade
+from .statistics_model   import StatisticsModel
 
 from engine.calc import CalcCenter
 from datetime import datetime
@@ -35,6 +36,7 @@ class StrategyModel(object):
         self._qteModel = StrategyQuote(strategy, self._cfgModel)
         self._hisModel = StrategyHisQuote(strategy, self._cfgModel, self._calcCenter)
         self._trdModel = StrategyTrade(strategy, self._cfgModel)
+        self._staModel = StatisticsModel(strategy, self._cfgModel)
 
     def setRunStatus(self, status):
         self._runStatus = status
@@ -626,7 +628,8 @@ class StrategyModel(object):
         # **************************************
         self._calcCenter.addOrder(orderParam)
         # **************************************
-        return self.sendOrder(userNo, contNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty)
+        retCode, eSessionId = self.sendOrder(userNo, contNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty)
+        return eSessionId if retCode == 0 else ""
         
     def sendOrder(self, userNo, contNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty):
         '''A账户下单函数，不经过calc模块，不产生信号，直接发单'''
@@ -1145,24 +1148,16 @@ class StrategyModel(object):
         self.logger.error(logInfo)
 
     # ///////////////////////属性函数///////////////////////////
-    def getBarInterval(self, contNo):
-        if len(self._cfgModel._metaData) == 0 or 'Sample' not in self._cfgModel._metaData:
+    def getBarInterval(self):
+        barInfo = self._cfgModel.getKLineShowInfo()
+        if 'KLineSlice' not in barInfo:
             return None
-
-        sample = self._cfgModel.getSample()
-        if not contNo:
-            return sample['KLineSlice']
-        barInfo = sample[contNo][-1]
         return barInfo['KLineSlice']
 
-    def getBarType(self,contNo):
-        if len(self._cfgModel._metaData) == 0 or 'Sample' not in self._cfgModel._metaData:
+    def getBarType(self):
+        barInfo = self._cfgModel.getKLineShowInfo()
+        if 'KLineType' not in barInfo:
             return None
-
-        sample = self._cfgModel.getSample()
-        if not contNo:
-            return sample['KLineType']
-        barInfo = sample[contNo][-1]
         return barInfo['KLineType']
 
     def getBidAskSize(self, contNo):
@@ -1382,14 +1377,8 @@ class StrategyModel(object):
     # ///////////////////////策略状态///////////////////////////
     def getAvgEntryPrice(self, contNo):
         '''当前持仓的平均建仓价格'''
-        subContracts = self._config.getContract()
         if not contNo:
-            if len(subContracts) == 0:
-                raise Exception("请在设置界面或者调用SetBarInterval方法至少订阅一个合约！")
-            elif len(subContracts) == 1:
-                contNo = subContracts[0]
-            else:
-                raise Exception("由于您订阅了多个合约，请指定一个需要计算的合约！")
+            contNo = self._config.getBenchmark()
 
         posInfo = self._calcCenter.getPositionInfo(contNo)
         if not posInfo:
@@ -1405,19 +1394,32 @@ class StrategyModel(object):
         if not contNo:
             contNo = self._cfgModel.getBenchmark()
 
-        barInfo = None
-        for eSessionId in self._strategy._eSessionIdList:
-            tradeRecord = self._strategy._localOrder[eSessionId]
-            # if contNo == tradeRecord._contNo and tradeRecord._offset == oOpen:
-            if contNo == tradeRecord._contNo and tradeRecord._offset == 'N':
-                barInfo = tradeRecord.getBarInfo()
-                break
+        if self.getMarketPosition(contNo) == 0:
+            return -1
 
-        if not barInfo:
-            return 0
+        orderInfo = self._calcCenter.getFirstOpenOrder(contNo)
+        if 'CurBarIndex' not in orderInfo:
+            return -1
 
+        barIndex = orderInfo['CurBarIndex']
         curBar = self._hisModel.getCurBar()
-        return (curBar['KLineIndex'] - barInfo['KLineIndex'])
+        return (curBar['KLineIndex'] - barIndex)
+
+    def getBarsSinceExit(self, contNo):
+        '''获得当前持仓中指定合约的最近平仓位置到当前位置的Bar计数'''
+        if not contNo:
+            contNo = self._cfgModel.getBenchmark()
+
+        if self.getMarketPosition(contNo) == 0:
+            return -1
+
+        orderInfo = self._calcCenter.getLatestCoverOrder(contNo)
+        if not orderInfo or 'CurBarIndex' not in orderInfo:
+            return -1
+
+        barIndex = orderInfo['CurBarIndex']
+        curBar = self._hisModel.getCurBar()
+        return (curBar['KLineIndex'] - barIndex)
 
     def getMarketPosition(self, contNo):
         if not contNo:
@@ -1499,3 +1501,6 @@ class StrategyModel(object):
         # return self._calcCenter.getProfit()["AllTrade"]
         return 0
 
+    def SMA(self, price, period, weight):
+        '''计算加权移动平均值'''
+        return self._staModel.SMA(price, period, weight)
