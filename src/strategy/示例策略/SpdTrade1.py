@@ -8,8 +8,8 @@ tp = 'M'
 p = 10
 
 p1=5
-p1=20
-dot=1
+p2=20
+dot=3
 qty=1
 
 bar=0
@@ -20,25 +20,25 @@ def initialize(context):
     
 def handle_data(context):
     if len(Close(code1, tp, p)) < p1 or len(Close(code2, tp, p)) < p2:
-        return;
+        return
     
-    ma1 = talib.MA(Close(code1, tp, p), timeperiod=p1, matype=0)
-    ma2 = talib.MA(Close(code2, tp, p), timeperiod=p1, matype=0)
+    ma1 = talib.MA(Close(code1, tp, p), timeperiod=p1)
+    ma2 = talib.MA(Close(code2, tp, p), timeperiod=p1)
     sma1= ma1[-1] - ma2[-1]
-    ma1 = talib.MA(Close(code1, tp, p), timeperiod=p2, matype=0)
-    ma2 = talib.MA(Close(code2, tp, p), timeperiod=p2, matype=0)
+    ma1 = talib.MA(Close(code1, tp, p), timeperiod=p2)
+    ma2 = talib.MA(Close(code2, tp, p), timeperiod=p2)
     sma2= ma1[-1] - ma2[-1]     
     
     PlotNumeric("sma1", sma1, 0x0000FF, False)
-    PlotNumeric("sma2", sma2, 0xFF0000, False)
-    PlotNumeric("profit", A_TotalProfitLoss(), 0x808080, False, True) 
+    PlotNumeric("sma2", sma2, 0xFF0000, False)   
+    PlotNumeric("profit", NetProfit() + FloatProfit() - TradeCost(), 0x808080, False, True)
     
     global bar    
     #同一根K线上只做一笔交易
     if bar == CurrentBar(code1, tp, p):
         return
 
-    if sma1 > sma2 + dot * PriceTick():
+    if sma1 < sma2 + dot * PriceTick():
         if MarketPosition(code1) == 0:
             Buy(qty, Close(code1, tp, p)[-1], code1)
             SellShort(qty, Close(code2, tp, p)[-1], code2)
@@ -47,7 +47,7 @@ def handle_data(context):
             Sell(qty, Close(code2, tp, p)[-1], code2)
         else:
             return
-    elif sma1 < sma2 - dot * PriceTick():
+    elif sma1 > sma2 - dot * PriceTick():
         if MarketPosition(code1) == 0:
             SellShort(qty, Close(code1, tp, p)[-1], code1)
             Buy(qty, Close(code2, tp, p)[-1], code2)
@@ -59,23 +59,4 @@ def handle_data(context):
         
     bar = CurrentBar(code1, tp, p)
     
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

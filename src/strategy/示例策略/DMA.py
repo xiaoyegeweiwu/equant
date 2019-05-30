@@ -42,16 +42,16 @@ def his_trigger(ma1, ma2):
 def tim_trigger(ma1, ma2):
     if ma1[-1] > ma2[-1]:
         if A_TotalPosition() == 0:       
-            A_SendOrder(usr, code, '2', '0', Enum_Buy(), Enum_Entry(), 'T', Q_BidPrice() + PriceTick(), qty)
+            A_SendOrder(usr, code, Enum_Order_Limit(), Enum_GFD(), Enum_Buy(), Enum_Entry(), Enum_Speculate(), Q_BidPrice() + PriceTick(), qty)
         elif A_TotalPosition() < 0:
-            A_SendOrder(usr, code, '2', '0', Enum_Buy(), Enum_ExitToday(), 'T', Q_BidPrice() + PriceTick(), qty)
+            A_SendOrder(usr, code, Enum_Order_Limit(), Enum_GFD(), Enum_Buy(), Enum_ExitToday(), Enum_Speculate(), Q_BidPrice() + PriceTick(), qty)
         else:
             return False
     elif ma1[-1] < ma2[-1]:
         if A_TotalPosition() == 0:
-            A_SendOrder(usr, code, '2', '0', Enum_Sell(), Enum_Entry(), 'T', Q_AskPrice() - PriceTick(), qty)
+            A_SendOrder(usr, code, Enum_Order_Limit(), Enum_GFD(), Enum_Sell(), Enum_Entry(), Enum_Speculate(), Q_AskPrice() - PriceTick(), qty)
         elif A_TotalPosition() > 0:
-            A_SendOrder(usr, code, '2', '0', Enum_Sell(), Enum_ExitToday(), 'T', Q_AskPrice() - PriceTick(), qty)
+            A_SendOrder(usr, code, Enum_Order_Limit(), Enum_GFD(), Enum_Sell(), Enum_ExitToday(), Enum_Speculate(), Q_AskPrice() - PriceTick(), qty)
         else:
             return False
     return True
@@ -61,10 +61,10 @@ def handle_data(context):
     if len(Close()) < p4:
         return;
         
-    ma1 = talib.MA(Close(), timeperiod=p1, matype=0)
-    ma2 = talib.MA(Close(), timeperiod=p2, matype=0)
-    ma3 = talib.MA(Close(), timeperiod=p3, matype=0)
-    ma4 = talib.MA(Close(), timeperiod=p4, matype=0)
+    ma1 = talib.MA(Close(), timeperiod=p1)
+    ma2 = talib.MA(Close(), timeperiod=p2)
+    ma3 = talib.MA(Close(), timeperiod=p3)
+    ma4 = talib.MA(Close(), timeperiod=p4)
     
     PlotNumeric("ma1", ma1[-1], color=0xFF0000)
     PlotNumeric("ma2", ma2[-1], color=0x00aa00)
@@ -73,9 +73,9 @@ def handle_data(context):
         
     # 盈利曲线
     if BarStatus() == 2:
-        PlotNumeric("fit2", A_TotalProfitLoss(), 0xFF0000, False) 
-    else:
-        PlotNumeric("fit1", NetProfit(), 0x0000FF, False)
+        PlotNumeric("profit2", A_TotalProfitLoss() + A_ProfitLoss() - A_Cost(), 0x808080, False) 
+    else:        
+        PlotNumeric("profit1", NetProfit() + FloatProfit() - TradeCost(), 0xFF8080, False)
             
     global bar       
     # 同一根K线上只做一笔交易

@@ -9,7 +9,7 @@ tp = 'M'
 p = 10
 
 p1=5
-p1=20
+p2=20
 dot=1
 qty=1
 
@@ -24,18 +24,18 @@ def initialize(context):
 
 def handle_data(context):
     if len(Close(code1, tp, p)) < p1 or len(Close(code2, tp, p)) < p2:
-        return;
+        return
 
-    ma1 = talib.MA(Close(code1, tp, p), timeperiod=p1, matype=0)
-    ma2 = talib.MA(Close(code2, tp, p), timeperiod=p1, matype=0)
+    ma1 = talib.MA(Close(code1, tp, p), timeperiod=p1)
+    ma2 = talib.MA(Close(code2, tp, p), timeperiod=p1)
     sma1= ma1[-1] - ma2[-1]
-    ma1 = talib.MA(Close(code1, tp, p), timeperiod=p2, matype=0)
-    ma2 = talib.MA(Close(code2, tp, p), timeperiod=p2, matype=0)
+    ma1 = talib.MA(Close(code1, tp, p), timeperiod=p2)
+    ma2 = talib.MA(Close(code2, tp, p), timeperiod=p2)
     sma2= ma1[-1] - ma2[-1]     
     
     PlotNumeric("sma1", sma1, 0x0000FF, False)
     PlotNumeric("sma2", sma2, 0xFF0000, False)
-    PlotNumeric("profit", A_TotalProfitLoss(), 0x808080, False, True) 
+    PlotNumeric("profit", A_TotalProfitLoss() + A_ProfitLoss() - A_Cost(), 0x808080, False, True) 
     
     if context.strategyStatus() !='C':
         return;
@@ -64,21 +64,4 @@ def handle_data(context):
         A_SendOrder(usr, code2, '2', '0', Enum_Buy() , offset, 'T', Q_BidPrice(code1) + PriceTick(), qty)
         
     bar == CurrentBar()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
