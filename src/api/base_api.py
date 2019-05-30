@@ -385,7 +385,6 @@ class BaseApi(object):
 	            HighPrice 最高价，如63.5
 	            LowPrice 最低价， 如63.49
 	            PositionQty 总持仓，如460816
-	            Priority 权益，如1
 	            TradeDate' 交易日期，如20190521
 
         【实例】
@@ -1170,7 +1169,47 @@ class BaseApi(object):
 
         '''
         return self._dataModel.setSellShort(contractNo, share, price)
-        
+
+    def StartTrade(self):
+        '''
+        【说明】
+              开启交易。
+
+        【语法】
+              void StartTrade()
+
+        【参数】
+              无
+
+        【备注】
+              在策略运行时，使用StopTrade可以暂时停止策略向实盘发单，通过该方法可以开启策略向实盘发单的功能。
+
+        【示例】
+              无
+
+        '''
+        return self._dataModel.setStartTrade()
+
+    def StopTrade(self):
+        '''
+        【说明】
+              暂停交易。
+
+        【语法】
+              void StopTrade()
+
+        【参数】
+              无
+
+        【备注】
+              在策略运行时，使用StopTrade可以暂时停止策略向实盘发单。
+
+        【示例】
+              无
+
+        '''
+        return self._dataModel.setStopTrade()
+
     #/////////////////////////属性函数/////////////////////////////
     def BarInterval(self):
         '''
@@ -2082,6 +2121,25 @@ class BaseApi(object):
               无
         '''
         return self._dataModel.getAccountId()
+
+    def A_GetAllPositionSymbol(self):
+        '''
+        【说明】
+              获得当前账户所有持仓合约。
+
+        【语法】
+              list A_GetAllPositionSymbol()
+
+        【参数】
+              无
+
+        【备注】
+              该参数返回类型为字符串列表，列表内容为账户所有持仓合约列表。
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getAllPositionSymbol()
 
     def A_Cost(self):
         '''
@@ -4035,29 +4093,6 @@ class BaseApi(object):
     def GetConfig(self):
         return self._dataModel.getConfig()
 
-    def SetBenchmark(self, contractNo):
-        '''
-        【说明】
-              设置基准合约及触发策略的合约列表，参数不能为空
-
-        【语法】
-              int SetBenchmark(string contractNo1, string contractNo2, string contractNo3, ...)
-
-        【参数】
-              contractNo 合约编号，第一个合约编号为基准合约
-              合约编号组成规则详见Symbol方法说明
-
-        【备注】
-              返回整型, 0成功，-1失败
-              如果使用合约的即时行情、K线、交易数据触发策略，则必须在策略代码中使用该函数设置合约
-              如果使用K线触发，则需要使用SetBarInterval函数设置类型和周期，否则设置界面选中的K线类型和周期
-
-        【示例】
-              SetBenchmark('ZCE|F|SR|905')
-              SetBenchmark('ZCE|F|SR|905', 'ZCE|F|SR|912', 'ZCE|F|SR|001')
-        '''
-        return self._dataModel.setSetBenchmark(contractNo)
-
     def AddUserNo(self, userNo):
         '''
         【说明】
@@ -4087,7 +4122,7 @@ class BaseApi(object):
               int SetBarInterval(string contractNo, char barType, int barInterval, int|string|char sampleConfig)
 
         【参数】
-              contractNo 合约编号，默认为基础合约
+              contractNo 合约编号
               barType K线类型 t分时，T分笔，S秒线，M分钟，H小时，D日线，W周线，m月线，Y年线
               barInterval K线周期
               sampleConfig 策略历史回测的起始点信息，可选的值为：
@@ -4101,7 +4136,8 @@ class BaseApi(object):
               返回整型, 0成功，-1失败
               通过该方法系统会订阅指定合约的K线数据，
               对于相同的合约，如果使用该函数设置不同的K线类型(barType)和周期(barInterval)，则系统会同时订阅指定的K线类型和周期的行情数据
-              对于相同的合约，如果使用该函数设置不同的起始点信息(sampleConfig)，则以最后一个起始点信息为准
+              如果使用该方法订阅了多个合约，则第一条合约为基准合约
+              如果在策略中使用SetBarInterval方法订阅了合约，则在设置界面选中的基准合约便不再订阅
 
         【示例】
               SetBarInterval('ZCE|F|SR|906', 'M', 3, 'A') 订阅合约ZCE|F|SR|906的3分钟K线数据，并使用所有K线样本进行历史回测
@@ -5006,6 +5042,10 @@ def HistoryDataExist(contractNo='', kLineType='', kLineValue=0):
 
 def HisData(type, period, interval, contractNo='', maxLength=100):
     return baseApi.HisData(type, period, interval, contractNo, maxLength)
+
+def HisBarsInfo(contractNo='', kLineType='', kLineValue=0, maxLength=None):
+    return baseApi.HisBarsInfo(contractNo, kLineType, kLineValue, maxLength)
+
 #即时行情
 def Q_UpdateTime(contractNo=''):
     return baseApi.Q_UpdateTime(contractNo)
@@ -5119,6 +5159,9 @@ def BarsSinceEntry(contractNo=''):
 def BarsSinceExit(contractNo=''):
     return baseApi.BarsSinceExit(contractNo)
 
+def BarsSinceLastEntry(contractNo=''):
+    return baseApi.BarsSinceLastEntry(contractNo)
+
 def MarketPosition(contractNo=''):
     return baseApi.MarketPosition(contractNo)
 # 策略性能
@@ -5173,6 +5216,9 @@ def TotalTrades():
 # 账户函数
 def A_AccountID():
     return baseApi.A_AccountID()
+
+def A_GetAllPositionSymbol():
+    return baseApi.A_GetAllPositionSymbol()
 
 def A_Cost():
     return baseApi.A_Cost()
@@ -5264,6 +5310,12 @@ def Sell(share=0, price=0, contractNo=None):
 
 def SellShort(share=0, price=0, contractNo=None):
     return baseApi.SellShort(contractNo, share, price)
+
+def StartTrade():
+    return baseApi.StartTrade()
+
+def StopTrade():
+    return baseApi.StopTrade()
     
 # 枚举函数
 def Enum_Buy():
@@ -5482,9 +5534,6 @@ def Enum_Data_Time():
 # 设置函数
 def GetConfig():
     return baseApi.GetConfig()
-
-# def SetBenchmark(*contractNo):
-#     return baseApi.SetBenchmark(contractNo)
 
 # def AddUserNo(userNo):
 #     return baseApi.AddUserNo(userNo)

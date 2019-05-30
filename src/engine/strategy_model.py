@@ -215,6 +215,10 @@ class StrategyModel(object):
         multiContKey = self.getKey(contractNo, kLineType, kLineValue)
         return self._hisModel.getHisData(dataType, multiContKey, maxLength)
 
+    def getHisBarsInfo(self, contNo, kLineType, kLineValue, maxLength):
+        multiContKey = self.getKey(contNo, kLineType, kLineValue)
+        return self._hisModel.getHisBarsInfo(multiContKey, maxLength)
+
     # ////////////////////////即时行情////////////////////////////
     def getQUpdateTime(self, symbol):
         return self._qteModel.getQUpdateTime(symbol)
@@ -405,15 +409,15 @@ class StrategyModel(object):
         
         self._strategy.sendEvent2Engine(signalNoticeEvent)
 
-    # def deleteOrder(self, contractNo):
-    #     pass
+    def setStartTrade(self):
+        self._cfgModel.setPending(False)
+
+    def setStopTrade(self):
+        self._cfgModel.setPending(True)
 
     #////////////////////////设置函数////////////////////////////
     def getConfig(self):
         return self._cfgModel._metaData
-
-    def setSetBenchmark(self, symbolTuple):
-        self._cfgModel.setContract(symbolTuple)
 
     def addUserNo(self, userNo):
         self._cfgModel.addUserNo(userNo)
@@ -508,6 +512,9 @@ class StrategyModel(object):
     # ///////////////////////账户函数///////////////////////////
     def getAccountId(self):
         return self._trdModel.getAccountId()
+
+    def getAllPositionSymbol(self):
+        return self._trdModel.getAllPositionSymbol()
 
     def getCost(self):
         return self._trdModel.getCost()
@@ -633,6 +640,10 @@ class StrategyModel(object):
         
     def sendOrder(self, userNo, contNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty):
         '''A账户下单函数，不经过calc模块，不产生信号，直接发单'''
+        # 是否暂停实盘下单
+        if self._cfgModel.getPending():
+            return -5, "用户调用StartTrade方法停止实盘下单功能"
+
         # 发送下单信号,K线触发、即时行情触发
         # 未选择实盘运行
         if not self._cfgModel.isActualRun():
