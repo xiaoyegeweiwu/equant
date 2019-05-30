@@ -19,6 +19,7 @@ _all_func_ = {
                     ['TradeDate'           , '当前Bar的交易日'],
                     ['HistoryDataExist'    , '历史数据是否存在'],
                     ['HisData'             , '获取各种历史数据数组'],
+                    ['HisBarsInfo'         , '获取历史K线详细数据'],
                 ],
                 
     '即时行情': [
