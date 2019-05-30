@@ -27,11 +27,16 @@ class StatisticsModel(object):
         return 0, sma
 
     def ParabolicSAR(self, high:np.array, low:np.array, afstep, aflimit):
+        oParClose = None
+        oParOpen = None
+        oPosition = None
+        oTransition = None
+
         hlen = len(high)
         llen = len(low)
 
         if hlen <=0 or llen <= 0:
-            return -1, np.nan
+            return oParClose, oParOpen, oPosition, oTransition
 
         arr = high if hlen < llen else low
 
@@ -42,11 +47,6 @@ class StatisticsModel(object):
         LLValue = 0
         pHHValue = 0
         pLLValue = 0
-
-        oParClose = None
-        oParOpen = None
-        oPosition = None
-        oTransition = None
 
         for i, a in enumerate(arr):
             if i == 0:

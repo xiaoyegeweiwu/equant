@@ -4780,6 +4780,7 @@ class BaseApi(object):
             第二个值为oParOpen, 下一Bar的停损值；
             第三个值为oPosition，输出建议的持仓状态，1 - 买仓，-1 - 卖仓；
             第四个值为oTransition, 输出当前Bar的状态是否发生反转，1 或 -1 为反转，0 为保持不变。
+            当输入high,low的numpy数组为空时，计算失败，返回的四个值均为None
 
         【示例】
             ParabolicSAR(High(), Low(), 0.02, 0.2)

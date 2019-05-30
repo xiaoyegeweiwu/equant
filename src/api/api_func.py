@@ -264,36 +264,36 @@ _all_func_ = {
                     ['SetTriggerType'      , '设置触发方式'],
                 ],
 
-    '其他函数': [
-                    ['PlotNumeric'          ,'绘制指标线'],
-                    ['PlotIcon'             ,'绘制系统图标'],
-                    ['PlotDot'              ,'绘制点'],
-                    ['PlotBar'              ,'绘制柱子'],
-                    ['PlotText'             ,'绘制字符串'],
-                    ['PlotVertLine'         ,'绘制竖线'],
-                    ['PlotPartLine'         ,'绘制斜线段'],
-                    ['PlotStickLine'        ,'绘制竖线段'],
-                    ['UnPlotText'           ,'取消绘制的字符串'],
-                    ['LogDebug'             ,'打印调试信息'],
-                    ['LogInfo'              ,'打印普通信息'],
-                    ['LogWarn'              ,'打印警告信息'],
-                    ['LogError'             ,'打印错误信息'],
-                ],
-                
-    'context函数': [
-                    ['strategyStatus'       ,'获取当前策略状态'],
-                    ['triggerType'          ,'获取当前触发类型'],
-                    ['contractNo'           ,'获取当前触发合约'],
-                    ['kLineType'            ,'获取当前触发的K线类型'],
-                    ['kLineSlice'           ,'获取当前触发的K线周期'],
-                    ['tradeDate'            ,'获取当前触发的交易日'],
-                    ['dateTimeStamp'        ,'获取当前触发的时间戳'],
-                    ['triggerData'          ,'获取当前触发类型对应的数据'],
+    '绘图函数': [
+                    ['PlotNumeric'         ,'绘制指标线'],
+                    ['PlotIcon'            ,'绘制系统图标'],
+                    ['PlotDot'             ,'绘制点'],
+                    ['PlotBar'             ,'绘制柱子'],
+                    ['PlotText'            ,'绘制字符串'],
+                    ['PlotVertLine'        ,'绘制竖线'],
+                    ['PlotPartLine'        ,'绘制斜线段'],
+                    ['PlotStickLine'       ,'绘制竖线段'],
+                    ['UnPlotText'          ,'取消绘制的字符串'],
                 ],
 
-    '金融及统计函数': [
-                    ['SMA'           ,   '计算加权移动平均值'],
-                    ['ParabolicSAR'  ,   '计算抛物线转向'],
+    'context函数': [
+                    ['strategyStatus'      ,'获取当前策略状态'],
+                    ['triggerType'         ,'获取当前触发类型'],
+                    ['contractNo'          ,'获取当前触发合约'],
+                    ['kLineType'           ,'获取当前触发的K线类型'],
+                    ['kLineSlice'          ,'获取当前触发的K线周期'],
+                    ['tradeDate'           ,'获取当前触发的交易日'],
+                    ['dateTimeStamp'       ,'获取当前触发的时间戳'],
+                    ['triggerData'         ,'获取当前触发类型对应的数据'],
+                ],
+
+    '其他函数': [
+                    ['SMA'                 ,'计算加权移动平均值'],
+                    ['ParabolicSAR'        ,'计算抛物线转向'],
+                    ['LogDebug'            ,'打印调试信息'],
+                    ['LogInfo'             ,'打印普通信息'],
+                    ['LogWarn'             ,'打印警告信息'],
+                    ['LogError'            ,'打印错误信息'],
                 ],
 
 }
