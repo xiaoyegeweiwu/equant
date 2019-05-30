@@ -994,7 +994,7 @@ class StrategyModel(object):
 
         self._plotNumeric(self._textName, np.nan, 0, main, EEQU_ISNOT_AXIS, EEQU_TEXT, barsback, data)
         
-    def setPlotIcon(self, value, icon, color, main, barsback):
+    def setPlotIcon(self, value, icon, main, barsback):
         main = '0' if main else '1'
         curBar = self._hisModel.getCurBar()
         klineIndex = curBar['KLineIndex'] - barsback
@@ -1008,7 +1008,7 @@ class StrategyModel(object):
             'Icon'       : icon
         }]
 
-        self._plotNumeric(self._strategyName, value, color, main, EEQU_ISNOT_AXIS, EEQU_ICON, barsback, data)
+        self._plotNumeric(self._strategyName, value, 0, main, EEQU_ISNOT_AXIS, EEQU_ICON, barsback, data)
 
     def setPlotDot(self, name, value, icon, color, main, barsback):
         main = '0' if main else '1'

@@ -4455,19 +4455,18 @@ class BaseApi(object):
         '''
         return self._dataModel.setPlotNumeric(name, value, color, main, axis, type, barsback)
         
-    def PlotIcon(self, value, icon, color, main, barsback):
+    def PlotIcon(self, value, icon, main, barsback):
         '''
         【说明】
             在当前Bar输出一个图标
 
         【语法】
-            float PlotIcon(float Value,int Icon, int color, bool main, int barsback=0)
+            float PlotIcon(float Value,int Icon, bool main, int barsback=0)
 
         【参数】
             value 输出的值
             icon 图标类型，0-默认图标，1-笑脸，2-哭脸，3-上箭头，4-下箭头，5-上箭头2, 6-下箭头2
                            7-喇叭，8-加锁，9-解锁，10-货币+，11-货币-，12-加号，13-减号，14-叹号，15-叉号
-            color 输出值的显示颜色，默认表示使用属性设置框中的颜色；
             main  指标是否加载到主图，True-主图，False-幅图，默认主图
             barsback 从当前Bar向前回溯的Bar数，默认值为当前Bar。
 
@@ -4478,7 +4477,7 @@ class BaseApi(object):
             例1：PlotIcon(10,14);
             输出MA1的值。
         '''
-        return self._dataModel.setPlotIcon(value, icon, color, main, barsback)
+        return self._dataModel.setPlotIcon(value, icon, main, barsback)
 
     def PlotDot(self, name, value, icon, color, main, barsback):
         '''
@@ -5609,25 +5608,25 @@ def SymbolType(contractNo=''):
 def PlotNumeric(name, value, color=0xdd0000, main=True, axis=False, type=1, barsback=0):
     return baseApi.PlotNumeric(name, value, color, main, axis, type, barsback)
     
-def PlotIcon(value, icon=0, color=0xdd0000, main=False, barsback=0):
-    return baseApi.PlotIcon(value, icon, color, main, barsback)
+def PlotIcon(value, icon=0, main=True, barsback=0):
+    return baseApi.PlotIcon(value, icon, main, barsback)
 
-def PlotDot(name, value, icon=0, color=0xdd0000, main=False, barsback=0):
+def PlotDot(name, value, icon=0, color=0xdd0000, main=True, barsback=0):
     return baseApi.PlotDot(name, value, icon, color, main, barsback)
 
-def PlotBar(name, vol1, vol2, color=0xdd0000, main=False, filled=True, barsback=0):
+def PlotBar(name, vol1, vol2, color=0xdd0000, main=True, filled=True, barsback=0):
     return baseApi.PlotBar(name, vol1, vol2, color, main, filled, barsback)
 
-def PlotText(value, text, color=0x999999, main=False, barsback=0):
+def PlotText(value, text, color=0x999999, main=True, barsback=0):
     return baseApi.PlotText(value, text, color, main, barsback) 
     
-def PlotVertLine(color=0xdd0000, main=False, axis=False, barsback=0):
+def PlotVertLine(color=0xdd0000, main=True, axis=False, barsback=0):
     return baseApi.PlotVertLine(color, main, axis, barsback)
 
-def PlotPartLine(name, index1, price1, index2, price2, color=0xdd0000, main=False, axis=False, width=1):
+def PlotPartLine(name, index1, price1, index2, price2, color=0xdd0000, main=True, axis=False, width=1):
     return baseApi.PlotPartLine(name, index1, price1, index2, price2, color, main, axis, width)
 
-def PlotStickLine(name, price1, price2, color=0xdd0000, main=False, axis=False, barsback=0):
+def PlotStickLine(name, price1, price2, color=0xdd0000, main=True, axis=False, barsback=0):
     return baseApi.PlotStickLine(name, price1, price2, color, main, axis, barsback)
 
 def UnPlotText(main=False, barsback=0):

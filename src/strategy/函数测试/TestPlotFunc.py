@@ -2,7 +2,7 @@ import talib
 
 
 def initialize(context): 
-    SetBarInterval('SHFE|F|CU|1907', 'M',1, 1000)
+    SetBarInterval('SHFE|F|CU|1907', 'M', 1, 100)
 
 
 def handle_data(context):
@@ -19,6 +19,7 @@ def handle_data(context):
         p2 = Close()[-2]
         PlotPartLine("PartLine", idx1, p1, idx2, p2, RGB_Red(), True, True, 1)
     '''
+    PlotIcon(value=Close()[-1])
 
 
 
