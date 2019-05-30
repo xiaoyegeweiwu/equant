@@ -19,6 +19,7 @@ _all_func_ = {
                     ['TradeDate'           , '当前Bar的交易日'],
                     ['HistoryDataExist'    , '历史数据是否存在'],
                     ['HisData'             , '获取各种历史数据数组'],
+                    ['HisBarsInfo'         , '获取历史K线详细数据'],
                 ],
                 
     '即时行情': [
@@ -94,7 +95,7 @@ _all_func_ = {
     '策略状态': [
                     ['AvgEntryPrice'       , '当前持仓平均建仓价格'],
                     ['BarsSinceEntry'      , '当前持仓的第一个建仓位置到当前位置的Bar计数'],
-                    # ['BarsSinceExit'       , '最近平仓位置到当前位置的Bar计数'],
+                    ['BarsSinceExit'       , '最近平仓位置到当前位置的Bar计数'],
     #                 ['BarsSinceLastEntry'  , '当前持仓的最后一个建仓位置到当前位置的Bar计数'],
     #                 ['ContractProfit'      , '当前持仓位置的每手浮动盈亏'],
     #                 ['CurrentContracts'    , '当前持仓的持仓合约数'],

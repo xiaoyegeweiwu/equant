@@ -308,13 +308,13 @@ class BaseApi(object):
         '''
         return self._dataModel.isHistoryDataExist(contractNo, kLineType, kLineValue)
 
-    def HisData(self, dataType, periodType, interval, contractNo, maxLength):
+    def HisData(self, dataType, kLineType, kLineValue, contractNo, maxLength):
         '''
         【说明】
               获取各种历史数据数组
 
         【语法】
-               numpy.array HisData(enum dataType, enum periodType, int interval, string contractNo, int maxLength)
+               numpy.array HisData(enum dataType, enum kLineType, int kLineValue, string contractNo, int maxLength)
 
         【参数】
               dataType 指定历史数据的种类，可选的枚举函数和相应含义为：
@@ -329,7 +329,7 @@ class BaseApi(object):
                 Enum_Data_Opi           : 持仓量
                 Enum_Data_Time          : K线时间
 				
-              periodType 指定周期类型，可选的枚举函数和相应含义为：
+              kLineType 指定周期类型，可选的枚举函数和相应含义为：
                 Enum_Period_Tick        : 周期类型_分笔
                 Enum_Period_Dyna        : 周期类型_分时
                 Enum_Period_Second      : 周期类型_秒线
@@ -340,7 +340,7 @@ class BaseApi(object):
                 Enum_Period_Month       : 周期类型_月线
                 Enum_Period_Year        : 周期类型_年线
 				
-              interval 周期数， 如：5分钟线，周期数就是5；50秒线，周期数为50
+              kLineValue 周期数， 如：5分钟线，周期数就是5；50秒线，周期数为50
               contractNo 合约编号, 为空时取当前合约
               maxLength 定返回历史数据数组的最大长度，默认值为100
 
@@ -352,7 +352,47 @@ class BaseApi(object):
               closeList[-1] # 当前Bar的收盘价
               closeList[-2] # 上一个Bar的收盘价
         '''
-        return self._dataModel.getHisData(dataType, periodType, interval, contractNo, maxLength)
+        return self._dataModel.getHisData(dataType, kLineType, kLineValue, contractNo, maxLength)
+
+    def HisBarsInfo(self, contractNo, kLineType, kLineValue, maxLength):
+        '''
+        【说明】
+              获取最多maxLength根指定类型的历史K线详细数据
+
+        【语法】
+               list HisBarsInfo(string contractNo, enum kLineType, int kLineValue, int maxLength)
+
+        【参数】
+              contractNo 合约编号, 为空时取当前合约
+              kLineType K线类型，可选值请参阅周期类型枚举函数
+              kLineValue K线周期
+              maxLength 定返回历史数据数组的最大长度，默认值为所有K线数据
+              若contractNo, kLineType, kLineValue同时不填，则取用于展示的合约及相应的K线类型和周期
+
+        【备注】
+              返回列表，包括截止当前Bar的最多maxLength个K线的历史数据
+              列表中以字典的形式保存每个K线的数据，字典中每个键值的含义如下:
+                ContractNo 合约编号，如'NYMEX|F|CL|1907'
+	            DateTimeStamp 更新时间，如20190521130800000
+	            KLineIndex K线索引，如1
+	            KLineQty K线成交量，如18
+	            TotalQty 总成交量，如41401
+	            KLineSlice K线周期， 如1
+	            KLineType K线周期，如'M'
+	            OpeningPrice 开盘价， 如63.5
+	            LastPrice 收盘价，如63.49
+	            SettlePrice 结算价，如63.21
+	            HighPrice 最高价，如63.5
+	            LowPrice 最低价， 如63.49
+	            PositionQty 总持仓，如460816
+	            Priority 权益，如1
+	            TradeDate' 交易日期，如20190521
+
+        【实例】
+              barList = HisBarsInfo("ZCE|F|SR|906", Enum_Period_Min(), 5, 1000) # 获取合约ZCE|F|SR|906包含当前Bar在内的之前1000个历史5分钟K线的数据
+              barInfo = barList[-1] # 当前Bar的详细信息
+        '''
+        return self._dataModel.getHisBarsInfo(contractNo, kLineType, kLineValue, maxLength)
 
     #/////////////////////////即时行情/////////////////////////////
     def Q_UpdateTime(self, contractNo):
@@ -1670,6 +1710,27 @@ class BaseApi(object):
               无
         '''
         return self._dataModel.getBarsSinceEntry(contractNo)
+
+    def BarsSinceExit(self, contractNo):
+        '''
+        【说明】
+              获得当前持仓中指定合约的最近平仓位置到当前位置的Bar计数。
+
+        【语法】
+              int BarsSinceExit(string contractNo)
+
+        【参数】
+              contractNo 合约编号，默认为基准合约。
+
+        【备注】
+              获得当前持仓指定合约的最近平仓位置到当前位置的Bar计数，返回值为整型。
+              只有当MarketPosition != 0时，即有持仓的状况下，该函数才有意义，否则返回-1。
+              注意：在平仓Bar上为0。
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getBarsSinceExit(contractNo)
 
     def MarketPosition(self, contractNo):
         '''
@@ -5054,6 +5115,9 @@ def AvgEntryPrice(contractNo=''):
 
 def BarsSinceEntry(contractNo=''):
     return baseApi.BarsSinceEntry(contractNo)
+
+def BarsSinceExit(contractNo=''):
+    return baseApi.BarsSinceExit(contractNo)
 
 def MarketPosition(contractNo=''):
     return baseApi.MarketPosition(contractNo)

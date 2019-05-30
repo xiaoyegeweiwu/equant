@@ -300,7 +300,21 @@ class StrategyHisQuote(object):
         numArray = methodMap[dataType](multiContKey)
 
         return numArray if len(numArray) <= maxLength else numArray[-maxLength : ]
-        
+
+    def getHisBarsInfo(self, multiContKey, maxLength):
+        if maxLength is not None and maxLength <= 0:
+            return []
+
+        if multiContKey not in self._curBarDict:
+            return []
+
+        barInfo = self._curBarDict[multiContKey]
+        barInfoList = barInfo._barList
+        if not barInfoList:
+            return []
+
+        return barInfoList if maxLength is None or len(barInfoList) <= maxLength else barInfoList[-maxLength : ]
+
     #//////////////////////////////////内部接口//////////////////////////////////
 
     # 获取存储位置最后一根k线的交易日
