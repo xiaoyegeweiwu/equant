@@ -1488,3 +1488,7 @@ class StrategyModel(object):
     def SMA(self, price, period, weight):
         '''计算加权移动平均值'''
         return self._staModel.SMA(price, period, weight)
+
+    def ParabolicSAR(self, high, low, afstep, aflimit):
+        '''计算抛物线转向'''
+        return self._staModel.ParabolicSAR(high, low, afstep, aflimit)

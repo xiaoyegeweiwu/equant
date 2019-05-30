@@ -4692,14 +4692,38 @@ class BaseApi(object):
             weight  权重
 
         【备注】
-            返回值为两个值，第一个为整型，第二个为浮点型
-            当第一个值为0时，此时第二个值是计算出的sma值
-            当第一个值小于0时，此时计算失败，此时第二个值为numpy.nan
+            返回值为两个值，第一个为整型，第二个为浮点型；
+            当第一个值为0时，此时第二个值是计算出的sma值；
+            当第一个值小于0时，此时计算失败，此时第二个值为numpy.nan。
 
         【示例】
             SMA(Close(), 12, 2)
         '''
         return self._dataModel.SMA(price, period, weight)
+
+    def ParabolicSAR(self, high, low, afstep, aflimit):
+        '''
+        【说明】
+            计算抛物线转向
+        【语法】
+            ParabolicSAR(self, numpy.array high, numpy.array low, float afstep, float aflimit)
+        【参数】
+            high    最高价序列值，numpy数组
+            low     最低价序列值，numpy数组
+            afstep  加速因子
+            aflimit 加速因子的限量
+
+        【备注】
+            返回值为四个值，均为数值型
+            第一个值为oParClose,当前bar的停损值；
+            第二个值为oParOpen, 下一Bar的停损值；
+            第三个值为oPosition，输出建议的持仓状态，1 - 买仓，-1 - 卖仓；
+            第四个值为oTransition, 输出当前Bar的状态是否发生反转，1 或 -1 为反转，0 为保持不变。
+
+        【示例】
+            ParabolicSAR(High(), Low(), 0.02, 0.2)
+        '''
+        return self._dataModel.ParabolicSAR(high, low, afstep, aflimit)
 
     def strategyStatus(self):
         '''
@@ -5558,3 +5582,6 @@ def LogError(*args):
 
 def SMA(price, period, weight):
     return baseApi.SMA(price, period, weight)
+
+def ParabolicSAR(high, low, afstep, aflimit):
+    return baseApi.ParabolicSAR(high, low, afstep, aflimit)
