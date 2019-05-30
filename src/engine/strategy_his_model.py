@@ -827,6 +827,10 @@ class StrategyHisQuote(object):
             hisData = self._kLineRspData[key]["KLineData"]
             allHisData.extend(hisData)
 
+        if len(allHisData) == 0:
+            self.logger.error("没有数据，请检查SetBarInterval函数")
+            return
+
         newDF = pd.DataFrame(allHisData)
         newDF.sort_values(['DateTimeStamp', 'Priority'], ascending=True, inplace=True)
         newDF.reset_index(drop=True, inplace=True)
