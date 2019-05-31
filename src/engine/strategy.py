@@ -30,6 +30,7 @@ class StartegyManager(object):
         # 进程字典，{'id', Strategy}
         self._strategyDict = {}
         self._strategyInfo = {}
+        self._strategyAttribute = {}
         self._isEquantExitStage = False
         self._isEquantExitCom = False
 
@@ -44,44 +45,58 @@ class StartegyManager(object):
         process = Process(target=self.run, args=(strategy,))
         process.daemon = True
         process.start()
-        self.insertStrategyInfo(strategyId, process)
 
-    def insertStrategyInfo(self, strategyId, process, config=None, strategyState = ST_STATUS_NONE):
+        args = {
+            "Config": event.getData()["Args"],
+            #"UIConfig": copy.deepcopy(event.getData()["Args"]),
+            "Path": event.getData()["Path"],
+            "StrategyName": None,
+            "StrategyId": strategyId,
+        }
+
+        self.insertNewStrategy(strategyId, process, args)
+
+    # 新建策略、恢复策略调用
+    def insertNewStrategy(self, strategyId, process, args):
         self._strategyInfo[strategyId] = {
             "StrategyId": strategyId,
-            "Process":process,
-            "StrategyState": strategyState,
-            "RunStage": None,
-            "Config": config,
-            "StrategyName":None,
-            "Path":None,
+            "Process": process,
+            "StrategyState": ST_STATUS_NONE,
         }
+        self._strategyAttribute[strategyId] = args
+
+    def insertResumedStrategy(self, strategyId, args):
+        self._strategyInfo[strategyId] = {
+            "StrategyId": strategyId,
+            "Process": None,
+            "StrategyState": ST_STATUS_QUIT,
+        }
+        # 策略恢复的时候用
+        self._strategyAttribute[strategyId] = args
 
     def quitStrategy(self, event):
         strategyId = event.getStrategyId()
         assert strategyId in self._strategyInfo and self._strategyInfo[strategyId]["Process"].is_alive(), " error "
         strategyInfo = self._strategyInfo[strategyId]
-        strategyInfo["Config"] = event.getData()["Config"]
         strategyInfo["StrategyState"] = ST_STATUS_QUIT
-        strategyInfo["Path"] = event.getData()["Path"]
-        strategyInfo["Config"] = event.getData()["Config"]
-        strategyInfo["StrategyName"] = event.getData()["StrategyName"]
         self.destroyProcess(self._strategyInfo[strategyId]["Process"], strategyId)
         strategyInfo["Process"] = None
 
     def removeQuitedStrategy(self, event):
         assert event.getStrategyId() in self._strategyInfo, "error"
         self._strategyInfo.pop(event.getStrategyId())
+        self._strategyAttribute.pop(event.getStrategyId())
 
     def removeRunningStrategy(self, event):
         strategyId = event.getStrategyId()
         assert strategyId in self._strategyInfo, "error"
         self.destroyProcess(self._strategyInfo[strategyId]['Process'], strategyId)
         self._strategyInfo.pop(strategyId)
+        self._strategyAttribute.pop(event.getStrategyId())
 
     def restartStrategy(self, engineLoadFunc, event):
         assert event.getStrategyId() in self._strategyInfo, "error"
-        strategyInfo = self._strategyInfo[event.getStrategyId()]
+        strategyInfo = self._strategyAttribute[event.getStrategyId()]
         loadStrategyEvent = Event({
             'EventSrc': EEQU_EVSRC_UI,
             'EventCode': EV_UI2EG_LOADSTRATEGY,
@@ -101,13 +116,7 @@ class StartegyManager(object):
         assert strategyId in self._strategyInfo, " error "
         strategyInfo = self._strategyInfo[event.getStrategyId()]
         strategyInfo["StrategyState"] = ST_STATUS_QUIT
-
-        # isEquantExitCom = True
-        # for k, v in self._strategyInfo.items():
-        #     if v["StrategyState"] != ST_STATUS_QUIT:
-        #         isEquantExitCom = False
-        # self._isEquantExitCom = isEquantExitCom
-        # print("now equant state ", self._isEquantExitCom)
+        #
 
     def isAllStrategyQuit(self):
         result = True
@@ -139,16 +148,21 @@ class StartegyManager(object):
             # traceback.print_exc()
             self.logger.debug("strategy %d exit fail" % strategyId)
 
+    def syncStrategyConfig(self, event):
+        strategyId = event.getStrategyId()
+        self._strategyAttribute[strategyId] = event.getData()
+
     def getStrategyConfig(self):
         result = {}
-        for k, v in self._strategyInfo.items():
-            result[k] = {
+        for strategyId, _ in self._strategyInfo.items():
+            v = self._strategyAttribute[strategyId]
+            result[strategyId] = {
                 "Config":v["Config"],
                 "Path":v["Path"],
                 "StrategyName":v["StrategyName"],
-                "StrategyId":k,
+                "StrategyId":strategyId,
+                #"UIConfig":v["UIConfig"]
             }
-
         result = OrderedDict(sorted(result.items(), key=lambda obj: str(obj[0])))
         return result
 
@@ -260,6 +274,7 @@ class Strategy:
         data = event.getData()
         self._filePath = data['Path']
         self._argsDict = data['Args']
+        self._uiConfig = copy.deepcopy(data['Args'])
 
         # print("now config is")
         # for k, v in self._argsDict.items():
@@ -313,7 +328,7 @@ class Strategy:
         userModule.initialize(self._context)
         self._userModule = userModule
         # 5.1 同步配置
-        # self._sendConfig2Engine()
+        self._sendConfig2Engine()
 
         # 6. 初始化model
         self._dataModel.initialize()
@@ -947,15 +962,20 @@ class Strategy:
 
         return dateTimeStamp, tradeDate, lv1Data
 
-    # def _sendConfig2Engine(self):
-    #     event = Event({
-    #         "EventCode": ST_ST2EG_SYNC_CONFIG,
-    #         "ContractNo": None,
-    #         "KLineType": None,
-    #         "KLineSlice": None,
-    #         "Data": {
-    #             "Data": self._dataModel.getConfigModel.getConfig(),
-    #         }
-    #     })
-    #     self.sendEvent2Engine(event)
+    def _sendConfig2Engine(self):
+        event = Event({
+            "EventCode": ST_ST2EG_SYNC_CONFIG,
+            "StrategyId": self._strategyId,
+            "ContractNo": None,
+            "KLineType": None,
+            "KLineSlice": None,
+            "Data": {
+                "UIConfig": self._uiConfig,
+                "Config": self._dataModel.getConfigModel().getConfig(),
+                "Path": self._filePath,
+                "StrategyName": self._strategyName,
+                "StrategyId": self._strategyId,
+            }
+        })
+        self.sendEvent2Engine(event)
 
