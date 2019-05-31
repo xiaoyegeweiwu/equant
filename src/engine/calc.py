@@ -248,7 +248,7 @@ class CalcCenter(object):
 
         return ret
 
-    def coverJudge(self, userNo, contNo, direct, orderQty, orderPrice):
+    def coverJudge(self, order):
         """
         平仓单是否合法判断
         :param userNo:      用户编号
@@ -262,21 +262,21 @@ class CalcCenter(object):
                 1:           允许平仓
 
         """
-        pInfo = self.getPositionInfo(contNo)
+        pInfo = self.getPositionInfo(order["Cont"])
         availableFund = self.getAvailableFund()
-        cost = self.getCostRate(contNo)
+        cost = self.getCostRate(order["Cont"])
 
         ret = -1
 
-        if direct == dBuy: # 买平
+        if order["Direct"] == dBuy and order["offset"] == oCover: # 买平
             if pInfo["TotalSell"] > 0:
                 # 判断持仓
-                if pInfo["TotalSell"] < orderQty:
+                if pInfo["TotalSell"] < order["OrderQty"]:
                     ret = -1  # 平卖仓失败， 仓位不足
 
                 # 计算平仓手续费
                 if cost["CloseRatio"]:
-                    coverCharge = orderPrice * pInfo["TotalSell"] * cost["TradeDot"] * cost["CloseRatio"]
+                    coverCharge = order["OrderPrice"] * pInfo["TotalSell"] * cost["TradeDot"] * cost["CloseRatio"]
                 else:
                     coverCharge = pInfo["TotalSell"] * cost["CloseFixed"]
 
@@ -286,17 +286,54 @@ class CalcCenter(object):
                 else:
                     ret = 1
 
-        else:   # 卖平
+        elif order["Direct"] == dSell and order["Offset"] == oCover:   # 卖平
             if pInfo["TotalBuy"] > 0:
                 # 判断持仓
-                if pInfo["TotalBuy"] < orderQty:
+                if pInfo["TotalBuy"] < order["OrderQty"]:
                     ret = -1  # 平买仓失败， 仓位不足
 
                 # 计算平仓手续费
                 if cost["CloseRatio"]:
-                    coverCharge = orderPrice * pInfo["TotalBuy"] * cost["TradeDot"] * cost["CloseRatio"]
+                    coverCharge = order["OrderPrice"] * pInfo["TotalBuy"] * cost["TradeDot"] * cost["CloseRatio"]
                 else:
                     coverCharge = pInfo["TotalBuy"] * cost["CloseFixed"]
+
+                # 判断资金
+                if availableFund < coverCharge:
+                    ret = -2   # 平买仓失败，资金不足
+                else:
+                    ret = 1
+
+        elif  order["Direct"] == dBuy and order["Offset"] == oCoverT:   # 买平今
+            if pInfo["TodaySell"] > 0:
+                # 判断持仓
+                if pInfo["TodaySell"] < order["OrderQty"]:
+                    ret = -1  # 平买仓失败， 仓位不足
+
+                # 计算平仓手续费
+                #TODO：平今手续费和平仓手续费是不是不一样
+                if cost["CloseRatio"]:
+                    coverCharge = order["OrderPrice"] * pInfo["TodaySell"] * cost["TradeDot"] * cost["CloseRatio"]
+                else:
+                    coverCharge = pInfo["TodaySell"] * cost["CloseFixed"]
+
+                # 判断资金
+                if availableFund < coverCharge:
+                    ret = -2   # 平买仓失败，资金不足
+                else:
+                    ret = 1
+
+        else:     # 卖平今
+            if pInfo["TodayBuy"] > 0:
+                # 判断持仓
+                if pInfo["TodayBuy"] < order["OrderQty"]:
+                    ret = -1  # 平买仓失败， 仓位不足
+
+                # 计算平仓手续费
+                if cost["CloseRatio"]:
+                    coverCharge = order["OrderPrice"] * pInfo["TodayBuy"] * cost["TradeDot"] * cost["CloseRatio"]
+                else:
+                    coverCharge = pInfo["TodayBuy"] * cost["CloseFixed"]
 
                 # 判断资金
                 if availableFund < coverCharge:
