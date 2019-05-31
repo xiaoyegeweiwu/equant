@@ -138,6 +138,23 @@ class CalcCenter(object):
         获取contract所对应的持仓
         :param contract: 合约
         :return: 持仓信息
+
+        {
+             "Cont"       :   合约编号
+             "TodayBuy"   :   今持买开手数
+             "TotalBuy"   :   总持买开手数
+             "BuyPrice"   :   买持仓均价
+
+             "TodaySell"  :  今持卖开手数
+             "TotalSell"  :  总持卖开手数
+             "SellPrice"  :  卖持仓均价
+
+             "LongMargin" :  多头保证金
+             "ShorMargin" :  空头保证金
+             "HoldProfit" :  持仓盈亏（浮动盈亏）
+
+             "Cost"       :  平掉所持仓位所需手续费
+         }
         """
         if not contract:
             return copy.deepcopy(self._positions)
@@ -149,9 +166,11 @@ class CalcCenter(object):
                 "TodayBuy": 0,
                 "TotalBuy": 0,
                 "BuyPrice": 0.0,
+
                 "TodaySell": 0,
                 "TotalSell": 0,
                 "SellPrice": 0.0,
+
                 "LongMargin": 0.0,
                 "ShortMargin": 0.0,
                 "HoldProfit": 0.0,
@@ -160,6 +179,18 @@ class CalcCenter(object):
             }
 
     def needCover(self, userNo, contNo, direct, orderQty, orderPrice):
+        """
+        开仓单信号先平对手仓在开仓，判断能否平对手仓以及能否开仓
+        :param userNo:     用户账户
+        :param contNo:     合约编号
+        :param direct:     买卖方向
+        :param orderQty:   订单数量
+        :param orderPrice: 订单价格
+        :return:
+                -1:       平对手仓失败
+                -2:       开仓失败
+                0或其他:  成功
+        """
         pInfo = self.getPositionInfo(contNo)
         availableFund = self.getAvailableFund()
         cost = self.getCostRate(contNo)
@@ -214,8 +245,65 @@ class CalcCenter(object):
                         ret = -2  # 开卖开仓失败
                     else:
                         ret = pInfo["TotalBuy"]
-                        
-            
+
+        return ret
+
+    def coverJudge(self, userNo, contNo, direct, orderQty, orderPrice):
+        """
+        平仓单是否合法判断
+        :param userNo:      用户编号
+        :param contNo:      合约编号
+        :param direct:      方向
+        :param orderQty:    订单数量
+        :param orderPrice:  订单价格
+        :return:
+                -1:          平仓失败， 仓位不足
+                -2:          平仓失败，资金不足
+                1:           允许平仓
+
+        """
+        pInfo = self.getPositionInfo(contNo)
+        availableFund = self.getAvailableFund()
+        cost = self.getCostRate(contNo)
+
+        ret = -1
+
+        if direct == dBuy: # 买平
+            if pInfo["TotalSell"] > 0:
+                # 判断持仓
+                if pInfo["TotalSell"] < orderQty:
+                    ret = -1  # 平卖仓失败， 仓位不足
+
+                # 计算平仓手续费
+                if cost["CloseRatio"]:
+                    coverCharge = orderPrice * pInfo["TotalSell"] * cost["TradeDot"] * cost["CloseRatio"]
+                else:
+                    coverCharge = pInfo["TotalSell"] * cost["CloseFixed"]
+
+                # 判断资金
+                if availableFund < coverCharge:
+                    ret = -2   # 平卖仓失败，资金不足
+                else:
+                    ret = 1
+
+        else:   # 卖平
+            if pInfo["TotalBuy"] > 0:
+                # 判断持仓
+                if pInfo["TotalBuy"] < orderQty:
+                    ret = -1  # 平买仓失败， 仓位不足
+
+                # 计算平仓手续费
+                if cost["CloseRatio"]:
+                    coverCharge = orderPrice * pInfo["TotalBuy"] * cost["TradeDot"] * cost["CloseRatio"]
+                else:
+                    coverCharge = pInfo["TotalBuy"] * cost["CloseFixed"]
+
+                # 判断资金
+                if availableFund < coverCharge:
+                    ret = -2   # 平买仓失败，资金不足
+                else:
+                    ret = 1
+
         return ret
 
     def addOrder(self, order):
@@ -529,11 +617,14 @@ class CalcCenter(object):
     def _updateLatestOpenOrder(self, contract):
         pInfo = self.getPositionInfo(contract)
         if pInfo["TotalBuy"] > 0 or pInfo["TotalSell"] > 0:
-            for eo in self._orders[:(-len(self._orders)+1-self._firstHoldPosition):-1]:
+            head = self._firstHoldPosition - 1 if self._firstHoldPosition > 0 else (-len(self._orders) - 1)
+            # for eo in self._orders[:(-len(self._orders)+1-self._firstHoldPosition):-1]:
+            for eo in self._orders[:head:-1]:
                 if eo["Order"]["Cont"] == contract and eo["LeftNum"] > 0:
                     self._latestOpenOrder[contract] = eo["Order"]
                     return
-        pass
+        else:
+            self._latestOpenOrder[contract] = {}
 
     def getLatestOpenOrder(self, contract):
         """
@@ -1084,10 +1175,14 @@ class CalcCenter(object):
         self._calcStageStaticInfo(self._yearStatis)
 
     def getFundRecord(self):
+        """
+        获取可用资金记录
+        :return:
+        """
         if self._fundRecords:
             return self._fundRecords
         else:
-            return defaultdict(int)
+            return []
 
     def getProfit(self):
         return self._profit
