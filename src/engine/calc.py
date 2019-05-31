@@ -308,8 +308,6 @@ class CalcCenter(object):
         self._updateLatestOpenOrder(order["Cont"])
         # 更新最近一笔平仓单
         self._updateLatestCoverOrder(order["Cont"])
-        self._logger.info("11111: %s"%(self.getFirstOpenOrder(order["Cont"])))
-        self._logger.info("22222: %s"%(self.getLatestOpenOrder(order["Cont"])))
 
         eo = self._orders[-1]
         self._calcOrderProfit(eo)   # self._calcSingleReturns（eo)是不是可以放在calcOrderProfit中呢？？？
