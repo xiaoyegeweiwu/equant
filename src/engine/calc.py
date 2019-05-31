@@ -138,6 +138,23 @@ class CalcCenter(object):
         获取contract所对应的持仓
         :param contract: 合约
         :return: 持仓信息
+
+        {
+             "Cont"       :   合约编号
+             "TodayBuy"   :   今持买开手数
+             "TotalBuy"   :   总持买开手数
+             "BuyPrice"   :   买持仓均价
+
+             "TodaySell"  :  今持卖开手数
+             "TotalSell"  :  总持卖开手数
+             "SellPrice"  :  卖持仓均价
+
+             "LongMargin" :  多头保证金
+             "ShorMargin" :  空头保证金
+             "HoldProfit" :  持仓盈亏（浮动盈亏）
+
+             "Cost"       :  平掉所持仓位所需手续费
+         }
         """
         if not contract:
             return copy.deepcopy(self._positions)
@@ -149,9 +166,11 @@ class CalcCenter(object):
                 "TodayBuy": 0,
                 "TotalBuy": 0,
                 "BuyPrice": 0.0,
+
                 "TodaySell": 0,
                 "TotalSell": 0,
                 "SellPrice": 0.0,
+
                 "LongMargin": 0.0,
                 "ShortMargin": 0.0,
                 "HoldProfit": 0.0,
@@ -289,6 +308,8 @@ class CalcCenter(object):
         self._updateLatestOpenOrder(order["Cont"])
         # 更新最近一笔平仓单
         self._updateLatestCoverOrder(order["Cont"])
+        self._logger.info("11111: %s"%(self.getFirstOpenOrder(order["Cont"])))
+        self._logger.info("22222: %s"%(self.getLatestOpenOrder(order["Cont"])))
 
         eo = self._orders[-1]
         self._calcOrderProfit(eo)   # self._calcSingleReturns（eo)是不是可以放在calcOrderProfit中呢？？？
@@ -529,11 +550,14 @@ class CalcCenter(object):
     def _updateLatestOpenOrder(self, contract):
         pInfo = self.getPositionInfo(contract)
         if pInfo["TotalBuy"] > 0 or pInfo["TotalSell"] > 0:
-            for eo in self._orders[:(-len(self._orders)+1-self._firstHoldPosition):-1]:
+            head = self._firstHoldPosition - 1 if self._firstHoldPosition > 0 else (-len(self._orders) - 1)
+            # for eo in self._orders[:(-len(self._orders)+1-self._firstHoldPosition):-1]:
+            for eo in self._orders[:head:-1]:
                 if eo["Order"]["Cont"] == contract and eo["LeftNum"] > 0:
                     self._latestOpenOrder[contract] = eo["Order"]
                     return
-        pass
+        else:
+            self._latestOpenOrder[contract] = {}
 
     def getLatestOpenOrder(self, contract):
         """
