@@ -1400,8 +1400,7 @@ class StrategyModel(object):
 
         return totalPrice/totalQty if totalQty > 0 else 0
 
-    def getBarsSinceEntry(self, contNo):
-        '''获得当前持仓中指定合约的第一个建仓位置到当前位置的Bar计数'''
+    def getFirstOpenOrderInfo(self, contNo, key):
         if not contNo:
             contNo = self._cfgModel.getBenchmark()
 
@@ -1409,15 +1408,12 @@ class StrategyModel(object):
             return -1
 
         orderInfo = self._calcCenter.getFirstOpenOrder(contNo)
-        if 'CurBarIndex' not in orderInfo:
+        if not orderInfo or key not in orderInfo:
             return -1
 
-        barIndex = orderInfo['CurBarIndex']
-        curBar = self._hisModel.getCurBar()
-        return (curBar['KLineIndex'] - barIndex)
+        return orderInfo[key]
 
-    def getBarsSinceExit(self, contNo):
-        '''获得当前持仓中指定合约的最近平仓位置到当前位置的Bar计数'''
+    def getLatestCoverOrderInfo(self, contNo, key):
         if not contNo:
             contNo = self._cfgModel.getBenchmark()
 
@@ -1425,12 +1421,95 @@ class StrategyModel(object):
             return -1
 
         orderInfo = self._calcCenter.getLatestCoverOrder(contNo)
-        if not orderInfo or 'CurBarIndex' not in orderInfo:
+        if not orderInfo or key not in orderInfo:
             return -1
 
-        barIndex = orderInfo['CurBarIndex']
+        return orderInfo[key]
+
+    def getLatestOpenOrderInfo(self, contNo, key):
+        if not contNo:
+            contNo = self._cfgModel.getBenchmark()
+
+        if self.getMarketPosition(contNo) == 0:
+            return -1
+
+        orderInfo = self._calcCenter.getLatestOpenOrder(contNo)
+        if not orderInfo or key not in orderInfo:
+            return -1
+
+        return orderInfo[key]
+
+    def getBarsSinceEntry(self, contNo):
+        '''获得当前持仓中指定合约的第一个建仓位置到当前位置的Bar计数'''
+        barIndex = self.getFirstOpenOrderInfo(contNo, 'CurBarIndex')
+        if barIndex == -1:
+            return barIndex
+
         curBar = self._hisModel.getCurBar()
         return (curBar['KLineIndex'] - barIndex)
+
+    def getBarsSinceExit(self, contNo):
+        '''获得当前持仓中指定合约的最近平仓位置到当前位置的Bar计数'''
+        barIndex = self.getLatestCoverOrderInfo(contNo, 'CurBarIndex')
+        if barIndex == -1:
+            return -1
+
+        curBar = self._hisModel.getCurBar()
+        return (curBar['KLineIndex'] - barIndex)
+
+    def getBarsSinceLastEntry(self, contNo):
+        '''获得当前持仓的最后一个建仓位置到当前位置的Bar计数'''
+        barIndex = self.getLatestCoverOrderInfo(contNo, 'CurBarIndex')
+        if barIndex == -1:
+            return -1
+
+        curBar = self._hisModel.getCurBar()
+        return (curBar['KLineIndex'] - barIndex)
+
+    def getEntryDate(self, contNo):
+        '''获得当前持仓的第一个建仓位置的日期'''
+        return self.getFirstOpenOrderInfo(contNo, 'TradeDate')
+
+    def getEntryPrice(self, contNo):
+        '''获得当前持仓的第一次建仓的委托价格'''
+        return self.getFirstOpenOrderInfo(contNo, 'OrderPrice')
+
+    def getEntryTime(self, contNo):
+        '''获得当前持仓的第一个建仓位置的时间'''
+        dateTimeStamp = self.getFirstOpenOrderInfo(contNo, 'DateTimeStamp')
+        if dateTimeStamp == -1:
+            return -1
+        return (int(dateTimeStamp)%1000000000)/1000000000
+
+    def getExitDate(self, contNo):
+        ''' 获得最近平仓位置Bar日期'''
+        return self.getLatestCoverOrderInfo(contNo, 'TradeDate')
+
+    def getExitPrice(self, contNo):
+        '''获得合约最近一次平仓的委托价格'''
+        return self.getLatestCoverOrderInfo(contNo, 'OrderPrice')
+
+    def getExitTime(self, contNo):
+        '''获得最近平仓位置Bar时间'''
+        dateTimeStamp = self.getLatestCoverOrderInfo(contNo, 'DateTimeStamp')
+        if dateTimeStamp == -1:
+            return -1
+        return (int(dateTimeStamp)%1000000000)/1000000000
+
+    def getLastEntryDate(self, contNo):
+        '''获得当前持仓的最后一个建仓位置的日期'''
+        return self.getLatestOpenOrderInfo(contNo, 'TradeDate')
+
+    def getLastEntryPrice(self, contNo):
+        '''获得当前持仓的最后一次建仓的委托价格'''
+        return self.getLatestOpenOrderInfo(contNo, 'OrderPrice')
+
+    def getLastEntryTime(self, contNo):
+        '''获得当前持仓的最后一个建仓位置的时间'''
+        dateTimeStamp = self.getLatestOpenOrderInfo(contNo, 'DateTimeStamp')
+        if dateTimeStamp == -1:
+            return -1
+        return (int(dateTimeStamp)%1000000000)/1000000000
 
     def getMarketPosition(self, contNo):
         if not contNo:

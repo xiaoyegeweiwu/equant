@@ -137,7 +137,7 @@ class StrategyHisQuote(object):
         self._contractTuple = self._config.getContract()
         
         # 基准合约
-        self._contractNo = self._contractTuple[0]
+        self._contractNo = self._config.getBenchmark()
 
         # 回测样本配置
         self._sampleDict = self._config.getSample()
@@ -718,6 +718,7 @@ class StrategyHisQuote(object):
     def onHisQuoteNotice(self, event):
         key = (event.getContractNo(), event.getKLineType(), event.getKLineSlice())
         kindInfo = {"ContractNo": key[0], "KLineType": key[1], "KLineSlice": key[2]}
+        print(kindInfo, len(event.getData()))
         assert kindInfo in self._config.getKLineKindsInfo(), " Error "
         localDataList = self._kLineNoticeData[key]['KLineData']
         self._handleKLineNoticeData(localDataList, event)

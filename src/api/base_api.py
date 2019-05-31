@@ -1771,6 +1771,207 @@ class BaseApi(object):
         '''
         return self._dataModel.getBarsSinceExit(contractNo)
 
+    def BarsSinceLastEntry(self, contractNo):
+        '''
+        【说明】
+              获得当前持仓的最后一个建仓位置到当前位置的Bar计数。
+
+        【语法】
+              int BarsSinceLastEntry(string contractNo)
+
+        【参数】
+              contractNo 合约编号，默认为基准合约。
+
+        【备注】
+              获得当前持仓指定合约的最后一个建仓位置到当前位置的Bar计数，返回值为整型。
+              只有当MarketPosition != 0时，即有持仓的状况下，该函数才有意义，否则返回-1。
+              注意：在建仓Bar上为0。
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getBarsSinceLastEntry(contractNo)
+
+    def EntryDate(self, contractNo):
+        '''
+        【说明】
+              获得当前持仓的第一个建仓位置的日期。
+
+        【语法】
+              int EntryDate(string contractNo)
+
+        【参数】
+              contractNo 合约编号，默认为基准合约。
+
+        【备注】
+              若策略当前持仓为0，则返回-1，否则返回YYYYMMDD格式的日期。
+              只有当MarketPosition != 0时，即有持仓的状况下，该函数才有意义，否则返回-1。
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getEntryDate(contractNo)
+
+    def EntryPrice(self, contractNo):
+        '''
+        【说明】
+              获得当前持仓的第一次建仓的委托价格。
+
+        【语法】
+              float EntryPrice(string contractNo)
+
+        【参数】
+              contractNo 合约编号，默认为基准合约。
+
+        【备注】
+              获得当前持仓的第一个建仓价格，返回值为浮点数。
+              只有当MarketPosition != 0时，即有持仓的状况下，该函数才有意义，否则返回-1。
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getEntryPrice(contractNo)
+
+    def EntryTime(self, contractNo):
+        '''
+        【说明】
+              获得当前持仓的第一个建仓位置的时间。
+
+        【语法】
+              float EntryTime(string contractNo)
+
+        【参数】
+              contractNo 合约编号，默认为基准合约。
+
+        【备注】
+              获得当前持仓的第一个建仓时间，返回值为0.HHMMSSmmm格式的时间。
+              只有当MarketPosition != 0时，即有持仓的状况下，该函数才有意义，否则返回-1。
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getEntryTime(contractNo)
+
+    def ExitDate(self, contractNo):
+        '''
+        【说明】
+              获得最近平仓位置Bar日期。
+
+        【语法】
+              int ExitDate(string contractNo)
+
+        【参数】
+              contractNo 合约编号，默认为基准合约。
+
+        【备注】
+              获得当前持仓的最近平仓时间，返回值为YYYYMMDD格式的日期。
+              只有当MarketPosition != 0时，即有持仓的状况下，该函数才有意义，否则返回-1。
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getExitDate(contractNo)
+
+    def ExitPrice(self, contractNo):
+        '''
+        【说明】
+              获得合约最近一次平仓的委托价格。
+
+        【语法】
+              float ExitPrice(string contractNo)
+
+        【参数】
+              contractNo 合约编号，默认为基准合约。
+
+        【备注】
+              获得最近平仓位置的平仓价格，返回值为浮点数。
+              只有当MarketPosition != 0时，即有持仓的状况下，该函数才有意义，否则返回-1。
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getExitPrice(contractNo)
+
+    def ExitTime(self, contractNo):
+        '''
+        【说明】
+              获得最近平仓位置Bar时间。
+
+        【语法】
+              float ExitTime(string contractNo)
+
+        【参数】
+              contractNo 合约编号，默认为基准合约。
+
+        【备注】
+              获得最近平仓位置Bar时间，返回值为0.HHMMSSmmm格式的时间。
+              只有当MarketPosition != 0时，即有持仓的状况下，该函数才有意义，否则返回-1。
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getExitTime(contractNo)
+
+    def LastEntryDate(self, contractNo):
+        '''
+        【说明】
+              获得当前持仓的最后一个建仓位置的日期。
+
+        【语法】
+              int LastEntryDate(string contractNo)
+
+        【参数】
+              contractNo 合约编号，默认为基准合约。
+
+        【备注】
+              获得当前持仓的最后一个建仓位置的日期，返回值为YYYYMMDD格式的日期。
+              只有当MarketPosition != 0时，即有持仓的状况下，该函数才有意义，否则返回-1。
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getLastEntryDate(contractNo)
+
+    def LastEntryPrice(self, contractNo):
+        '''
+        【说明】
+              获得当前持仓的最后一次建仓的委托价格。
+
+        【语法】
+              float LastEntryPrice(string contractNo)
+
+        【参数】
+              contractNo 合约编号，默认为基准合约。
+
+        【备注】
+              获得当前持仓的最后一个建仓价格，返回值为浮点数。
+              只有当MarketPosition != 0时，即有持仓的状况下，该函数才有意义，否则返回-1。
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getLastEntryPrice(contractNo)
+
+    def LastEntryTime(self, contractNo):
+        '''
+        【说明】
+              获得当前持仓的最后一个建仓位置的时间。
+
+        【语法】
+              float LastEntryTime(string contractNo)
+
+        【参数】
+              contractNo 合约编号，默认为基准合约。
+
+        【备注】
+              获得当前持仓的最后一个建仓位置的时间，返回值为0.HHMMSSmmm格式的时间。
+              只有当MarketPosition != 0时，即有持仓的状况下，该函数才有意义，否则返回-1。
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getLastEntryTime(contractNo)
+
     def MarketPosition(self, contractNo):
         '''
         【说明】
@@ -5161,6 +5362,33 @@ def BarsSinceExit(contractNo=''):
 
 def BarsSinceLastEntry(contractNo=''):
     return baseApi.BarsSinceLastEntry(contractNo)
+
+def EntryDate(contractNo=''):
+    return baseApi.EntryDate(contractNo)
+
+def EntryPrice(contractNo=''):
+    return baseApi.EntryPrice(contractNo)
+
+def EntryTime(contractNo=''):
+    return baseApi.EntryTime(contractNo)
+
+def ExitDate(contractNo=''):
+    return baseApi.ExitDate(contractNo)
+
+def ExitPrice(contractNo=''):
+    return baseApi.ExitPrice(contractNo)
+
+def ExitTime(contractNo=''):
+    return baseApi.ExitTime(contractNo)
+
+def LastEntryDate(contractNo=''):
+    return baseApi.LastEntryDate(contractNo)
+
+def LastEntryPrice(contractNo=''):
+    return baseApi.LastEntryPrice(contractNo)
+
+def LastEntryTime(contractNo=''):
+    return baseApi.LastEntryTime(contractNo)
 
 def MarketPosition(contractNo=''):
     return baseApi.MarketPosition(contractNo)
