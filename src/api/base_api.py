@@ -1792,6 +1792,46 @@ class BaseApi(object):
         '''
         return self._dataModel.getBarsSinceLastEntry(contractNo)
 
+    def ContractProfit(self, contractNo):
+        '''
+        【说明】
+              获得当前持仓的每手浮动盈亏。
+
+        【语法】
+              float ContractProfit(string contractNo)
+
+        【参数】
+              contractNo 合约编号，默认为基准合约。
+
+        【备注】
+              获得当前持仓位置的每手浮动盈亏，返回值为浮点数。
+              只有当MarketPosition != 0时，即有持仓的状况下，该函数才有意义，否则返回-1。
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getContractProfit(contractNo)
+
+    def CurrentContracts(self, contractNo):
+        '''
+        【说明】
+              获得策略当前的持仓合约数(净持仓)。
+
+        【语法】
+              int CurrentContracts(string contractNo)
+
+        【参数】
+              contractNo 合约编号，默认为基准合约。
+
+        【备注】
+              获得策略当前的持仓合约数，返回值为整数。
+              只有当MarketPosition != 0时，即有持仓的状况下，该函数才有意义，否则返回-1。
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getCurrentContracts(contractNo)
+
     def EntryDate(self, contractNo):
         '''
         【说明】
@@ -5538,6 +5578,12 @@ def BarsSinceExit(contractNo=''):
 
 def BarsSinceLastEntry(contractNo=''):
     return baseApi.BarsSinceLastEntry(contractNo)
+
+def ContractProfit(contractNo=''):
+    return baseApi.ContractProfit(contractNo)
+
+def CurrentContracts(contractNo=''):
+    return baseApi.CurrentContracts(contractNo)
 
 def EntryDate(contractNo=''):
     return baseApi.EntryDate(contractNo)
