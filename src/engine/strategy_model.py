@@ -47,6 +47,12 @@ class StrategyModel(object):
     def getConfigData(self):
         return self._cfgModel.getConfig()
 
+    def getConfigTimer(self):
+        return self._cfgModel.getTimerTrigger()
+
+    def getConfigCycle(self):
+        return self._cfgModel.getCycleTrigger()
+
     def getConfigModel(self):
         return self._cfgModel
 
@@ -629,6 +635,11 @@ class StrategyModel(object):
             "TriggerType"    : triggerType,
             "CurBarIndex"    : curBarIndex #
         }
+
+        if entryOrExit in (oCover, oCoverT):
+            isVaildOrder = self._calcCenter.coverJudge(orderParam)
+            if isVaildOrder < 0:
+                return ""
 
         key = (triggerInfo['ContractNo'], triggerInfo['KLineType'], triggerInfo['KLineSlice'])
         isSendSignal = self._config.hasKLineTrigger() and key == self._config.getKLineShowInfoSimple()
@@ -1519,6 +1530,40 @@ class StrategyModel(object):
         curBar = self._hisModel.getCurBar()
         return (curBar['KLineIndex'] - barIndex)
 
+    def getPositionValue(self, contNo, key):
+        if not contNo:
+            contNo = self._cfgModel.getBenchmark()
+
+        pos = self.getMarketPosition(contNo)
+        if pos == 0:
+            return -1
+
+        positionInfo = self._calcCenter.getPositionInfo(contNo)
+        if not positionInfo or key not in positionInfo:
+            return -1
+
+        return positionInfo[key]
+
+    def getContractProfit(self, contNo):
+        '''获得当前持仓的每手浮动盈亏'''
+        holdProfit = self.getPositionValue(contNo, 'HoldProfit')
+        if holdProfit == -1:
+            return -1
+
+        totalBuy = self.getPositionValue(contNo, 'TotalBuy')
+        totalSell = self.getPositionValue(contNo, 'TotalSell')
+        totalQty = totalBuy + totalSell
+        return holdProfit/totalQty if totalQty > 0 else 0
+
+    def getCurrentContracts(self, contNo):
+        '''获得策略当前的持仓合约数(净持仓)'''
+        totalBuy = self.getPositionValue(contNo, 'TotalBuy')
+        totalBuy = 0 if totalBuy == -1 else totalBuy
+        totalSell = self.getPositionValue(contNo, 'TotalSell')
+        totalSell = 0 if totalSell == -1 else totalSell
+
+        return totalBuy+totalSell
+
     def getEntryDate(self, contNo):
         '''获得当前持仓的第一个建仓位置的日期'''
         return self.getFirstOpenOrderInfo(contNo, 'TradeDate')
@@ -1581,6 +1626,14 @@ class StrategyModel(object):
     # ///////////////////////策略性能///////////////////////////
     def getAvailable(self):
         return self._calcCenter.getProfit()['Available']
+
+    def getEquity(self):
+        fundRecodeList = self._calcCenter.getFundRecord()
+        if not fundRecodeList:
+            return self.getAvailable()
+
+        fundRecordDict = fundRecodeList[-1]
+        return fundRecordDict['DynamicEquity']
 
     def getFloatProfit(self, contNo):
         return self._calcCenter._getHoldProfit(contNo)

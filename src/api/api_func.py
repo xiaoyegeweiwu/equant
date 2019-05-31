@@ -99,8 +99,8 @@ _all_func_ = {
                     ['BarsSinceEntry'      , '当前持仓的第一个建仓位置到当前位置的Bar计数'],
                     ['BarsSinceExit'       , '最近平仓位置到当前位置的Bar计数'],
                     ['BarsSinceLastEntry'  , '当前持仓的最后一个建仓位置到当前位置的Bar计数'],
-    #                 ['ContractProfit'      , '当前持仓位置的每手浮动盈亏'],
-    #                 ['CurrentContracts'    , '当前持仓的持仓合约数'],
+                    ['ContractProfit'      , '当前持仓位置的每手浮动盈亏'],
+                    ['CurrentContracts'    , '当前持仓的持仓合约数'],
     #                 ['CurrentEntries'      , '当前持仓的建仓次数'],
                     ['EntryDate'           , '当前持仓的第一个建仓位置的日期'],
                     ['EntryPrice'          , '当前持仓的第一个建仓价格'],
@@ -122,6 +122,7 @@ _all_func_ = {
                 
     '策略性能': [
                     ['Available'           , '策略当前可用虚拟资金'],
+                    ['CurrentEquity'       , '账户权益'],
                     ['FloatProfit'         , '浮动盈亏'],
                     ['GrossLoss'           , '累计总亏损'],
                     ['GrossProfit'         , '累计总利润'],

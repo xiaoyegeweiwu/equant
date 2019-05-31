@@ -66,18 +66,18 @@ class StrategyEngine(object):
 
         # 恢复上次推出时保存的结构
         self._strategyOrder = {}
-        # self._resumeStrategy()
+        self._resumeStrategy()
         self._engineOrderModel = EngineOrderModel(self._strategyOrder)
         self.logger.debug('Initialize strategy engine ok!')
 
     def _resumeStrategy(self):
         if not os.path.exists('config/StrategyContext.json'):
             return
-        with open("config/StrategyContext.json", 'r') as resumeFile:
+        with open("config/StrategyContext.json", 'r', encoding="utf-8") as resumeFile:
             try:
                 strategyContext = json.load(resumeFile)
             except Exception as e:
-                self.logger.error("恢复配置的过程中遇到错误，无法恢复")
+                self.logger.error("无法恢复配置")
                 return
             for k,v in strategyContext.items():
                 if k == "MaxStrategyId":
@@ -103,11 +103,15 @@ class StrategyEngine(object):
                     "StrategyId": strategyId,
                     "StrategyName": strategyIni["StrategyName"],
                     "StrategyState": ST_STATUS_QUIT,
+
+                    # 取其ui配置
                     "Config": strategyIni["Config"],
+                    #"UIConfig": strategyIni["UIConfig"],
+                    "Path" : strategyIni["Path"]
                 }
             })
             self._eg2uiQueue.put(fakeEvent)
-            self._strategyMgr.insertStrategyInfo(int(strategyId), None, strategyIni["Config"], ST_STATUS_QUIT)
+            self._strategyMgr.insertResumedStrategy(int(strategyId), fakeEvent.getData())
 
     def _resumeStrategyOrder(self, strategyOrder):
         if not strategyOrder:
@@ -175,6 +179,7 @@ class StrategyEngine(object):
             # load strategy
             EV_EG2UI_LOADSTRATEGY_RESPONSE  : self._loadStrategyResponse,
             EV_EG2UI_STRATEGY_STATUS        : self._onStrategyStatus,
+            ST_ST2EG_SYNC_CONFIG            : self._syncStrategyConfig,
 
             EV_ST2EG_STRATEGYTRADEINFO      : self._reqTradeInfo,
             EV_ST2EG_ACTUAL_ORDER           : self._sendOrder,
@@ -937,3 +942,6 @@ class StrategyEngine(object):
             }
         })
         self._eg2uiQueue.put(quitEvent)
+
+    def _syncStrategyConfig(self, event):
+        self._strategyMgr.syncStrategyConfig(event)

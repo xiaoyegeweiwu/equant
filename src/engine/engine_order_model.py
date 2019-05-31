@@ -3,11 +3,17 @@ from capi.com_types import *
 
 
 class EngineOrderModel:
-    def __init__(self, orderNo2OtherMap={}):
+    def __init__(self, strategyOrder={}):
+
         self._localOrder = {}
         self._epoleStarOrder = {}
         # 从文件中恢复的对应关系
-        self._orderNo2OtherMap = orderNo2OtherMap
+        self._orderNo2OtherMap = {}
+
+        if strategyOrder:
+            # self._localOrder = strategyOrder["LocalOrder"]
+            # self._epoleStarOrder = strategyOrder["EpoleStarOrder"]
+            self._orderNo2OtherMap = strategyOrder["EpoleStarOrder2LocalOrderMap"]
 
         strategyId = 0
         self._localOrder.update({strategyId:SingleStrategyLocalOrder(strategyId)})
