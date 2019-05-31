@@ -965,7 +965,8 @@ class StrategyModel(object):
         
     def setPlotText(self, value, text, color, main, barsback):
         main = '0' if main else '1'
-        curBar = self._hisModel.getCurBar()  
+        curBar = self._hisModel.getCurBar()
+
         klineIndex = curBar['KLineIndex'] - barsback
         if klineIndex <= 0:
             return
@@ -997,8 +998,8 @@ class StrategyModel(object):
     def setPlotIcon(self, value, icon, main, barsback):
         main = '0' if main else '1'
         curBar = self._hisModel.getCurBar()
+
         klineIndex = curBar['KLineIndex'] - barsback
-        
         if klineIndex <= 0:
             return
             
@@ -1010,11 +1011,14 @@ class StrategyModel(object):
 
         self._plotNumeric(self._strategyName, value, 0, main, EEQU_ISNOT_AXIS, EEQU_ICON, barsback, data)
 
+    def setUnPlotIcon(self, main, barsback):
+        return self.setPlotIcon(np.nan, 0, main, barsback)
+
     def setPlotDot(self, name, value, icon, color, main, barsback):
         main = '0' if main else '1'
         curBar = self._hisModel.getCurBar()
-        klineIndex = curBar['KLineIndex'] - barsback
 
+        klineIndex = curBar['KLineIndex'] - barsback
         if klineIndex <= 0:
             return
 
@@ -1025,6 +1029,9 @@ class StrategyModel(object):
         }]
 
         self._plotNumeric(name, value, color, main, EEQU_ISNOT_AXIS, EEQU_DOT, barsback, data)
+
+    def setUnPlotDot(self, name, main, barsback):
+        return self.setPlotDot(self._strategyName, np.nan, 0, 0, main, barsback)
 
     def setPlotBar(self, name, vol1, vol2, color, main, filled, barsback):
         main = '0' if main else '1'
@@ -1044,6 +1051,9 @@ class StrategyModel(object):
         }]
 
         self._plotNumeric(name, 0, color, main, EEQU_ISNOT_AXIS, EEQU_BAR, barsback, data)
+
+    def setUnPlotBar(self, main, barsback):
+        return self.setPlotBar("", np.nan, np.nan, 0, main, True, barsback)
 
     def setPlotNumeric(self, name, value, color, main, axis, type, barsback):
         main = '0' if main else '1'

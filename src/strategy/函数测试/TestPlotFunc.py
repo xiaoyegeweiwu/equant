@@ -8,8 +8,10 @@ def initialize(context):
 def handle_data(context):
 
     #PlotVertLine(main=True, axis = True)
-    #PlotDot(name="Dot", value=Close()[-1], main=True)
+    PlotDot(name="Dot", value=Close()[-1], main=True)
+    UnPlotDot("")
     #PlotBar("BarExample1", Vol()[-1], 0, RGB_Red())
+    #UnPlotBar("BarExample1")
     #PlotStickLine("StickLine", Close()[-1], Open()[-1], RGB_Blue(), True, True, 0)
     '''
     idx1 = CurrentBar()
@@ -19,7 +21,8 @@ def handle_data(context):
         p2 = Close()[-2]
         PlotPartLine("PartLine", idx1, p1, idx2, p2, RGB_Red(), True, True, 1)
     '''
-    PlotIcon(value=Close()[-1])
+    #PlotIcon(value=Close()[-1], icon=1)
+    #UnPlotIcon()
 
 
 

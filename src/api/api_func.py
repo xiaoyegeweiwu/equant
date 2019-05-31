@@ -274,6 +274,9 @@ _all_func_ = {
                     ['PlotPartLine'        ,'绘制斜线段'],
                     ['PlotStickLine'       ,'绘制竖线段'],
                     ['UnPlotText'          ,'取消绘制的字符串'],
+                    ['UnPlotIcon'          ,'取消绘制的图标'],
+                    ['UnPlotDot'           ,'取消绘制的点'],
+                    ['UnPlotBar'           ,'取消绘制的柱子'],
                 ],
 
     'context函数': [

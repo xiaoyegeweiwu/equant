@@ -4637,21 +4637,77 @@ class BaseApi(object):
             在当前Bar取消输出的字符串
 
         【语法】
-            void PlotUnText(bool main, int barsback=0)
+            void UnPlotText(bool main, int barsback=0)
 
         【参数】
             main  指标是否加载到主图，True-主图，False-幅图，默认主图
             barsback 从当前Bar向前回溯的Bar数，默认值为当前Bar。
 
         【备注】
-            在当前Bar取消字符串输出，输出的值用于在上层调用模块显示。返回数值型，即输入的Number。
 
         【示例】
             UnPlotText();
         '''
         return self._dataModel.setUnPlotText(main, barsback)
-        
-    
+
+    def UnPlotIcon(self, main, barsback):
+        '''
+        【说明】
+            在当前Bar取消输出的Icon
+
+        【语法】
+            void UnPlotIcon(bool main, int barsback=0)
+
+        【参数】
+            main  指标是否加载到主图，True-主图，False-幅图，默认主图
+            barsback 从当前Bar向前回溯的Bar数，默认值为当前Bar。
+
+        【备注】
+
+        【示例】
+            UnPlotIcon();
+        '''
+        return self._dataModel.setUnPlotIcon(main, barsback)
+
+    def UnPlotDot(self, name, main, barsback):
+        '''
+        【说明】
+            在当前Bar取消输出的Dot
+
+        【语法】
+            void UnPlotDot(bool main, int barsback=0)
+
+        【参数】
+            name  名称
+            main  指标是否加载到主图，True-主图，False-幅图，默认主图
+            barsback 从当前Bar向前回溯的Bar数，默认值为当前Bar。
+
+        【备注】
+
+        【示例】
+            UnPlotDot();
+        '''
+        return self._dataModel.setUnPlotDot(name, main, barsback)
+
+    def UnPlotBar(self, main, barsback):
+        '''
+        【说明】
+            在当前Bar取消输出的Bar
+
+        【语法】
+            void UnPlotBar(bool main, int barsback=0)
+
+        【参数】
+            main  指标是否加载到主图，True-主图，False-幅图，默认主图
+            barsback 从当前Bar向前回溯的Bar数，默认值为当前Bar。
+
+        【备注】
+
+        【示例】
+            UnPlotBar();
+        '''
+        return self._dataModel.setUnPlotBar(main, barsback)
+
     def LogDebug(self, args):
         '''
         【说明】
@@ -5629,8 +5685,17 @@ def PlotPartLine(name, index1, price1, index2, price2, color=0xdd0000, main=True
 def PlotStickLine(name, price1, price2, color=0xdd0000, main=True, axis=False, barsback=0):
     return baseApi.PlotStickLine(name, price1, price2, color, main, axis, barsback)
 
-def UnPlotText(main=False, barsback=0):
-    return baseApi.UnPlotText(main, barsback) 
+def UnPlotText(main=True, barsback=0):
+    return baseApi.UnPlotText(main, barsback)
+
+def UnPlotIcon(main=True, barsback=0):
+    return baseApi.UnPlotIcon(main, barsback)
+
+def UnPlotDot(name, main=True, barsback=0):
+    return baseApi.UnPlotDot(name, main, barsback)
+
+def UnPlotBar(main=True, barsback=0):
+    return baseApi.UnPlotBar(main, barsback)
 
 def LogDebug(*args):
     return baseApi.LogDebug(args)
