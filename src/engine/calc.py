@@ -179,6 +179,18 @@ class CalcCenter(object):
             }
 
     def needCover(self, userNo, contNo, direct, orderQty, orderPrice):
+        """
+        开仓单信号先平对手仓在开仓，判断能否平对手仓以及能否开仓
+        :param userNo:     用户账户
+        :param contNo:     合约编号
+        :param direct:     买卖方向
+        :param orderQty:   订单数量
+        :param orderPrice: 订单价格
+        :return:
+                -1:       平对手仓失败
+                -2:       开仓失败
+                0或其他:  成功
+        """
         pInfo = self.getPositionInfo(contNo)
         availableFund = self.getAvailableFund()
         cost = self.getCostRate(contNo)
@@ -233,8 +245,65 @@ class CalcCenter(object):
                         ret = -2  # 开卖开仓失败
                     else:
                         ret = pInfo["TotalBuy"]
-                        
-            
+
+        return ret
+
+    def coverJudge(self, userNo, contNo, direct, orderQty, orderPrice):
+        """
+        平仓单是否合法判断
+        :param userNo:      用户编号
+        :param contNo:      合约编号
+        :param direct:      方向
+        :param orderQty:    订单数量
+        :param orderPrice:  订单价格
+        :return:
+                -1:          平仓失败， 仓位不足
+                -2:          平仓失败，资金不足
+                1:           允许平仓
+
+        """
+        pInfo = self.getPositionInfo(contNo)
+        availableFund = self.getAvailableFund()
+        cost = self.getCostRate(contNo)
+
+        ret = -1
+
+        if direct == dBuy: # 买平
+            if pInfo["TotalSell"] > 0:
+                # 判断持仓
+                if pInfo["TotalSell"] < orderQty:
+                    ret = -1  # 平卖仓失败， 仓位不足
+
+                # 计算平仓手续费
+                if cost["CloseRatio"]:
+                    coverCharge = orderPrice * pInfo["TotalSell"] * cost["TradeDot"] * cost["CloseRatio"]
+                else:
+                    coverCharge = pInfo["TotalSell"] * cost["CloseFixed"]
+
+                # 判断资金
+                if availableFund < coverCharge:
+                    ret = -2   # 平卖仓失败，资金不足
+                else:
+                    ret = 1
+
+        else:   # 卖平
+            if pInfo["TotalBuy"] > 0:
+                # 判断持仓
+                if pInfo["TotalBuy"] < orderQty:
+                    ret = -1  # 平买仓失败， 仓位不足
+
+                # 计算平仓手续费
+                if cost["CloseRatio"]:
+                    coverCharge = orderPrice * pInfo["TotalBuy"] * cost["TradeDot"] * cost["CloseRatio"]
+                else:
+                    coverCharge = pInfo["TotalBuy"] * cost["CloseFixed"]
+
+                # 判断资金
+                if availableFund < coverCharge:
+                    ret = -2   # 平买仓失败，资金不足
+                else:
+                    ret = 1
+
         return ret
 
     def addOrder(self, order):
@@ -1106,10 +1175,14 @@ class CalcCenter(object):
         self._calcStageStaticInfo(self._yearStatis)
 
     def getFundRecord(self):
+        """
+        获取可用资金记录
+        :return:
+        """
         if self._fundRecords:
             return self._fundRecords
         else:
-            return defaultdict(int)
+            return []
 
     def getProfit(self):
         return self._profit
