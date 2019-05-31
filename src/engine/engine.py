@@ -96,17 +96,17 @@ class StrategyEngine(object):
         for strategyId, strategyIni in strategyConfig.items():
             fakeEvent = Event({
                 "EventCode": EV_EG2UI_LOADSTRATEGY_RESPONSE,
-                "StrategyId": strategyId,
+                "StrategyId": int(strategyId),
                 "ErrorCode": 0,
                 "ErrorText": "",
                 "Data": {
-                    "StrategyId": strategyId,
+                    "StrategyId": int(strategyId),
                     "StrategyName": strategyIni["StrategyName"],
                     "StrategyState": ST_STATUS_QUIT,
 
                     # 取其ui配置
                     "Config": strategyIni["Config"],
-                    #"UIConfig": strategyIni["UIConfig"],
+                    # "UIConfig": strategyIni["UIConfig"],
                     "Path" : strategyIni["Path"]
                 }
             })

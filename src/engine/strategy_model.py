@@ -144,8 +144,8 @@ class StrategyModel(object):
     def continueTrigger(self):
         return self._cfgModel.continues()
 
-    #++++++++++++++++++++++base api接口++++++++++++++++++++++++++
-    #////////////////////////K线函数/////////////////////////////
+    # ++++++++++++++++++++++base api接口++++++++++++++++++++++++++
+    # ////////////////////////K线函数/////////////////////////////
     def getKey(self, contNo, kLineType, kLineValue):
         #空合约取默认展示的合约
         if contNo == "" or kLineType =='' or kLineValue == 0:

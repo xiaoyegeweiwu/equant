@@ -1291,12 +1291,11 @@ class PyAPI(object):
             dataList.append(idict)
         
         # 发送到引擎
-        # print("in py2c ", len(dataList), apiEvent.getSessionId(), apiEvent.getContractNo(), apiEvent.getKLineType(), apiEvent.getKLineSlice(), apiEvent.isChainEnd())
+        # print("[in py2c] ", len(dataList), apiEvent.getContractNo(), apiEvent.getKLineType(), apiEvent.getKLineSlice(), apiEvent.isChainEnd())
         apiEvent.setData(dataList)
         sid = apiEvent.getSessionId()
         apiEvent.setStrategyId(self._getStrategyId(sid))
         self._api2egQueue.put(apiEvent)
-        
         
     def _onLoginInfo(self, apiEvent):
         '''登录账号应答'''
@@ -1396,18 +1395,22 @@ class PyAPI(object):
         # 发送到引擎
         apiEvent.setData(dataList)
 
+        def getStrategyIdAndOrderId(apiSessionId, args):
+            strategyId, eSessionId = 0, 0
+            if apiSessionId in args:
+                strategyId, eSessionId = args[apiSessionId]
+            return strategyId, eSessionId
+
+        # 委托查询
+        if apiEvent.getEventCode() == EEQU_SRVEVENT_TRADE_ORDERQRY:
+            apiEvent.setStrategyId(0)
+            apiEvent.setESessionId(0)
         # 委托通知
-        if apiEvent.getEventCode() == EEQU_SRVEVENT_TRADE_ORDER and len(apiEvent.getData()) > 0:
-            print(apiEvent.getData()[0])
-            apiSessionId = apiEvent.getData()[0]["SessionId"]
-            # print(apiEvent.getData()[0]["SessionId"], apiEvent.getData()[0]["OrderId"], apiEvent.getEventCode(), apiEvent.getData()[0]["OrderState"])
-            if apiSessionId in self._apiSessionIdMap:
-                strategyId, eSessionId = self._apiSessionIdMap[apiSessionId]
-                apiEvent.setStrategyId(strategyId)
-                apiEvent.setESessionId(eSessionId)
-                # print("Strategy id = ",apiEvent.getStrategyId(),"Esession id =", apiEvent.getESessionId())
-            else:
-                apiEvent.setStrategyId(0)
+        elif apiEvent.getEventCode() == EEQU_SRVEVENT_TRADE_ORDER:
+            assert len(dataList) > 0, " error "
+            strategyId, eSessionId = getStrategyIdAndOrderId(apiEvent.getData()[0]["SessionId"], self._apiSessionIdMap)
+            apiEvent.setStrategyId(strategyId)
+            apiEvent.setESessionId(eSessionId)
         self._api2egQueue.put(apiEvent)
 
     def _onMatchData(self, apiEvent):

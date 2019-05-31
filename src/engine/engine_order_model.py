@@ -35,9 +35,11 @@ class EngineOrderModel:
         elif eventCode == EEQU_SRVEVENT_TRADE_ORDER:
             self._updateEpoleStarOrderNotice(apiEvent)
         elif eventCode == EEQU_SRVEVENT_TRADE_MATCHQRY:
-            self._updateEpoleStarOrderResponse(apiEvent)
+            pass
+            # self._updateEpoleStarOrderResponse(apiEvent)
         elif eventCode == EEQU_SRVEVENT_TRADE_MATCH:
-            self._updateEpoleStarOrderNotice(apiEvent)
+            pass
+            # self._updateEpoleStarOrderNotice(apiEvent)
         else:
             raise NotImplementedError
 
