@@ -687,8 +687,14 @@ class StrategyConfig(object):
     def hasTimerTrigger(self):
         return bool(self._metaData['Trigger']['Timer'])
 
+    def getTimerTrigger(self):
+        return self._metaData['Trigger']['Timer']
+
     def hasCycleTrigger(self):
         return bool(self._metaData['Trigger']['Cycle'])
+
+    def getCycleTrigger(self):
+        return self._metaData['Trigger']['Cycle']
 
     def hasSnapShotTrigger(self):
         return bool(self._metaData['Trigger']['SnapShot'])

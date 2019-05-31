@@ -418,7 +418,7 @@ class Strategy:
             return
 
         nowStr = datetime.now().strftime("%Y%m%d%H%M%S")
-        for i,timeSecond in enumerate(self._dataModel.getConfigData()['Trigger']['Timer']):
+        for i,timeSecond in enumerate(self._dataModel.getConfigTimer()):
             if 0<=(int(nowStr)-int(timeSecond))<1 and not self._isTimeTriggered[i]:
                 self._isTimeTriggered[i] = True
                 key = self._dataModel.getConfigModel().getKLineShowInfoSimple()
@@ -445,7 +445,7 @@ class Strategy:
             return
 
         nowTime = datetime.now()
-        cycle = self._dataModel.getConfigData()['Trigger']['Cycle']
+        cycle = self._dataModel.getConfigCycle()
         if (nowTime - self._nowTime).total_seconds()*1000>cycle:
             self._nowTime = nowTime
             key = self._dataModel.getConfigModel().getKLineShowInfoSimple()
@@ -480,7 +480,7 @@ class Strategy:
             
         
     def _runTimer(self):
-        timeList = self._dataModel.getConfigData()['Trigger']['Timer']
+        timeList = self._dataModel.getConfigTimer()
         if timeList is None:
             timeList = []
         self._isTimeTriggered = [False for i in timeList]
