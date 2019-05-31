@@ -63,7 +63,9 @@ _all_func_ = {
                     ['Buy'                 , '多头建仓'],
                     ['BuyToCover'          , '空头平仓'],
                     ['Sell'                , '多头平仓'],
-                    ['SellShort'           , '空头建仓']
+                    ['SellShort'           , '空头建仓'],
+                    ['StartTrade'          , '开启交易'],
+                    ['StopTrade'           , '暂停交易'],
                 ],
                 
     '属性函数': [
@@ -139,6 +141,7 @@ _all_func_ = {
                 
     '账户函数': [
                     ['A_AccountID'         , '交易账户ID'],
+                    ['A_GetAllPositionSymbol', '所有持仓合约'],
                     ['A_Cost'              , '手续费'],
                     ['A_CurrentEquity'     , '账户权益'],
                     ['A_FreeMargin'        , '可用资金'],
@@ -248,7 +251,6 @@ _all_func_ = {
                 ],
 
     '设置函数': [
-                    ## ['SetBenchmark'        , '设置基准合约'],
                     ## ['AddUserNo'           , '添加交易账号'],
                     ['SetBarInterval'      , '设置K线类型'],
                     ['SetInitCapital'      , '设置初始资金'],
