@@ -308,13 +308,13 @@ class BaseApi(object):
         '''
         return self._dataModel.isHistoryDataExist(contractNo, kLineType, kLineValue)
 
-    def HisData(self, dataType, periodType, interval, contractNo, maxLength):
+    def HisData(self, dataType, kLineType, kLineValue, contractNo, maxLength):
         '''
         【说明】
               获取各种历史数据数组
 
         【语法】
-               numpy.array HisData(enum dataType, enum periodType, int interval, string contractNo, int maxLength)
+               numpy.array HisData(enum dataType, enum kLineType, int kLineValue, string contractNo, int maxLength)
 
         【参数】
               dataType 指定历史数据的种类，可选的枚举函数和相应含义为：
@@ -329,7 +329,7 @@ class BaseApi(object):
                 Enum_Data_Opi           : 持仓量
                 Enum_Data_Time          : K线时间
 				
-              periodType 指定周期类型，可选的枚举函数和相应含义为：
+              kLineType 指定周期类型，可选的枚举函数和相应含义为：
                 Enum_Period_Tick        : 周期类型_分笔
                 Enum_Period_Dyna        : 周期类型_分时
                 Enum_Period_Second      : 周期类型_秒线
@@ -340,7 +340,7 @@ class BaseApi(object):
                 Enum_Period_Month       : 周期类型_月线
                 Enum_Period_Year        : 周期类型_年线
 				
-              interval 周期数， 如：5分钟线，周期数就是5；50秒线，周期数为50
+              kLineValue 周期数， 如：5分钟线，周期数就是5；50秒线，周期数为50
               contractNo 合约编号, 为空时取当前合约
               maxLength 定返回历史数据数组的最大长度，默认值为100
 
@@ -352,7 +352,46 @@ class BaseApi(object):
               closeList[-1] # 当前Bar的收盘价
               closeList[-2] # 上一个Bar的收盘价
         '''
-        return self._dataModel.getHisData(dataType, periodType, interval, contractNo, maxLength)
+        return self._dataModel.getHisData(dataType, kLineType, kLineValue, contractNo, maxLength)
+
+    def HisBarsInfo(self, contractNo, kLineType, kLineValue, maxLength):
+        '''
+        【说明】
+              获取最多maxLength根指定类型的历史K线详细数据
+
+        【语法】
+               list HisBarsInfo(string contractNo, enum kLineType, int kLineValue, int maxLength)
+
+        【参数】
+              contractNo 合约编号, 为空时取当前合约
+              kLineType K线类型，可选值请参阅周期类型枚举函数
+              kLineValue K线周期
+              maxLength 定返回历史数据数组的最大长度，默认值为所有K线数据
+              若contractNo, kLineType, kLineValue同时不填，则取用于展示的合约及相应的K线类型和周期
+
+        【备注】
+              返回列表，包括截止当前Bar的最多maxLength个K线的历史数据
+              列表中以字典的形式保存每个K线的数据，字典中每个键值的含义如下:
+                ContractNo 合约编号，如'NYMEX|F|CL|1907'
+	            DateTimeStamp 更新时间，如20190521130800000
+	            KLineIndex K线索引，如1
+	            KLineQty K线成交量，如18
+	            TotalQty 总成交量，如41401
+	            KLineSlice K线周期， 如1
+	            KLineType K线周期，如'M'
+	            OpeningPrice 开盘价， 如63.5
+	            LastPrice 收盘价，如63.49
+	            SettlePrice 结算价，如63.21
+	            HighPrice 最高价，如63.5
+	            LowPrice 最低价， 如63.49
+	            PositionQty 总持仓，如460816
+	            TradeDate' 交易日期，如20190521
+
+        【实例】
+              barList = HisBarsInfo("ZCE|F|SR|906", Enum_Period_Min(), 5, 1000) # 获取合约ZCE|F|SR|906包含当前Bar在内的之前1000个历史5分钟K线的数据
+              barInfo = barList[-1] # 当前Bar的详细信息
+        '''
+        return self._dataModel.getHisBarsInfo(contractNo, kLineType, kLineValue, maxLength)
 
     #/////////////////////////即时行情/////////////////////////////
     def Q_UpdateTime(self, contractNo):
@@ -1130,7 +1169,47 @@ class BaseApi(object):
 
         '''
         return self._dataModel.setSellShort(contractNo, share, price)
-        
+
+    def StartTrade(self):
+        '''
+        【说明】
+              开启交易。
+
+        【语法】
+              void StartTrade()
+
+        【参数】
+              无
+
+        【备注】
+              在策略运行时，使用StopTrade可以暂时停止策略向实盘发单，通过该方法可以开启策略向实盘发单的功能。
+
+        【示例】
+              无
+
+        '''
+        return self._dataModel.setStartTrade()
+
+    def StopTrade(self):
+        '''
+        【说明】
+              暂停交易。
+
+        【语法】
+              void StopTrade()
+
+        【参数】
+              无
+
+        【备注】
+              在策略运行时，使用StopTrade可以暂时停止策略向实盘发单。
+
+        【示例】
+              无
+
+        '''
+        return self._dataModel.setStopTrade()
+
     #/////////////////////////属性函数/////////////////////////////
     def BarInterval(self):
         '''
@@ -1663,13 +1742,34 @@ class BaseApi(object):
 
         【备注】
               获得当前持仓指定合约的第一个建仓位置到当前位置的Bar计数，返回值为整型。
-              只有当MarketPosition != 0时，即有持仓的状况下，该函数才有意义，否则返回0。
+              只有当MarketPosition != 0时，即有持仓的状况下，该函数才有意义，否则返回-1。
               注意：在开仓Bar上为0。
 
         【示例】
               无
         '''
         return self._dataModel.getBarsSinceEntry(contractNo)
+
+    def BarsSinceExit(self, contractNo):
+        '''
+        【说明】
+              获得当前持仓中指定合约的最近平仓位置到当前位置的Bar计数。
+
+        【语法】
+              int BarsSinceExit(string contractNo)
+
+        【参数】
+              contractNo 合约编号，默认为基准合约。
+
+        【备注】
+              获得当前持仓指定合约的最近平仓位置到当前位置的Bar计数，返回值为整型。
+              只有当MarketPosition != 0时，即有持仓的状况下，该函数才有意义，否则返回-1。
+              注意：在平仓Bar上为0。
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getBarsSinceExit(contractNo)
 
     def MarketPosition(self, contractNo):
         '''
@@ -2021,6 +2121,25 @@ class BaseApi(object):
               无
         '''
         return self._dataModel.getAccountId()
+
+    def A_GetAllPositionSymbol(self):
+        '''
+        【说明】
+              获得当前账户所有持仓合约。
+
+        【语法】
+              list A_GetAllPositionSymbol()
+
+        【参数】
+              无
+
+        【备注】
+              该参数返回类型为字符串列表，列表内容为账户所有持仓合约列表。
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getAllPositionSymbol()
 
     def A_Cost(self):
         '''
@@ -3974,29 +4093,6 @@ class BaseApi(object):
     def GetConfig(self):
         return self._dataModel.getConfig()
 
-    def SetBenchmark(self, contractNo):
-        '''
-        【说明】
-              设置基准合约及触发策略的合约列表，参数不能为空
-
-        【语法】
-              int SetBenchmark(string contractNo1, string contractNo2, string contractNo3, ...)
-
-        【参数】
-              contractNo 合约编号，第一个合约编号为基准合约
-              合约编号组成规则详见Symbol方法说明
-
-        【备注】
-              返回整型, 0成功，-1失败
-              如果使用合约的即时行情、K线、交易数据触发策略，则必须在策略代码中使用该函数设置合约
-              如果使用K线触发，则需要使用SetBarInterval函数设置类型和周期，否则设置界面选中的K线类型和周期
-
-        【示例】
-              SetBenchmark('ZCE|F|SR|905')
-              SetBenchmark('ZCE|F|SR|905', 'ZCE|F|SR|912', 'ZCE|F|SR|001')
-        '''
-        return self._dataModel.setSetBenchmark(contractNo)
-
     def AddUserNo(self, userNo):
         '''
         【说明】
@@ -4026,7 +4122,7 @@ class BaseApi(object):
               int SetBarInterval(string contractNo, char barType, int barInterval, int|string|char sampleConfig)
 
         【参数】
-              contractNo 合约编号，默认为基础合约
+              contractNo 合约编号
               barType K线类型 t分时，T分笔，S秒线，M分钟，H小时，D日线，W周线，m月线，Y年线
               barInterval K线周期
               sampleConfig 策略历史回测的起始点信息，可选的值为：
@@ -4040,7 +4136,8 @@ class BaseApi(object):
               返回整型, 0成功，-1失败
               通过该方法系统会订阅指定合约的K线数据，
               对于相同的合约，如果使用该函数设置不同的K线类型(barType)和周期(barInterval)，则系统会同时订阅指定的K线类型和周期的行情数据
-              对于相同的合约，如果使用该函数设置不同的起始点信息(sampleConfig)，则以最后一个起始点信息为准
+              如果使用该方法订阅了多个合约，则第一条合约为基准合约
+              如果在策略中使用SetBarInterval方法订阅了合约，则在设置界面选中的基准合约便不再订阅
 
         【示例】
               SetBarInterval('ZCE|F|SR|906', 'M', 3, 'A') 订阅合约ZCE|F|SR|906的3分钟K线数据，并使用所有K线样本进行历史回测
@@ -4394,19 +4491,18 @@ class BaseApi(object):
         '''
         return self._dataModel.setPlotNumeric(name, value, color, main, axis, type, barsback)
         
-    def PlotIcon(self, value, icon, color, main, barsback):
+    def PlotIcon(self, value, icon, main, barsback):
         '''
         【说明】
             在当前Bar输出一个图标
 
         【语法】
-            float PlotIcon(float Value,int Icon, int color, bool main, int barsback=0)
+            float PlotIcon(float Value,int Icon, bool main, int barsback=0)
 
         【参数】
             value 输出的值
             icon 图标类型，0-默认图标，1-笑脸，2-哭脸，3-上箭头，4-下箭头，5-上箭头2, 6-下箭头2
                            7-喇叭，8-加锁，9-解锁，10-货币+，11-货币-，12-加号，13-减号，14-叹号，15-叉号
-            color 输出值的显示颜色，默认表示使用属性设置框中的颜色；
             main  指标是否加载到主图，True-主图，False-幅图，默认主图
             barsback 从当前Bar向前回溯的Bar数，默认值为当前Bar。
 
@@ -4417,7 +4513,7 @@ class BaseApi(object):
             例1：PlotIcon(10,14);
             输出MA1的值。
         '''
-        return self._dataModel.setPlotIcon(value, icon, color, main, barsback)
+        return self._dataModel.setPlotIcon(value, icon, main, barsback)
 
     def PlotDot(self, name, value, icon, color, main, barsback):
         '''
@@ -4425,7 +4521,7 @@ class BaseApi(object):
             在当前Bar输出一个点
 
         【语法】
-            PlotDot(self, name, value, icon, color, main, barsback)
+            PlotDot(string name, float value, int icon, int color, bool main, int barsback=0)
 
         【参数】
             value 输出的值
@@ -4449,7 +4545,7 @@ class BaseApi(object):
             绘制一根Bar
 
         【语法】
-            PlotBar(self, name, vol1, vol2, color, main, filled, barsback)
+            PlotBar(string name, int vol1, int vol2, int color, bool main, bool filled, int barsback=0)
 
         【参数】
             name  bar名称
@@ -4519,7 +4615,7 @@ class BaseApi(object):
             绘制斜线段
 
         【语法】
-            PlotPartLine(self, name, index1, price1, index2, price2, color, main, axis, width)
+            PlotPartLine(string name, int index1, float price1, int index2, float price2, int color, bool main, bool axis, int width)
 
         【参数】
             name   名称
@@ -4551,7 +4647,7 @@ class BaseApi(object):
             绘制竖线段
 
         【语法】
-            PlotStickLine(self, name, price1, price2, color, main, axis, barsback)
+            PlotStickLine(string name, float price1, float price2, int color, bool main, bool axis, int barsback=0)
 
         【参数】
             name   名称
@@ -4679,7 +4775,53 @@ class BaseApi(object):
               LogError("当前使用的用户账户ID为 : %s，可用资金为 : %10.2f" % (accountId, freeMargin))
         '''
         return self._dataModel.LogError(args)
-        
+
+    def SMA(self, price, period, weight):
+        '''
+        【说明】
+            获取加权移动平均值
+        【语法】
+            SMA(self, numpy.array price, int period, int weight)
+        【参数】
+            price   序列值，numpy数组
+            period  周期
+            weight  权重
+
+        【备注】
+            返回值为两个值，第一个为整型，第二个为浮点型；
+            当第一个值为0时，此时第二个值是计算出的sma值；
+            当第一个值小于0时，此时计算失败，此时第二个值为numpy.nan。
+
+        【示例】
+            SMA(Close(), 12, 2)
+        '''
+        return self._dataModel.SMA(price, period, weight)
+
+    def ParabolicSAR(self, high, low, afstep, aflimit):
+        '''
+        【说明】
+            计算抛物线转向
+        【语法】
+            ParabolicSAR(self, numpy.array high, numpy.array low, float afstep, float aflimit)
+        【参数】
+            high    最高价序列值，numpy数组
+            low     最低价序列值，numpy数组
+            afstep  加速因子
+            aflimit 加速因子的限量
+
+        【备注】
+            返回值为四个值，均为数值型
+            第一个值为oParClose,当前bar的停损值；
+            第二个值为oParOpen, 下一Bar的停损值；
+            第三个值为oPosition，输出建议的持仓状态，1 - 买仓，-1 - 卖仓；
+            第四个值为oTransition, 输出当前Bar的状态是否发生反转，1 或 -1 为反转，0 为保持不变。
+            当输入high,low的numpy数组为空时，计算失败，返回的四个值均为None
+
+        【示例】
+            ParabolicSAR(High(), Low(), 0.02, 0.2)
+        '''
+        return self._dataModel.ParabolicSAR(high, low, afstep, aflimit)
+
     def strategyStatus(self):
         '''
         【说明】
@@ -4900,6 +5042,10 @@ def HistoryDataExist(contractNo='', kLineType='', kLineValue=0):
 
 def HisData(type, period, interval, contractNo='', maxLength=100):
     return baseApi.HisData(type, period, interval, contractNo, maxLength)
+
+def HisBarsInfo(contractNo='', kLineType='', kLineValue=0, maxLength=None):
+    return baseApi.HisBarsInfo(contractNo, kLineType, kLineValue, maxLength)
+
 #即时行情
 def Q_UpdateTime(contractNo=''):
     return baseApi.Q_UpdateTime(contractNo)
@@ -5010,6 +5156,12 @@ def AvgEntryPrice(contractNo=''):
 def BarsSinceEntry(contractNo=''):
     return baseApi.BarsSinceEntry(contractNo)
 
+def BarsSinceExit(contractNo=''):
+    return baseApi.BarsSinceExit(contractNo)
+
+def BarsSinceLastEntry(contractNo=''):
+    return baseApi.BarsSinceLastEntry(contractNo)
+
 def MarketPosition(contractNo=''):
     return baseApi.MarketPosition(contractNo)
 # 策略性能
@@ -5064,6 +5216,9 @@ def TotalTrades():
 # 账户函数
 def A_AccountID():
     return baseApi.A_AccountID()
+
+def A_GetAllPositionSymbol():
+    return baseApi.A_GetAllPositionSymbol()
 
 def A_Cost():
     return baseApi.A_Cost()
@@ -5155,6 +5310,12 @@ def Sell(share=0, price=0, contractNo=None):
 
 def SellShort(share=0, price=0, contractNo=None):
     return baseApi.SellShort(contractNo, share, price)
+
+def StartTrade():
+    return baseApi.StartTrade()
+
+def StopTrade():
+    return baseApi.StopTrade()
     
 # 枚举函数
 def Enum_Buy():
@@ -5374,9 +5535,6 @@ def Enum_Data_Time():
 def GetConfig():
     return baseApi.GetConfig()
 
-# def SetBenchmark(*contractNo):
-#     return baseApi.SetBenchmark(contractNo)
-
 # def AddUserNo(userNo):
 #     return baseApi.AddUserNo(userNo)
 
@@ -5499,25 +5657,25 @@ def SymbolType(contractNo=''):
 def PlotNumeric(name, value, color=0xdd0000, main=True, axis=False, type=1, barsback=0):
     return baseApi.PlotNumeric(name, value, color, main, axis, type, barsback)
     
-def PlotIcon(value, icon=0, color=0xdd0000, main=False, barsback=0):
-    return baseApi.PlotIcon(value, icon, color, main, barsback)
+def PlotIcon(value, icon=0, main=True, barsback=0):
+    return baseApi.PlotIcon(value, icon, main, barsback)
 
-def PlotDot(name, value, icon=0, color=0xdd0000, main=False, barsback=0):
+def PlotDot(name, value, icon=0, color=0xdd0000, main=True, barsback=0):
     return baseApi.PlotDot(name, value, icon, color, main, barsback)
 
-def PlotBar(name, vol1, vol2, color=0xdd0000, main=False, filled=True, barsback=0):
+def PlotBar(name, vol1, vol2, color=0xdd0000, main=True, filled=True, barsback=0):
     return baseApi.PlotBar(name, vol1, vol2, color, main, filled, barsback)
 
-def PlotText(value, text, color=0x999999, main=False, barsback=0):
+def PlotText(value, text, color=0x999999, main=True, barsback=0):
     return baseApi.PlotText(value, text, color, main, barsback) 
     
-def PlotVertLine(color=0xdd0000, main=False, axis=False, barsback=0):
+def PlotVertLine(color=0xdd0000, main=True, axis=False, barsback=0):
     return baseApi.PlotVertLine(color, main, axis, barsback)
 
-def PlotPartLine(name, index1, price1, index2, price2, color=0xdd0000, main=False, axis=False, width=1):
+def PlotPartLine(name, index1, price1, index2, price2, color=0xdd0000, main=True, axis=False, width=1):
     return baseApi.PlotPartLine(name, index1, price1, index2, price2, color, main, axis, width)
 
-def PlotStickLine(name, price1, price2, color=0xdd0000, main=False, axis=False, barsback=0):
+def PlotStickLine(name, price1, price2, color=0xdd0000, main=True, axis=False, barsback=0):
     return baseApi.PlotStickLine(name, price1, price2, color, main, axis, barsback)
 
 def UnPlotText(main=False, barsback=0):
@@ -5535,3 +5693,8 @@ def LogWarn(*args):
 def LogError(*args):
     return baseApi.LogError(args)
 
+def SMA(price, period, weight):
+    return baseApi.SMA(price, period, weight)
+
+def ParabolicSAR(high, low, afstep, aflimit):
+    return baseApi.ParabolicSAR(high, low, afstep, aflimit)

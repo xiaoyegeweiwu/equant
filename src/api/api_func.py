@@ -19,6 +19,7 @@ _all_func_ = {
                     ['TradeDate'           , '当前Bar的交易日'],
                     ['HistoryDataExist'    , '历史数据是否存在'],
                     ['HisData'             , '获取各种历史数据数组'],
+                    ['HisBarsInfo'         , '获取历史K线详细数据'],
                 ],
                 
     '即时行情': [
@@ -62,7 +63,9 @@ _all_func_ = {
                     ['Buy'                 , '多头建仓'],
                     ['BuyToCover'          , '空头平仓'],
                     ['Sell'                , '多头平仓'],
-                    ['SellShort'           , '空头建仓']
+                    ['SellShort'           , '空头建仓'],
+                    ['StartTrade'          , '开启交易'],
+                    ['StopTrade'           , '暂停交易'],
                 ],
                 
     '属性函数': [
@@ -93,8 +96,8 @@ _all_func_ = {
                 
     '策略状态': [
                     ['AvgEntryPrice'       , '当前持仓平均建仓价格'],
-                    ## ['BarsSinceEntry'      , '当前持仓的第一个建仓位置到当前位置的Bar计数'],
-                    # ['BarsSinceExit'       , '最近平仓位置到当前位置的Bar计数'],
+                    ['BarsSinceEntry'      , '当前持仓的第一个建仓位置到当前位置的Bar计数'],
+                    ['BarsSinceExit'       , '最近平仓位置到当前位置的Bar计数'],
     #                 ['BarsSinceLastEntry'  , '当前持仓的最后一个建仓位置到当前位置的Bar计数'],
     #                 ['ContractProfit'      , '当前持仓位置的每手浮动盈亏'],
     #                 ['CurrentContracts'    , '当前持仓的持仓合约数'],
@@ -138,6 +141,7 @@ _all_func_ = {
                 
     '账户函数': [
                     ['A_AccountID'         , '交易账户ID'],
+                    ['A_GetAllPositionSymbol', '所有持仓合约'],
                     ['A_Cost'              , '手续费'],
                     ['A_CurrentEquity'     , '账户权益'],
                     ['A_FreeMargin'        , '可用资金'],
@@ -247,7 +251,6 @@ _all_func_ = {
                 ],
 
     '设置函数': [
-                    ## ['SetBenchmark'        , '设置基准合约'],
                     ## ['AddUserNo'           , '添加交易账号'],
                     ['SetBarInterval'      , '设置K线类型'],
                     ['SetInitCapital'      , '设置初始资金'],
@@ -263,31 +266,36 @@ _all_func_ = {
                     ['SetTriggerType'      , '设置触发方式'],
                 ],
 
-    '其他函数': [
-                    ['PlotNumeric'          ,'绘制指标线'],
-                    ['PlotIcon'             ,'绘制系统图标'],
-                    ['PlotDot'              ,'绘制点'],
-                    ['PlotBar'              ,'绘制柱子'],
-                    ['PlotText'             ,'绘制字符串'],
-                    ['PlotVertLine'         ,'绘制竖线'],
-                    ['PlotPartLine'         ,'绘制斜线段'],
-                    ['PlotStickLine'        ,'绘制竖线段'],
-                    ['UnPlotText'           ,'取消绘制的字符串'],
-                    ['LogDebug'             ,'打印调试信息'],
-                    ['LogInfo'              ,'打印普通信息'],
-                    ['LogWarn'              ,'打印警告信息'],
-                    ['LogError'             ,'打印错误信息'],
+    '绘图函数': [
+                    ['PlotNumeric'         ,'绘制指标线'],
+                    ['PlotIcon'            ,'绘制系统图标'],
+                    ['PlotDot'             ,'绘制点'],
+                    ['PlotBar'             ,'绘制柱子'],
+                    ['PlotText'            ,'绘制字符串'],
+                    ['PlotVertLine'        ,'绘制竖线'],
+                    ['PlotPartLine'        ,'绘制斜线段'],
+                    ['PlotStickLine'       ,'绘制竖线段'],
+                    ['UnPlotText'          ,'取消绘制的字符串'],
                 ],
-                
+
     'context函数': [
-                    ['strategyStatus'       ,'获取当前策略状态'],
-                    ['triggerType'          ,'获取当前触发类型'],
-                    ['contractNo'           ,'获取当前触发合约'],
-                    ['kLineType'            ,'获取当前触发的K线类型'],
-                    ['kLineSlice'           ,'获取当前触发的K线周期'],
-                    ['tradeDate'            ,'获取当前触发的交易日'],
-                    ['dateTimeStamp'        ,'获取当前触发的时间戳'],
-                    ['triggerData'          ,'获取当前触发类型对应的数据'],
+                    ['strategyStatus'      ,'获取当前策略状态'],
+                    ['triggerType'         ,'获取当前触发类型'],
+                    ['contractNo'          ,'获取当前触发合约'],
+                    ['kLineType'           ,'获取当前触发的K线类型'],
+                    ['kLineSlice'          ,'获取当前触发的K线周期'],
+                    ['tradeDate'           ,'获取当前触发的交易日'],
+                    ['dateTimeStamp'       ,'获取当前触发的时间戳'],
+                    ['triggerData'         ,'获取当前触发类型对应的数据'],
+                ],
+
+    '其他函数': [
+                    ['SMA'                 ,'计算加权移动平均值'],
+                    ['ParabolicSAR'        ,'计算抛物线转向'],
+                    ['LogDebug'            ,'打印调试信息'],
+                    ['LogInfo'             ,'打印普通信息'],
+                    ['LogWarn'             ,'打印警告信息'],
+                    ['LogError'            ,'打印错误信息'],
                 ],
 
 }
