@@ -122,6 +122,7 @@ _all_func_ = {
                 
     '策略性能': [
                     ['Available'           , '策略当前可用虚拟资金'],
+                    ['CurrentEquity'       , '账户权益'],
                     ['FloatProfit'         , '浮动盈亏'],
                     ['GrossLoss'           , '累计总亏损'],
                     ['GrossProfit'         , '累计总利润'],

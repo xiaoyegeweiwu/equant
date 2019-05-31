@@ -471,7 +471,8 @@ class StrategyConfig(object):
         contract = self._metaData['Contract']
         defaultBenchmark = contract[0] if len(contract) > 0 and len(contract[0]) else ""
         if len(defaultBenchmark) > 0:
-            del self._metaData['Sample'][defaultBenchmark]
+            if defaultBenchmark in self._metaData['Sample']:
+                del self._metaData['Sample'][defaultBenchmark]
             self._metaData['Sample']['Display']['ContractNo'] = None
             self._metaData['SubContract'] = []
 

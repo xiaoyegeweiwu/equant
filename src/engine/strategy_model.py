@@ -636,6 +636,11 @@ class StrategyModel(object):
             "CurBarIndex"    : curBarIndex #
         }
 
+        if entryOrExit in (oCover, oCoverT):
+            isVaildOrder = self._calcCenter.coverJudge(orderParam)
+            if not isVaildOrder:
+                return ""
+
         key = (triggerInfo['ContractNo'], triggerInfo['KLineType'], triggerInfo['KLineSlice'])
         isSendSignal = self._config.hasKLineTrigger() and key == self._config.getKLineShowInfoSimple()
         # K线触发，发送信号
@@ -1587,6 +1592,14 @@ class StrategyModel(object):
     # ///////////////////////策略性能///////////////////////////
     def getAvailable(self):
         return self._calcCenter.getProfit()['Available']
+
+    def getEquity(self):
+        fundRecodeList = self._calcCenter.getFundRecord()
+        if not fundRecodeList:
+            return self.getAvailable()
+
+        fundRecordDict = fundRecodeList[-1]
+        return fundRecordDict['DynamicEquity']
 
     def getFloatProfit(self, contNo):
         return self._calcCenter._getHoldProfit(contNo)

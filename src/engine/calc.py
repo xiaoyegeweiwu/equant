@@ -268,7 +268,7 @@ class CalcCenter(object):
 
         ret = -1
 
-        if order["Direct"] == dBuy and order["offset"] == oCover: # 买平
+        if order["Direct"] == dBuy and order["Offset"] == oCover: # 买平
             if pInfo["TotalSell"] > 0:
                 # 判断持仓
                 if pInfo["TotalSell"] < order["OrderQty"]:

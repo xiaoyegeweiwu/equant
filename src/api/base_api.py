@@ -2016,6 +2016,25 @@ class BaseApi(object):
         '''
         return self._dataModel.getAvailable()
 
+    def CurrentEquity(self):
+        '''
+        【说明】
+              返回策略的当前账户权益。
+
+        【语法】
+              float CurrentEquity()
+
+        【参数】
+              无
+
+        【备注】
+              无
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getEquity()
+
     def FloatProfit(self, contractNo):
         '''
         【说明】
@@ -5552,6 +5571,9 @@ def MarketPosition(contractNo=''):
 # 策略性能
 def Available():
     return baseApi.Available()
+
+def CurrentEquity():
+    return baseApi.CurrentEquity()
 
 def FloatProfit(contractNo=''):
     return baseApi.FloatProfit(contractNo)
