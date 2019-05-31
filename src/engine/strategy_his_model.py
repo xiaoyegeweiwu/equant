@@ -709,7 +709,9 @@ class StrategyHisQuote(object):
                 "KLineType": key[1],
                 "KLineSlice": key[2],
                 'Data': {
-                    "Data": data
+                    "Data": data,
+                    "TradeDate": data["TradeDate"],
+                    "DateTimeStamp": data["DateTimeStamp"],
                 }
             })
             self._strategy.sendTriggerQueue(event)
