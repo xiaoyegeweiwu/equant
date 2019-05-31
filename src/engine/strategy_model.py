@@ -638,7 +638,7 @@ class StrategyModel(object):
 
         if entryOrExit in (oCover, oCoverT):
             isVaildOrder = self._calcCenter.coverJudge(orderParam)
-            if not isVaildOrder:
+            if isVaildOrder < 0:
                 return ""
 
         key = (triggerInfo['ContractNo'], triggerInfo['KLineType'], triggerInfo['KLineSlice'])

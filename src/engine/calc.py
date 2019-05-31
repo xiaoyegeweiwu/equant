@@ -207,16 +207,6 @@ class CalcCenter(object):
                     return -1   # 平卖开仓失败
                 else:
                     #TODO: 需要计算资金变化
-                    # beforePrice = pInfo["SellPrice"]  # 未平之前的持仓价
-                    # afterPrice = self._getHoldPrice(contNo, 0, False)  # 平过之后的持仓价
-                    #
-                    # # 平仓盈亏
-                    # liquidateProfit = ((beforePrice * pInfo["TotalSell"] - afterPrice * 0)
-                    #                    - orderPrice * pInfo["TotalSell"]) * cost["TradeDot"]
-                    # # 计算盈利
-                    # profit = liquidateProfit
-                    # profit -= coverCharge
-
                     if cost["OpenRatio"]:
                         openCharge = orderPrice * orderQty * cost["TradeDot"] * cost["OpenRatio"]
                     else:
@@ -234,7 +224,7 @@ class CalcCenter(object):
                 else:
                     coverCharge = pInfo["TotalBuy"] * cost["CloseFixed"]
                 if availableFund < coverCharge:
-                    ret =  -1  # 平买开仓失败
+                    ret = -1  # 平买开仓失败
                 else:
                     if cost["OpenRatio"]:
                         openCharge = orderPrice * orderQty * cost["TradeDot"] * cost["OpenRatio"]
@@ -272,7 +262,7 @@ class CalcCenter(object):
             if pInfo["TotalSell"] > 0:
                 # 判断持仓
                 if pInfo["TotalSell"] < order["OrderQty"]:
-                    ret = -1  # 平卖仓失败， 仓位不足
+                    return -1  # 平卖仓失败， 仓位不足
 
                 # 计算平仓手续费
                 if cost["CloseRatio"]:
@@ -290,7 +280,7 @@ class CalcCenter(object):
             if pInfo["TotalBuy"] > 0:
                 # 判断持仓
                 if pInfo["TotalBuy"] < order["OrderQty"]:
-                    ret = -1  # 平买仓失败， 仓位不足
+                    return -1  # 平买仓失败， 仓位不足
 
                 # 计算平仓手续费
                 if cost["CloseRatio"]:
@@ -308,7 +298,7 @@ class CalcCenter(object):
             if pInfo["TodaySell"] > 0:
                 # 判断持仓
                 if pInfo["TodaySell"] < order["OrderQty"]:
-                    ret = -1  # 平买仓失败， 仓位不足
+                    return -1  # 平买仓失败， 仓位不足
 
                 # 计算平仓手续费
                 #TODO：平今手续费和平仓手续费是不是不一样
@@ -327,7 +317,7 @@ class CalcCenter(object):
             if pInfo["TodayBuy"] > 0:
                 # 判断持仓
                 if pInfo["TodayBuy"] < order["OrderQty"]:
-                    ret = -1  # 平买仓失败， 仓位不足
+                    return -1  # 平买仓失败， 仓位不足
 
                 # 计算平仓手续费
                 if cost["CloseRatio"]:
