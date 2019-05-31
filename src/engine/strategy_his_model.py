@@ -718,7 +718,7 @@ class StrategyHisQuote(object):
     def onHisQuoteNotice(self, event):
         key = (event.getContractNo(), event.getKLineType(), event.getKLineSlice())
         kindInfo = {"ContractNo": key[0], "KLineType": key[1], "KLineSlice": key[2]}
-        print(kindInfo, len(event.getData()))
+        # print(kindInfo, len(event.getData()), event.getData()[0]["DateTimeStamp"])
         assert kindInfo in self._config.getKLineKindsInfo(), " Error "
         localDataList = self._kLineNoticeData[key]['KLineData']
         self._handleKLineNoticeData(localDataList, event)
@@ -980,7 +980,6 @@ class StrategyHisQuote(object):
         ST_TRIGGER_SANPSHOT, ST_TRIGGER_TIMER, ST_TRIGGER_CYCLE],  "Error "
 
         allData = event.getData()
-
         args = {
             "Status": ST_STATUS_CONTINUES,
             "TriggerType": eventCode,

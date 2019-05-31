@@ -66,7 +66,7 @@ class StrategyEngine(object):
 
         # 恢复上次推出时保存的结构
         self._strategyOrder = {}
-        self._resumeStrategy()
+        # self._resumeStrategy()
         self._engineOrderModel = EngineOrderModel(self._strategyOrder)
         self.logger.debug('Initialize strategy engine ok!')
 
