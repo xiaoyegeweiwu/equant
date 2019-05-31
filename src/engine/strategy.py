@@ -825,6 +825,7 @@ class Strategy:
                 "Pid":os.getpid(),
                 "Path":self._filePath,
                 "StrategyName": self._strategyName,
+                "Result":self._dataModel.getCalcCenter().testResult()
             }
         })
         self.sendEvent2UI(quitEvent)
