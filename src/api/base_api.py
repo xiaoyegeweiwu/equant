@@ -6045,7 +6045,7 @@ def SymbolType(contractNo=''):
 def PlotNumeric(name, value, color=0xdd0000, main=True, axis=False, type=1, barsback=0):
     return baseApi.PlotNumeric(name, value, color, main, axis, type, barsback)
     
-def PlotIcon(value, icon=0, main=True, barsback=0):
+def PlotIcon(value, icon=0, main=False, barsback=0):
     return baseApi.PlotIcon(value, icon, main, barsback)
 
 def PlotDot(name, value, icon=0, color=0xdd0000, main=True, barsback=0):

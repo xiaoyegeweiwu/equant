@@ -6,7 +6,6 @@ def initialize(context):
 
 
 def handle_data(context):
-
     #PlotVertLine(main=True, axis = True)
     #UnPlotVertLine()
     #PlotDot(name="Dot", value=Close()[-1], main=True)
