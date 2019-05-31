@@ -4705,6 +4705,25 @@ class BaseApi(object):
         '''
         return self._dataModel.setUnPlotIcon(main, barsback)
 
+    def UnPlotVertLine(self, main, barsback):
+        '''
+        【说明】
+            在当前Bar取消输出的竖线
+
+        【语法】
+            void UnPlotVertLine(bool main, int barsback=0)
+
+        【参数】
+            main  指标是否加载到主图，True-主图，False-幅图，默认主图
+            barsback 从当前Bar向前回溯的Bar数，默认值为当前Bar。
+
+        【备注】
+
+        【示例】
+            UnPlotVertLine();
+        '''
+        return self._dataModel.setUnPlotVertLine(main, barsback)
+
     def UnPlotDot(self, name, main, barsback):
         '''
         【说明】
@@ -4725,24 +4744,86 @@ class BaseApi(object):
         '''
         return self._dataModel.setUnPlotDot(name, main, barsback)
 
-    def UnPlotBar(self, main, barsback):
+    def UnPlotBar(self, name, main, barsback):
         '''
         【说明】
             在当前Bar取消输出的Bar
 
         【语法】
-            void UnPlotBar(bool main, int barsback=0)
+            void UnPlotBar(string name, bool main, int barsback=0)
 
         【参数】
+            name  名称
             main  指标是否加载到主图，True-主图，False-幅图，默认主图
             barsback 从当前Bar向前回溯的Bar数，默认值为当前Bar。
 
         【备注】
 
         【示例】
-            UnPlotBar();
+            UnPlotBar(“Bar”);
         '''
-        return self._dataModel.setUnPlotBar(main, barsback)
+        return self._dataModel.setUnPlotBar(name, main, barsback)
+
+    def UnPlotNumeric(self, name, main, barsback):
+        '''
+        【说明】
+            在当前Bar取消输出的Numeric
+
+        【语法】
+            void UnPlotNumeric(string name, bool main, int barsback=0)
+
+        【参数】
+            name  名称
+            main  指标是否加载到主图，True-主图，False-幅图，默认主图
+            barsback 从当前Bar向前回溯的Bar数，默认值为当前Bar。
+
+        【备注】
+
+        【示例】
+            UnPlotNumeric("numeric")
+        '''
+        return self._dataModel.setUnPlotNumeric(name, main, barsback)
+
+    def UnPlotPartLine(self, name, index1, index2, main):
+        '''
+        【说明】
+            在当前Bar取消输出的斜线段
+
+        【语法】
+            void UnPlotPartLine(string name, int index1, int index2, bool main)
+
+        【参数】
+            name  名称
+            index1 起始索引, 目前只对当前Bar有效
+            index2 结束索引
+            main  指标是否加载到主图，True-主图，False-幅图，默认主图
+
+        【备注】
+
+        【示例】
+            UnPlotPartLine("PartLine", idx1, idx2, True)
+        '''
+        return self._dataModel.setUnPlotPartLine(name, index1, index2, main)
+
+    def UnPlotStickLine(self, name, main, barsback):
+        '''
+        【说明】
+            在当前Bar取消输出的竖线段
+
+        【语法】
+            void UnPlotStickLine(string name, bool main, int barsback=0)
+
+        【参数】
+            name  名称
+            main  指标是否加载到主图，True-主图，False-幅图，默认主图
+            barsback 从当前Bar向前回溯的Bar数，默认值为当前Bar。
+
+        【备注】
+
+        【示例】
+            UnPlotStickLine("StickLine")
+        '''
+        return self._dataModel.setUnPlotStickLine(name, main, barsback)
 
     def LogDebug(self, args):
         '''
@@ -5740,11 +5821,23 @@ def UnPlotText(main=True, barsback=0):
 def UnPlotIcon(main=True, barsback=0):
     return baseApi.UnPlotIcon(main, barsback)
 
+def UnPlotVertLine(main=True, barsback=0):
+    return baseApi.UnPlotVertLine(main, barsback)
+
 def UnPlotDot(name, main=True, barsback=0):
     return baseApi.UnPlotDot(name, main, barsback)
 
-def UnPlotBar(main=True, barsback=0):
-    return baseApi.UnPlotBar(main, barsback)
+def UnPlotBar(name, main=True, barsback=0):
+    return baseApi.UnPlotBar(name, main, barsback)
+
+def UnPlotNumeric(name, main=True, barsback=0):
+    return baseApi.UnPlotNumeric(name, main, barsback)
+
+def UnPlotPartLine(name, index1, index2, main=True):
+    return baseApi.UnPlotPartLine(name, index1, index2, main)
+
+def UnPlotStickLine(name, main=True, barsback=0):
+    return baseApi.UnPlotStickLine(name, main, barsback)
 
 def LogDebug(*args):
     return baseApi.LogDebug(args)

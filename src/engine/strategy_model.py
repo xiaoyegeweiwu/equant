@@ -1042,7 +1042,7 @@ class StrategyModel(object):
         self._plotNumeric(name, value, color, main, EEQU_ISNOT_AXIS, EEQU_DOT, barsback, data)
 
     def setUnPlotDot(self, name, main, barsback):
-        return self.setPlotDot(self._strategyName, np.nan, 0, 0, main, barsback)
+        return self.setPlotDot(name, np.nan, 0, 0, main, barsback)
 
     def setPlotBar(self, name, vol1, vol2, color, main, filled, barsback):
         main = '0' if main else '1'
@@ -1063,8 +1063,8 @@ class StrategyModel(object):
 
         self._plotNumeric(name, 0, color, main, EEQU_ISNOT_AXIS, EEQU_BAR, barsback, data)
 
-    def setUnPlotBar(self, main, barsback):
-        return self.setPlotBar("", np.nan, np.nan, 0, main, True, barsback)
+    def setUnPlotBar(self, name, main, barsback):
+        return self.setPlotBar(name, np.nan, np.nan, 0, main, True, barsback)
 
     def setPlotNumeric(self, name, value, color, main, axis, type, barsback):
         main = '0' if main else '1'
@@ -1081,6 +1081,9 @@ class StrategyModel(object):
             'Value'      : value
         }]
         self._plotNumeric(name, value, color, main, axis, type, barsback, data)
+
+    def setUnPlotNumeric(self, name, main, barsback):
+        return self.setPlotNumeric(name, np.nan, 0, main, EEQU_ISNOT_AXIS, 1, barsback)
         
     def setPlotVertLine(self, color, main, axis, barsback):
         main = '0' if main else '1'
@@ -1101,6 +1104,24 @@ class StrategyModel(object):
 
         self._plotNumeric(self._strategyName, value, color, main, axis, EEQU_VERTLINE, barsback, data)
 
+    def setUnPlotVertLine(self, main, barsback):
+        main = '0' if main else '1'
+
+        curBar = self._hisModel.getCurBar()
+        klineIndex = curBar['KLineIndex'] - barsback
+
+        if klineIndex <= 0:
+            return
+
+        value = curBar['LastPrice']
+        data = [{
+            'KLineIndex' : klineIndex,
+            'Value'      : np.nan,
+            'ClrK'       : 0
+        }]
+
+        self._plotNumeric(self._strategyName, np.nan, 0, main, EEQU_ISNOT_AXIS, EEQU_VERTLINE, barsback, data)
+
     def setPlotPartLine(self, name, index1, price1, index2, price2, color, main, axis, width):
         main = '0' if main else '1'
         axis = '0' if axis else '1'
@@ -1119,8 +1140,24 @@ class StrategyModel(object):
 
         self._plotNumeric(name, 0, color, main, axis, EEQU_PARTLINE, 0, data)
 
-    def setPlotStickLine(self, name, price1, price2, color, main, axis, barsback):
+    def setUnPlotPartLine(self, name, index1, index2, main):
+        main = '0' if main else '1'
 
+        if index1<= 0 or index2 <= 0:
+            return
+
+        data = [{
+            'KLineIndex' : index1,
+            'Value'      : np.nan,
+            'Idx2'       : index2,
+            'LineValue'  : np.nan,
+            'ClrLine'    : 0,
+            'LinWid'     : 1
+        }]
+
+        self._plotNumeric(name, np.nan, 0, main, EEQU_ISNOT_AXIS, EEQU_PARTLINE, 0, data)
+
+    def setPlotStickLine(self, name, price1, price2, color, main, axis, barsback):
         main = '0' if main else '1'
         axis = '0' if axis else '1'
 
@@ -1138,6 +1175,9 @@ class StrategyModel(object):
         }]
 
         self._plotNumeric(name, 0, color, main, axis, EEQU_STICKLINE, barsback, data)
+
+    def setUnPlotStickLine(self, name, main, barsback):
+        return self.setPlotStickLine(name, np.nan, np.nan, 0, main, EEQU_ISNOT_AXIS, barsback)
 
     def formatArgs(self, args):
         if len(args) == 0:

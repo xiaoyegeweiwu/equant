@@ -15,3 +15,4 @@ def handle_data(context):
     opc, opo, opos, otran = ParabolicSAR(High(), Low(), 0.02, 0.2)
     LogInfo("round:%d, opc:%f, opo:%f, opos:%d, otran:%d\n" %(rd, opc, opo, opos, otran))
     rd = rd+1
+

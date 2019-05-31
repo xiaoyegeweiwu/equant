@@ -4,7 +4,7 @@ p1=5
 p2=20
 
 def initialize(context): 
-    SetBarInterval("ZCE|F|TA|909", 'M', 1, "20190510")
+    SetBarInterval("ZCE|F|TA|909", 'M', 1, 1000)
     SetActual()
 
 def handle_data(context):
@@ -20,6 +20,9 @@ def handle_data(context):
     PlotNumeric("ma1", ma1[-1], color=0xFF0000)
     PlotNumeric("ma2", ma2[-1], color=0x00aa00)    
     PlotNumeric("fit", NetProfit(), 0xFF0000, False)
+    #UnPlotNumeric("ma1")
+    #UnPlotNumeric("ma2")
+    #UnPlotNumeric("fit")
 
     # 执行下单操作
     if MarketPosition() <= 0 and ma1[-1] > ma2[-1]:
