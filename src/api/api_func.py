@@ -146,6 +146,7 @@ _all_func_ = {
                     ['A_CurrentEquity'     , '账户权益'],
                     ['A_FreeMargin'        , '可用资金'],
                     ['A_ProfitLoss'        , '浮动盈亏'],
+                    ['A_CoverProfit'       , '平仓盈亏'],
                     ['A_TotalFreeze'       , '冻结资金'],
                     ['A_BuyAvgPrice'       , '买入均价'],
                     ['A_BuyPosition'       , '买持仓量'],

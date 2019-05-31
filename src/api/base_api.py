@@ -2420,6 +2420,26 @@ class BaseApi(object):
         '''
         return self._dataModel.getProfitLoss()
 
+    def A_CoverProfit(self):
+        '''
+        【说明】
+              返回当前账户的平仓盈亏。
+
+        【语法】
+              float A_CoverProfit()
+
+        【参数】
+              无
+
+        【备注】
+              返回当前公式应用的交易帐户的平仓盈亏，返回值为浮点数。
+              注：不能使用于历史测试，仅适用于实时行情交易。
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getCoverProfit()
+
     def A_TotalFreeze(self):
         '''
         【说明】
@@ -5459,6 +5479,9 @@ def A_FreeMargin():
 
 def A_ProfitLoss():
     return baseApi.A_ProfitLoss()
+
+def A_CoverProfit():
+    return baseApi.A_CoverProfit()
 
 def A_TotalFreeze():
     return baseApi.A_TotalFreeze()

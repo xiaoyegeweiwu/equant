@@ -110,6 +110,9 @@ class StrategyTrade(TradeModel):
         '''
         return self.getDataFromTMoneyModel('FloatProfitTBT')
 
+    def getCoverProfit(self):
+        return self.getDataFromTMoneyModel('CoverProfitTBT')
+
     def getTotalFreeze(self):
         '''
         :return:当前公式应用的交易帐户的冻结资金

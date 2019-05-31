@@ -528,6 +528,9 @@ class StrategyModel(object):
     def getProfitLoss(self):
         return self._trdModel.getProfitLoss()
 
+    def getCoverProfit(self):
+        return self._trdModel.getCoverProfit()
+
     def getTotalFreeze(self):
         return self._trdModel.getTotalFreeze()
 
