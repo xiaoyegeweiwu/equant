@@ -137,7 +137,7 @@ class StrategyHisQuote(object):
         self._contractTuple = self._config.getContract()
         
         # 基准合约
-        self._contractNo = self._contractTuple[0]
+        self._contractNo = self._config.getBenchmark()
 
         # 回测样本配置
         self._sampleDict = self._config.getSample()
