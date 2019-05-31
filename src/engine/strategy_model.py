@@ -47,6 +47,12 @@ class StrategyModel(object):
     def getConfigData(self):
         return self._cfgModel.getConfig()
 
+    def getConfigTimer(self):
+        return self._cfgModel.getTimerTrigger()
+
+    def getConfigCycle(self):
+        return self._cfgModel.getCycleTrigger()
+
     def getConfigModel(self):
         return self._cfgModel
 
