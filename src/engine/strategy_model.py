@@ -647,14 +647,16 @@ class StrategyModel(object):
             if isVaildOrder < 0:
                 return ""
 
+        canAdded = self._calcCenter.addOrder(orderParam)
+        if not canAdded:
+            return ""
+
         key = (triggerInfo['ContractNo'], triggerInfo['KLineType'], triggerInfo['KLineSlice'])
         isSendSignal = self._config.hasKLineTrigger() and key == self._config.getKLineShowInfoSimple()
         # K线触发，发送信号
         if signal and isSendSignal:
             self.sendSignalEvent(self._signalName, contNo, orderDirct, entryOrExit, orderPrice, orderQty, curBar)
-        # **************************************
-        self._calcCenter.addOrder(orderParam)
-        # **************************************
+
         retCode, eSessionId = self.sendOrder(userNo, contNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty)
         return eSessionId if retCode == 0 else ""
         
