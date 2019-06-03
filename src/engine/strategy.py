@@ -48,7 +48,7 @@ class StartegyManager(object):
 
         args = {
             "Config": event.getData()["Args"],
-            #"UIConfig": copy.deepcopy(event.getData()["Args"]),
+            # "UIConfig": copy.deepcopy(event.getData()["Args"]),
             "Path": event.getData()["Path"],
             "StrategyName": None,
             "StrategyId": strategyId,
@@ -377,6 +377,7 @@ class Strategy:
             if self._isExit():
                 time.sleep(0.2)
                 self._clearQueue(self._eg2stQueue)
+                continue
             event = self._eg2stQueue.get()
             code = event.getEventCode()
             if code not in self._egCallbackDict:
@@ -396,31 +397,27 @@ class Strategy:
         self._runStatus = ST_STATUS_HISTORY
         self._send2UIStatus(self._runStatus)
         # runReport中会有等待
-        try:
-            self._dataModel.runReport(self._context, self._userModule.handle_data)
 
-            # 持续运行阶段
-            # 1. 中间阶段, 实际上还是作为历史回测
-            # 2. 真正的实时阶段
-            # self._runStatus = ST_STATUS_HISTORY
-            # self._send2UIStatus(self._runStatus)
-            #
-            while not self._isExit():
-                try:
-                    event = self._triggerQueue.get_nowait()
-                    # 发单方式，实时发单、k线稳定后发单。
-                    self._dataModel.runRealTime(self._context, self._userModule.handle_data, event)
-                except queue.Empty as e:
-                    if self._firstTriggerQueueEmpty:
-                        self._runStatus = ST_STATUS_CONTINUES
-                        self._send2UIStatus(self._runStatus)
-                        self._firstTriggerQueueEmpty = False
-                    else:
-                        time.sleep(0.1)
-        except Exception as e:
-            errorText = traceback.format_exc()
-            # traceback.print_exc()
-            self._exit(-1, errorText)
+        self._dataModel.runReport(self._context, self._userModule.handle_data)
+
+        # 持续运行阶段
+        # 1. 中间阶段, 实际上还是作为历史回测
+        # 2. 真正的实时阶段
+        # self._runStatus = ST_STATUS_HISTORY
+        # self._send2UIStatus(self._runStatus)
+        #
+        while not self._isExit():
+            try:
+                event = self._triggerQueue.get_nowait()
+                # 发单方式，实时发单、k线稳定后发单。
+                self._dataModel.runRealTime(self._context, self._userModule.handle_data, event)
+            except queue.Empty as e:
+                if self._firstTriggerQueueEmpty:
+                    self._runStatus = ST_STATUS_CONTINUES
+                    self._send2UIStatus(self._runStatus)
+                    self._firstTriggerQueueEmpty = False
+                else:
+                    time.sleep(0.1)
 
     def _startStrategyThread(self):
         '''历史数据准备完成后，运行策略'''
@@ -444,7 +441,7 @@ class Strategy:
                     "KLineType" : None,
                     "KLineSlice": None,
                     "Data":{
-                        "TradeDate"  : tradeDate,
+                        "TradeDate": tradeDate,
                         "DateTimeStamp": dateTimeStamp,
                         "Data":timeSecond
                     }
@@ -635,16 +632,20 @@ class Strategy:
     def _onLoadStrategyResponse(self, event):
         '''向界面返回策略加载应答'''
         cfg = self._dataModel.getConfigData()
-        
+
+        key = self._dataModel.getConfigModel().getKLineShowInfoSimple()
         revent = Event({
             "EventCode" : EV_EG2UI_LOADSTRATEGY_RESPONSE,
             "StrategyId": self._strategyId,
-            "ErrorCode" : 0,
-            "ErrorText" : "",
             "Data":{
                 "StrategyId"   : self._strategyId,
                 "StrategyName" : self._strategyName,
                 "StrategyState": self._runStatus,
+                "ContractNo"   : key[0],
+                "KLineType"    : key[1],
+                "KLinceSlice"  : key[2],
+                "IsActualRun"  : self._dataModel.getConfigModel().isActualRun(),
+                "InitialFund"  : self._dataModel.getConfigModel().getInitCapital(),
                 "Config"       : cfg,
             }
         })
@@ -806,26 +807,29 @@ class Strategy:
             }
         })
         self.sendEvent2EngineForce(event)
-        self._onStrategyQuit()
+        self._onStrategyQuit(None, ST_STATUS_EXCEPTION)
         # 保证该进程is_alive， 使得队列可用
         while True:
             time.sleep(2)
 
     # 停止策略
-    def _onStrategyQuit(self, event=None):
+    def _onStrategyQuit(self, event=None, status=ST_STATUS_QUIT):
         self._isSt2EgQueueEffective = False
         self._strategyState = StrategyStatusExit
         config = None if self._dataModel is None else self._dataModel.getConfigData()
+        result = None
+        if self._dataModel and self._dataModel.getCalcCenter():
+            result = self._dataModel.getCalcCenter().testResult()
         quitEvent = Event({
             "EventCode": EV_EG2UI_STRATEGY_STATUS,
             "StrategyId": self._strategyId,
             "Data":{
-                "Status":ST_STATUS_QUIT,
+                "Status":status,
                 "Config":config,
                 "Pid":os.getpid(),
                 "Path":self._filePath,
                 "StrategyName": self._strategyName,
-                "Result":self._dataModel.getCalcCenter().testResult()
+                "Result":result
             }
         })
         self.sendEvent2UI(quitEvent)
