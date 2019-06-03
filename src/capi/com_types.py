@@ -185,6 +185,7 @@ ST_STATUS_CONTINUES               = 'C'             #运行状态
 ST_STATUS_PAUSE                   = 'P'             #暂停状态
 ST_STATUS_QUIT                    = 'Q'             #停止状态
 ST_STATUS_REMOVE                  = 'R'             #移除状态
+ST_STATUS_EXCEPTION               = 'E'
 
 # 策略触发事件定义
 ST_TRIGGER_TIMER                  = 'T'              # 定时触发

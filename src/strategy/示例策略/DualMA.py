@@ -4,7 +4,7 @@ p1=5
 p2=20
 
 def initialize(context): 
-    SetBarInterval("NYMEX|F|CL|1909", 'M', 1, 10)
+    SetBarInterval("ZCE|F|TA|909", 'M', 1, 1000)
     SetActual()
 
 def handle_data(context):

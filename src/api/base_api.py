@@ -1832,46 +1832,6 @@ class BaseApi(object):
         '''
         return self._dataModel.getCurrentContracts(contractNo)
 
-    def BuyPosition(self, contractNo):
-        '''
-        【说明】
-              获得当前持仓的买入方向的持仓量。
-
-        【语法】
-              int BuyPosition(string contractNo)
-
-        【参数】
-              contractNo 合约编号，默认为基准合约。
-
-        【备注】
-              获得策略当前持仓的买入方向的持仓量，返回值为整数。
-              只有当MarketPosition != 0时，即有持仓的状况下，该函数才有意义，否则返回-1。
-
-        【示例】
-              无
-        '''
-        return self._dataModel.getBuyPosition(contractNo)
-
-    def SellPosition(self, contractNo):
-        '''
-        【说明】
-              获得当前持仓的卖出方向的持仓量。
-
-        【语法】
-              int SellPosition(string contractNo)
-
-        【参数】
-              contractNo 合约编号，默认为基准合约。
-
-        【备注】
-              获得策略当前持仓的卖出持仓量，返回值为整数。
-              只有当MarketPosition != 0时，即有持仓的状况下，该函数才有意义，否则返回-1。
-
-        【示例】
-              无
-        '''
-        return self._dataModel.getSellPosition(contractNo)
-
     def EntryDate(self, contractNo):
         '''
         【说明】
@@ -5624,12 +5584,6 @@ def ContractProfit(contractNo=''):
 
 def CurrentContracts(contractNo=''):
     return baseApi.CurrentContracts(contractNo)
-
-def BuyPosition(contractNo=''):
-    return baseApi.BuyPosition(contractNo)
-
-def SellPosition(contractNo=''):
-    return baseApi.SellPosition(contractNo)
 
 def EntryDate(contractNo=''):
     return baseApi.EntryDate(contractNo)

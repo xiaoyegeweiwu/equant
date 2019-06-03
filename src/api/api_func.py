@@ -101,8 +101,6 @@ _all_func_ = {
                     ['BarsSinceLastEntry'  , '当前持仓的最后一个建仓位置到当前位置的Bar计数'],
                     ['ContractProfit'      , '当前持仓位置的每手浮动盈亏'],
                     ['CurrentContracts'    , '当前持仓的持仓合约数'],
-                    ['BuyPosition'         , '当前持仓的买入持仓量'],
-                    ['SellPosition'        , '当前持仓的卖出持仓量'],
     #                 ['CurrentEntries'      , '当前持仓的建仓次数'],
                     ['EntryDate'           , '当前持仓的第一个建仓位置的日期'],
                     ['EntryPrice'          , '当前持仓的第一个建仓价格'],
