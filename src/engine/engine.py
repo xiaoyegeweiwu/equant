@@ -207,7 +207,7 @@ class StrategyEngine(object):
                 self.sendErrorMsg(-1, errorText)
 
     def _sendEvent2Strategy(self, strategyId, event):
-        if strategyId not in self._eg2stQueueDict or not self._isEffective[strategyId]:
+        if strategyId not in self._eg2stQueueDict or strategyId not in self._isEffective or not self._isEffective[strategyId]:
             return
         if event is None:
             return
@@ -414,8 +414,7 @@ class StrategyEngine(object):
                 
         '''
         #
-        
-    
+
     def _onApiExchange(self, apiEvent):  
         self._qteModel.updateExchange(apiEvent)
 
@@ -546,9 +545,6 @@ class StrategyEngine(object):
     def _onApiOrderDataNotice(self, apiEvent):
         # 订单信息
         self._trdModel.updateOrderData(apiEvent)
-
-        print(" 33333333333333333333 ")
-        print(apiEvent.getData())
         self._engineOrderModel.updateEpoleStarOrder(apiEvent)
         # print("++++++ 订单信息 引擎 变化 ++++++", apiEvent.getData())
         # TODO: 分块传递
@@ -556,8 +552,10 @@ class StrategyEngine(object):
         if strategyId > 0:
             self._sendEvent2Strategy(strategyId, apiEvent)
         else:
-            self._sendEvent2AllStrategy(apiEvent)
-        
+            contractNo = apiEvent.getContractNo()
+            for strategyId in self._quoteOberverDict[contractNo].keys():
+                self._sendEvent2Strategy(strategyId, apiEvent)
+
     def _onApiMatchDataQry(self, apiEvent):
         self._trdModel.updateMatchData(apiEvent)
         # print("++++++ 成交信息 引擎 查询 ++++++", apiEvent.getData())
@@ -648,6 +646,14 @@ class StrategyEngine(object):
             'Data': data,
         })
         self._sendEvent2Strategy(stragetyId, trdEvent)
+
+        # 订单恢复
+        orderEvents = self._engineOrderModel.getStrategyOrder(event.getStrategyId())
+        for orderEvent in orderEvents:
+            contractNo = orderEvent.getContractNo()
+            condition = orderEvent.getStrategyId() == 0 and stragetyId in self._quoteOberverDict[contractNo].keys()
+            if orderEvent.getStrategyId() == event.getStrategyId() or condition:
+                self._sendEvent2Strategy(stragetyId, orderEvent)
 
     #///////////////策略进程事件////////////////////////////// 
     def _addSubscribe(self, contractNo, strategyId):
