@@ -393,31 +393,39 @@ class Strategy:
             pass
 
     def _runStrategy(self):
-        # 等待回测阶段
-        self._runStatus = ST_STATUS_HISTORY
-        self._send2UIStatus(self._runStatus)
-        # runReport中会有等待
+        try:
+            # 等待回测阶段
+            self._runStatus = ST_STATUS_HISTORY
+            self._send2UIStatus(self._runStatus)
+            # runReport中会有等待
 
-        self._dataModel.runReport(self._context, self._userModule.handle_data)
+            self._dataModel.runReport(self._context, self._userModule.handle_data)
 
-        # 持续运行阶段
-        # 1. 中间阶段, 实际上还是作为历史回测
-        # 2. 真正的实时阶段
-        # self._runStatus = ST_STATUS_HISTORY
-        # self._send2UIStatus(self._runStatus)
-        #
-        while not self._isExit():
-            try:
-                event = self._triggerQueue.get_nowait()
-                # 发单方式，实时发单、k线稳定后发单。
-                self._dataModel.runRealTime(self._context, self._userModule.handle_data, event)
-            except queue.Empty as e:
-                if self._firstTriggerQueueEmpty:
-                    self._runStatus = ST_STATUS_CONTINUES
-                    self._send2UIStatus(self._runStatus)
-                    self._firstTriggerQueueEmpty = False
-                else:
-                    time.sleep(0.1)
+            # 持续运行阶段
+            # 1. 中间阶段, 实际上还是作为历史回测
+            # 2. 真正的实时阶段
+            # self._runStatus = ST_STATUS_HISTORY
+            # self._send2UIStatus(self._runStatus)
+            #
+
+            while not self._isExit():
+                try:
+                    event = self._triggerQueue.get_nowait()
+                    # 发单方式，实时发单、k线稳定后发单。
+                    self._dataModel.runRealTime(self._context, self._userModule.handle_data, event)
+                except queue.Empty as e:
+                    if self._firstTriggerQueueEmpty:
+                        self._runStatus = ST_STATUS_CONTINUES
+                        self._send2UIStatus(self._runStatus)
+                        self._firstTriggerQueueEmpty = False
+                    else:
+                        time.sleep(0.1)
+        except Exception as e:
+                self._strategyState = StrategyStatusExit
+                self._isSt2EgQueueEffective = False
+                errorText = traceback.format_exc()
+                # traceback.print_exc()
+                self._exit(-1, errorText)
 
     def _startStrategyThread(self):
         '''历史数据准备完成后，运行策略'''
