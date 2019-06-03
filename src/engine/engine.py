@@ -207,7 +207,7 @@ class StrategyEngine(object):
                 self.sendErrorMsg(-1, errorText)
 
     def _sendEvent2Strategy(self, strategyId, event):
-        if strategyId not in self._eg2stQueueDict or not self._isEffective[strategyId]:
+        if strategyId not in self._eg2stQueueDict or strategyId not in self._isEffective or not self._isEffective[strategyId]:
             return
         if event is None:
             return
