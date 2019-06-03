@@ -1442,8 +1442,8 @@ class RunWin(QuantToplevel, QuantFrame):
                 self.toSampFrame()
                 return
 
-        #self.config["Contract"] = (contractInfo,)
-        self.config["Contract"] = tuple(contractInfo)
+        self.config["Contract"] = (contractInfo,)
+        # self.config["Contract"] = tuple(contractInfo)
         self.config["Trigger"]["Cycle"] = int(cycle) if isCycle else None
         self.config["Trigger"]["Timer"] = timerFormatter if timer else None
         self.config["Trigger"]["KLine"] = True if isKLine else False
