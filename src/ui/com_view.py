@@ -462,7 +462,8 @@ class RunWin(QuantToplevel, QuantFrame):
             if len(conf[VContract]) > 1:
                 self.contract.set(conf[VContract][0] + ", ...")
             else:
-                self.contract.set(conf[VContract][0])
+                self.contract.set(conf[VContract])
+
             self.userContList = conf[VContract]
             # self.setText(self.contractInfo, conf[VContract])
 
@@ -1460,7 +1461,6 @@ class RunWin(QuantToplevel, QuantFrame):
 
         # self.config["Contract"] = (contractInfo,)
         self.config["Contract"] = tuple(contractInfo)
-        # self.config["Contract"] = tuple(contractInfo)
         self.config["Trigger"]["Cycle"] = int(cycle) if isCycle else None
         self.config["Trigger"]["Timer"] = timerFormatter if timer else None
         self.config["Trigger"]["KLine"] = True if isKLine else False
@@ -1787,7 +1787,8 @@ class SelectContractWin(QuantToplevel, QuantFrame):
         if len(self._selectCon) > 1:
             self._master.contractEntry.insert(tk.END, self._selectCon[0] + ", ...")
         else:
-            self._master.contractEntry.insert(tk.END, self._selectCon[0])
+            # self._master.contractEntry.insert(tk.END, self._selectCon[0])
+            self._master.contractEntry.insert(tk.END, self._selectCon)
         self._master.setUserContract(self._selectCon)
 
         self._master.contractEntry.config(state="disabled")
