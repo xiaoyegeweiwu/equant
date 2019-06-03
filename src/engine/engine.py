@@ -902,10 +902,15 @@ class StrategyEngine(object):
 
     def _onStrategyRemove(self, event):
         strategyId = event.getStrategyId()
+        # 还在正常运行
         if strategyId in self._isEffective and self._isEffective[strategyId]:
             self._sendEvent2StrategyForce(strategyId, event)
-        else:
+        # 停止
+        elif self._strategyMgr.getStrategyState(strategyId) == ST_STATUS_QUIT:
             self._strategyMgr.removeQuitedStrategy(event)
+        # 异常状态
+        elif self._strategyMgr.getStrategyState(strategyId) == ST_STATUS_EXCEPTION:
+            self._strategyMgr.removeExceptionStrategy(event)
 
     def _onStrategyRemoveCom(self, event):
         self._cleanStrategyInfo(event.getStrategyId())

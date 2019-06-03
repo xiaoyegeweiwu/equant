@@ -38,13 +38,17 @@ class StartegyManager(object):
     def run(strategy):
         strategy.run()
 
+    def getStrategyState(self, strategyId):
+        assert strategyId in self._strategyInfo, 'error '
+        return self._strategyInfo[strategyId]["StrategyState"]
+
     def handleStrategyException(self, event):
         strategyId = event.getStrategyId()
         if strategyId not in self._strategyInfo:
             return
         self._strategyInfo[strategyId]["StrategyState"] = ST_STATUS_EXCEPTION
-        self.destroyProcessByStrategyId(event.getStrategyId())
-        self._strategyInfo[strategyId]["Process"] = None
+        # self.destroyProcessByStrategyId(event.getStrategyId())
+        # self._strategyInfo[strategyId]["Process"] = None
 
     def create(self, strategyId, eg2stQueue, eg2uiQueue, st2egQueue, event):
         qdict = {'eg2st': eg2stQueue, 'st2eg': st2egQueue, 'st2ui':eg2uiQueue}
@@ -101,6 +105,9 @@ class StartegyManager(object):
         self.destroyProcess(self._strategyInfo[strategyId]['Process'], strategyId)
         self._strategyInfo.pop(strategyId)
         self._strategyAttribute.pop(event.getStrategyId())
+
+    def removeExceptionStrategy(self, event):
+        self.removeRunningStrategy(event)
 
     def restartStrategy(self, engineLoadFunc, event):
         assert event.getStrategyId() in self._strategyInfo, "error"
