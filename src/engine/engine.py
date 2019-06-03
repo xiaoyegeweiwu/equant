@@ -14,6 +14,7 @@ import os, json
 from collections import OrderedDict
 import traceback
 from .engine_order_model import EngineOrderModel
+from .strategy_cfg_model import StrategyConfig
 
 class StrategyEngine(object):
     '''策略引擎'''
@@ -94,6 +95,8 @@ class StrategyEngine(object):
 
     def resumeAllStrategyConfig(self, strategyConfig):
         for strategyId, strategyIni in strategyConfig.items():
+            config = StrategyConfig(strategyIni["Config"])
+            key = config.getKLineShowInfoSimple()
             fakeEvent = Event({
                 "EventCode": EV_EG2UI_LOADSTRATEGY_RESPONSE,
                 "StrategyId": int(strategyId),
@@ -103,11 +106,16 @@ class StrategyEngine(object):
                     "StrategyId": int(strategyId),
                     "StrategyName": strategyIni["StrategyName"],
                     "StrategyState": ST_STATUS_QUIT,
-
-                    # 取其ui配置
+                    "Path": strategyIni["Path"],
+                    "ContractNo": key[0],
+                    "KLineType": key[1],
+                    "KLinceSlice": key[2],
+                    "IsActualRun": config.isActualRun(),
+                    "InitialFund": config.getInitCapital(),
                     "Config": strategyIni["Config"],
+                    # 取其ui配置
+                    # "Config": strategyIni["Config"],
                     # "UIConfig": strategyIni["UIConfig"],
-                    "Path" : strategyIni["Path"]
                 }
             })
             self._eg2uiQueue.put(fakeEvent)
@@ -291,6 +299,9 @@ class StrategyEngine(object):
             self._eg2uiQueue.put(event)
         elif event.getData()["Status"] == ST_STATUS_REMOVE:
             self._onStrategyRemoveCom(event)
+        elif event.getData()["Status"] == ST_STATUS_EXCEPTION:
+            self._isEffective[event.getStrategyId()] = False
+            self._strategyMgr.handleStrategyException(event)
 
     # ////////////////api回调及策略请求事件处理//////////////////
     def _handleApiData(self):
@@ -331,7 +342,7 @@ class StrategyEngine(object):
             except Exception as e:
                 errorText = traceback.format_exc()
                 errorText = errorText + f"When handle strategy:{strategyId} in engine, EventCode: {code}. stop stratey {strategyId}!"
-                self._handleStrategyException(strategyId)
+                self._handleEngineExceptionCausedByStrategy(strategyId)
                 self.sendErrorMsg(-1, errorText)
 
             self.maxContinuousIdleTimes = 0
@@ -884,7 +895,6 @@ class StrategyEngine(object):
     def _onStrategyRemove(self, event):
         strategyId = event.getStrategyId()
         if strategyId in self._isEffective and self._isEffective[strategyId]:
-            self._isEffective[strategyId] = False
             self._sendEvent2StrategyForce(strategyId, event)
         else:
             self._strategyMgr.removeQuitedStrategy(event)
@@ -928,16 +938,16 @@ class StrategyEngine(object):
         except queue.Empty:
             pass
 
-    def _handleStrategyException(self, strategyId):
+    def _handleEngineExceptionCausedByStrategy(self, strategyId):
         self._isEffective[strategyId] = False
         self._isSt2EngineDataEffective[strategyId] = False
-        self._strategyMgr._strategyInfo[strategyId]['StrategyState'] = ST_STATUS_QUIT
+        self._strategyMgr._strategyInfo[strategyId]['StrategyState'] = ST_STATUS_EXCEPTION
         self._strategyMgr.destroyProcessByStrategyId(strategyId)
         quitEvent = Event({
             "EventCode": EV_EG2UI_STRATEGY_STATUS,
             "StrategyId": strategyId,
             "Data": {
-                "Status": ST_STATUS_QUIT,
+                "Status": ST_STATUS_EXCEPTION,
 
             }
         })

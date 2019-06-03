@@ -38,6 +38,14 @@ class StartegyManager(object):
     def run(strategy):
         strategy.run()
 
+    def handleStrategyException(self, event):
+        strategyId = event.getStrategyId()
+        if strategyId not in self._strategyInfo:
+            return
+        self._strategyInfo[strategyId]["StrategyState"] = ST_STATUS_EXCEPTION
+        self.destroyProcessByStrategyId(event.getStrategyId())
+        self._strategyInfo[strategyId]["Process"] = None
+
     def create(self, strategyId, eg2stQueue, eg2uiQueue, st2egQueue, event):
         qdict = {'eg2st': eg2stQueue, 'st2eg': st2egQueue, 'st2ui':eg2uiQueue}
         strategy = Strategy(self.logger, strategyId, qdict, event)
@@ -121,7 +129,7 @@ class StartegyManager(object):
     def isAllStrategyQuit(self):
         result = True
         for k, v in self._strategyInfo.items():
-            if v["StrategyState"] != ST_STATUS_QUIT:
+            if v["StrategyState"] != ST_STATUS_QUIT and v["StrategyState"] != ST_STATUS_EXCEPTION:
                 result = False
                 break
         # print("now is equant exit complete ", result)
@@ -154,7 +162,9 @@ class StartegyManager(object):
 
     def getStrategyConfig(self):
         result = {}
-        for strategyId, _ in self._strategyInfo.items():
+        for strategyId, value in self._strategyInfo.items():
+            if value["StrategyState"] == ST_STATUS_EXCEPTION:
+                continue
             v = self._strategyAttribute[strategyId]
             result[strategyId] = {
                 "Config":v["Config"],
