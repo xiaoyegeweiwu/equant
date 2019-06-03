@@ -38,6 +38,14 @@ class StartegyManager(object):
     def run(strategy):
         strategy.run()
 
+    def handleStrategyException(self, event):
+        strategyId = event.getStrategyId()
+        if strategyId not in self._strategyInfo:
+            return
+        self._strategyInfo[strategyId]["StrategyState"] = ST_STATUS_EXCEPTION
+        self.destroyProcessByStrategyId(event.getStrategyId())
+        self._strategyInfo[strategyId]["Process"] = None
+
     def create(self, strategyId, eg2stQueue, eg2uiQueue, st2egQueue, event):
         qdict = {'eg2st': eg2stQueue, 'st2eg': st2egQueue, 'st2ui':eg2uiQueue}
         strategy = Strategy(self.logger, strategyId, qdict, event)
@@ -121,7 +129,7 @@ class StartegyManager(object):
     def isAllStrategyQuit(self):
         result = True
         for k, v in self._strategyInfo.items():
-            if v["StrategyState"] != ST_STATUS_QUIT:
+            if v["StrategyState"] != ST_STATUS_QUIT and v["StrategyState"] != ST_STATUS_EXCEPTION:
                 result = False
                 break
         # print("now is equant exit complete ", result)
@@ -154,7 +162,9 @@ class StartegyManager(object):
 
     def getStrategyConfig(self):
         result = {}
-        for strategyId, _ in self._strategyInfo.items():
+        for strategyId, value in self._strategyInfo.items():
+            if value["StrategyState"] == ST_STATUS_EXCEPTION:
+                continue
             v = self._strategyAttribute[strategyId]
             result[strategyId] = {
                 "Config":v["Config"],
@@ -393,31 +403,39 @@ class Strategy:
             pass
 
     def _runStrategy(self):
-        # 等待回测阶段
-        self._runStatus = ST_STATUS_HISTORY
-        self._send2UIStatus(self._runStatus)
-        # runReport中会有等待
+        try:
+            # 等待回测阶段
+            self._runStatus = ST_STATUS_HISTORY
+            self._send2UIStatus(self._runStatus)
+            # runReport中会有等待
 
-        self._dataModel.runReport(self._context, self._userModule.handle_data)
+            self._dataModel.runReport(self._context, self._userModule.handle_data)
 
-        # 持续运行阶段
-        # 1. 中间阶段, 实际上还是作为历史回测
-        # 2. 真正的实时阶段
-        # self._runStatus = ST_STATUS_HISTORY
-        # self._send2UIStatus(self._runStatus)
-        #
-        while not self._isExit():
-            try:
-                event = self._triggerQueue.get_nowait()
-                # 发单方式，实时发单、k线稳定后发单。
-                self._dataModel.runRealTime(self._context, self._userModule.handle_data, event)
-            except queue.Empty as e:
-                if self._firstTriggerQueueEmpty:
-                    self._runStatus = ST_STATUS_CONTINUES
-                    self._send2UIStatus(self._runStatus)
-                    self._firstTriggerQueueEmpty = False
-                else:
-                    time.sleep(0.1)
+            # 持续运行阶段
+            # 1. 中间阶段, 实际上还是作为历史回测
+            # 2. 真正的实时阶段
+            # self._runStatus = ST_STATUS_HISTORY
+            # self._send2UIStatus(self._runStatus)
+            #
+
+            while not self._isExit():
+                try:
+                    event = self._triggerQueue.get_nowait()
+                    # 发单方式，实时发单、k线稳定后发单。
+                    self._dataModel.runRealTime(self._context, self._userModule.handle_data, event)
+                except queue.Empty as e:
+                    if self._firstTriggerQueueEmpty:
+                        self._runStatus = ST_STATUS_CONTINUES
+                        self._send2UIStatus(self._runStatus)
+                        self._firstTriggerQueueEmpty = False
+                    else:
+                        time.sleep(0.1)
+        except Exception as e:
+                self._strategyState = StrategyStatusExit
+                self._isSt2EgQueueEffective = False
+                errorText = traceback.format_exc()
+                # traceback.print_exc()
+                self._exit(-1, errorText)
 
     def _startStrategyThread(self):
         '''历史数据准备完成后，运行策略'''

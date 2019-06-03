@@ -661,6 +661,7 @@ class StrategyHisQuote(object):
                     "Status": ST_STATUS_CONTINUES
                 }
             })
+            # print("[on his quote notice]填充k线到队列", data["KLineIndex"], data)
             self._strategy.sendTriggerQueue(event)
             return
 
@@ -673,7 +674,7 @@ class StrategyHisQuote(object):
             "KLineType": key[1],
             "KLineSlice": key[2],
             'Data': {
-                "Data":data,
+                "Data": data,
                 "TradeDate": data["TradeDate"],
                 "DateTimeStamp": data["DateTimeStamp"],
             }
@@ -720,7 +721,12 @@ class StrategyHisQuote(object):
     def onHisQuoteNotice(self, event):
         key = (event.getContractNo(), event.getKLineType(), event.getKLineSlice())
         kindInfo = {"ContractNo": key[0], "KLineType": key[1], "KLineSlice": key[2]}
-        # print(kindInfo, len(event.getData()), event.getData()[0]["DateTimeStamp"])
+
+        # 丢掉
+        if not self._kLineRspData[key]["KLineReady"]:
+            return
+
+        # print("[on his quote notice ]", kindInfo, len(event.getData()), event.getData()[0]["DateTimeStamp"])
         assert kindInfo in self._config.getKLineKindsInfo(), " Error "
         localDataList = self._kLineNoticeData[key]['KLineData']
         self._handleKLineNoticeData(localDataList, event)
@@ -969,6 +975,7 @@ class StrategyHisQuote(object):
         key = (event.getContractNo(), event.getKLineType(), event.getKLineSlice())
         data = event.getData()["Data"]
         self._updateCurBar(key, data)
+        # print("[run fill data] ", data["KLineIndex"], data)
         if self._config.hasKLineTrigger() and key == self._config.getKLineShowInfoSimple():
             self._updateRealTimeKLine(key, data)
         # print(self._strategy.isRealTimeStatus(), self._strategy._runStatus, self._strategy._runRealTimeStatus, self._strategy.isRealTimeAsHisStatus())

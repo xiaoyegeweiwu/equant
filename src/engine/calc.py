@@ -788,7 +788,7 @@ class CalcCenter(object):
         :param contract: 合约
         :return: 持仓盈亏
         """
-        if contract is None:
+        if not contract:
             profit = 0
             for pInfo in self._positions.values():
                 profit += pInfo["HoldProfit"]
@@ -815,7 +815,7 @@ class CalcCenter(object):
         :param contract: 合约
         :return: 持仓保证金
         """
-        if contract is None:   # 全部合约
+        if not contract:   # 全部合约
             margin = 0
             for pInfo in self._positions.values():
                 margin += pInfo["LongMargin"]
