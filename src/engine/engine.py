@@ -61,9 +61,9 @@ class StrategyEngine(object):
         self._isSt2EngineDataEffective= {}
         
         # 即时行情订阅列表
-        self._contStrategyDict = {} #{'contractNo' : [strategyId1, strategyId2...]}
+        self._quoteOberverDict = {} #{'contractNo' : [strategyId1, strategyId2...]}
         # 历史K线订阅列表
-        self._hisContStrategyDict = {} #{'contractNo' : [strategyId1, strategyId2...]}
+        self._hisKLineOberverDict = {} #{'contractNo' : [strategyId1, strategyId2...]}
 
         # 恢复上次推出时保存的结构
         self._strategyOrder = {}
@@ -142,7 +142,7 @@ class StrategyEngine(object):
             EEQU_SRVEVENT_TRADE_USERQRY     : self._onApiUserInfo              ,
             EEQU_SRVEVENT_TRADE_LOGINNOTICE : self._onApiLoginInfo             ,
             EEQU_SRVEVENT_TRADE_ORDERQRY    : self._onApiOrderDataQry          ,
-            EEQU_SRVEVENT_TRADE_ORDER       : self._onApiOrderData             ,
+            EEQU_SRVEVENT_TRADE_ORDER       : self._onApiOrderDataNotice             ,
             EEQU_SRVEVENT_TRADE_MATCHQRY    : self._onApiMatchDataQry           ,
             EEQU_SRVEVENT_TRADE_MATCH       : self._onApiMatchData             ,
             EEQU_SRVEVENT_TRADE_POSITQRY    : self._onApiPosDataQry            ,
@@ -227,7 +227,7 @@ class StrategyEngine(object):
         '''分发即时行情'''
         apiData = apiEvent.getData()
         contractNo = apiEvent.getContractNo()
-        contStList = self._contStrategyDict[contractNo]
+        contStList = self._quoteOberverDict[contractNo]
         
         data = apiData[:]
         
@@ -381,8 +381,10 @@ class StrategyEngine(object):
     #////////////////api回调事件//////////////////////////////
     def _onApiConnect(self, apiEvent):
         self._pyApi.reqExchange(Event({'StrategyId':0, 'Data':''}))
+        self._eg2uiQueue.put(apiEvent)
         
     def _onApiDisconnect(self, apiEvent):
+        self._eg2uiQueue.put(apiEvent)
         '''
         断连事件：区分与9.5/交易/即时行情/历史行情
             1. 与9.5断连：
@@ -485,10 +487,10 @@ class StrategyEngine(object):
 
         # 推送数据，分发
         key = (apiEvent.getContractNo(), apiEvent.getKLineType(), apiEvent.getKLineSlice())
-        if key not in self._hisContStrategyDict:
+        if key not in self._hisKLineOberverDict:
             return
 
-        stDict = self._hisContStrategyDict[key]
+        stDict = self._hisKLineOberverDict[key]
         for key in stDict:
             event.setStrategyId(key)
             self._sendEvent2Strategy(key, event)
@@ -528,25 +530,25 @@ class StrategyEngine(object):
         
     def _onApiOrderDataQry(self, apiEvent):
         self._trdModel.updateOrderData(apiEvent)
-        # print("++++++ 订单信息 引擎 查询 ++++++", apiEvent.getData())
-        # TODO: 分块传递
-        self._sendEvent2AllStrategy(apiEvent)
+        # 获取关联的策略id和订单id
         self._engineOrderModel.updateEpoleStarOrder(apiEvent)
-
         if not apiEvent.isChainEnd():
             return
         if not apiEvent.isSucceed():
             return
-            
+
         self._trdModel.setStatus(TM_STATUS_ORDER)
         # 查询所有账户下成交信息
         eventList = self._trdModel.getMatchEvent()
         for event in eventList:
             self._reqMatch(event)
         
-    def _onApiOrderData(self, apiEvent):
+    def _onApiOrderDataNotice(self, apiEvent):
         # 订单信息
         self._trdModel.updateOrderData(apiEvent)
+
+        print(" 33333333333333333333 ")
+        print(apiEvent.getData())
         self._engineOrderModel.updateEpoleStarOrder(apiEvent)
         # print("++++++ 订单信息 引擎 变化 ++++++", apiEvent.getData())
         # TODO: 分块传递
@@ -649,7 +651,7 @@ class StrategyEngine(object):
 
     #///////////////策略进程事件////////////////////////////// 
     def _addSubscribe(self, contractNo, strategyId):
-        stDict = self._contStrategyDict[contractNo]
+        stDict = self._quoteOberverDict[contractNo]
         # 重复订阅
         if strategyId in stDict:
             return
@@ -676,13 +678,13 @@ class StrategyEngine(object):
         
         subList = []
         for contractNo in contractList:
-            if contractNo not in self._contStrategyDict:
+            if contractNo not in self._quoteOberverDict:
                 subList.append(contractNo)
-                self._contStrategyDict[contractNo] = {strategyId:None}
+                self._quoteOberverDict[contractNo] = {strategyId:None}
             else:
-                if strategyId in self._contStrategyDict[contractNo]:
+                if strategyId in self._quoteOberverDict[contractNo]:
                     continue  # 重复订阅，不做任何处理
-                self._contStrategyDict[contractNo][strategyId] = None
+                self._quoteOberverDict[contractNo][strategyId] = None
                 self._sendQuote(contractNo, strategyId)
         
         if len(subList) > 0:
@@ -696,9 +698,9 @@ class StrategyEngine(object):
         
         unSubList = []
         for contNo in contractList:
-            if contNo not in self._contStrategyDict:
+            if contNo not in self._quoteOberverDict:
                 continue #该合约没有订阅
-            stDict = self._contStrategyDict[contNo]
+            stDict = self._quoteOberverDict[contNo]
             if strategyId not in stDict:
                 continue #该策略没有订阅
             stDict.pop(strategyId)
@@ -724,10 +726,10 @@ class StrategyEngine(object):
         strategyId = event.getStrategyId()
         key = (data['ContractNo'], data['KLineType'], data['KLineSlice'])
 
-        if key not in self._hisContStrategyDict:
-            self._hisContStrategyDict[key] = {}
+        if key not in self._hisKLineOberverDict:
+            self._hisKLineOberverDict[key] = {}
 
-        self._hisContStrategyDict[key].update({strategyId:True})
+        self._hisKLineOberverDict[key].update({strategyId:True})
         self._pyApi.reqSubHisquote(event)
 
     def _reqUnsubHisquote(self, event):
@@ -736,9 +738,9 @@ class StrategyEngine(object):
         data = event.getData()
 
         key = (data['ContractNo'], data['KLineType'], data['KLineSlice'])
-        if key not in self._hisContStrategyDict or strategyId not in self._hisContStrategyDict[key]:
+        if key not in self._hisKLineOberverDict or strategyId not in self._hisKLineOberverDict[key]:
             return
-        stDict = self._hisContStrategyDict[key]
+        stDict = self._hisKLineOberverDict[key]
         stDict.pop(strategyId)
         
     def _reqKLineStrategySwitch(self, event):
@@ -858,7 +860,7 @@ class StrategyEngine(object):
     # 当策略退出成功时
     def _cleanStrategyInfo(self, strategyId):
         # 清除即时行情数据观察者
-        for k, v in self._contStrategyDict.items():
+        for k, v in self._quoteOberverDict.items():
             if strategyId in v:
                 v.pop(strategyId)
         # 策略停止，通知9.5清理数据
