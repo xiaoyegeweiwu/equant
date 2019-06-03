@@ -1173,7 +1173,7 @@ class BaseApi(object):
     def StartTrade(self):
         '''
         【说明】
-              开启交易。
+              开启实盘交易。
 
         【语法】
               void StartTrade()
@@ -1193,7 +1193,7 @@ class BaseApi(object):
     def StopTrade(self):
         '''
         【说明】
-              暂停交易。
+              暂停实盘交易。
 
         【语法】
               void StopTrade()
@@ -1209,6 +1209,26 @@ class BaseApi(object):
 
         '''
         return self._dataModel.setStopTrade()
+
+    def IsTradeAllowed(self):
+        '''
+        【说明】
+              是否允许实盘交易。
+
+        【语法】
+              bool IsTradeAllowed()
+
+        【参数】
+              无
+
+        【备注】
+              获取策略是否可以向实盘发单的布尔值，允许向实盘发单返回True，否则返回False。
+
+        【示例】
+              无
+
+        '''
+        return self._dataModel.isTradeAllowed()
 
     #/////////////////////////属性函数/////////////////////////////
     def BarInterval(self):
@@ -1393,13 +1413,16 @@ class BaseApi(object):
               index 交易时间段的索引值, 从0开始。
 
         【备注】
-              返回浮点数
+              返回指定合约的交易时间段结束时间，格式为0.HHMMSS的浮点数。
 
         【示例】
               contractNo = "ZCE|F|SR|905"
               sessionCount = GetSessionCount(contractNo)
               for i in range(0, sessionCount-1):
                 sessionEndTime = GetSessionEndTime(contractNo, i)
+
+              由于合约ZCE|F|TA|908的第三段交易结束时间为11:30:00，
+              所以GetSessionEndTime("ZCE|F|TA|908", 2)的返回值为0.113
         '''
         return self._dataModel.getSessionEndTime(contractNo, index)
 
@@ -1416,32 +1439,32 @@ class BaseApi(object):
               index 交易时间段的索引值, 从0开始。
 
         【备注】
-              返回浮点数
+              返回指定合约的交易时间段开始时间，格式为0.HHMMSS的浮点数。
 
         【示例】
               无
         '''
         return self._dataModel.getGetSessionStartTime(contractNo, index)
 
-    def GetNextTimeInfo(self, contractNo, timeStr):
+    def GetNextTimeInfo(self, contractNo, timeStamp):
         '''
         【说明】
               获取指定合约指定时间点的下一个时间点及交易状态。
 
         【语法】
-              dict GetNextTimeInfo(contractNo, timeStr)
+              dict GetNextTimeInfo(string contractNo, float timeStamp)
 
         【参数】
               contractNo 合约编号，为空时，取基准合约。
-              timeStr 指定的时间点，格式为HH:MM:SS。
+              timeStr 指定的时间点，格式为0.HHMMSS。
 
         【备注】
               返回时间字典，结构如下：
               {
-                'Time' : 210000000,
+                'Time' : 0.21,
                 'TradeState' : 3
               }
-              其中Time对应的值表示指定时间timeStr的下一个时间点，数据格式为整数，例如210000000表示格式化的时间为21:00:00.000
+              其中Time对应的值表示指定时间timeStamp的下一个时间点，返回指定合约的交易时间段开始时间，格式为0.HHMMSS的浮点数。
               TradeState表示对应时间点的交易状态，数据类型为字符，可能出现的值及相应的状态含义如下：
                 1 : 集合竞价
                 2 : 集合竞价撮合
@@ -1456,13 +1479,32 @@ class BaseApi(object):
               异常情况返回为空字典：{}
 
         【示例】
-              GetNextTimeInfo('SHFE|F|CU|1907', '22:00:00') # 获取22:00:00后下一个时间点的时间和交易状态
+              GetNextTimeInfo('SHFE|F|CU|1907', 0.22) # 获取22:00:00后下一个时间点的时间和交易状态
               获取当前时间下一个时间点的时间和交易状态
               import time # 需要在策略头部添加time库
-              curTime = time.strftime('%H:%M:%S',time.localtime(time.time()))
+              curTime = time.strftime('0.%H%M%S',time.localtime(time.time()))
               timeInfoDict = GetNextTimeInfo("SHFE|F|CU|1907", curTime)
         '''
-        return self._dataModel.getNextTimeInfo(contractNo, timeStr)
+        return self._dataModel.getNextTimeInfo(contractNo, timeStamp)
+
+    def CurrentTime(self):
+        '''
+        【说明】
+              获取操作系统的当前时间。
+
+        【语法】
+              float CurrentTime()
+
+        【参数】
+              无
+
+        【备注】
+              获取操作系统的当前时间，格式为0.HHMMSS的浮点数。
+
+        【示例】
+              如果当前时间为11:34:21，CurrentTime返回值为0.113421。
+        '''
+        return self._dataModel.getCurrentTime()
 
     def MarginRatio(self, contractNo):
         '''
@@ -5810,6 +5852,9 @@ def StartTrade():
 
 def StopTrade():
     return baseApi.StopTrade()
+
+def IsTradeAllowed():
+    return baseApi.IsTradeAllowed()
     
 # 枚举函数
 def Enum_Buy():
@@ -6110,6 +6155,9 @@ def GetSessionStartTime(contractNo='', index=0):
 
 def GetNextTimeInfo(contractNo, timeStr):
     return baseApi.GetNextTimeInfo(contractNo, timeStr)
+
+def CurrentTime():
+    return baseApi.CurrentTime()
 
 def MarginRatio(contractNo=''):
     return baseApi.MarginRatio(contractNo)

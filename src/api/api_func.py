@@ -64,8 +64,9 @@ _all_func_ = {
                     ['BuyToCover'          , '空头平仓'],
                     ['Sell'                , '多头平仓'],
                     ['SellShort'           , '空头建仓'],
-                    ['StartTrade'          , '开启交易'],
-                    ['StopTrade'           , '暂停交易'],
+                    ['StartTrade'          , '开启实盘交易'],
+                    ['StopTrade'           , '暂停实盘交易'],
+                    ['IsTradeAllowed'      , '是否允许实盘交易'],
                 ],
                 
     '属性函数': [
@@ -77,9 +78,10 @@ _all_func_ = {
                     ['ExchangeName'        , '交易所名称'],
                     # ['ExpiredDate'         , '最后交易日'],
                     ['GetSessionCount'     , '交易时段个数'],
-                    ['GetSessionEndTime'   , '交易时段结束时间'],
                     ['GetSessionStartTime' , '交易时段起始时间'],
+                    ['GetSessionEndTime'   , '交易时段结束时间'],
                     ['GetNextTimeInfo'     , '获取下一个时间点信息'],
+                    ['CurrentTime'         , '获取当前时间'],
                     ['MarginRatio'         , '保证金比例'],
                     ['MaxBarsBack'         , '最大回溯Bar数'],
                     ['MaxSingleTradeSize'  , '单笔交易限量'],
