@@ -463,7 +463,6 @@ class RunWin(QuantToplevel, QuantFrame):
                 self.contract.set(conf[VContract][0] + ", ...")
             else:
                 self.contract.set(conf[VContract])
-
             self.userContList = conf[VContract]
             # self.setText(self.contractInfo, conf[VContract])
 
@@ -579,6 +578,7 @@ class RunWin(QuantToplevel, QuantFrame):
         return self.userContList
 
     def setUserContract(self, contList):
+        """设置用户所选数据合约"""
         self.userContList = contList
 
     def setPos(self):
@@ -1377,7 +1377,6 @@ class RunWin(QuantToplevel, QuantFrame):
         #     return
         # else:
         #     contractInfo = (contract.rstrip(", ")).split(", ")
-
         contractInfo = self.userContList
 
         timer = self.timerText.get('1.0', "end-1c")   # 时间
@@ -1461,6 +1460,7 @@ class RunWin(QuantToplevel, QuantFrame):
 
         # self.config["Contract"] = (contractInfo,)
         self.config["Contract"] = tuple(contractInfo)
+
         self.config["Trigger"]["Cycle"] = int(cycle) if isCycle else None
         self.config["Trigger"]["Timer"] = timerFormatter if timer else None
         self.config["Trigger"]["KLine"] = True if isKLine else False
@@ -1614,6 +1614,7 @@ class RunWin(QuantToplevel, QuantFrame):
             }
         }
 
+        # print("config: ", self.config)
         # 将配置信息保存到本地文件
         self.writeConfig(userConfig)
 
@@ -1755,6 +1756,7 @@ class SelectContractWin(QuantToplevel, QuantFrame):
         #     for contract in contractInfo:
         #         self._selectCon.append(contract)
         #         self.contractText.setText(contract)
+
         for contract in contractText:
             self._selectCon.append(contract)
             self.contractText.setText(contract)
@@ -1781,6 +1783,7 @@ class SelectContractWin(QuantToplevel, QuantFrame):
     def enter(self):
         self._master.contractEntry.config(state="normal")
         self._master.contractEntry.delete('0', tk.END)
+
         # 多合约
         # for con in self._selectCon:
         #     self._master.contractEntry.insert(tk.END, con)
