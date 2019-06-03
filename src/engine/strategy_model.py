@@ -93,6 +93,7 @@ class StrategyModel(object):
             "KLineSlice": 1,  # todo
             "TradeDot": self.getContractUnit(contNo),  # 每手乘数
             "PriceTick": self.getPriceScale(contNo),  # 最小变动价位
+            "Limit":self._config.getLimit(),
         }
         self._calcCenter.initArgs(strategyParam)
 
