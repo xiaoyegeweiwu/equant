@@ -1568,6 +1568,14 @@ class StrategyModel(object):
         '''获得当前持仓的第一个建仓位置的日期'''
         return self.getFirstOpenOrderInfo(contNo, 'TradeDate')
 
+    def getBuyPosition(self, contNo):
+        '''获得当前持仓的买入方向的持仓量'''
+        return self.getPositionValue(contNo, 'TotalBuy')
+
+    def getSellPosition(self, contNo):
+        '''当前持仓的卖出持仓量'''
+        return self.getPositionValue(contNo, 'TotalSell')
+
     def getEntryPrice(self, contNo):
         '''获得当前持仓的第一次建仓的委托价格'''
         return self.getFirstOpenOrderInfo(contNo, 'OrderPrice')
