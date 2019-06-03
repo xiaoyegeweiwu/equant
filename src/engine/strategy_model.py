@@ -1644,6 +1644,8 @@ class StrategyModel(object):
         return fundRecordDict['DynamicEquity']
 
     def getFloatProfit(self, contNo):
+        if not contNo:
+            contNo = self._cfgModel.getBenchmark()
         return self._calcCenter._getHoldProfit(contNo)
 
     def getGrossLoss(self):

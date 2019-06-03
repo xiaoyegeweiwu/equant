@@ -2110,13 +2110,13 @@ class BaseApi(object):
     def FloatProfit(self, contractNo):
         '''
         【说明】
-              返回某个合约或者所有合约的浮动盈亏。
+              返回指定合约的浮动盈亏。
 
         【语法】
               float FloatProfit(string contractNo)
 
         【参数】
-              contractNo 合约编号，为空时返回所有合约的浮动盈亏。
+              contractNo 合约编号，为空时返回基准合约的浮动盈亏。
 
         【备注】
               无
@@ -2167,13 +2167,13 @@ class BaseApi(object):
     def Margin(self, contractNo):
         '''
         【说明】
-              返回某个合约或者所有合约的持仓保证金。
+              返回指定合约的持仓保证金。
 
         【语法】
               float Margin(string contractNo)
 
         【参数】
-              contractNo 合约编号，为空时返回所有合约的浮动盈亏。
+              contractNo 合约编号，为空时返回基准合约的浮动盈亏。
 
         【备注】
               无
