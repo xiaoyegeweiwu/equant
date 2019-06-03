@@ -97,7 +97,9 @@ def handle_data(context):
 
     barsinfo = HisBarsInfo()
 
-    if len(barsinfo) < fsLength:
+    bslen = len(barsinfo)
+
+    if bslen < fsLength:
         return
 
     op = barsinfo[-1]["OpeningPrice"]
@@ -120,7 +122,8 @@ def handle_data(context):
     TurtleUnits = int(TurtleUnits)
     maxUnites = int(Available()/(high*ContractUnit()))
     TurtleUnits = min(maxUnites , TurtleUnits)
-    LogInfo("avl:%f, mar:%f, conu:%f, tu:%f, N:%f, mp:%f\n" %(Available(), Margin(), ContractUnit(), TurtleUnits, N, MinPoint))
+    LogInfo("avl:%f, mar:%f, conu:%f, tu:%f, N:%f, mp:%f, cidx:%d, bslen:%d\n" \
+        %(Available(), Margin(), ContractUnit(), TurtleUnits, N, MinPoint, CurrentBar(), bslen))
 
     DonchianHi   = ta.MAX(highs[:-1], timeperiod=boLength)[-1]
     DonchianLo   = ta.MIN(lows[:-1],  timeperiod=boLength)[-1]

@@ -69,12 +69,17 @@ class CalcCenter(object):
         # TODO: setExpertSetting外部调用比较合适
         # self._setExpertSetting()
 
+        # limits
+        self._limit = {}            # 下单限制
+
+
     def initArgs(self, args):
         """初始化参数"""
         self._strategy = args
         self._setProfitInitialFundInfo(int(self._strategy["InitialFunds"]) - self._runSet["StartFund"])
         self._setExpertSetting()
         self._curTradeDate = self._strategy["StartTime"]
+        self._limit = self._strategy["Limit"]
 
     def _updateTradeDate(self, Time):
         """更新当前交易日信息"""
