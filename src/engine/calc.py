@@ -75,7 +75,6 @@ class CalcCenter(object):
 
     def initArgs(self, args):
         """初始化参数"""
-        print("1111111111111111111: ", args)
         self._strategy = args
         self._setProfitInitialFundInfo(int(self._strategy["InitialFunds"]) - self._runSet["StartFund"])
         self._setExpertSetting()
