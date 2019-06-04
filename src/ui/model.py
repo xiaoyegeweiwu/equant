@@ -4,6 +4,8 @@ import threading
 import copy
 
 import traceback
+import queue
+
 from utils.utils import load_file
 from capi.com_types import *
 from capi.event import Event
@@ -259,7 +261,10 @@ class GetEgData(object):
             EEQU_SRVEVENT_EXCHANGE:         self._onEgExchangeInfo,
             EEQU_SRVEVENT_COMMODITY:        self._onEgCommodityInfo,
             EEQU_SRVEVENT_CONTRACT:         self._onEgContractInfo,
-            EEQU_SRVEVENT_TRADE_USERQRY:    self._onEgUserInfo
+            EEQU_SRVEVENT_TRADE_USERQRY:    self._onEgUserInfo,
+
+            EEQU_SRVEVENT_CONNECT:          self._onEgConnect,
+            EEQU_SRVEVENT_DISCONNECT:       self._onEgDisconnect
         }
 
     # TODO: event.getChian()的类型为字符串：'1', '0'
@@ -343,12 +348,22 @@ class GetEgData(object):
                 self._stManager.removeStrategy(id)
                 # 更新界面
                 self._app.delUIStrategy(id)
+
+    def _onEgConnect(self, event):
+        src = event.getEventSrc()
+        self._app.setConnect(src)
+
+    def _onEgDisconnect(self, event):
+        src = event.getEventSrc()
+        self._app.setDisconnect(src)
                 
     def handlerExit(self):
         self._eg2uiQueue.put(Event({"EventCode":999}))
         self._logger.info("handlerExit")
 
     def handlerEgEvent(self):
+        # 如果不给出超时则会导致线程退出时阻塞
+
         try:
             # 如果不给出超时则会导致线程退出时阻塞
             event = self._eg2uiQueue.get(timeout=0.1)
@@ -357,7 +372,7 @@ class GetEgData(object):
                 self._logger.error("Unknown engine event(%d)" % (eventCode))
             else:
                 self._egAskCallbackDict[eventCode](event)
-        except:
+        except queue.Empty:
             pass
 
     def getReportData(self):
