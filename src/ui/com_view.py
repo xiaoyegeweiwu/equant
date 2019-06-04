@@ -437,8 +437,8 @@ class RunWin(QuantToplevel, QuantFrame):
 
     def setDefaultConfigure(self):
         conf = self.getTextConfigure()
-        # if conf:
-        if None:
+        if conf:
+        # if None:
             # self.user.set(conf[VUser]),
             self.initFund.set(conf[VInitFund]),
             self.defaultType.set(conf[VDefaultType]),
@@ -484,7 +484,8 @@ class RunWin(QuantToplevel, QuantFrame):
             self.canClose.set(conf[VCanClose]),
             self.canOpen.set(conf[VCanOpen]),
 
-        if True:
+        # if True:
+        else:
             # 设置默认值
             self.isCycle.set(0),
             self.cycle.set(200),
@@ -1441,8 +1442,8 @@ class RunWin(QuantToplevel, QuantFrame):
                 self.toSampFrame()
                 return
 
-        self.config["Contract"] = (contractInfo,)
-        # self.config["Contract"] = tuple(contractInfo)
+        #self.config["Contract"] = (contractInfo,)
+        self.config["Contract"] = tuple(contractInfo)
         self.config["Trigger"]["Cycle"] = int(cycle) if isCycle else None
         self.config["Trigger"]["Timer"] = timerFormatter if timer else None
         self.config["Trigger"]["KLine"] = True if isKLine else False

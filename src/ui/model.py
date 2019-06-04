@@ -336,7 +336,7 @@ class GetEgData(object):
             self._app.updateStatus(id, dataDict)
             if sStatus == ST_STATUS_QUIT:
                 # 策略停止时接收策略数据
-                self._stManager.addResultData(id, event.getData()["TestResult"])
+                self._stManager.addResultData(id, event.getData()["Result"])
             if sStatus == ST_STATUS_REMOVE:
                 # 删除策略需要接到通知之后再进行删除
                 # 将策略管理器中的该策略也删除掉

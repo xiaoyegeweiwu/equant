@@ -47,6 +47,12 @@ class StrategyModel(object):
     def getConfigData(self):
         return self._cfgModel.getConfig()
 
+    def getConfigTimer(self):
+        return self._cfgModel.getTimerTrigger()
+
+    def getConfigCycle(self):
+        return self._cfgModel.getCycleTrigger()
+
     def getConfigModel(self):
         return self._cfgModel
 
@@ -138,8 +144,8 @@ class StrategyModel(object):
     def continueTrigger(self):
         return self._cfgModel.continues()
 
-    #++++++++++++++++++++++base api接口++++++++++++++++++++++++++
-    #////////////////////////K线函数/////////////////////////////
+    # ++++++++++++++++++++++base api接口++++++++++++++++++++++++++
+    # ////////////////////////K线函数/////////////////////////////
     def getKey(self, contNo, kLineType, kLineValue):
         #空合约取默认展示的合约
         if contNo == "" or kLineType =='' or kLineValue == 0:
@@ -214,6 +220,10 @@ class StrategyModel(object):
     def getHisData(self, dataType, kLineType, kLineValue, contractNo, maxLength):
         multiContKey = self.getKey(contractNo, kLineType, kLineValue)
         return self._hisModel.getHisData(dataType, multiContKey, maxLength)
+
+    def getHisBarsInfo(self, contNo, kLineType, kLineValue, maxLength):
+        multiContKey = self.getKey(contNo, kLineType, kLineValue)
+        return self._hisModel.getHisBarsInfo(multiContKey, maxLength)
 
     # ////////////////////////即时行情////////////////////////////
     def getQUpdateTime(self, symbol):
@@ -405,15 +415,15 @@ class StrategyModel(object):
         
         self._strategy.sendEvent2Engine(signalNoticeEvent)
 
-    # def deleteOrder(self, contractNo):
-    #     pass
+    def setStartTrade(self):
+        self._cfgModel.setPending(False)
+
+    def setStopTrade(self):
+        self._cfgModel.setPending(True)
 
     #////////////////////////设置函数////////////////////////////
     def getConfig(self):
         return self._cfgModel._metaData
-
-    def setSetBenchmark(self, symbolTuple):
-        self._cfgModel.setContract(symbolTuple)
 
     def addUserNo(self, userNo):
         self._cfgModel.addUserNo(userNo)
@@ -509,6 +519,9 @@ class StrategyModel(object):
     def getAccountId(self):
         return self._trdModel.getAccountId()
 
+    def getAllPositionSymbol(self):
+        return self._trdModel.getAllPositionSymbol()
+
     def getCost(self):
         return self._trdModel.getCost()
 
@@ -520,6 +533,9 @@ class StrategyModel(object):
 
     def getProfitLoss(self):
         return self._trdModel.getProfitLoss()
+
+    def getCoverProfit(self):
+        return self._trdModel.getCoverProfit()
 
     def getTotalFreeze(self):
         return self._trdModel.getTotalFreeze()
@@ -620,6 +636,11 @@ class StrategyModel(object):
             "CurBarIndex"    : curBarIndex #
         }
 
+        if entryOrExit in (oCover, oCoverT):
+            isVaildOrder = self._calcCenter.coverJudge(orderParam)
+            if isVaildOrder < 0:
+                return ""
+
         key = (triggerInfo['ContractNo'], triggerInfo['KLineType'], triggerInfo['KLineSlice'])
         isSendSignal = self._config.hasKLineTrigger() and key == self._config.getKLineShowInfoSimple()
         # K线触发，发送信号
@@ -633,6 +654,10 @@ class StrategyModel(object):
         
     def sendOrder(self, userNo, contNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty):
         '''A账户下单函数，不经过calc模块，不产生信号，直接发单'''
+        # 是否暂停实盘下单
+        if self._cfgModel.getPending():
+            return -5, "用户调用StartTrade方法停止实盘下单功能"
+
         # 发送下单信号,K线触发、即时行情触发
         # 未选择实盘运行
         if not self._cfgModel.isActualRun():
@@ -965,7 +990,8 @@ class StrategyModel(object):
         
     def setPlotText(self, value, text, color, main, barsback):
         main = '0' if main else '1'
-        curBar = self._hisModel.getCurBar()  
+        curBar = self._hisModel.getCurBar()
+
         klineIndex = curBar['KLineIndex'] - barsback
         if klineIndex <= 0:
             return
@@ -994,11 +1020,11 @@ class StrategyModel(object):
 
         self._plotNumeric(self._textName, np.nan, 0, main, EEQU_ISNOT_AXIS, EEQU_TEXT, barsback, data)
         
-    def setPlotIcon(self, value, icon, color, main, barsback):
+    def setPlotIcon(self, value, icon, main, barsback):
         main = '0' if main else '1'
         curBar = self._hisModel.getCurBar()
+
         klineIndex = curBar['KLineIndex'] - barsback
-        
         if klineIndex <= 0:
             return
             
@@ -1008,13 +1034,16 @@ class StrategyModel(object):
             'Icon'       : icon
         }]
 
-        self._plotNumeric(self._strategyName, value, color, main, EEQU_ISNOT_AXIS, EEQU_ICON, barsback, data)
+        self._plotNumeric(self._strategyName, value, 0, main, EEQU_ISNOT_AXIS, EEQU_ICON, barsback, data)
+
+    def setUnPlotIcon(self, main, barsback):
+        return self.setPlotIcon(np.nan, 0, main, barsback)
 
     def setPlotDot(self, name, value, icon, color, main, barsback):
         main = '0' if main else '1'
         curBar = self._hisModel.getCurBar()
-        klineIndex = curBar['KLineIndex'] - barsback
 
+        klineIndex = curBar['KLineIndex'] - barsback
         if klineIndex <= 0:
             return
 
@@ -1025,6 +1054,9 @@ class StrategyModel(object):
         }]
 
         self._plotNumeric(name, value, color, main, EEQU_ISNOT_AXIS, EEQU_DOT, barsback, data)
+
+    def setUnPlotDot(self, name, main, barsback):
+        return self.setPlotDot(name, np.nan, 0, 0, main, barsback)
 
     def setPlotBar(self, name, vol1, vol2, color, main, filled, barsback):
         main = '0' if main else '1'
@@ -1045,6 +1077,9 @@ class StrategyModel(object):
 
         self._plotNumeric(name, 0, color, main, EEQU_ISNOT_AXIS, EEQU_BAR, barsback, data)
 
+    def setUnPlotBar(self, name, main, barsback):
+        return self.setPlotBar(name, np.nan, np.nan, 0, main, True, barsback)
+
     def setPlotNumeric(self, name, value, color, main, axis, type, barsback):
         main = '0' if main else '1'
         axis = '0' if axis else '1'
@@ -1060,6 +1095,9 @@ class StrategyModel(object):
             'Value'      : value
         }]
         self._plotNumeric(name, value, color, main, axis, type, barsback, data)
+
+    def setUnPlotNumeric(self, name, main, barsback):
+        return self.setPlotNumeric(name, np.nan, 0, main, EEQU_ISNOT_AXIS, 1, barsback)
         
     def setPlotVertLine(self, color, main, axis, barsback):
         main = '0' if main else '1'
@@ -1080,6 +1118,24 @@ class StrategyModel(object):
 
         self._plotNumeric(self._strategyName, value, color, main, axis, EEQU_VERTLINE, barsback, data)
 
+    def setUnPlotVertLine(self, main, barsback):
+        main = '0' if main else '1'
+
+        curBar = self._hisModel.getCurBar()
+        klineIndex = curBar['KLineIndex'] - barsback
+
+        if klineIndex <= 0:
+            return
+
+        value = curBar['LastPrice']
+        data = [{
+            'KLineIndex' : klineIndex,
+            'Value'      : np.nan,
+            'ClrK'       : 0
+        }]
+
+        self._plotNumeric(self._strategyName, np.nan, 0, main, EEQU_ISNOT_AXIS, EEQU_VERTLINE, barsback, data)
+
     def setPlotPartLine(self, name, index1, price1, index2, price2, color, main, axis, width):
         main = '0' if main else '1'
         axis = '0' if axis else '1'
@@ -1098,8 +1154,24 @@ class StrategyModel(object):
 
         self._plotNumeric(name, 0, color, main, axis, EEQU_PARTLINE, 0, data)
 
-    def setPlotStickLine(self, name, price1, price2, color, main, axis, barsback):
+    def setUnPlotPartLine(self, name, index1, index2, main):
+        main = '0' if main else '1'
 
+        if index1<= 0 or index2 <= 0:
+            return
+
+        data = [{
+            'KLineIndex' : index1,
+            'Value'      : np.nan,
+            'Idx2'       : index2,
+            'LineValue'  : np.nan,
+            'ClrLine'    : 0,
+            'LinWid'     : 1
+        }]
+
+        self._plotNumeric(name, np.nan, 0, main, EEQU_ISNOT_AXIS, EEQU_PARTLINE, 0, data)
+
+    def setPlotStickLine(self, name, price1, price2, color, main, axis, barsback):
         main = '0' if main else '1'
         axis = '0' if axis else '1'
 
@@ -1117,6 +1189,9 @@ class StrategyModel(object):
         }]
 
         self._plotNumeric(name, 0, color, main, axis, EEQU_STICKLINE, barsback, data)
+
+    def setUnPlotStickLine(self, name, main, barsback):
+        return self.setPlotStickLine(name, np.nan, np.nan, 0, main, EEQU_ISNOT_AXIS, barsback)
 
     def formatArgs(self, args):
         if len(args) == 0:
@@ -1389,8 +1464,7 @@ class StrategyModel(object):
 
         return totalPrice/totalQty if totalQty > 0 else 0
 
-    def getBarsSinceEntry(self, contNo):
-        '''获得当前持仓中指定合约的第一个建仓位置到当前位置的Bar计数'''
+    def getFirstOpenOrderInfo(self, contNo, key):
         if not contNo:
             contNo = self._cfgModel.getBenchmark()
 
@@ -1398,15 +1472,12 @@ class StrategyModel(object):
             return -1
 
         orderInfo = self._calcCenter.getFirstOpenOrder(contNo)
-        if 'CurBarIndex' not in orderInfo:
+        if not orderInfo or key not in orderInfo:
             return -1
 
-        barIndex = orderInfo['CurBarIndex']
-        curBar = self._hisModel.getCurBar()
-        return (curBar['KLineIndex'] - barIndex)
+        return orderInfo[key]
 
-    def getBarsSinceExit(self, contNo):
-        '''获得当前持仓中指定合约的最近平仓位置到当前位置的Bar计数'''
+    def getLatestCoverOrderInfo(self, contNo, key):
         if not contNo:
             contNo = self._cfgModel.getBenchmark()
 
@@ -1414,12 +1485,129 @@ class StrategyModel(object):
             return -1
 
         orderInfo = self._calcCenter.getLatestCoverOrder(contNo)
-        if not orderInfo or 'CurBarIndex' not in orderInfo:
+        if not orderInfo or key not in orderInfo:
             return -1
 
-        barIndex = orderInfo['CurBarIndex']
+        return orderInfo[key]
+
+    def getLatestOpenOrderInfo(self, contNo, key):
+        if not contNo:
+            contNo = self._cfgModel.getBenchmark()
+
+        if self.getMarketPosition(contNo) == 0:
+            return -1
+
+        orderInfo = self._calcCenter.getLatestOpenOrder(contNo)
+        if not orderInfo or key not in orderInfo:
+            return -1
+
+        return orderInfo[key]
+
+    def getBarsSinceEntry(self, contNo):
+        '''获得当前持仓中指定合约的第一个建仓位置到当前位置的Bar计数'''
+        barIndex = self.getFirstOpenOrderInfo(contNo, 'CurBarIndex')
+        if barIndex == -1:
+            return barIndex
+
         curBar = self._hisModel.getCurBar()
         return (curBar['KLineIndex'] - barIndex)
+
+    def getBarsSinceExit(self, contNo):
+        '''获得当前持仓中指定合约的最近平仓位置到当前位置的Bar计数'''
+        barIndex = self.getLatestCoverOrderInfo(contNo, 'CurBarIndex')
+        if barIndex == -1:
+            return -1
+
+        curBar = self._hisModel.getCurBar()
+        return (curBar['KLineIndex'] - barIndex)
+
+    def getBarsSinceLastEntry(self, contNo):
+        '''获得当前持仓的最后一个建仓位置到当前位置的Bar计数'''
+        barIndex = self.getLatestCoverOrderInfo(contNo, 'CurBarIndex')
+        if barIndex == -1:
+            return -1
+
+        curBar = self._hisModel.getCurBar()
+        return (curBar['KLineIndex'] - barIndex)
+
+    def getPositionValue(self, contNo, key):
+        if not contNo:
+            contNo = self._cfgModel.getBenchmark()
+
+        pos = self.getMarketPosition(contNo)
+        if pos == 0:
+            return -1
+
+        positionInfo = self._calcCenter.getPositionInfo(contNo)
+        if not positionInfo or key not in positionInfo:
+            return -1
+
+        return positionInfo[key]
+
+    def getContractProfit(self, contNo):
+        '''获得当前持仓的每手浮动盈亏'''
+        holdProfit = self.getPositionValue(contNo, 'HoldProfit')
+        if holdProfit == -1:
+            return -1
+
+        totalBuy = self.getPositionValue(contNo, 'TotalBuy')
+        totalSell = self.getPositionValue(contNo, 'TotalSell')
+        totalQty = totalBuy + totalSell
+        return holdProfit/totalQty if totalQty > 0 else 0
+
+    def getCurrentContracts(self, contNo):
+        '''获得策略当前的持仓合约数(净持仓)'''
+        totalBuy = self.getPositionValue(contNo, 'TotalBuy')
+        totalBuy = 0 if totalBuy == -1 else totalBuy
+        totalSell = self.getPositionValue(contNo, 'TotalSell')
+        totalSell = 0 if totalSell == -1 else totalSell
+
+        return totalBuy+totalSell
+
+    def getEntryDate(self, contNo):
+        '''获得当前持仓的第一个建仓位置的日期'''
+        return self.getFirstOpenOrderInfo(contNo, 'TradeDate')
+
+    def getEntryPrice(self, contNo):
+        '''获得当前持仓的第一次建仓的委托价格'''
+        return self.getFirstOpenOrderInfo(contNo, 'OrderPrice')
+
+    def getEntryTime(self, contNo):
+        '''获得当前持仓的第一个建仓位置的时间'''
+        dateTimeStamp = self.getFirstOpenOrderInfo(contNo, 'DateTimeStamp')
+        if dateTimeStamp == -1:
+            return -1
+        return (int(dateTimeStamp)%1000000000)/1000000000
+
+    def getExitDate(self, contNo):
+        ''' 获得最近平仓位置Bar日期'''
+        return self.getLatestCoverOrderInfo(contNo, 'TradeDate')
+
+    def getExitPrice(self, contNo):
+        '''获得合约最近一次平仓的委托价格'''
+        return self.getLatestCoverOrderInfo(contNo, 'OrderPrice')
+
+    def getExitTime(self, contNo):
+        '''获得最近平仓位置Bar时间'''
+        dateTimeStamp = self.getLatestCoverOrderInfo(contNo, 'DateTimeStamp')
+        if dateTimeStamp == -1:
+            return -1
+        return (int(dateTimeStamp)%1000000000)/1000000000
+
+    def getLastEntryDate(self, contNo):
+        '''获得当前持仓的最后一个建仓位置的日期'''
+        return self.getLatestOpenOrderInfo(contNo, 'TradeDate')
+
+    def getLastEntryPrice(self, contNo):
+        '''获得当前持仓的最后一次建仓的委托价格'''
+        return self.getLatestOpenOrderInfo(contNo, 'OrderPrice')
+
+    def getLastEntryTime(self, contNo):
+        '''获得当前持仓的最后一个建仓位置的时间'''
+        dateTimeStamp = self.getLatestOpenOrderInfo(contNo, 'DateTimeStamp')
+        if dateTimeStamp == -1:
+            return -1
+        return (int(dateTimeStamp)%1000000000)/1000000000
 
     def getMarketPosition(self, contNo):
         if not contNo:
@@ -1438,6 +1626,14 @@ class StrategyModel(object):
     # ///////////////////////策略性能///////////////////////////
     def getAvailable(self):
         return self._calcCenter.getProfit()['Available']
+
+    def getEquity(self):
+        fundRecodeList = self._calcCenter.getFundRecord()
+        if not fundRecodeList:
+            return self.getAvailable()
+
+        fundRecordDict = fundRecodeList[-1]
+        return fundRecordDict['DynamicEquity']
 
     def getFloatProfit(self, contNo):
         return self._calcCenter._getHoldProfit(contNo)
@@ -1504,3 +1700,7 @@ class StrategyModel(object):
     def SMA(self, price, period, weight):
         '''计算加权移动平均值'''
         return self._staModel.SMA(price, period, weight)
+
+    def ParabolicSAR(self, high, low, afstep, aflimit):
+        '''计算抛物线转向'''
+        return self._staModel.ParabolicSAR(high, low, afstep, aflimit)

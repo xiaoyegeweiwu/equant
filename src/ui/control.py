@@ -236,7 +236,7 @@ class TkinterController(object):
                     self.app.delUIStrategy(id)
                     # return
                 self._request.strategyRemove(id)
-            else:  # 策略已经停止， 直接删除
+            else:
                 self.app.delUIStrategy(id)
 
     def signalDisplay(self, strategyIdList):

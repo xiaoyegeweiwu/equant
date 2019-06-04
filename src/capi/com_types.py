@@ -99,9 +99,9 @@ EV_ST2EG_ADD_KLINESIGNAL          = 0x256           #增加信号数据
 EV_ST2EG_NOTICE_KLINESIGNAL       = 0x257           #推送信号数据
 EV_ST2EG_UPDATE_KLINESIGNAL       = 0x258           #更新信号数据
 EV_ST2EG_UPDATE_STRATEGYDATA      = 0x259           #刷新信号、指标数
-EV_ST2EG_STRATEGYEXCEPTION        = 0x25A           #策略出现异常事件
-
+EV_ST2EG_STRATEGY_EXCEPTION       = 0x25A           #策略出现异常事件
 EV_ST2EG_STRATEGYTRADEINFO        = 0x25B           #获取交易信息
+ST_ST2EG_SYNC_CONFIG              = 0x25C           # 策略向引擎同步自己的配置
 
 #///////////////////引擎->策略事件定义////////////////////////
 EV_EG2ST_EXCHANGE_RSP             = 0X301           #查询交易所信息

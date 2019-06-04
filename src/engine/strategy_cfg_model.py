@@ -103,6 +103,9 @@ class StrategyConfig(object):
                 continue
             resDict[key] = deepcopy(value)
 
+        # 策略暂停向实盘下单
+        resDict['Pending'] = False
+
         # Sample
         sample = argsDict['Sample']
         useSample = ('BeginTime' in sample) or ('KLineCount' in sample) or ('AllK' in sample)
@@ -285,33 +288,17 @@ class StrategyConfig(object):
             else:
                 raise NotImplementedError
     # *******************************************************
-
-    def setBenchmark(self, benchmark):
-        '''设置基准合约'''
-        if not benchmark:
-            return 0
-
-        if not self._metaData['Contract']:
-            self._metaData['Contract'] = (benchmark, )
-
-        contList = list(self._metaData['Contract'])
-        contList[0] = benchmark
-        self._metaData['Contract'] = tuple(contList)
-        
     def getContract(self):
         '''获取合约列表'''
         return self._metaData['SubContract']
 
-    def setContract(self, contTuple):
-        '''设置合约列表'''
-        pass
-        # if not isinstance(contTuple, tuple):
-        #     return -1
-        #
-        # defaultBenchmark = self._metaData['Contract'][0] if len(self._metaData['Contract']) > 0 else ""
-        # if len(defaultBenchmark) > 0:
-        #     del self._metaData['Sample'][defaultBenchmark]
-        # self._metaData['Contract'] = contTuple
+    def setPending(self, pending):
+        '''设置是否暂停向实盘下单标志'''
+        self._metaData['Pending'] = pending
+
+    def getPending(self):
+        '''获取是否暂停向实盘下单标志'''
+        return self._metaData['Pending'] if 'Pending' in self._metaData else False
 
     def addUserNo(self, userNo):
         '''设置交易使用的账户'''
@@ -421,14 +408,12 @@ class StrategyConfig(object):
 
     def getKLineType(self):
         '''获取K线类型'''
-        # return self._metaData['Sample']['KLineType']
         kLineInfo = self.getKLineShowInfo()
         if 'KLineType' in kLineInfo:
             return kLineInfo['KLineType']
 
     def getKLineSlice(self):
         '''获取K线间隔'''
-        # return self._metaData['Sample']['KLineSlice']
         kLineInfo = self.getKLineShowInfo()
         if 'KLineSlice' in kLineInfo:
             return kLineInfo['KLineSlice']
@@ -486,8 +471,8 @@ class StrategyConfig(object):
         contract = self._metaData['Contract']
         defaultBenchmark = contract[0] if len(contract) > 0 and len(contract[0]) else ""
         if len(defaultBenchmark) > 0:
-            del self._metaData['Sample'][defaultBenchmark]
-            self.setContract(("",))
+            if defaultBenchmark in self._metaData['Sample']:
+                del self._metaData['Sample'][defaultBenchmark]
             self._metaData['Sample']['Display']['ContractNo'] = None
             self._metaData['SubContract'] = []
 
@@ -703,8 +688,14 @@ class StrategyConfig(object):
     def hasTimerTrigger(self):
         return bool(self._metaData['Trigger']['Timer'])
 
+    def getTimerTrigger(self):
+        return self._metaData['Trigger']['Timer']
+
     def hasCycleTrigger(self):
         return bool(self._metaData['Trigger']['Cycle'])
+
+    def getCycleTrigger(self):
+        return self._metaData['Trigger']['Cycle']
 
     def hasSnapShotTrigger(self):
         return bool(self._metaData['Trigger']['SnapShot'])

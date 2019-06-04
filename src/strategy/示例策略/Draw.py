@@ -16,7 +16,6 @@ def handle_data(context):
         PlotNumeric("ask", ask, 0xFF0000) 
     else:
         bid = ask = Close()[-1]                  
-    PlotNumeric("profit", NetProfit() + FloatProfit() - TradeCost(), 0xFF8080, False)
     
     global bar
     if bar == CurrentBar():
@@ -28,4 +27,7 @@ def handle_data(context):
         SellShort(1, ask)
 
     bar = CurrentBar()
+
+    PlotNumeric("profit", NetProfit() +  FloatProfit(), 0xFF00FF, False, True)      
+
 
