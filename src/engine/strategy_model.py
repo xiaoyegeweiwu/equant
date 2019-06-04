@@ -1375,6 +1375,19 @@ class StrategyModel(object):
         currentTime = datetime.now().strftime('0.%H%M%S')
         return float(currentTime)
 
+    def isInSession(self, contNo):
+        if not contNo:
+            contNo = self._cfgModel.getBenchmark()
+
+        currentTime = self.getCurrentTime()
+        sessionCount = self.getGetSessionCount(contNo)
+        for index in range(0, sessionCount):
+            startTime = self.getGetSessionStartTime(contNo, index)
+            endTime = self.getSessionEndTime(contNo, index)
+            if currentTime >= startTime and currentTime <endTime:
+                return True
+        return False
+
     def getMarginRatio(self, contNo):
         contractNo = contNo
         if not contNo:
