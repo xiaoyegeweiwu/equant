@@ -1506,6 +1506,25 @@ class BaseApi(object):
         '''
         return self._dataModel.getCurrentTime()
 
+    def IsInSession(self, contractNo):
+        '''
+        【说明】
+              操作系统的当前时间是否为指定合约的交易时间。
+
+        【语法】
+              bool IsInSession(string contractNo)
+
+        【参数】
+              contractNo 合约编号，默认为基础合约。
+
+        【备注】
+              获取操作系统的当前时间，是否为指定合约的交易时间。
+
+        【示例】
+              如果当前时间为11:34:21，IsInSession("ZCE|F|TA|909")返回值为False。
+        '''
+        return self._dataModel.isInSession(contractNo)
+
     def MarginRatio(self, contractNo):
         '''
         【说明】
@@ -6158,6 +6177,9 @@ def GetNextTimeInfo(contractNo, timeStr):
 
 def CurrentTime():
     return baseApi.CurrentTime()
+
+def IsInSession(contractNo=''):
+    return baseApi.IsInSession(contractNo)
 
 def MarginRatio(contractNo=''):
     return baseApi.MarginRatio(contractNo)

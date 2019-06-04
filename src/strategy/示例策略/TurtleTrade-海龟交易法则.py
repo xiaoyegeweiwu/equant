@@ -77,7 +77,7 @@ def XAverage(prices:np.array, length):
 def initialize(context):
     global ContractId
     SetBarInterval(ContractId, 'M', 1, 2000)
-    SetActual()
+    # SetActual()
 
 def handle_data(context):
     global RiskRatio, ATRLength, boLength

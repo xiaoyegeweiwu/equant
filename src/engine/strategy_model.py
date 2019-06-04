@@ -9,7 +9,8 @@ from .strategy_cfg_model import StrategyConfig
 from .strategy_his_model import StrategyHisQuote
 from .strategy_qte_model import StrategyQuote
 from .strategy_trd_model import StrategyTrade
-from .statistics_model   import StatisticsModel
+from .statistics_model import StatisticsModel
+import copy
 
 from engine.calc import CalcCenter
 from datetime import datetime
@@ -621,9 +622,11 @@ class StrategyModel(object):
 
         curBarIndex = None
         curBar = None
-        if (triggerType == ST_TRIGGER_KLINE or triggerType == ST_TRIGGER_HIS_KLINE) and triggerData :
-            curBarIndex = triggerData["KLineIndex"]
-            curBar = triggerData
+        key = self._config.getKLineShowInfoSimple()
+        curShowBar = self.getHisQuoteModel().getCurBar(key)
+        if curShowBar:
+            curBar = copy.deepcopy(curShowBar)
+            curBarIndex = curBar["KLineIndex"]
 
         orderParam = {
             "UserNo"         : userNo,                   # 账户编号
@@ -639,7 +642,11 @@ class StrategyModel(object):
             "DateTimeStamp"  : dateTime,                 # 时间戳（基准合约）
             "TradeDate"      : tradeDate,                # 交易日（基准合约）
             "TriggerType"    : triggerType,
-            "CurBarIndex"    : curBarIndex #
+            "CurBar"         : curBar,
+            "CurBarIndex"    : curBarIndex,              #
+            "StrategyId"     : self._strategy.getStrategyId(),
+            "StrategyName"   : self._strategy.getStrategyName(),
+            "StrategyStage"  : self._strategy.getStatus()
         }
 
         if entryOrExit in (oCover, oCoverT):
@@ -648,8 +655,8 @@ class StrategyModel(object):
                 return ""
 
         canAdded = self._calcCenter.addOrder(orderParam)
-        if not canAdded:
-            return ""
+        # if not canAdded:
+        #     return ""
 
         key = (triggerInfo['ContractNo'], triggerInfo['KLineType'], triggerInfo['KLineSlice'])
         isSendSignal = self._config.hasKLineTrigger() and key == self._config.getKLineShowInfoSimple()
@@ -1367,6 +1374,19 @@ class StrategyModel(object):
     def getCurrentTime(self):
         currentTime = datetime.now().strftime('0.%H%M%S')
         return float(currentTime)
+
+    def isInSession(self, contNo):
+        if not contNo:
+            contNo = self._cfgModel.getBenchmark()
+
+        currentTime = self.getCurrentTime()
+        sessionCount = self.getGetSessionCount(contNo)
+        for index in range(0, sessionCount):
+            startTime = self.getGetSessionStartTime(contNo, index)
+            endTime = self.getSessionEndTime(contNo, index)
+            if currentTime >= startTime and currentTime <endTime:
+                return True
+        return False
 
     def getMarginRatio(self, contNo):
         contractNo = contNo
