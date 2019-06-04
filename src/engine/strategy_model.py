@@ -9,7 +9,8 @@ from .strategy_cfg_model import StrategyConfig
 from .strategy_his_model import StrategyHisQuote
 from .strategy_qte_model import StrategyQuote
 from .strategy_trd_model import StrategyTrade
-from .statistics_model   import StatisticsModel
+from .statistics_model import StatisticsModel
+import copy
 
 from engine.calc import CalcCenter
 from datetime import datetime
@@ -621,9 +622,11 @@ class StrategyModel(object):
 
         curBarIndex = None
         curBar = None
-        if (triggerType == ST_TRIGGER_KLINE or triggerType == ST_TRIGGER_HIS_KLINE) and triggerData :
-            curBarIndex = triggerData["KLineIndex"]
-            curBar = triggerData
+        key = self._config.getKLineShowInfoSimple()
+        curShowBar = self.getHisQuoteModel().getCurBar(key)
+        if curShowBar:
+            curBar = copy.deepcopy(curShowBar)
+            curBarIndex = curBar["KLineIndex"]
 
         orderParam = {
             "UserNo"         : userNo,                   # 账户编号
@@ -639,7 +642,11 @@ class StrategyModel(object):
             "DateTimeStamp"  : dateTime,                 # 时间戳（基准合约）
             "TradeDate"      : tradeDate,                # 交易日（基准合约）
             "TriggerType"    : triggerType,
-            "CurBarIndex"    : curBarIndex #
+            "CurBar"         : curBar,
+            "CurBarIndex"    : curBarIndex,              #
+            "StrategyId"     : self._strategy.getStrategyId(),
+            "StrategyName"   : self._strategy.getStrategyName(),
+            "StrategyStage"  : self._strategy.getStatus()
         }
 
         if entryOrExit in (oCover, oCoverT):
