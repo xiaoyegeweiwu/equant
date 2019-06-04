@@ -655,8 +655,8 @@ class StrategyModel(object):
                 return ""
 
         canAdded = self._calcCenter.addOrder(orderParam)
-        if not canAdded:
-            return ""
+        # if not canAdded:
+        #     return ""
 
         key = (triggerInfo['ContractNo'], triggerInfo['KLineType'], triggerInfo['KLineSlice'])
         isSendSignal = self._config.hasKLineTrigger() and key == self._config.getKLineShowInfoSimple()
