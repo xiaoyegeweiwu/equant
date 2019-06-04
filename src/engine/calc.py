@@ -367,7 +367,6 @@ class CalcCenter(object):
         }
         :return:
         """
-        print("1111: ", order)
         # print("begin:", datetime.now().strftime('%H:%M:%S.%f'))
         if not self._beginDate:
             self._beginDate = order["TradeDate"]

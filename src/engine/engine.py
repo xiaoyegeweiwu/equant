@@ -368,8 +368,12 @@ class StrategyEngine(object):
         while True:
             eventList = self._trdModel.getMoneyEvent()
             # 查询所有账户下的资金
-            for event in eventList:
-                self._reqMoney(event)
+            allMoneyReqEvent = Event({
+                "StrategyId": 0,
+                "Data": {
+                }
+            })
+            self._reqMoney(allMoneyReqEvent)
                 
             time.sleep(60)
                 
@@ -518,14 +522,15 @@ class StrategyEngine(object):
             return       
         if not apiEvent.isSucceed():
             return
-        
+
         self._trdModel.setStatus(TM_STATUS_USER)
         # 查询所有账户下委托信息
-        eventList = self._trdModel.getOrderEvent()
-
-        for event in eventList:
-            # print("====== 查询所有账户下委托信息 ======", event.getData())
-            self._reqOrder(event)
+        allOrderReqEvent = Event({
+            "StrategyId":0,
+            "Data":{
+            }
+        })
+        self._reqOrder(allOrderReqEvent)
         
     def _onApiOrderDataQry(self, apiEvent):
         self._trdModel.updateOrderData(apiEvent)
@@ -535,12 +540,15 @@ class StrategyEngine(object):
             return
         if not apiEvent.isSucceed():
             return
-
         self._trdModel.setStatus(TM_STATUS_ORDER)
+
         # 查询所有账户下成交信息
-        eventList = self._trdModel.getMatchEvent()
-        for event in eventList:
-            self._reqMatch(event)
+        allMatchReqEvent = Event({
+            "StrategyId": 0,
+            "Data": {
+            }
+        })
+        self._reqMatch(allMatchReqEvent)
         
     def _onApiOrderDataNotice(self, apiEvent):
         # 订单信息
@@ -568,10 +576,14 @@ class StrategyEngine(object):
             return
             
         self._trdModel.setStatus(TM_STATUS_MATCH)
-        #查询所有账户下成交信息
-        eventList = self._trdModel.getPositionEvent()
-        for event in eventList:
-            self._reqPosition(event)
+        # 查询所有账户下持仓信息
+        allPosReqEvent = Event({
+            "StrategyId": 0,
+            "Data": {
+            }
+        })
+
+        self._reqPosition(allPosReqEvent)
             
     def _onApiMatchData(self, apiEvent):
         # 成交信息
