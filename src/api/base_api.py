@@ -3098,7 +3098,7 @@ class BaseApi(object):
               bool A_DeleteOrder(string orderId)
 
         【参数】
-              orderId 使用A_SendOrder返回的下单编号，为空时使用当日最后成交的委托编号作为查询依据。
+              orderId 使用A_SendOrder返回的下单编号。
 
         【备注】
               针对当前公式应用的帐户、商品发送撤单指令，发送成功返回True, 发送失败返回False。
@@ -3109,6 +3109,33 @@ class BaseApi(object):
               无
          '''
         return self._dataModel.deleteOrder(orderId)
+
+    def A_GetOrderNo(self, orderId):
+        '''
+        【说明】
+              针对当前公式应用的帐户获取下单编号对应的定单号和委托号。
+
+        【语法】
+              string, string A_GetOrderNo(string orderId)
+
+        【参数】
+              orderId 使用A_SendOrder返回的下单编号。
+
+        【备注】
+              针对当前策略使用A_SendOrder返回的下单编号，可以使用A_GetOrderNo获取下单编号对应的定单号和委托号。
+              由于使用A_SendOrder返回的下单编号orderId与策略相关，所以在策略重启后orderId会发生变化。
+              由于委托单对应的定单号与客户端有关，所以在客户端重启后，委托单对应的定单号可能会发生变化。
+              由于委托号是服务器生成的，所以在使用A_SendOrder得到下单编号后，如果服务器还没有返回相应的委托单信息，可能获取不到相应的定单号和委托号。
+              当orderId对应的定单号和委托号还没有从服务器返回，则对应的值为空字符串。
+              注：不能使用于历史测试，仅适用于实时行情交易。
+
+        【示例】
+              retCode, retMsg = A_SendOrder(.....)
+              time.sleep(5)
+              if retCode == 0:
+                sessionId, orderNo =  A_GetOrderNo(retMsg)
+         '''
+        return self._dataModel.getAOrderNo(orderId)
         
     #/////////////////////////////枚举函数/////////////////
     def Enum_Buy(self):
@@ -5849,6 +5876,9 @@ def A_SendOrder(userNo, contractNo, orderType, validType, orderDirct, entryOrExi
 
 def A_DeleteOrder(orderId):
     return baseApi.A_DeleteOrder(orderId)
+
+def A_GetOrderNo(orderId):
+    return baseApi.A_GetOrderNo(orderId)
 
 #策略交易
 def Buy(share=0, price=0, contractNo=None):

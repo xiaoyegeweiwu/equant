@@ -656,7 +656,6 @@ class StrategyModel(object):
 
         canAdded = self._calcCenter.addOrder(orderParam)
         if canAdded < 1:
-            print("sun ------------------- canAdded")
             return ""
 
         key = (triggerInfo['ContractNo'], triggerInfo['KLineType'], triggerInfo['KLineSlice'])
@@ -725,26 +724,14 @@ class StrategyModel(object):
         self._strategy.updateLocalOrder(eId, aOrder)
         return 0, eId
 
-    # def addOrder2CalcCenter(self, userNo, contNo, direct, offset, price, share, curBar):
-    #     if not curBar:
-    #         return
-    #
-    #     orderParam = {
-    #         "UserNo": userNo,  # 账户编号
-    #         "OrderType": otMarket,  # 定单类型
-    #         "ValidType": vtGFD,  # 有效类型
-    #         "ValidTime": '0',  # 有效日期时间(GTD情况下使用)
-    #         "Cont": contNo,  # 合约
-    #         "Direct": direct,  # 买卖方向：买、卖
-    #         "Offset": offset,  # 开仓、平仓、平今
-    #         "Hedge": hSpeculate,  # 投机套保
-    #         "OrderPrice": price,  # 委托价格 或 期权应价买入价格
-    #         "OrderQty": share,  # 委托数量 或 期权应价数量
-    #         "DateTimeStamp": curBar['DateTimeStamp'],  # 时间戳（基准合约）
-    #         "TradeDate": curBar['TradeDate'],  # 交易日（基准合约）
-    #         "CurrentBarIndex": curBar['KLineIndex'],  # 当前K线索引
-    #     }
-    #     self._calcCenter.addOrder(orderParam)
+    def getAOrderNo(self, eId):
+        orderId = self._strategy.getOrderId(eId)
+        if not orderId:
+            orderId = ''
+        orderNo = self._strategy.getOrderNo(eId)
+        if not orderNo:
+            orderNo = ''
+        return orderId, orderNo
 
     # ///////////////////////枚举函数///////////////////////////
     def getEnumBuy(self):
