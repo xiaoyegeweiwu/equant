@@ -1281,11 +1281,7 @@ class StrategyModel(object):
         }
         contractNo = contNo
         if not contNo:
-            contractTuple = self._cfgModel.getContract()
-            if len(contractTuple) == 0:
-                return ret
-            else:
-                contractNo = contractTuple[0]
+            contractTuple = self._cfgModel.getBenchmark()
 
         contList = contractNo.split('|')
         if len(contList) == 0:
@@ -1589,11 +1585,11 @@ class StrategyModel(object):
         '''获得当前持仓的第一个建仓位置的日期'''
         return self.getFirstOpenOrderInfo(contNo, 'TradeDate')
 
-    def getBuyPosition(self, contNo):
+    def getBuyPositionInStrategy(self, contNo):
         '''获得当前持仓的买入方向的持仓量'''
         return self.getPositionValue(contNo, 'TotalBuy')
 
-    def getSellPosition(self, contNo):
+    def getSellPositionInStrategy(self, contNo):
         '''当前持仓的卖出持仓量'''
         return self.getPositionValue(contNo, 'TotalSell')
 
