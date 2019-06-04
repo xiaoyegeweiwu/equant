@@ -291,6 +291,8 @@ class GetEgData(object):
         if data:
             errText = data["ErrorText"]
             self._logger.err_error(errText)
+        else:   # TODO：没有错误信息时接收不到消息，所以这里不会被执行
+            self._app.clearError()
 
     def _onEgMonitorInfo(self, event):
         """获取引擎实时推送监控信息"""

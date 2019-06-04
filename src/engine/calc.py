@@ -367,6 +367,7 @@ class CalcCenter(object):
         }
         :return:
         """
+        print("1111: ", order)
         # print("begin:", datetime.now().strftime('%H:%M:%S.%f'))
         if not self._beginDate:
             self._beginDate = order["TradeDate"]
@@ -388,15 +389,18 @@ class CalcCenter(object):
 
         ftOrder = self._formatOrder(order)
 
-        self._logger.sig_info("%s, %s, %s, %s, %s, %s, %s, %s, %s"%(ftOrder["OrderId"],
-                                                                    ftOrder["UserNo"],
-                                                                    ftOrder["Cont"],
-                                                                    ftOrder["Direct"],
-                                                                    ftOrder["Offset"],
-                                                                    ftOrder["OrderPrice"],
-                                                                    ftOrder["OrderQty"],
-                                                                    ftOrder["OrderType"],
-                                                                    ftOrder["Hedge"]))
+        self._logger.sig_info("[%3s] [%4s] [%5s], %s, %s, %s, %s, %s, %s, %s, %s"%(
+                                                        ftOrder["StrategyId"],
+                                                        ftOrder["StrategyStage"],
+                                                        ftOrder["OrderId"],
+                                                        ftOrder["UserNo"],
+                                                        ftOrder["Cont"],
+                                                        ftOrder["Direct"],
+                                                        ftOrder["Offset"],
+                                                        ftOrder["OrderPrice"],
+                                                        ftOrder["OrderQty"],
+                                                        ftOrder["OrderType"],
+                                                        ftOrder["Hedge"]))
 
         # self._logger.sig_info(self._formatOrder(order))
 
@@ -443,6 +447,8 @@ class CalcCenter(object):
     def _formatOrder(self, order):
 
         return {
+           "StrategyId"      : order["StrategyId"],
+           "StrategyStage"   : StrategyStatus[order["StrategyStage"]],
            "OrderId"         : order["OrderId"],
             "UserNo"         : order["UserNo"],
            "Cont"            : order["Cont"],

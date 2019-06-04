@@ -214,6 +214,9 @@ class QuantMonitor(object):
             self.toErrFrame()
             self.errText.setText(errData)
 
+    def clearErrorText(self):
+        self.errText.setText("")
+
     def toMonFrame(self):
         self.runBtn.config(bg="white")
         self.rColor = self.runBtn['bg']

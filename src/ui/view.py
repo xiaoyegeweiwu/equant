@@ -225,3 +225,7 @@ class QuantApplication(object):
 
         if src == 'S':
             self.quant_editor_head.stateLabel.config(text="极星9.5退出")
+
+    def clearError(self):
+        """清除错误信息"""
+        self.quant_monitor.clearErrorText("")
