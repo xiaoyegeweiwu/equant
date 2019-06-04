@@ -1,6 +1,6 @@
 import copy
 from capi.com_types import *
-
+from capi.event import *
 
 class EngineOrderModel:
     def __init__(self, strategyOrder={}):
@@ -18,6 +18,21 @@ class EngineOrderModel:
         strategyId = 0
         self._localOrder.update({strategyId:SingleStrategyLocalOrder(strategyId)})
         self._epoleStarOrder.update({strategyId:EpoleStarOrder(strategyId)})
+
+    def getStrategyOrder(self, strategyId):
+        resultEvent = []
+        if strategyId not in self._epoleStarOrder:
+            return resultEvent
+        if strategyId == 0:
+            for strategyId, v in self._epoleStarOrder.items():
+                curStrategyEPSOrder = self._epoleStarOrder[strategyId]
+                resultEvent.extend(curStrategyEPSOrder.getRecord())
+        elif strategyId > 0:
+            curStrategyEPSOrder = self._epoleStarOrder[strategyId]
+            resultEvent.extend(curStrategyEPSOrder.getRecord())
+            curStrategyEPSOrder0 = self._epoleStarOrder[0]
+            resultEvent.extend(curStrategyEPSOrder0.getRecord())
+        return resultEvent
 
     def updateLocalOrder(self, event):
         strategyId = event.getStrategyId()
@@ -54,9 +69,16 @@ class EngineOrderModel:
                 record['StrategyId'] = 0
                 record["ESessionId"] = 0
 
+            ePoleStarOrderEvent = Event({
+                "EventCode":EEQU_SRVEVENT_TRADE_ORDERQRY,
+                "ContractNo":record["Cont"],
+                "StrategyId":record["StrategyId"],
+                "ESessionId":record["ESessionId"],
+                "Data":[record]
+            })
             if record["StrategyId"] not in self._epoleStarOrder:
                 self._epoleStarOrder.update({record["StrategyId"]:EpoleStarOrder(record["StrategyId"])})
-            self._epoleStarOrder[record["StrategyId"]].updateEpoleOrderResponse(record)
+            self._epoleStarOrder[record["StrategyId"]].updateEpoleOrderResponse(ePoleStarOrderEvent)
 
     def _updateEpoleStarOrderNotice(self, apiEvent):
         assert len(apiEvent.getData()) == 1, "error"
@@ -65,8 +87,16 @@ class EngineOrderModel:
         record["StrategyId"] = strategyId; record["ESessionId"] = eSessionId
         if strategyId not in self._epoleStarOrder:
             self._epoleStarOrder.update({strategyId: EpoleStarOrder(strategyId)})
-        self._epoleStarOrder[strategyId].updateEpoleStarOrderNotice(record)
-        self._localOrder[strategyId].updateLocalOrder(record)
+
+        ePoleStarOrderEvent = Event({
+            "EventCode": EEQU_SRVEVENT_TRADE_ORDERQRY,
+            "ContractNo": record["Cont"],
+            "StrategyId": record["StrategyId"],
+            "ESessionId": record["ESessionId"],
+            "Data": [record]
+        })
+        self._epoleStarOrder[strategyId].updateEpoleStarOrderNotice(ePoleStarOrderEvent)
+        # self._localOrder[strategyId].updateLocalOrder()
         if strategyId > 0 and record["OrderNo"]:
             self._orderNo2OtherMap[record["OrderNo"]] = {"StrategyId":strategyId, "ESessionId":eSessionId}
 
@@ -118,24 +148,30 @@ class EpoleStarOrder:
         if self._strategyId == 0:
             self._eSessionId = 1
 
-    def updateEpoleOrderResponse(self, record):
-        self.resetESessionId(record)
-        self._epoleStarOrder[record["ESessionId"]] = record
-        self._epoleStarOrderFlow.append(record)
+    # 更新response存储
+    def updateEpoleOrderResponse(self, ePoleStarOrderEvent):
+        self.resetESessionId(ePoleStarOrderEvent)
+        self._epoleStarOrder[ePoleStarOrderEvent.getESessionId()] = ePoleStarOrderEvent
+        self._epoleStarOrderFlow.append(ePoleStarOrderEvent)
 
-    def updateEpoleStarOrderNotice(self, record):
-        self.resetESessionId(record)
-        self._epoleStarOrder[record["ESessionId"]] = record
-        self._epoleStarOrderFlow.append(record)
+    # 更新notice存储
+    def updateEpoleStarOrderNotice(self, ePoleStarOrderEvent):
+        self.updateEpoleOrderResponse(ePoleStarOrderEvent)
 
-    def resetESessionId(self, record):
-        if self._strategyId == 0 and record["ESessionId"] == 0:
+    def resetESessionId(self, ePoleStarOrderEvent):
+        if self._strategyId == 0 and ePoleStarOrderEvent.getESessionId() == 0:
             eSessionId = str(self._strategyId)+'-'+str(self._eSessionId)
-            record["ESessionId"] = eSessionId
+            ePoleStarOrderEvent.setESessionId(eSessionId)
             self._eSessionId += 1
 
     def getEpoleStarOrder(self):
-        return self._epoleStarOrder
+        result = {}
+        for eSessionId, apiEvent in self._epoleStarOrder.items():
+            result[eSessionId] = apiEvent.getData()[0]
+        return result
+
+    def getRecord(self):
+        return list(self._epoleStarOrder.values())
 
     def clear(self):
         self._epoleStarOrder = {}

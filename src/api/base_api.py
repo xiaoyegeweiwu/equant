@@ -1173,7 +1173,7 @@ class BaseApi(object):
     def StartTrade(self):
         '''
         【说明】
-              开启交易。
+              开启实盘交易。
 
         【语法】
               void StartTrade()
@@ -1193,7 +1193,7 @@ class BaseApi(object):
     def StopTrade(self):
         '''
         【说明】
-              暂停交易。
+              暂停实盘交易。
 
         【语法】
               void StopTrade()
@@ -1209,6 +1209,26 @@ class BaseApi(object):
 
         '''
         return self._dataModel.setStopTrade()
+
+    def IsTradeAllowed(self):
+        '''
+        【说明】
+              是否允许实盘交易。
+
+        【语法】
+              bool IsTradeAllowed()
+
+        【参数】
+              无
+
+        【备注】
+              获取策略是否可以向实盘发单的布尔值，允许向实盘发单返回True，否则返回False。
+
+        【示例】
+              无
+
+        '''
+        return self._dataModel.isTradeAllowed()
 
     #/////////////////////////属性函数/////////////////////////////
     def BarInterval(self):
@@ -1393,13 +1413,16 @@ class BaseApi(object):
               index 交易时间段的索引值, 从0开始。
 
         【备注】
-              返回浮点数
+              返回指定合约的交易时间段结束时间，格式为0.HHMMSS的浮点数。
 
         【示例】
               contractNo = "ZCE|F|SR|905"
               sessionCount = GetSessionCount(contractNo)
               for i in range(0, sessionCount-1):
                 sessionEndTime = GetSessionEndTime(contractNo, i)
+
+              由于合约ZCE|F|TA|908的第三段交易结束时间为11:30:00，
+              所以GetSessionEndTime("ZCE|F|TA|908", 2)的返回值为0.113
         '''
         return self._dataModel.getSessionEndTime(contractNo, index)
 
@@ -1416,32 +1439,32 @@ class BaseApi(object):
               index 交易时间段的索引值, 从0开始。
 
         【备注】
-              返回浮点数
+              返回指定合约的交易时间段开始时间，格式为0.HHMMSS的浮点数。
 
         【示例】
               无
         '''
         return self._dataModel.getGetSessionStartTime(contractNo, index)
 
-    def GetNextTimeInfo(self, contractNo, timeStr):
+    def GetNextTimeInfo(self, contractNo, timeStamp):
         '''
         【说明】
               获取指定合约指定时间点的下一个时间点及交易状态。
 
         【语法】
-              dict GetNextTimeInfo(contractNo, timeStr)
+              dict GetNextTimeInfo(string contractNo, float timeStamp)
 
         【参数】
               contractNo 合约编号，为空时，取基准合约。
-              timeStr 指定的时间点，格式为HH:MM:SS。
+              timeStr 指定的时间点，格式为0.HHMMSS。
 
         【备注】
               返回时间字典，结构如下：
               {
-                'Time' : 210000000,
+                'Time' : 0.21,
                 'TradeState' : 3
               }
-              其中Time对应的值表示指定时间timeStr的下一个时间点，数据格式为整数，例如210000000表示格式化的时间为21:00:00.000
+              其中Time对应的值表示指定时间timeStamp的下一个时间点，返回指定合约的交易时间段开始时间，格式为0.HHMMSS的浮点数。
               TradeState表示对应时间点的交易状态，数据类型为字符，可能出现的值及相应的状态含义如下：
                 1 : 集合竞价
                 2 : 集合竞价撮合
@@ -1456,13 +1479,32 @@ class BaseApi(object):
               异常情况返回为空字典：{}
 
         【示例】
-              GetNextTimeInfo('SHFE|F|CU|1907', '22:00:00') # 获取22:00:00后下一个时间点的时间和交易状态
+              GetNextTimeInfo('SHFE|F|CU|1907', 0.22) # 获取22:00:00后下一个时间点的时间和交易状态
               获取当前时间下一个时间点的时间和交易状态
               import time # 需要在策略头部添加time库
-              curTime = time.strftime('%H:%M:%S',time.localtime(time.time()))
+              curTime = time.strftime('0.%H%M%S',time.localtime(time.time()))
               timeInfoDict = GetNextTimeInfo("SHFE|F|CU|1907", curTime)
         '''
-        return self._dataModel.getNextTimeInfo(contractNo, timeStr)
+        return self._dataModel.getNextTimeInfo(contractNo, timeStamp)
+
+    def CurrentTime(self):
+        '''
+        【说明】
+              获取操作系统的当前时间。
+
+        【语法】
+              float CurrentTime()
+
+        【参数】
+              无
+
+        【备注】
+              获取操作系统的当前时间，格式为0.HHMMSS的浮点数。
+
+        【示例】
+              如果当前时间为11:34:21，CurrentTime返回值为0.113421。
+        '''
+        return self._dataModel.getCurrentTime()
 
     def MarginRatio(self, contractNo):
         '''
@@ -1832,6 +1874,38 @@ class BaseApi(object):
         '''
         return self._dataModel.getCurrentContracts(contractNo)
 
+    def BuyPosition(self, contractNo):
+        '''
+        【说明】
+              获得当前持仓的买入方向的持仓量。
+         【语法】
+              int BuyPosition(string contractNo)
+         【参数】
+              contractNo 合约编号，默认为基准合约。
+         【备注】
+              获得策略当前持仓的买入方向的持仓量，返回值为整数。
+              只有当MarketPosition != 0时，即有持仓的状况下，该函数才有意义，否则返回-1。
+         【示例】
+              无
+        '''
+        return self._dataModel.getBuyPosition(contractNo)
+
+    def SellPosition(self, contractNo):
+        '''
+        【说明】
+              获得当前持仓的卖出方向的持仓量。
+         【语法】
+              int SellPosition(string contractNo)
+         【参数】
+              contractNo 合约编号，默认为基准合约。
+         【备注】
+              获得策略当前持仓的卖出持仓量，返回值为整数。
+              只有当MarketPosition != 0时，即有持仓的状况下，该函数才有意义，否则返回-1。
+         【示例】
+              无
+        '''
+        return self._dataModel.getSellPosition(contractNo)
+
     def EntryDate(self, contractNo):
         '''
         【说明】
@@ -2078,13 +2152,13 @@ class BaseApi(object):
     def FloatProfit(self, contractNo):
         '''
         【说明】
-              返回某个合约或者所有合约的浮动盈亏。
+              返回指定合约的浮动盈亏。
 
         【语法】
               float FloatProfit(string contractNo)
 
         【参数】
-              contractNo 合约编号，为空时返回所有合约的浮动盈亏。
+              contractNo 合约编号，为空时返回基准合约的浮动盈亏。
 
         【备注】
               无
@@ -2135,13 +2209,13 @@ class BaseApi(object):
     def Margin(self, contractNo):
         '''
         【说明】
-              返回某个合约或者所有合约的持仓保证金。
+              返回指定合约的持仓保证金。
 
         【语法】
               float Margin(string contractNo)
 
         【参数】
-              contractNo 合约编号，为空时返回所有合约的浮动盈亏。
+              contractNo 合约编号，为空时返回基准合约的浮动盈亏。
 
         【备注】
               无
@@ -5205,9 +5279,9 @@ class BaseApi(object):
             weight  权重
 
         【备注】
-            返回值为两个值，第一个为整型，第二个为浮点型；
-            当第一个值为0时，此时第二个值是计算出的sma值；
-            当第一个值小于0时，此时计算失败，此时第二个值为numpy.nan。
+            返回值为两个值，第一个为整型，第二个为浮点型numpy.array；
+            当第一个值为0时，此时第二个值是计算出的sma值序列；
+            当第一个值小于0时，此时计算失败，此时第二个值numpy.array为空
 
         【示例】
             SMA(Close(), 12, 2)
@@ -5227,12 +5301,12 @@ class BaseApi(object):
             aflimit 加速因子的限量
 
         【备注】
-            返回值为四个值，均为数值型
-            第一个值为oParClose,当前bar的停损值；
-            第二个值为oParOpen, 下一Bar的停损值；
-            第三个值为oPosition，输出建议的持仓状态，1 - 买仓，-1 - 卖仓；
-            第四个值为oTransition, 输出当前Bar的状态是否发生反转，1 或 -1 为反转，0 为保持不变。
-            当输入high,low的numpy数组为空时，计算失败，返回的四个值均为None
+            返回值为四个值，均为数值型numpy.array
+            第一个值序列为oParClose,当前bar的停损值；
+            第二个值序列为oParOpen, 下一Bar的停损值；
+            第三个值序列为oPosition，输出建议的持仓状态，1 - 买仓，-1 - 卖仓；
+            第四个值序列为oTransition, 输出当前Bar的状态是否发生反转，1 或 -1 为反转，0 为保持不变。
+            当输入high,low的numpy数组为空时，计算失败，返回的四个值均为空的numpy.array
 
         【示例】
             ParabolicSAR(High(), Low(), 0.02, 0.2)
@@ -5585,6 +5659,12 @@ def ContractProfit(contractNo=''):
 def CurrentContracts(contractNo=''):
     return baseApi.CurrentContracts(contractNo)
 
+def BuyPosition(contractNo=''):
+    return baseApi.BuyPosition(contractNo)
+
+def SellPosition(contractNo=''):
+    return baseApi.SellPosition(contractNo)
+
 def EntryDate(contractNo=''):
     return baseApi.EntryDate(contractNo)
 
@@ -5772,6 +5852,9 @@ def StartTrade():
 
 def StopTrade():
     return baseApi.StopTrade()
+
+def IsTradeAllowed():
+    return baseApi.IsTradeAllowed()
     
 # 枚举函数
 def Enum_Buy():
@@ -6072,6 +6155,9 @@ def GetSessionStartTime(contractNo='', index=0):
 
 def GetNextTimeInfo(contractNo, timeStr):
     return baseApi.GetNextTimeInfo(contractNo, timeStr)
+
+def CurrentTime():
+    return baseApi.CurrentTime()
 
 def MarginRatio(contractNo=''):
     return baseApi.MarginRatio(contractNo)

@@ -495,7 +495,7 @@ class StrategyConfig(object):
             'KLineType': barType,
             'KLineSlice': barInterval,
             'BeginTime' : sampleConfig if isinstance(sampleConfig, str) and self.isVaildDate(sampleConfig, "%Y%m%d") else '',
-            'KLineCount' : sampleConfig if isinstance(sampleConfig, int) and sampleConfig > 0 else 0,
+            'KLineCount' : sampleConfig if isinstance(sampleConfig, int) and sampleConfig > 0 else (1 if sampleConfig == 'N' else 0),
             'AllK' : True if sampleConfig == 'A' else False,
             'UseSample' : False if sampleConfig == 'N' else True,
             'Trigger' : trigger,

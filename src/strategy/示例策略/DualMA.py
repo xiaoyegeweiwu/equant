@@ -1,10 +1,10 @@
 import talib
 
 p1=5
-p2=30
+p2=20
 
 def initialize(context): 
-    SetBarInterval("NYMEX|F|CL|1909", 'M', 1, 2000)
+    SetBarInterval("ZCE|F|TA|909", 'M', 1, 1000)
     SetActual()
 
 def handle_data(context):
@@ -19,6 +19,10 @@ def handle_data(context):
     # 绘制指标图形
     PlotNumeric("ma1", ma1[-1], color=0xFF0000)
     PlotNumeric("ma2", ma2[-1], color=0x00aa00)    
+    PlotNumeric("fit", NetProfit(), 0xFF0000, False)
+    #UnPlotNumeric("ma1")
+    #UnPlotNumeric("ma2")
+    #UnPlotNumeric("fit")
 
     # 执行下单操作
     if MarketPosition() <= 0 and ma1[-1] > ma2[-1]:
@@ -26,5 +30,44 @@ def handle_data(context):
     if MarketPosition() >= 0 and ma1[-1] < ma2[-1]:
         SellShort(1, Close()[-1])
 
-    PlotNumeric("profit", NetProfit() +  FloatProfit(), 0xFF00FF, False, True)   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

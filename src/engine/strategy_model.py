@@ -93,6 +93,7 @@ class StrategyModel(object):
             "KLineSlice": 1,  # todo
             "TradeDot": self.getContractUnit(contNo),  # 每手乘数
             "PriceTick": self.getPriceScale(contNo),  # 最小变动价位
+            "Limit":self._config.getLimit(),
         }
         self._calcCenter.initArgs(strategyParam)
 
@@ -421,6 +422,11 @@ class StrategyModel(object):
     def setStopTrade(self):
         self._cfgModel.setPending(True)
 
+    def isTradeAllowed(self):
+        if self._cfgModel.isActualRun() and self._strategy.isRealTimeStatus() and not self._cfgModel.getPending():
+            return True
+        return False
+
     #////////////////////////设置函数////////////////////////////
     def getConfig(self):
         return self._cfgModel._metaData
@@ -641,14 +647,16 @@ class StrategyModel(object):
             if isVaildOrder < 0:
                 return ""
 
+        canAdded = self._calcCenter.addOrder(orderParam)
+        if not canAdded:
+            return ""
+
         key = (triggerInfo['ContractNo'], triggerInfo['KLineType'], triggerInfo['KLineSlice'])
         isSendSignal = self._config.hasKLineTrigger() and key == self._config.getKLineShowInfoSimple()
         # K线触发，发送信号
         if signal and isSendSignal:
             self.sendSignalEvent(self._signalName, contNo, orderDirct, entryOrExit, orderPrice, orderQty, curBar)
-        # **************************************
-        self._calcCenter.addOrder(orderParam)
-        # **************************************
+
         retCode, eSessionId = self.sendOrder(userNo, contNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty)
         return eSessionId if retCode == 0 else ""
         
@@ -1322,7 +1330,8 @@ class StrategyModel(object):
             return 0
 
         timeBucket = self._qteModel._commodityData[commodity]._metaData['TimeBucket']
-        return timeBucket[2*index + 1]["BeginTime"] if 2*index + 1 < len(timeBucket) else 0
+        endTime = timeBucket[2*index + 1]["BeginTime"] if 2*index + 1 < len(timeBucket) else 0
+        return float(endTime)/1000000000
 
     def getGetSessionStartTime(self, contNo, index):
         commodity = self.getCommodityInfoFromContNo(contNo)['CommodityCode']
@@ -1330,16 +1339,15 @@ class StrategyModel(object):
             return 0
 
         timeBucket = self._qteModel._commodityData[commodity]._metaData['TimeBucket']
-        return timeBucket[2 * index]["BeginTime"] if 2 * index < len(timeBucket) else 0
+        beginTime = timeBucket[2 * index]["BeginTime"] if 2 * index < len(timeBucket) else 0
+        return float(beginTime)/1000000000
 
     def getNextTimeInfo(self, contNo, timeStr):
         commodity = self.getCommodityInfoFromContNo(contNo)['CommodityCode']
         if commodity not in self._qteModel._commodityData:
             return {}
 
-        timeInt = self.convertTime(timeStr)
-        if timeInt < 0:
-            return {}
+        timeInt = float(timeStr) * 1000000000
 
         timeBucket = self._qteModel._commodityData[commodity]._metaData['TimeBucket']
         if len(timeBucket) == 0:
@@ -1352,20 +1360,13 @@ class StrategyModel(object):
 
         for timeTuple in timeList:
             if timeTuple[0] >= timeInt:
-                return {'Time' : timeTuple[0], 'TradeState' : timeTuple[1]}
+                return {'Time' : float(timeTuple[0])/1000000000, 'TradeState' : timeTuple[1]}
 
-        return {'Time' : timeList[0][0], 'TradeState' : timeList[0][1]}
+        return {'Time' : float(timeList[0][0])/1000000000, 'TradeState' : timeList[0][1]}
 
-    def convertTime(self, timeStr):
-        # to millisecond
-        timeList = timeStr.split(':')
-        if len(timeList) != 3:
-            return -1
-
-        timeInt = 0
-        for t in timeList:
-            timeInt = timeInt*100 + int(t)
-        return timeInt*1000
+    def getCurrentTime(self):
+        currentTime = datetime.now().strftime('0.%H%M%S')
+        return float(currentTime)
 
     def getMarginRatio(self, contNo):
         contractNo = contNo
@@ -1510,7 +1511,7 @@ class StrategyModel(object):
             return barIndex
 
         curBar = self._hisModel.getCurBar()
-        return (curBar['KLineIndex'] - barIndex)
+        return int(curBar['KLineIndex'] - barIndex)
 
     def getBarsSinceExit(self, contNo):
         '''获得当前持仓中指定合约的最近平仓位置到当前位置的Bar计数'''
@@ -1567,6 +1568,14 @@ class StrategyModel(object):
     def getEntryDate(self, contNo):
         '''获得当前持仓的第一个建仓位置的日期'''
         return self.getFirstOpenOrderInfo(contNo, 'TradeDate')
+
+    def getBuyPosition(self, contNo):
+        '''获得当前持仓的买入方向的持仓量'''
+        return self.getPositionValue(contNo, 'TotalBuy')
+
+    def getSellPosition(self, contNo):
+        '''当前持仓的卖出持仓量'''
+        return self.getPositionValue(contNo, 'TotalSell')
 
     def getEntryPrice(self, contNo):
         '''获得当前持仓的第一次建仓的委托价格'''
@@ -1636,6 +1645,8 @@ class StrategyModel(object):
         return fundRecordDict['DynamicEquity']
 
     def getFloatProfit(self, contNo):
+        if not contNo:
+            contNo = self._cfgModel.getBenchmark()
         return self._calcCenter._getHoldProfit(contNo)
 
     def getGrossLoss(self):
@@ -1645,6 +1656,8 @@ class StrategyModel(object):
         return self._calcCenter.getProfit()["TotalProfit"]
 
     def getMargin(self, contNo):
+        if not contNo:
+            contNo = self._cfgModel.getBenchmark()
         return self._calcCenter._getHoldMargin(contNo)
 
     def getNetProfit(self):

@@ -38,6 +38,18 @@ class StartegyManager(object):
     def run(strategy):
         strategy.run()
 
+    def getStrategyState(self, strategyId):
+        assert strategyId in self._strategyInfo, 'error '
+        return self._strategyInfo[strategyId]["StrategyState"]
+
+    def handleStrategyException(self, event):
+        strategyId = event.getStrategyId()
+        if strategyId not in self._strategyInfo:
+            return
+        self._strategyInfo[strategyId]["StrategyState"] = ST_STATUS_EXCEPTION
+        # self.destroyProcessByStrategyId(event.getStrategyId())
+        # self._strategyInfo[strategyId]["Process"] = None
+
     def create(self, strategyId, eg2stQueue, eg2uiQueue, st2egQueue, event):
         qdict = {'eg2st': eg2stQueue, 'st2eg': st2egQueue, 'st2ui':eg2uiQueue}
         strategy = Strategy(self.logger, strategyId, qdict, event)
@@ -48,7 +60,7 @@ class StartegyManager(object):
 
         args = {
             "Config": event.getData()["Args"],
-            #"UIConfig": copy.deepcopy(event.getData()["Args"]),
+            # "UIConfig": copy.deepcopy(event.getData()["Args"]),
             "Path": event.getData()["Path"],
             "StrategyName": None,
             "StrategyId": strategyId,
@@ -94,6 +106,9 @@ class StartegyManager(object):
         self._strategyInfo.pop(strategyId)
         self._strategyAttribute.pop(event.getStrategyId())
 
+    def removeExceptionStrategy(self, event):
+        self.removeRunningStrategy(event)
+
     def restartStrategy(self, engineLoadFunc, event):
         assert event.getStrategyId() in self._strategyInfo, "error"
         strategyInfo = self._strategyAttribute[event.getStrategyId()]
@@ -121,7 +136,7 @@ class StartegyManager(object):
     def isAllStrategyQuit(self):
         result = True
         for k, v in self._strategyInfo.items():
-            if v["StrategyState"] != ST_STATUS_QUIT:
+            if v["StrategyState"] != ST_STATUS_QUIT and v["StrategyState"] != ST_STATUS_EXCEPTION:
                 result = False
                 break
         # print("now is equant exit complete ", result)
@@ -154,7 +169,9 @@ class StartegyManager(object):
 
     def getStrategyConfig(self):
         result = {}
-        for strategyId, _ in self._strategyInfo.items():
+        for strategyId, value in self._strategyInfo.items():
+            if value["StrategyState"] == ST_STATUS_EXCEPTION:
+                continue
             v = self._strategyAttribute[strategyId]
             result[strategyId] = {
                 "Config":v["Config"],
@@ -377,6 +394,7 @@ class Strategy:
             if self._isExit():
                 time.sleep(0.2)
                 self._clearQueue(self._eg2stQueue)
+                continue
             event = self._eg2stQueue.get()
             code = event.getEventCode()
             if code not in self._egCallbackDict:
@@ -392,11 +410,12 @@ class Strategy:
             pass
 
     def _runStrategy(self):
-        # 等待回测阶段
-        self._runStatus = ST_STATUS_HISTORY
-        self._send2UIStatus(self._runStatus)
-        # runReport中会有等待
         try:
+            # 等待回测阶段
+            self._runStatus = ST_STATUS_HISTORY
+            self._send2UIStatus(self._runStatus)
+            # runReport中会有等待
+
             self._dataModel.runReport(self._context, self._userModule.handle_data)
 
             # 持续运行阶段
@@ -405,6 +424,7 @@ class Strategy:
             # self._runStatus = ST_STATUS_HISTORY
             # self._send2UIStatus(self._runStatus)
             #
+
             while not self._isExit():
                 try:
                     event = self._triggerQueue.get_nowait()
@@ -418,9 +438,11 @@ class Strategy:
                     else:
                         time.sleep(0.1)
         except Exception as e:
-            errorText = traceback.format_exc()
-            # traceback.print_exc()
-            self._exit(-1, errorText)
+                self._strategyState = StrategyStatusExit
+                self._isSt2EgQueueEffective = False
+                errorText = traceback.format_exc()
+                # traceback.print_exc()
+                self._exit(-1, errorText)
 
     def _startStrategyThread(self):
         '''历史数据准备完成后，运行策略'''
@@ -444,7 +466,7 @@ class Strategy:
                     "KLineType" : None,
                     "KLineSlice": None,
                     "Data":{
-                        "TradeDate"  : tradeDate,
+                        "TradeDate": tradeDate,
                         "DateTimeStamp": dateTimeStamp,
                         "Data":timeSecond
                     }
@@ -635,16 +657,20 @@ class Strategy:
     def _onLoadStrategyResponse(self, event):
         '''向界面返回策略加载应答'''
         cfg = self._dataModel.getConfigData()
-        
+
+        key = self._dataModel.getConfigModel().getKLineShowInfoSimple()
         revent = Event({
             "EventCode" : EV_EG2UI_LOADSTRATEGY_RESPONSE,
             "StrategyId": self._strategyId,
-            "ErrorCode" : 0,
-            "ErrorText" : "",
             "Data":{
                 "StrategyId"   : self._strategyId,
                 "StrategyName" : self._strategyName,
                 "StrategyState": self._runStatus,
+                "ContractNo"   : key[0],
+                "KLineType"    : key[1],
+                "KLinceSlice"  : key[2],
+                "IsActualRun"  : self._dataModel.getConfigModel().isActualRun(),
+                "InitialFund"  : self._dataModel.getConfigModel().getInitCapital(),
                 "Config"       : cfg,
             }
         })
@@ -806,26 +832,29 @@ class Strategy:
             }
         })
         self.sendEvent2EngineForce(event)
-        self._onStrategyQuit()
+        self._onStrategyQuit(None, ST_STATUS_EXCEPTION)
         # 保证该进程is_alive， 使得队列可用
         while True:
             time.sleep(2)
 
     # 停止策略
-    def _onStrategyQuit(self, event=None):
+    def _onStrategyQuit(self, event=None, status=ST_STATUS_QUIT):
         self._isSt2EgQueueEffective = False
         self._strategyState = StrategyStatusExit
         config = None if self._dataModel is None else self._dataModel.getConfigData()
+        result = None
+        if self._dataModel and self._dataModel.getCalcCenter():
+            result = self._dataModel.getCalcCenter().testResult()
         quitEvent = Event({
             "EventCode": EV_EG2UI_STRATEGY_STATUS,
             "StrategyId": self._strategyId,
             "Data":{
-                "Status":ST_STATUS_QUIT,
+                "Status":status,
                 "Config":config,
                 "Pid":os.getpid(),
                 "Path":self._filePath,
                 "StrategyName": self._strategyName,
-                "Result":self._dataModel.getCalcCenter().testResult()
+                "Result":result
             }
         })
         self.sendEvent2UI(quitEvent)

@@ -11,12 +11,13 @@ class StatisticsModel(object):
 
     def SMA(self, price:np.array, period, weight):
         sma = 0.0
+        smas = []
 
         if period <= 0:
-            return -1, np.nan
+            return -1, np.array(smas)
 
         if weight > period or weight <= 0:
-            return -2, np.nan
+            return -2, np.array(smas)
 
         for i, p in enumerate(price):
             if i == 0:
@@ -24,7 +25,9 @@ class StatisticsModel(object):
             else:
                 sma = (sma*(period-weight)+p*weight)/period
 
-        return 0, sma
+            smas.append(sma)
+
+        return 0, np.array(smas)
 
     def ParabolicSAR(self, high:np.array, low:np.array, afstep, aflimit):
         oParClose = None
@@ -32,11 +35,16 @@ class StatisticsModel(object):
         oPosition = None
         oTransition = None
 
+        opc_s = []
+        opo_s = []
+        opos_s = []
+        otran_s = []
+
         hlen = len(high)
         llen = len(low)
 
         if hlen <=0 or llen <= 0:
-            return oParClose, oParOpen, oPosition, oTransition
+            return np.array(opc_s), np.array(opo_s), np.array(opos_s), np.array(otran_s)
 
         arr = high if hlen < llen else low
 
@@ -140,12 +148,15 @@ class StatisticsModel(object):
                             ParOpen = high[i-1]
 
 
-        oParOpen = ParOpen
-        oPosition = Position
+            oParOpen = ParOpen
+            oPosition = Position
 
-        return oParClose, oParOpen, oPosition, oTransition
+            opc_s.append(oParClose)
+            opo_s.append(oParOpen)
+            opos_s.append(oPosition)
+            otran_s.append(oTransition)
 
-
+        return np.array(opc_s), np.array(opo_s), np.array(opos_s), np.array(otran_s)
 
 
 
