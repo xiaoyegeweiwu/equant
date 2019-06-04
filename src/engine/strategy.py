@@ -961,7 +961,7 @@ class Strategy:
             return
 
         if apiEvent.getEventCode() == EEQU_SRVEVENT_TRADE_MATCH and str(apiEvent.getStrategyId()) == str(self._strategyId):
-            contractNo = apiEvent.getData[0]["Cont"]
+            contractNo = apiEvent.getData()[0]["Cont"]
             dateTimeStamp, tradeDate, lv1Data = self.getTriggerTimeAndData(contractNo)
 
             tradeTriggerEvent = Event({

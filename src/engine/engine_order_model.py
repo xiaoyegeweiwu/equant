@@ -114,8 +114,8 @@ class EngineOrderModel:
 
     def getData(self):
         result = {
-            "LocalOrder":self.getLocalOrderData(),
-            "EpoleStarOrder":self.getEpoleStarOrder(),
+            "LocalOrder":{},                                        # self.getLocalOrderData(),
+            "EpoleStarOrder":{},                                    # self.getEpoleStarOrder(),
             "EpoleStarOrder2LocalOrderMap":self._orderNo2OtherMap
         }
         return result
