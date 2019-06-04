@@ -1907,7 +1907,7 @@ class BaseApi(object):
          【示例】
               无
         '''
-        return self._dataModel.getBuyPosition(contractNo)
+        return self._dataModel.getBuyPositionInStrategy(contractNo)
 
     def SellPosition(self, contractNo):
         '''
@@ -1923,7 +1923,7 @@ class BaseApi(object):
          【示例】
               无
         '''
-        return self._dataModel.getSellPosition(contractNo)
+        return self._dataModel.getSellPositionInStrategy(contractNo)
 
     def EntryDate(self, contractNo):
         '''
