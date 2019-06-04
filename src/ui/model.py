@@ -61,7 +61,7 @@ class QuantModel(object):
     def getUserNo(self):
         return self._receive.getUserNo()
 
-    def getStrategyManaegr(self):
+    def getStrategyManager(self):
         return self._stManager
 
 
