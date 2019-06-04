@@ -663,7 +663,7 @@ class StrategyEngine(object):
         orderEvents = self._engineOrderModel.getStrategyOrder(event.getStrategyId())
         for orderEvent in orderEvents:
             contractNo = orderEvent.getContractNo()
-            condition = orderEvent.getStrategyId() == 0 and stragetyId in self._quoteOberverDict[contractNo].keys()
+            condition = orderEvent.getStrategyId() == 0 and contractNo in self._quoteOberverDict and stragetyId in self._quoteOberverDict[contractNo].keys()
             if orderEvent.getStrategyId() == event.getStrategyId() or condition:
                 self._sendEvent2Strategy(stragetyId, orderEvent)
 
