@@ -7,6 +7,8 @@ from capi.com_types import *
 from report.reportdetail import ReportDetail
 from report.fieldConfigure import *
 
+from engine.limitctl import LimitCtl
+
 
 class CalcCenter(object):
     def __init__(self, logger):
@@ -72,7 +74,6 @@ class CalcCenter(object):
         # limits
         self._limit = {}            # 下单限制
 
-
     def initArgs(self, args):
         """初始化参数"""
         self._strategy = args
@@ -80,6 +81,12 @@ class CalcCenter(object):
         self._setExpertSetting()
         self._curTradeDate = self._strategy["StartTime"]
         self._limit = self._strategy["Limit"]
+
+        self._initLimitCtl()
+
+    def _initLimitCtl(self):
+        self._limitCtl = LimitCtl(self._limit["ContinueOpenTimes"], self._limit["OpenTimes"],
+                                  self._limit["OpenAllowClose"], self._limit["CloseAllowOpen"])
 
     def _updateTradeDate(self, Time):
         """更新当前交易日信息"""
@@ -360,10 +367,20 @@ class CalcCenter(object):
         }
         :return:
         """
+        print("1111: ", order)
         # print("begin:", datetime.now().strftime('%H:%M:%S.%f'))
         if not self._beginDate:
             self._beginDate = order["TradeDate"]
         self._endDate = order["TradeDate"]
+        self._updateTradeDate(order["TradeDate"])
+
+        # TODO:限制信息写在这里
+        if len(self._orders) < 1:
+            ret = self._limitCtl.allowOrder(order, [])
+        else:
+            ret = self._limitCtl.allowOrder(order, self._orders[-1]["Order"])
+        if ret == -1:
+            return 0
 
         order.update({"OrderId": self._orderId})
         self._orderId += 1
@@ -372,15 +389,18 @@ class CalcCenter(object):
 
         ftOrder = self._formatOrder(order)
 
-        self._logger.sig_info("%s, %s, %s, %s, %s, %s, %s, %s, %s"%(ftOrder["OrderId"],
-                                                                    ftOrder["UserNo"],
-                                                                    ftOrder["Cont"],
-                                                                    ftOrder["Direct"],
-                                                                    ftOrder["Offset"],
-                                                                    ftOrder["OrderPrice"],
-                                                                    ftOrder["OrderQty"],
-                                                                    ftOrder["OrderType"],
-                                                                    ftOrder["Hedge"]))
+        self._logger.sig_info("[%3s] [%4s] [%5s], %s, %s, %s, %s, %s, %s, %s, %s"%(
+                                                        ftOrder["StrategyId"],
+                                                        ftOrder["StrategyStage"],
+                                                        ftOrder["OrderId"],
+                                                        ftOrder["UserNo"],
+                                                        ftOrder["Cont"],
+                                                        ftOrder["Direct"],
+                                                        ftOrder["Offset"],
+                                                        ftOrder["OrderPrice"],
+                                                        ftOrder["OrderQty"],
+                                                        ftOrder["OrderType"],
+                                                        ftOrder["Hedge"]))
 
         # self._logger.sig_info(self._formatOrder(order))
 
@@ -422,9 +442,13 @@ class CalcCenter(object):
         self._updateFundRecord(order["DateTimeStamp"], eo["Profit"], eo["Cost"])
         # print("end:", datetime.now().strftime('%H:%M:%S.%f'))
 
+        return 1   # 订单发送成功
+
     def _formatOrder(self, order):
 
         return {
+           "StrategyId"      : order["StrategyId"],
+           "StrategyStage"   : StrategyStatus[order["StrategyStage"]],
            "OrderId"         : order["OrderId"],
             "UserNo"         : order["UserNo"],
            "Cont"            : order["Cont"],
