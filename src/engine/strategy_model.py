@@ -724,6 +724,64 @@ class StrategyModel(object):
         self._strategy.updateLocalOrder(eId, aOrder)
         return 0, eId
 
+    def sendConditionOrder(self, userNo, contNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty, \
+                           triggerType=stNone, triggerMode=tmNone, triggerCondition=tcNone, triggerPrice=0):
+        '''A账户下单函数，不经过calc模块，不产生信号，直接发单'''
+        # 是否暂停实盘下单
+        if self._cfgModel.getPending():
+            return -5, "用户调用StartTrade方法停止实盘下单功能"
+
+        # 发送下单信号,K线触发、即时行情触发
+        # 未选择实盘运行
+        if not self._cfgModel.isActualRun():
+            return -1, '未选择实盘运行，请在设置界面勾选"实盘运行"，或者在策略代码中调用SetActual()方法选择实盘运行'
+
+        if not self._strategy.isRealTimeStatus():
+            return -2, "策略当前状态不是实盘运行状态，请勿在历史回测阶段调用该函数"
+
+        # 账户错误
+        if not userNo or userNo == 'Default':
+            return -3, "未指定下单账户信息"
+
+        # 指定的用户未登录
+        if self._trdModel.getSign(userNo) is None:
+            return -4, "输入的账户没有在极星客户端登录"
+
+        # 发送定单到实盘
+        aOrder = {
+            'UserNo': userNo,
+            'Sign': self._trdModel.getSign(userNo),
+            'Cont': contNo,
+            'OrderType': orderType,
+            'ValidType': validType,
+            'ValidTime': '0',
+            'Direct': orderDirct,
+            'Offset': entryOrExit,
+            'Hedge': hedge,
+            'OrderPrice': orderPrice,
+            'TriggerPrice': triggerPrice,
+            'TriggerMode': triggerMode,
+            'TriggerCondition': triggerCondition,
+            'OrderQty': orderQty,
+            'StrategyType': triggerType,
+            'Remark': '',
+            'AddOneIsValid': tsDay,
+        }
+
+        eId = str(self._strategy.getStrategyId()) + '-' + str(self._strategy.getESessionId())
+        aOrderEvent = Event({
+            "EventCode": EV_ST2EG_ACTUAL_ORDER,
+            "StrategyId": self._strategy.getStrategyId(),
+            "Data": aOrder,
+            "ESessionId": eId,
+        })
+        self._strategy.sendEvent2Engine(aOrderEvent)
+
+        # 更新策略的订单信息
+        self._strategy.setESessionId(self._strategy.getESessionId() + 1)
+        self._strategy.updateLocalOrder(eId, aOrder)
+        return 0, eId
+
     def getAOrderNo(self, eId):
         orderId = self._strategy.getOrderId(eId)
         if not orderId:

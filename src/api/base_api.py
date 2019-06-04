@@ -3028,13 +3028,13 @@ class BaseApi(object):
          '''
         return self._dataModel.getOrderTime(orderId)
 
-    def A_SendOrder(self, userNo, contractNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty):
+    def A_SendOrder(self, userNo, contractNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty, triggerType, triggerMode, triggerCondition, triggerPrice):
         '''
         【说明】A_SendOrder
               针对指定的帐户、商品发送委托单。
 
         【语法】
-              bool A_SendOrder(string userNo, string contractNo, char orderType, char validType, char orderDirct, char entryOrExit, char hedge, float orderPrice, int orderQty)
+              bool A_SendOrder(string userNo, string contractNo, char orderType, char validType, char orderDirct, char entryOrExit, char hedge, float orderPrice, int orderQty, char triggerType, char triggerMode, char triggerCondition, float triggerPrice)
 
         【参数】
               userNo 指定的账户名称，
@@ -3073,7 +3073,24 @@ class BaseApi(object):
                 'M' : 做市
                 可使用如Enum_Speculate、Enum_Hedge等订单投保标记枚举函数获取相应的类型，
               orderPrice 委托单的交易价格，
-              orderQty 委托单的交易数量。
+              orderQty 委托单的交易数量，
+              triggerType 触发委托类型，默认值为N，可用的值为：
+                'N' : 普通单
+                'P' : 预备单(埋单)
+                'A' : 自动单
+                'C' : 条件单
+              triggerMode 触发模式，默认值为N，可用的值为：
+                'N' : 普通单
+                'L' : 最新价
+                'B' : 买价
+                'A' : 卖价
+              triggerCondition 触发条件，默认值为N，可用的值为：
+                'N' : 无
+                'g' : 大于
+                'G' : 大于等于
+                'l' : 小于
+                'L' : 小于等于
+              triggerPrice 触发价格，默认价格为0。
 
         【备注】
               针对当前公式指定的帐户、商品发送委托单，发送成功返回如"1-2"的下单编号，发送失败返回空字符串""。
@@ -3087,6 +3104,9 @@ class BaseApi(object):
               retCode, retMsg = A_SendOrder(UserId, ContractId, Enum_Order_Limit(), Enum_FOK(), Enum_Buy(), Enum_Exit(), Enum_Speculate(), Q_AskPrice(), OrderNum)
               当retCode为0时表明发送订单信息成功。
          '''
+        if triggerType in ('P', 'A', 'C'):
+            return self._dataModel.sendConditionOrder(userNo, contractNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty, \
+                                                      triggerType, triggerMode, triggerCondition, triggerPrice)
         return self._dataModel.sendOrder(userNo, contractNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty)
 
     def A_DeleteOrder(self, orderId):
@@ -5871,8 +5891,8 @@ def A_OrderStatus(orderId=''):
 def A_OrderTime(orderId=''):
     return baseApi.A_OrderTime(orderId)
 
-def A_SendOrder(userNo, contractNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty):
-    return baseApi.A_SendOrder(userNo, contractNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty)
+def A_SendOrder(userNo, contractNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty, triggerType='N', triggerMode='N', triggerCondition='N', triggerPrice=0):
+    return baseApi.A_SendOrder(userNo, contractNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty, triggerType, triggerMode, triggerCondition, triggerPrice)
 
 def A_DeleteOrder(orderId):
     return baseApi.A_DeleteOrder(orderId)
