@@ -8,7 +8,7 @@ def initialize(context):
 def handle_data(context):
     #PlotVertLine(main=True, axis = True)
     #UnPlotVertLine()
-    #PlotDot(name="Dot", value=Close()[-1], main=True)
+    #PlotDot(name="Dot", value=Close()[-1], icon=1, main=True)
     #UnPlotDot("Dot")
     #PlotBar("BarExample1", Vol()[-1], 0, RGB_Red())
     #UnPlotBar("BarExample1")
