@@ -174,7 +174,8 @@ _all_func_ = {
                     ['A_OrderStatus'       , '定单状态'],
                     ['A_OrderTime'         , '下单时间'],
                     ['A_SendOrder'         , '下单'],
-                    ['A_DeleteOrder'       , '撤单']
+                    ['A_DeleteOrder'       , '撤单'],
+                    ['A_GetOrderNo'        , '获取定单号和委托号'],
                 ],
                 
     '枚举函数': [

@@ -40,8 +40,7 @@ class PyAPI(object):
         self._contractCount = 0
         self._exchangeCount = 0
 
-        #
-
+    #
     def _setSessionId(self, session_id, strategy_id):
         self._SessionStrategyPair[session_id] = strategy_id
         
@@ -52,13 +51,14 @@ class PyAPI(object):
         
     def _apiCallbackFunc(self, service):
         apiEvent = Event(service)
-        code = apiEvent.getEventCode()
-        if code not in self._apiCallbackDict:
-            self.logger.error("callback(%d) not register!"%code)
-            return -1
-            
-        self._apiCallbackDict[code](apiEvent)
-        
+        try:
+            code = apiEvent.getEventCode()
+            if code not in self._apiCallbackDict:
+                self.logger.error("callback(%d) not register!"%code)
+                return -1
+            self._apiCallbackDict[code](apiEvent)
+        except Exception as e:
+            self.logger.error(f"error in call back function, py2c, {e}")
         return 0
         
     def _regCallback(self):
@@ -813,6 +813,8 @@ class PyAPI(object):
         self.logger.info("Request query login info:%s"%event.getData())
         sessionId = c_uint()
         req = EEquLoginInfoReq()
+        req.LoginNo = "".encode()
+        req.Sign = "".encode()
         self._cDll.E_ReqQryLoginInfo(byref(sessionId), byref(req))
         
     def reqQryUserInfo(self, event):
@@ -830,6 +832,8 @@ class PyAPI(object):
         self.logger.info("Request query user info:%s"%event.getData())
         sessionId = c_uint()
         req = EEquUserInfoReq()
+        req.UserNo = "".encode()
+        req.Sign = "".encode()
         self._cDll.E_ReqQryUserInfo(byref(sessionId), byref(req))
         
     def reqQryMoney(self, event):
@@ -849,9 +853,9 @@ class PyAPI(object):
         sessionId = c_uint()
         data = event.getData()
         req = EEquUserMoneyReq()
-        req.UserNo = data['UserNo'].encode()
-        req.Sign = data['Sign'].encode()
-        req.CurrencyNo = data['CurrencyNo'].encode()
+        req.UserNo = "".encode()
+        req.Sign = "".encode()
+        req.CurrencyNo = "".encode()
         self._cDll.E_ReqQryMoney(byref(sessionId), byref(req))
         
     def reqQryOrder(self, event):
@@ -869,22 +873,21 @@ class PyAPI(object):
         '''
         sessionId = c_uint()
         data = event.getData()
-        self.logger.debug('Request query order:%s'%event.getData())
+        # self.logger.debug('Request query order:%s'%event.getData())
         req = EEquOrderQryReq()
-        req.UserNo = data['UserNo'].encode()
-        req.Signa = data['Sign'].encode()
+        req.UserNo = "".encode()
+        req.Sign = "".encode()
         self._cDll.E_ReqQryOrder(byref(sessionId), byref(req))
         self._setSessionId(sessionId.value, event.getStrategyId())
-        
-        
+
     def reqQryMatch(self, event):
         '''查询成交信息'''
         sessionId = c_uint()
         data = event.getData()
-        self.logger.debug('Request query match:%s'%event.getData())
+        # self.logger.debug('Request query match:%s'%event.getData())
         req = EEquOrderQryReq()
-        req.UserNo = data['UserNo'].encode()
-        req.Signa = data['Sign'].encode()
+        req.UserNo = "".encode()
+        req.Sign = "".encode()
         self._cDll.E_ReqQryMatch(byref(sessionId), byref(req))
         self._setSessionId(sessionId.value, event.getStrategyId())
         
@@ -892,10 +895,10 @@ class PyAPI(object):
         '''查询持仓信息'''
         sessionId = c_uint()
         data = event.getData()
-        self.logger.debug('Request query position:%s'%event.getData())
+        # self.logger.debug('Request query position:%s'%event.getData())
         req = EEquOrderQryReq()
-        req.UserNo = data['UserNo'].encode()
-        req.Signa = data['Sign'].encode()
+        req.UserNo = "".encode()
+        req.Sign = "".encode()
         self._cDll.E_ReqQryPosition(byref(sessionId), byref(req))
         self._setSessionId(sessionId.value, event.getStrategyId())
 

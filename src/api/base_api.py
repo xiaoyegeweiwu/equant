@@ -1222,7 +1222,7 @@ class BaseApi(object):
               无
 
         【备注】
-              获取策略是否可以向实盘发单的布尔值，允许向实盘发单返回True，否则返回False。
+              获取策略是否可以向实盘发单的布尔值，策略实盘运行时并且允许向实盘发单返回True，否则返回False。
 
         【示例】
               无
@@ -1824,7 +1824,7 @@ class BaseApi(object):
 
         【备注】
               获得当前持仓指定合约的最近平仓位置到当前位置的Bar计数，返回值为整型。
-              只有当MarketPosition != 0时，即有持仓的状况下，该函数才有意义，否则返回-1。
+              若从未平过仓，则返回-1。
               注意：在平仓Bar上为0。
 
         【示例】
@@ -1845,7 +1845,7 @@ class BaseApi(object):
 
         【备注】
               获得当前持仓指定合约的最后一个建仓位置到当前位置的Bar计数，返回值为整型。
-              只有当MarketPosition != 0时，即有持仓的状况下，该函数才有意义，否则返回-1。
+              若当前策略持仓为0，则返回-1。
               注意：在建仓Bar上为0。
 
         【示例】
@@ -1866,7 +1866,6 @@ class BaseApi(object):
 
         【备注】
               获得当前持仓位置的每手浮动盈亏，返回值为浮点数。
-              只有当MarketPosition != 0时，即有持仓的状况下，该函数才有意义，否则返回-1。
 
         【示例】
               无
@@ -1886,7 +1885,7 @@ class BaseApi(object):
 
         【备注】
               获得策略当前的持仓合约数，返回值为整数。
-              只有当MarketPosition != 0时，即有持仓的状况下，该函数才有意义，否则返回-1。
+              该函数返回策略当前的净持仓数量，多仓为正值，空仓为负值，持平返回0。
 
         【示例】
               无
@@ -1937,8 +1936,7 @@ class BaseApi(object):
               contractNo 合约编号，默认为基准合约。
 
         【备注】
-              若策略当前持仓为0，则返回-1，否则返回YYYYMMDD格式的日期。
-              只有当MarketPosition != 0时，即有持仓的状况下，该函数才有意义，否则返回-1。
+              若策略当前持仓为0，则返回无效日期:19700101，否则返回YYYYMMDD格式的日期。
 
         【示例】
               无
@@ -1958,7 +1956,7 @@ class BaseApi(object):
 
         【备注】
               获得当前持仓的第一个建仓价格，返回值为浮点数。
-              只有当MarketPosition != 0时，即有持仓的状况下，该函数才有意义，否则返回-1。
+              若策略当前持仓为0，则返回0。
 
         【示例】
               无
@@ -1978,7 +1976,7 @@ class BaseApi(object):
 
         【备注】
               获得当前持仓的第一个建仓时间，返回值为0.HHMMSSmmm格式的时间。
-              只有当MarketPosition != 0时，即有持仓的状况下，该函数才有意义，否则返回-1。
+              若策略当前持仓为0，则返回0。
 
         【示例】
               无
@@ -1998,7 +1996,7 @@ class BaseApi(object):
 
         【备注】
               获得当前持仓的最近平仓时间，返回值为YYYYMMDD格式的日期。
-              只有当MarketPosition != 0时，即有持仓的状况下，该函数才有意义，否则返回-1。
+              若从未平过仓，则返回无效日期:19700101。
 
         【示例】
               无
@@ -2018,7 +2016,7 @@ class BaseApi(object):
 
         【备注】
               获得最近平仓位置的平仓价格，返回值为浮点数。
-              只有当MarketPosition != 0时，即有持仓的状况下，该函数才有意义，否则返回-1。
+              若合约从未被平仓,则返回0，否则返回合约最近一次平仓时的委托价格。
 
         【示例】
               无
@@ -2038,7 +2036,7 @@ class BaseApi(object):
 
         【备注】
               获得最近平仓位置Bar时间，返回值为0.HHMMSSmmm格式的时间。
-              只有当MarketPosition != 0时，即有持仓的状况下，该函数才有意义，否则返回-1。
+              若合约从未平过仓，则返回0。
 
         【示例】
               无
@@ -2058,7 +2056,7 @@ class BaseApi(object):
 
         【备注】
               获得当前持仓的最后一个建仓位置的日期，返回值为YYYYMMDD格式的日期。
-              只有当MarketPosition != 0时，即有持仓的状况下，该函数才有意义，否则返回-1。
+              若策略当前持仓为0，则返回无效日期:19700101。
 
         【示例】
               无
@@ -2078,7 +2076,7 @@ class BaseApi(object):
 
         【备注】
               获得当前持仓的最后一个建仓价格，返回值为浮点数。
-              只有当MarketPosition != 0时，即有持仓的状况下，该函数才有意义，否则返回-1。
+              若策略当前持仓为0，则返回0。
 
         【示例】
               无
@@ -2098,7 +2096,7 @@ class BaseApi(object):
 
         【备注】
               获得当前持仓的最后一个建仓位置的时间，返回值为0.HHMMSSmmm格式的时间。
-              只有当MarketPosition != 0时，即有持仓的状况下，该函数才有意义，否则返回-1。
+              若策略当前持仓为0，则返回0。
 
         【示例】
               无
@@ -3030,13 +3028,13 @@ class BaseApi(object):
          '''
         return self._dataModel.getOrderTime(orderId)
 
-    def A_SendOrder(self, userNo, contractNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty):
+    def A_SendOrder(self, userNo, contractNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty, triggerType, triggerMode, triggerCondition, triggerPrice):
         '''
         【说明】A_SendOrder
               针对指定的帐户、商品发送委托单。
 
         【语法】
-              bool A_SendOrder(string userNo, string contractNo, char orderType, char validType, char orderDirct, char entryOrExit, char hedge, float orderPrice, int orderQty)
+              bool A_SendOrder(string userNo, string contractNo, char orderType, char validType, char orderDirct, char entryOrExit, char hedge, float orderPrice, int orderQty, char triggerType, char triggerMode, char triggerCondition, float triggerPrice)
 
         【参数】
               userNo 指定的账户名称，
@@ -3075,7 +3073,24 @@ class BaseApi(object):
                 'M' : 做市
                 可使用如Enum_Speculate、Enum_Hedge等订单投保标记枚举函数获取相应的类型，
               orderPrice 委托单的交易价格，
-              orderQty 委托单的交易数量。
+              orderQty 委托单的交易数量，
+              triggerType 触发委托类型，默认值为N，可用的值为：
+                'N' : 普通单
+                'P' : 预备单(埋单)
+                'A' : 自动单
+                'C' : 条件单
+              triggerMode 触发模式，默认值为N，可用的值为：
+                'N' : 普通单
+                'L' : 最新价
+                'B' : 买价
+                'A' : 卖价
+              triggerCondition 触发条件，默认值为N，可用的值为：
+                'N' : 无
+                'g' : 大于
+                'G' : 大于等于
+                'l' : 小于
+                'L' : 小于等于
+              triggerPrice 触发价格，默认价格为0。
 
         【备注】
               针对当前公式指定的帐户、商品发送委托单，发送成功返回如"1-2"的下单编号，发送失败返回空字符串""。
@@ -3089,6 +3104,9 @@ class BaseApi(object):
               retCode, retMsg = A_SendOrder(UserId, ContractId, Enum_Order_Limit(), Enum_FOK(), Enum_Buy(), Enum_Exit(), Enum_Speculate(), Q_AskPrice(), OrderNum)
               当retCode为0时表明发送订单信息成功。
          '''
+        if triggerType in ('P', 'A', 'C'):
+            return self._dataModel.sendConditionOrder(userNo, contractNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty, \
+                                                      triggerType, triggerMode, triggerCondition, triggerPrice)
         return self._dataModel.sendOrder(userNo, contractNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty)
 
     def A_DeleteOrder(self, orderId):
@@ -3100,7 +3118,7 @@ class BaseApi(object):
               bool A_DeleteOrder(string orderId)
 
         【参数】
-              orderId 使用A_SendOrder返回的下单编号，为空时使用当日最后成交的委托编号作为查询依据。
+              orderId 使用A_SendOrder返回的下单编号。
 
         【备注】
               针对当前公式应用的帐户、商品发送撤单指令，发送成功返回True, 发送失败返回False。
@@ -3111,6 +3129,33 @@ class BaseApi(object):
               无
          '''
         return self._dataModel.deleteOrder(orderId)
+
+    def A_GetOrderNo(self, orderId):
+        '''
+        【说明】
+              针对当前公式应用的帐户获取下单编号对应的定单号和委托号。
+
+        【语法】
+              string, string A_GetOrderNo(string orderId)
+
+        【参数】
+              orderId 使用A_SendOrder返回的下单编号。
+
+        【备注】
+              针对当前策略使用A_SendOrder返回的下单编号，可以使用A_GetOrderNo获取下单编号对应的定单号和委托号。
+              由于使用A_SendOrder返回的下单编号orderId与策略相关，所以在策略重启后orderId会发生变化。
+              由于委托单对应的定单号与客户端有关，所以在客户端重启后，委托单对应的定单号可能会发生变化。
+              由于委托号是服务器生成的，所以在使用A_SendOrder得到下单编号后，如果服务器还没有返回相应的委托单信息，可能获取不到相应的定单号和委托号。
+              当orderId对应的定单号和委托号还没有从服务器返回，则对应的值为空字符串。
+              注：不能使用于历史测试，仅适用于实时行情交易。
+
+        【示例】
+              retCode, retMsg = A_SendOrder(.....)
+              time.sleep(5)
+              if retCode == 0:
+                sessionId, orderNo =  A_GetOrderNo(retMsg)
+         '''
+        return self._dataModel.getAOrderNo(orderId)
         
     #/////////////////////////////枚举函数/////////////////
     def Enum_Buy(self):
@@ -5846,11 +5891,14 @@ def A_OrderStatus(orderId=''):
 def A_OrderTime(orderId=''):
     return baseApi.A_OrderTime(orderId)
 
-def A_SendOrder(userNo, contractNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty):
-    return baseApi.A_SendOrder(userNo, contractNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty)
+def A_SendOrder(userNo, contractNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty, triggerType='N', triggerMode='N', triggerCondition='N', triggerPrice=0):
+    return baseApi.A_SendOrder(userNo, contractNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty, triggerType, triggerMode, triggerCondition, triggerPrice)
 
 def A_DeleteOrder(orderId):
     return baseApi.A_DeleteOrder(orderId)
+
+def A_GetOrderNo(orderId):
+    return baseApi.A_GetOrderNo(orderId)
 
 #策略交易
 def Buy(share=0, price=0, contractNo=None):

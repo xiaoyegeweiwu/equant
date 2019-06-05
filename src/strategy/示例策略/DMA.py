@@ -15,7 +15,7 @@ qty = 1
 bar = 0
 
 def initialize(context):
-    SetBarInterval(code, 'M', 1, '20190520')
+    SetBarInterval(code, 'M', 3, '20190520')
     SetOrderWay(1)
     SetTriggerType(code, 1)
     SetActual()
