@@ -30,7 +30,7 @@ class BaseApi(object):
               当前Bar的日期
 
         【语法】
-              string Date(string contractNo, kLineType, kLineValue)
+              int Date(string contractNo, char kLineType, int kLineValue)
 
         【参数】
 			  contractNo 合约编号, 默认基准合约
@@ -38,10 +38,10 @@ class BaseApi(object):
               kLineValue K线周期
 
         【备注】
-              简写D,返回格式为YYYYMMDD的字符串
+              简写D,返回格式为YYYYMMDD的整数
 
         【实例】
-              当前Bar对应的日期为2019-03-25，则Date返回值为"20190325"
+              当前Bar对应的日期为2019-03-25，则Date返回值为20190325
         '''
         return self._dataModel.getBarDate(contractNo, kLineType, kLineValue)
 
@@ -51,7 +51,7 @@ class BaseApi(object):
               当前Bar的时间
 
         【语法】
-              string Time(string contractNo, kLineType, kLineValue)
+              float Time(string contractNo, char kLineType, int kLineValue)
 
         【参数】
               contractNo 合约编号, 默认基准合约
@@ -59,12 +59,12 @@ class BaseApi(object):
               kLineValue K线周期
 
         【备注】
-              简写T, 返回格式为HHMMSSmmm的字符串
+              简写T, 返回格式为0.HHMMSS的浮点数
 
         【实例】
-              当前Bar对应的时间为11:34:21.356，Time返回值为"113421356"
-              当前Bar对应的时间为09:34:00.000，Time返回值为"093400000"
-              当前Bar对应的时间为11:34:00.000，Time返回值为"113400000"
+              当前Bar对应的时间为11:34:21，Time返回值为0.113421
+              当前Bar对应的时间为09:34:00，Time返回值为0.0934
+              当前Bar对应的时间为11:34:00，Time返回值为0.1134
         '''
         return self._dataModel.getBarTime(contractNo, kLineType, kLineValue)
 
@@ -165,7 +165,7 @@ class BaseApi(object):
               指定合约指定周期的成交量
 
         【语法】
-              array Vol(string contractNo, kLineType, kLineValue)
+              array Vol(string contractNo, char kLineType, int kLineValue)
 
         【参数】
               contractNo 合约编号, 默认基准合约
@@ -187,7 +187,7 @@ class BaseApi(object):
               指定合约指定周期的持仓量
 
         【语法】
-              numpy.array OpenInt(string contractNo, kLineType, kLineValue)
+              numpy.array OpenInt(string contractNo, char kLineType, int kLineValue)
 
         【参数】
               contractNo 合约编号, 默认基准合约
@@ -209,7 +209,7 @@ class BaseApi(object):
               指定合约当前Bar的交易日
 
         【语法】
-              string TradeDate(string contractNo, kLineType, kLineValue)
+              int TradeDate(string contractNo, char kLineType, int kLineValue)
 
         【参数】
               contractNo 合约编号, 默认基准合约
@@ -217,10 +217,10 @@ class BaseApi(object):
               kLineValue K线周期
 
         【备注】
-              返回格式为YYYYMMDD的字符串
+              返回格式为YYYYMMDD的整数
 
         【实例】
-              当前Bar对用的日期为2019-03-25，则Date返回值为"20190325"
+              当前Bar对用的日期为2019-03-25，则Date返回值为20190325
         '''
         return self._dataModel.getBarTradeDate(contractNo, kLineType, kLineValue)
 

@@ -671,7 +671,7 @@ class StrategyModel(object):
         '''A账户下单函数，不经过calc模块，不产生信号，直接发单'''
         # 是否暂停实盘下单
         if self._cfgModel.getPending():
-            return -5, "用户调用StartTrade方法停止实盘下单功能"
+            return -5, "请调用StartTrade方法开启实盘下单功能"
 
         # 发送下单信号,K线触发、即时行情触发
         # 未选择实盘运行
@@ -729,7 +729,7 @@ class StrategyModel(object):
         '''A账户下单函数，不经过calc模块，不产生信号，直接发单'''
         # 是否暂停实盘下单
         if self._cfgModel.getPending():
-            return -5, "用户调用StartTrade方法停止实盘下单功能"
+            return -5, "请调用StartTrade方法开启实盘下单功能"
 
         # 发送下单信号,K线触发、即时行情触发
         # 未选择实盘运行
@@ -744,7 +744,7 @@ class StrategyModel(object):
             return -3, "未指定下单账户信息"
 
         # 指定的用户未登录
-        if self._trdModel.getSign(userNo) is None:
+        if not self._trdModel.getSign(userNo):
             return -4, "输入的账户没有在极星客户端登录"
 
         # 发送定单到实盘
@@ -1327,7 +1327,7 @@ class StrategyModel(object):
         }
         contractNo = contNo
         if not contNo:
-            contractTuple = self._cfgModel.getBenchmark()
+            contractNo = self._cfgModel.getBenchmark()
 
         contList = contractNo.split('|')
         if len(contList) == 0:
