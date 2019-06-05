@@ -849,7 +849,7 @@ class PyAPI(object):
                 }
             }
         '''
-        self.logger.info("Request query money:%s"%event.getData())
+        # self.logger.info("Request query money:%s"%event.getData())
         sessionId = c_uint()
         data = event.getData()
         req = EEquUserMoneyReq()

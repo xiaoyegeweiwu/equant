@@ -73,6 +73,9 @@ class BarInfo(object):
         
     def getBarTradeDate(self):
         return self._curBar['TradeDate']
+
+    def getBarList(self):
+        return self._barList
         
         
 class StrategyHisQuote(object):
@@ -841,14 +844,16 @@ class StrategyHisQuote(object):
             return
 
         newDF = pd.DataFrame(allHisData)
-        newDF.sort_values(['DateTimeStamp', 'Priority'], ascending=True, inplace=True)
+        newDF.sort_values(['TradeDate', 'DateTimeStamp', 'Priority'], ascending=True, inplace=True)
         newDF.reset_index(drop=True, inplace=True)
         allHisData = newDF.to_dict(orient="index")
 
-        beginTime = datetime.now()
-        beginTimeStr = datetime.now().strftime('%H:%M:%S.%f')
+        # print(newDF[["ContractNo", "TradeDate", "DateTimeStamp"]])
+        beginTime = datetime.now();beginTimeStr = datetime.now().strftime('%H:%M:%S.%f')
         print('**************************** run his begin', len(allHisData))
         self.logger.info('[runReport] run report begin')
+        beginPos = 0
+        endPos = 0
         for index, row in allHisData.items():
             key = (row["ContractNo"], row["KLineType"], row["KLineSlice"])
             isShow = key == self._config.getKLineShowInfoSimple()
@@ -877,24 +882,42 @@ class StrategyHisQuote(object):
                 context.setCurTriggerSourceInfo(args)
                 handle_data(context)
 
-            # 要显示的k线
+            # # 要显示的k线
             if isShow:
-                self._addKLine(row)
+                endPos += 1
 
             # 发送刷新事件
-            if index % 100 == 0:
+            if isShow and endPos % 50 == 0:
+                batchKLine = self._curBarDict[key].getBarList()[beginPos:endPos]
+                self._sendBatchKLine(batchKLine)
                 self._sendFlushEvent()
+                beginPos = endPos
 
             # 收到策略停止或退出信号， 退出历史回测
             if self._strategy._isExit():
                 break
 
+        if endPos != beginPos:
+            batchKLine = self._curBarDict[key].getBarList()[beginPos]
+            self._sendBatchKLine(batchKLine)
         self._sendFlushEvent()
-        endTime = datetime.now()
-        endTimeStr = datetime.now().strftime('%H:%M:%S.%f')
+        endTime = datetime.now();endTimeStr = datetime.now().strftime('%H:%M:%S.%f')
         self.logger.debug('[runReport] run report completed!')
         # self.logger.debug('[runReport] run report completed!, k线数量: {}, 耗时: {}s'.format(len(allHisData), endTime-beginTime))
         # print('**************************** run his end')
+
+    def _sendBatchKLine(self, data):
+        event = Event({
+            "EventCode": EV_ST2EG_NOTICE_KLINEDATA,
+            "StrategyId": self._strategy.getStrategyId(),
+            "KLineType": self._getKLineType(),
+            "Data": {
+                'Count': len(data),
+                "Data": copy.deepcopy(data),
+            }
+        })
+        # print("历史回测阶段:", data["KLineIndex"])
+        self._strategy.sendEvent2Engine(event)
 
     def runVirtualReport(self, context, handle_data, event):
         key = (event.getContractNo(), event.getKLineType(), event.getKLineSlice())
