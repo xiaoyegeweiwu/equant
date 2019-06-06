@@ -561,6 +561,10 @@ class StrategyEngine(object):
             self._sendEvent2Strategy(strategyId, apiEvent)
         else:
             contractNo = apiEvent.getContractNo()
+            # print("contractNo = ", contractNo, apiEvent.getData())
+            # 客户端手动开仓平仓
+            if not contractNo:
+                contractNo = apiEvent.getData()[0]["Cont"]
             for strategyId in self._quoteOberverDict[contractNo].keys():
                 self._sendEvent2Strategy(strategyId, apiEvent)
 
