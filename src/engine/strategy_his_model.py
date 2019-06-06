@@ -898,7 +898,7 @@ class StrategyHisQuote(object):
                 break
 
         if endPos != beginPos:
-            batchKLine = self._curBarDict[key].getBarList()[beginPos]
+            batchKLine = self._curBarDict[key].getBarList()[beginPos:]
             self._sendBatchKLine(batchKLine)
         self._sendFlushEvent()
         endTime = datetime.now();endTimeStr = datetime.now().strftime('%H:%M:%S.%f')
