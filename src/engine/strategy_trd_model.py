@@ -381,6 +381,9 @@ class StrategyTrade(TradeModel):
         return self.getDataFromTOrderModel(orderNo, 'InsertTime')
 
     def getFirstOrderNo(self, contNo1, contNo2):
+        if self._selectedUserNo not in self._userInfo:
+            raise Exception("请先在极星客户端登录您的交易账号")
+
         tUserInfoModel = self._userInfo[self._selectedUserNo]
         if len(tUserInfoModel._order) == 0:
             return -1
@@ -395,6 +398,9 @@ class StrategyTrade(TradeModel):
         return orderId
 
     def getNextOrderNo(self, orderId, contNo1, contNo2):
+        if self._selectedUserNo not in self._userInfo:
+            raise Exception("请先在极星客户端登录您的交易账号")
+
         tUserInfoModel = self._userInfo[self._selectedUserNo]
         if len(tUserInfoModel._order) == 0:
             return -1
@@ -415,6 +421,9 @@ class StrategyTrade(TradeModel):
         return minOrderId
 
     def getOrderContractNo(self, orderId):
+        if self._selectedUserNo not in self._userInfo:
+            raise Exception("请先在极星客户端登录您的交易账号")
+
         tUserInfoModel = self._userInfo[self._selectedUserNo]
         if len(tUserInfoModel._order) == 0:
             return ""
