@@ -244,6 +244,8 @@ class TradeRecord(object):
         self._sessionId = orderData['SessionId'] if 'SessionId' in orderData else None
         # 合约编号
         self._contNo = orderData['Cont'] if 'Cont' in orderData else None
+        # 定单号
+        self._orderId = orderData['OrderId'] if 'OrderId' in orderData else None
         # 委托单号
         self._orderNo = orderData['OrderNo'] if 'OrderNo' in orderData else None
         # 方向
@@ -265,6 +267,8 @@ class TradeRecord(object):
             self._sessionId = orderData['SessionId']
         if 'Cont' in orderData:
             self._contNo = orderData['Cont']
+        if 'OrderId' in orderData:
+            self._orderId = orderData['OrderId']
         if 'OrderNo' in orderData:
             self._orderNo = orderData['OrderNo']
         if 'Direct' in orderData:
@@ -797,6 +801,12 @@ class Strategy:
         tradeRecord = self._localOrder[eSessionId]
         return tradeRecord._orderNo
 
+    def getOrderId(self, eSessionId):
+        if eSessionId not in self._localOrder:
+            return 0
+        tradeRecord = self._localOrder[eSessionId]
+        return tradeRecord._orderId
+
     def getStrategyName(self):
         return self._strategyName
 
@@ -961,7 +971,7 @@ class Strategy:
             return
 
         if apiEvent.getEventCode() == EEQU_SRVEVENT_TRADE_MATCH and str(apiEvent.getStrategyId()) == str(self._strategyId):
-            contractNo = apiEvent.getData[0]["Cont"]
+            contractNo = apiEvent.getData()[0]["Cont"]
             dateTimeStamp, tradeDate, lv1Data = self.getTriggerTimeAndData(contractNo)
 
             tradeTriggerEvent = Event({

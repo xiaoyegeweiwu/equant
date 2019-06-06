@@ -1240,7 +1240,7 @@ class RunWin(QuantToplevel, QuantFrame):
         self.conTimesFrame.pack(fill=tk.X, pady=6)
 
         self.conCheck = tk.Checkbutton(self.conTimesFrame, text="最大连续同向开仓次数:", bg=rgb_to_hex(255, 255, 255),
-                                       anchor=tk.W, variable=self.isConOpenTimes)
+                                       anchor=tk.W, onvalue=1, offvalue=0, variable=self.isConOpenTimes)
         self.conCheck.pack(side=tk.LEFT, padx=10)
 
         self.conTimesEntry = tk.Entry(self.conTimesFrame, relief=tk.GROOVE, bd=2, width=8, textvariable=self.conOpenTimes,
@@ -1402,6 +1402,7 @@ class RunWin(QuantToplevel, QuantFrame):
         openTimes = self.openTimes.get()
 
         isConOpenTimes = self.isConOpenTimes.get()
+
         conOpenTimes = self.conOpenTimes.get()
         canClose = self.canClose.get()
         canOpen = self.canOpen.get()

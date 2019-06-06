@@ -77,7 +77,7 @@ def XAverage(prices:np.array, length):
 def initialize(context):
     global ContractId
     SetBarInterval(ContractId, 'M', 1, 2000)
-    SetActual()
+    # SetActual()
 
 def handle_data(context):
     global RiskRatio, ATRLength, boLength
@@ -118,12 +118,12 @@ def handle_data(context):
     AvgTR = XAverage(trs, ATRLength)
 
     TotalEquity = Available() + Margin()
-    TurtleUnits = (TotalEquity*RiskRatio/100)/(N*ContractUnit())
+    TurtleUnits = (TotalEquity*RiskRatio/100)/(N*ContractUnit(ContractId))
     TurtleUnits = int(TurtleUnits)
-    maxUnites = int(Available()/(high*ContractUnit()))
+    maxUnites = int(Available()/(high*ContractUnit(ContractId)))
     TurtleUnits = min(maxUnites , TurtleUnits)
     LogInfo("avl:%f, mar:%f, conu:%f, tu:%f, N:%f, mp:%f, cidx:%d, bslen:%d\n" \
-        %(Available(), Margin(), ContractUnit(), TurtleUnits, N, MinPoint, CurrentBar(), bslen))
+        %(Available(), Margin(), ContractUnit(ContractId), TurtleUnits, N, MinPoint, CurrentBar(), bslen))
 
     DonchianHi   = ta.MAX(highs[:-1], timeperiod=boLength)[-1]
     DonchianLo   = ta.MIN(lows[:-1],  timeperiod=boLength)[-1]

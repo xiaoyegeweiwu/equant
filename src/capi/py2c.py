@@ -40,8 +40,7 @@ class PyAPI(object):
         self._contractCount = 0
         self._exchangeCount = 0
 
-        #
-
+    #
     def _setSessionId(self, session_id, strategy_id):
         self._SessionStrategyPair[session_id] = strategy_id
         
@@ -52,13 +51,14 @@ class PyAPI(object):
         
     def _apiCallbackFunc(self, service):
         apiEvent = Event(service)
-        code = apiEvent.getEventCode()
-        if code not in self._apiCallbackDict:
-            self.logger.error("callback(%d) not register!"%code)
-            return -1
-            
-        self._apiCallbackDict[code](apiEvent)
-        
+        try:
+            code = apiEvent.getEventCode()
+            if code not in self._apiCallbackDict:
+                self.logger.error("callback(%d) not register!"%code)
+                return -1
+            self._apiCallbackDict[code](apiEvent)
+        except Exception as e:
+            self.logger.error(f"error in call back function, py2c, {e}")
         return 0
         
     def _regCallback(self):
@@ -813,6 +813,8 @@ class PyAPI(object):
         self.logger.info("Request query login info:%s"%event.getData())
         sessionId = c_uint()
         req = EEquLoginInfoReq()
+        req.LoginNo = "".encode()
+        req.Sign = "".encode()
         self._cDll.E_ReqQryLoginInfo(byref(sessionId), byref(req))
         
     def reqQryUserInfo(self, event):
@@ -830,6 +832,8 @@ class PyAPI(object):
         self.logger.info("Request query user info:%s"%event.getData())
         sessionId = c_uint()
         req = EEquUserInfoReq()
+        req.UserNo = "".encode()
+        req.Sign = "".encode()
         self._cDll.E_ReqQryUserInfo(byref(sessionId), byref(req))
         
     def reqQryMoney(self, event):
@@ -845,13 +849,13 @@ class PyAPI(object):
                 }
             }
         '''
-        self.logger.info("Request query money:%s"%event.getData())
+        # self.logger.info("Request query money:%s"%event.getData())
         sessionId = c_uint()
         data = event.getData()
         req = EEquUserMoneyReq()
-        req.UserNo = data['UserNo'].encode()
-        req.Sign = data['Sign'].encode()
-        req.CurrencyNo = data['CurrencyNo'].encode()
+        req.UserNo = "".encode()
+        req.Sign = "".encode()
+        req.CurrencyNo = "".encode()
         self._cDll.E_ReqQryMoney(byref(sessionId), byref(req))
         
     def reqQryOrder(self, event):
@@ -869,22 +873,21 @@ class PyAPI(object):
         '''
         sessionId = c_uint()
         data = event.getData()
-        self.logger.debug('Request query order:%s'%event.getData())
+        # self.logger.debug('Request query order:%s'%event.getData())
         req = EEquOrderQryReq()
-        req.UserNo = data['UserNo'].encode()
-        req.Signa = data['Sign'].encode()
+        req.UserNo = "".encode()
+        req.Sign = "".encode()
         self._cDll.E_ReqQryOrder(byref(sessionId), byref(req))
         self._setSessionId(sessionId.value, event.getStrategyId())
-        
-        
+
     def reqQryMatch(self, event):
         '''查询成交信息'''
         sessionId = c_uint()
         data = event.getData()
-        self.logger.debug('Request query match:%s'%event.getData())
+        # self.logger.debug('Request query match:%s'%event.getData())
         req = EEquOrderQryReq()
-        req.UserNo = data['UserNo'].encode()
-        req.Signa = data['Sign'].encode()
+        req.UserNo = "".encode()
+        req.Sign = "".encode()
         self._cDll.E_ReqQryMatch(byref(sessionId), byref(req))
         self._setSessionId(sessionId.value, event.getStrategyId())
         
@@ -892,10 +895,10 @@ class PyAPI(object):
         '''查询持仓信息'''
         sessionId = c_uint()
         data = event.getData()
-        self.logger.debug('Request query position:%s'%event.getData())
+        # self.logger.debug('Request query position:%s'%event.getData())
         req = EEquOrderQryReq()
-        req.UserNo = data['UserNo'].encode()
-        req.Signa = data['Sign'].encode()
+        req.UserNo = "".encode()
+        req.Sign = "".encode()
         self._cDll.E_ReqQryPosition(byref(sessionId), byref(req))
         self._setSessionId(sessionId.value, event.getStrategyId())
 
@@ -931,8 +934,6 @@ class PyAPI(object):
         sessionId = c_uint()
         data = event.getData()
         req = EEquOrderInsertReq()
-        print("55555555555555555 ")
-        print(data['Cont'])
         req.UserNo = data['UserNo'].encode()
         req.Sign = data['Sign'].encode()
         req.Cont = data['Cont'].encode()
@@ -1354,9 +1355,8 @@ class PyAPI(object):
         dataAddr   = apiEvent.getData()
         fieldSize  = apiEvent.getFieldSize()
         fieldCount = apiEvent.getFieldCount()
-        
         dataList = []
-        
+
         for i in range(fieldCount):
             buf = string_at(dataAddr + fieldSize * i, fieldSize)
             data = EEquOrderDataNotice()
@@ -1389,28 +1389,36 @@ class PyAPI(object):
                 'ErrorText'        : data.ErrorText.decode('gbk'),
                 'InsertTime'       : data.InsertTime.decode('utf-8'),
                 'UpdateTime'       : data.UpdateTime.decode('utf-8'),
+                'StrategyId'       : None,
+                'StrategyOrderId'  : None,
             }
             dataList.append(idict)
         
-        # 发送到引擎
-        apiEvent.setData(dataList)
-
+        #
         def getStrategyIdAndOrderId(apiSessionId, args):
             strategyId, eSessionId = 0, 0
             if apiSessionId in args:
                 strategyId, eSessionId = args[apiSessionId]
             return strategyId, eSessionId
-
         # 委托查询
         if apiEvent.getEventCode() == EEQU_SRVEVENT_TRADE_ORDERQRY:
             apiEvent.setStrategyId(0)
             apiEvent.setESessionId(0)
         # 委托通知
         elif apiEvent.getEventCode() == EEQU_SRVEVENT_TRADE_ORDER:
-            assert len(dataList) > 0, " error "
-            strategyId, eSessionId = getStrategyIdAndOrderId(apiEvent.getData()[0]["SessionId"], self._apiSessionIdMap)
+            singleData = dataList[0]
+            strategyId, eSessionId = getStrategyIdAndOrderId(singleData["SessionId"], self._apiSessionIdMap)
             apiEvent.setStrategyId(strategyId)
             apiEvent.setESessionId(eSessionId)
+            # 使用OrderNo 作为成交关联
+            self._orderNoMap[singleData["OrderNo"]] = (strategyId, eSessionId)
+        # ==============================================================================================================
+        for i in range(len(dataList)):
+            dataList[i]["StrategyId"] = apiEvent.getStrategyId()
+            dataList[i]["StrategyOrderId"] = apiEvent.getESessionId()
+
+        # 发送到引擎
+        apiEvent.setData(dataList)
         self._api2egQueue.put(apiEvent)
 
     def _onMatchData(self, apiEvent):
@@ -1418,9 +1426,8 @@ class PyAPI(object):
         dataAddr   = apiEvent.getData()
         fieldSize  = apiEvent.getFieldSize()
         fieldCount = apiEvent.getFieldCount()
-        
         dataList = []
-        
+
         for i in range(fieldCount):
             buf = string_at(dataAddr + fieldSize * i, fieldSize)
             data = EEquMatchNotice()
@@ -1441,13 +1448,33 @@ class PyAPI(object):
                 'MatchDateTime'    : data.MatchDateTime.decode('utf-8'),
                 'AddOne'           : data.AddOne.decode('utf-8'),
                 'Deleted'          : data.Deleted.decode('utf-8'),
+                "StrategyId"       : None,
+                "StrategyOrderId"  : None,
             }
             dataList.append(idict)
-        
+        # ====================================================================================================
+        def getStrategyIdAndOrderId(orderNo, args):
+            strategyId, eSessionId = 0, 0
+            if orderNo in args:
+                strategyId, eSessionId = args[orderNo]
+            return strategyId, eSessionId
+
+        # 成交查询
+        if apiEvent.getEventCode() == EEQU_SRVEVENT_TRADE_MATCHQRY:
+            apiEvent.setStrategyId(0)
+            apiEvent.setESessionId(0)
+        # 成交通知
+        elif apiEvent.getEventCode() == EEQU_SRVEVENT_TRADE_MATCH:
+            strategyId, eSessionId = getStrategyIdAndOrderId(dataList[0]["OrderNo"], self._orderNoMap)
+            apiEvent.setStrategyId(strategyId)
+            apiEvent.setESessionId(eSessionId)
+
+        for i in range(len(dataList)):
+            dataList[i]["StrategyId"] = apiEvent.getStrategyId()
+            dataList[i]["StrategyOrderId"] = apiEvent.getESessionId()
+        # ==============================================================================================================
         # 发送到引擎
         apiEvent.setData(dataList)
-        sid = apiEvent.getSessionId()
-        apiEvent.setStrategyId(self._getStrategyId(sid))
         self._api2egQueue.put(apiEvent)
         
     def _onPositionData(self, apiEvent):
