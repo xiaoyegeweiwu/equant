@@ -38,7 +38,7 @@ def handle_data(context):
     PlotNumeric("profit", A_TotalProfitLoss() + A_ProfitLoss() - A_Cost(), 0x808080, False, True) 
     
     if context.strategyStatus() !='C':
-        return;
+        return
     
     global bar    
     #同一根K线上只做一笔交易
