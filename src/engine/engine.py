@@ -561,8 +561,13 @@ class StrategyEngine(object):
             self._sendEvent2Strategy(strategyId, apiEvent)
         else:
             contractNo = apiEvent.getContractNo()
-            for strategyId in self._quoteOberverDict[contractNo].keys():
-                self._sendEvent2Strategy(strategyId, apiEvent)
+            # print("contractNo = ", contractNo, apiEvent.getData())
+            # 客户端手动开仓平仓
+            if not contractNo:
+                contractNo = apiEvent.getData()[0]["Cont"]
+            assert contractNo, " error "
+            apiEvent.setContractNo(contractNo)
+            self._sendEvent2AllStrategy(apiEvent)
 
     def _onApiMatchDataQry(self, apiEvent):
         self._trdModel.updateMatchData(apiEvent)

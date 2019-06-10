@@ -604,6 +604,15 @@ class StrategyModel(object):
     def getOrderTime(self, eSession):
         return self._trdModel.getOrderTime(eSession)
 
+    def getFirstOrderNo(self, contNo1, contNo2):
+        return self._trdModel.getFirstOrderNo(contNo1, contNo2)
+
+    def getNextOrderNo(self, orderId, contNo1, contNo2):
+        return self._trdModel.getNextOrderNo(orderId, contNo1, contNo2)
+
+    def getOrderContractNo(self, orderId):
+        return self._trdModel.getOrderContractNo(orderId)
+
     def deleteOrder(self, eSession):
         return self._trdModel.deleteOrder(eSession)
         
