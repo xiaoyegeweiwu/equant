@@ -1853,6 +1853,27 @@ class BaseApi(object):
         '''
         return self._dataModel.getBarsSinceLastEntry(contractNo)
 
+    def BarsSinceToday(self, contractNo, kLineType, kLineValue):
+        '''
+        【说明】
+              获得当天的第一根Bar到当前的Bar个数。
+
+        【语法】
+              int BarsSinceToday(string contractNo, char kLineType, int kLineValue)
+
+        【参数】
+              contractNo 合约编号，默认为基准合约
+              kLineType K线类型
+              kLineValue K线周期
+
+        【备注】
+              无。
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getBarsSinceToday(contractNo, kLineType, kLineValue)
+
     def ContractProfit(self, contractNo):
         '''
         【说明】
@@ -5845,6 +5866,9 @@ def BarsSinceExit(contractNo=''):
 
 def BarsSinceLastEntry(contractNo=''):
     return baseApi.BarsSinceLastEntry(contractNo)
+
+def BarsSinceToday(contractNo='', barType='', barValue=''):
+    return baseApi.BarsSinceToday(contractNo, barType, barValue)
 
 def ContractProfit(contractNo=''):
     return baseApi.ContractProfit(contractNo)

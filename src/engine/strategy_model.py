@@ -1605,6 +1605,18 @@ class StrategyModel(object):
         curBar = self._hisModel.getCurBar()
         return (int(curBar['KLineIndex']) - barIndex)
 
+    def getBarsSinceToday(self, contractNo, barType, barValue):
+        key = self.getKey(contractNo, barType, barValue)
+        curBar = self._hisModel.getCurBar(key)
+        tradeDate = curBar['TradeDate']
+        barList = self._hisModel._curBarDict[key].getTradeDateKLine(tradeDate)
+        if len(barList) == 0:
+            return 0
+
+        firstBar = barList[0]
+        res = curBar['KLineIndex'] - firstBar['KLineIndex']
+        return res if res > 0 else 0
+
     def getPositionValue(self, contNo, key):
         if not contNo:
             contNo = self._cfgModel.getBenchmark()
