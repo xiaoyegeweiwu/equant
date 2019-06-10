@@ -311,6 +311,8 @@ _all_func_ = {
     '其他函数': [
                     ['SMA'                 ,'计算加权移动平均值'],
                     ['ParabolicSAR'        ,'计算抛物线转向'],
+                    ['Highest'             ,'求最高'],
+                    ['Lowest'              ,'求最低'],
                     ['LogDebug'            ,'打印调试信息'],
                     ['LogInfo'             ,'打印普通信息'],
                     ['LogWarn'             ,'打印警告信息'],

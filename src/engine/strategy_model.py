@@ -1840,3 +1840,23 @@ class StrategyModel(object):
     def ParabolicSAR(self, high, low, afstep, aflimit):
         '''计算抛物线转向'''
         return self._staModel.ParabolicSAR(high, low, afstep, aflimit)
+
+    def getHighest(self, price, length):
+        if not isinstance(price, list) or len(price) == 0:
+            return np.array()
+
+        if length <= 1:
+            return np.array(price)
+
+        arr = np.array(price)
+        return talib.MAX(arr, length)
+
+    def getLowest(self, price, length):
+        if not isinstance(price, list) or len(price) == 0:
+            return np.array()
+
+        if length <= 1:
+            return np.array(price)
+
+        arr = np.array(price)
+        return talib.MIN(arr, length)

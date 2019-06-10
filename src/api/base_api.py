@@ -5462,6 +5462,50 @@ class BaseApi(object):
         '''
         return self._dataModel.ParabolicSAR(high, low, afstep, aflimit)
 
+    def Highest(self, price, length):
+        '''
+        【说明】
+            求最高
+
+        【语法】
+            numpy.array Highest(list price, int length)
+
+        【参数】
+            price 用于求最高值的值，必须是数值型列表；
+            length 需要计算的周期数，为整型。
+
+        【备注】
+            该函数计算指定周期内的数值型序列值的最高值，返回值为浮点数数字列表;
+            当price的类型不是list或者price的长度为0时，则返回为空的numpy.array()
+
+        【示例】
+            Highest (Close(), 12); 计算12周期以来的收盘价的最高值；
+            Highest ((Close() + High() + Low())/ 3, 10); 计算10周期以来高低收价格的平均值的最高值。
+        '''
+        return self._dataModel.getHighest(price, length)
+
+    def Lowest(self, price, length):
+        '''
+        【说明】
+            求最低
+
+        【语法】
+            numpy.array Lowest(list price, int length)
+
+        【参数】
+            price 用于求最低值的值，必须是数值型列表；
+            length 需要计算的周期数，为整型。
+
+        【备注】
+            该函数计算指定周期内的数值型序列值的最低值，返回值为浮点数数字列表;
+            当price的类型不是list或者price的长度为0时，则返回为空的numpy.array()
+
+        【示例】
+            Highest (Close(), 12); 计算12周期以来的收盘价的最低值；
+            Highest ((Close() + High() + Low())/ 3, 10); 计算10周期以来高低收价格的平均值的最低值。
+        '''
+        return self._dataModel.getLowest(price, length)
+
     def strategyStatus(self):
         '''
         【说明】
@@ -6428,3 +6472,9 @@ def SMA(price, period, weight):
 
 def ParabolicSAR(high, low, afstep, aflimit):
     return baseApi.ParabolicSAR(high, low, afstep, aflimit)
+
+def Highest(price, length):
+    return baseApi.Highest(price, length)
+
+def Lowest(price, length):
+    return baseApi.Lowest(price, length)
