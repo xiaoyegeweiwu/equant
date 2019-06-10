@@ -11,6 +11,31 @@ from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 
 
+class TradeDateBars:
+    def __init__(self, tradeDate):
+        self._tradeDate = tradeDate
+        self._data = []
+
+    def updateBar(self, bar):
+        assert "TradeDate" in bar and self.isInCurDataSet(bar["TradeDate"]), " error "
+        if len(self._data) > 0 and bar["DateTimeStamp"] <= self._data[-1]["DateTimeStamp"]:
+            self._data[-1] = bar
+        else:
+            self._data.append(bar)
+
+    def getLastBar(self):
+        if len(self._data) == 0:
+            return None
+        return self._data[-1]
+
+    # 是否应该在当前数据结构中
+    def isInCurDataSet(self, tradeDate):
+        return tradeDate == self._tradeDate
+
+    def getData(self):
+        return self._data
+
+
 class BarInfo(object):
     '''
     _curBar = 
@@ -33,7 +58,10 @@ class BarInfo(object):
         self._logger = logger
         self._barList = []
         self._curBar = None
-        
+
+        #
+        self._tradeDateBars = {}
+
     def _getBarValue(self, key):
         barValue = []
         for bar in self._barList:
@@ -46,6 +74,11 @@ class BarInfo(object):
             self._barList[-1] = data
         else:
             self._barList.append(data)
+
+        #
+        if data["TradeDate"] not in self._tradeDateBars:
+            self._tradeDateBars[data["TradeDate"]] = TradeDateBars(data["TradeDate"])
+        self._tradeDateBars[data["TradeDate"]].updateBar(data)
 
     def getCurBar(self):
         return self._curBar
@@ -76,6 +109,11 @@ class BarInfo(object):
 
     def getBarList(self):
         return self._barList
+
+    def getTradeDateKLine(self, tradeDate):
+        if tradeDate not in self._tradeDateBars:
+            return None
+        return self._tradeDateBars[tradeDate].getData()
         
         
 class StrategyHisQuote(object):
@@ -893,6 +931,7 @@ class StrategyHisQuote(object):
                 self._addBatchKLine(batchKLine)
                 self._sendFlushEvent()
                 beginPos = endPos
+                tradeDate = self._curBarDict[key].getCurBar()["TradeDate"]
 
             # 收到策略停止或退出信号， 退出历史回测
             if self._strategy._isExit():
