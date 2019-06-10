@@ -30,7 +30,7 @@ class BaseApi(object):
               当前Bar的日期
 
         【语法】
-              string Date(string contractNo, kLineType, kLineValue)
+              int Date(string contractNo, char kLineType, int kLineValue)
 
         【参数】
 			  contractNo 合约编号, 默认基准合约
@@ -38,10 +38,10 @@ class BaseApi(object):
               kLineValue K线周期
 
         【备注】
-              简写D,返回格式为YYYYMMDD的字符串
+              简写D,返回格式为YYYYMMDD的整数
 
         【实例】
-              当前Bar对应的日期为2019-03-25，则Date返回值为"20190325"
+              当前Bar对应的日期为2019-03-25，则Date返回值为20190325
         '''
         return self._dataModel.getBarDate(contractNo, kLineType, kLineValue)
 
@@ -51,7 +51,7 @@ class BaseApi(object):
               当前Bar的时间
 
         【语法】
-              string Time(string contractNo, kLineType, kLineValue)
+              float Time(string contractNo, char kLineType, int kLineValue)
 
         【参数】
               contractNo 合约编号, 默认基准合约
@@ -59,12 +59,12 @@ class BaseApi(object):
               kLineValue K线周期
 
         【备注】
-              简写T, 返回格式为HHMMSSmmm的字符串
+              简写T, 返回格式为0.HHMMSS的浮点数
 
         【实例】
-              当前Bar对应的时间为11:34:21.356，Time返回值为"113421356"
-              当前Bar对应的时间为09:34:00.000，Time返回值为"093400000"
-              当前Bar对应的时间为11:34:00.000，Time返回值为"113400000"
+              当前Bar对应的时间为11:34:21，Time返回值为0.113421
+              当前Bar对应的时间为09:34:00，Time返回值为0.0934
+              当前Bar对应的时间为11:34:00，Time返回值为0.1134
         '''
         return self._dataModel.getBarTime(contractNo, kLineType, kLineValue)
 
@@ -165,7 +165,7 @@ class BaseApi(object):
               指定合约指定周期的成交量
 
         【语法】
-              array Vol(string contractNo, kLineType, kLineValue)
+              array Vol(string contractNo, char kLineType, int kLineValue)
 
         【参数】
               contractNo 合约编号, 默认基准合约
@@ -187,7 +187,7 @@ class BaseApi(object):
               指定合约指定周期的持仓量
 
         【语法】
-              numpy.array OpenInt(string contractNo, kLineType, kLineValue)
+              numpy.array OpenInt(string contractNo, char kLineType, int kLineValue)
 
         【参数】
               contractNo 合约编号, 默认基准合约
@@ -209,7 +209,7 @@ class BaseApi(object):
               指定合约当前Bar的交易日
 
         【语法】
-              string TradeDate(string contractNo, kLineType, kLineValue)
+              int TradeDate(string contractNo, char kLineType, int kLineValue)
 
         【参数】
               contractNo 合约编号, 默认基准合约
@@ -217,10 +217,10 @@ class BaseApi(object):
               kLineValue K线周期
 
         【备注】
-              返回格式为YYYYMMDD的字符串
+              返回格式为YYYYMMDD的整数
 
         【实例】
-              当前Bar对用的日期为2019-03-25，则Date返回值为"20190325"
+              当前Bar对用的日期为2019-03-25，则Date返回值为20190325
         '''
         return self._dataModel.getBarTradeDate(contractNo, kLineType, kLineValue)
 
@@ -3028,13 +3028,74 @@ class BaseApi(object):
          '''
         return self._dataModel.getOrderTime(orderId)
 
+    def A_FirstOrderNo(self, contractNo1, contractNo2):
+        '''
+        【说明】
+              返回当前账户第一个订单号。
+
+        【语法】
+              int A_FirstOrderNo(string contractNo)
+
+        【参数】
+              contractNo 合约代码，默认为遍历所有合约。
+
+        【备注】
+              若返回值为-1，表示没有任何订单，否则，返回第一个订单的索引值，
+              该函数经常和A_NextOrderNo函数合用，用于遍历所有的订单。
+
+        【示例】
+              无
+         '''
+        return self._dataModel.getFirstOrderNo(contractNo1, contractNo2)
+
+    def A_NextOrderNo(self, orderId, contractNo1, contractNo2):
+        '''
+        【说明】
+              返回当前账户下一个订单号。
+
+        【语法】
+              int A_NextOrderNo(int orderId, string contractNo)
+
+        【参数】
+              orderId 定单号，不能为空，
+              contractNo 合约代码，默认为遍历所有合约。
+
+        【备注】
+              若返回值为-1，表示没有任何订单，否则，返回处在OrderNo后面的订单索引值，
+              该函数常和A_FirstOrderNo联合使用。
+
+        【示例】
+              无
+         '''
+        return self._dataModel.getNextOrderNo(orderId, contractNo1, contractNo2)
+
+    def A_OrderContractNo(self, orderId):
+        '''
+        【说明】
+              返回订单的合约号。
+
+        【语法】
+              string A_OrderContractNo(int orderId)
+
+        【参数】
+              orderId 定单号，整数类型。
+
+        【备注】
+              返回结果如："ZCE|F|TA|305"等，
+              如果orderId没有对应的委托单，则返回结果为字符串。
+
+        【示例】
+              无
+         '''
+        return self._dataModel.getOrderContractNo(orderId)
+
     def A_SendOrder(self, userNo, contractNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty, triggerType, triggerMode, triggerCondition, triggerPrice):
         '''
         【说明】A_SendOrder
               针对指定的帐户、商品发送委托单。
 
         【语法】
-              bool A_SendOrder(string userNo, string contractNo, char orderType, char validType, char orderDirct, char entryOrExit, char hedge, float orderPrice, int orderQty, char triggerType, char triggerMode, char triggerCondition, float triggerPrice)
+              int, string A_SendOrder(string userNo, string contractNo, char orderType, char validType, char orderDirct, char entryOrExit, char hedge, float orderPrice, int orderQty, char triggerType, char triggerMode, char triggerCondition, float triggerPrice)
 
         【参数】
               userNo 指定的账户名称，
@@ -3096,7 +3157,12 @@ class BaseApi(object):
               针对当前公式指定的帐户、商品发送委托单，发送成功返回如"1-2"的下单编号，发送失败返回空字符串""。
               返回结果形式未：retCode, retMsg，retCode的数据类型为可以为负的整数, retMsg的数据类型为字符串。
               其中发送成功时retCode为0，retMsg为返回的下单编号，其组成规则为：策略id-该策略中发送委托单的次数，所以下单编号"1-2"表示在策略id为1的策略中的第2次发送委托单返回的下单编号。
-              当发送失败时retCode为负数，retMsg为返回的发送失败的原因。
+              当发送失败时retCode为负数，retMsg为返回的发送失败的原因，retCode可能返回的值及含义如下：
+                -1 : 未选择实盘运行，请在设置界面勾选"实盘运行"，或者在策略代码中调用SetActual()方法选择实盘运行；
+                -2 : 策略当前状态不是实盘运行状态，请勿在历史回测阶段调用该函数；
+                -3 : 未指定下单账户信息；
+                -4 : 输入的账户没有在极星客户端登录；
+                -5 : 请调用StartTrade方法开启实盘下单功能。
               该函数直接发单，不经过任何确认，并会在每次公式计算时发送，一般需要配合着仓位头寸进行条件处理，在不清楚运行机制的情况下，请慎用。
               注：不能使用于历史测试，仅适用于实时行情交易。
 
@@ -5890,6 +5956,15 @@ def A_OrderStatus(orderId=''):
 
 def A_OrderTime(orderId=''):
     return baseApi.A_OrderTime(orderId)
+
+def A_FirstOrderNo(contractNo1='', contractNo2=''):
+    return baseApi.A_FirstOrderNo(contractNo1, contractNo2)
+
+def A_NextOrderNo(orderId=0, contractNo1='', contractNo2=''):
+    return baseApi.A_NextOrderNo(orderId, contractNo1, contractNo2)
+
+def A_OrderContractNo(orderId):
+    return baseApi.A_OrderContractNo(orderId)
 
 def A_SendOrder(userNo, contractNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty, triggerType='N', triggerMode='N', triggerCondition='N', triggerPrice=0):
     return baseApi.A_SendOrder(userNo, contractNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty, triggerType, triggerMode, triggerCondition, triggerPrice)
