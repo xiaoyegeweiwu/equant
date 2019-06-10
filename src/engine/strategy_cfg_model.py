@@ -491,7 +491,7 @@ class StrategyConfig(object):
             self._metaData['Sample']['Display'] = {"ContractNo" : contNo, "KLineType": barType, "KLineSlice": barInterval}
 
         # 更新回测起始点信息
-        kLineCount = 0
+        kLineCount = 1
         if isinstance(sampleConfig, int):
             if sampleConfig == 0:
                 kLineCount = 1
@@ -505,7 +505,7 @@ class StrategyConfig(object):
             'BeginTime' : sampleConfig if isinstance(sampleConfig, str) and self.isVaildDate(sampleConfig, "%Y%m%d") else '',
             'KLineCount' : kLineCount,
             'AllK' : True if sampleConfig == 'A' else False,
-            'UseSample' : False if sampleConfig == 'N' else True,
+            'UseSample' : True,
             'Trigger' : trigger,
         }
 
