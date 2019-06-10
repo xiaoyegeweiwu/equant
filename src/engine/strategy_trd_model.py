@@ -380,6 +380,60 @@ class StrategyTrade(TradeModel):
         orderNo = self._strategy.getOrderNo(eSession)
         return self.getDataFromTOrderModel(orderNo, 'InsertTime')
 
+    def getFirstOrderNo(self, contNo1, contNo2):
+        if self._selectedUserNo not in self._userInfo:
+            raise Exception("请先在极星客户端登录您的交易账号")
+
+        tUserInfoModel = self._userInfo[self._selectedUserNo]
+        if len(tUserInfoModel._order) == 0:
+            return -1
+
+        orderId = -1
+        for orderNo in list(tUserInfoModel._order.keys()):
+            orderModel = tUserInfoModel._order[orderNo]
+            if not contNo1 or contNo1 == orderModel._metaData['Cont']:
+                if orderId == -1 or orderId > orderModel._metaData['OrderId']:
+                    orderId = orderModel._metaData['OrderId']
+
+        return orderId
+
+    def getNextOrderNo(self, orderId, contNo1, contNo2):
+        if self._selectedUserNo not in self._userInfo:
+            raise Exception("请先在极星客户端登录您的交易账号")
+
+        tUserInfoModel = self._userInfo[self._selectedUserNo]
+        if len(tUserInfoModel._order) == 0:
+            return -1
+
+        minOrderId = -1
+        for orderNo in list(tUserInfoModel._order.keys()):
+            orderModel = tUserInfoModel._order[orderNo]
+            if not contNo1 or contNo1 == orderModel._metaData['Cont']:
+                if orderModel._metaData['OrderId'] <= orderId:
+                    continue
+                # 获取大于orderId的值
+                if minOrderId == -1:
+                    minOrderId = orderModel._metaData['OrderId']
+                # 找到大于orderId并最接近orderId的值
+                if orderModel._metaData['OrderId'] < minOrderId:
+                    minOrderId = orderModel._metaData['OrderId']
+
+        return minOrderId
+
+    def getOrderContractNo(self, orderId):
+        if self._selectedUserNo not in self._userInfo:
+            raise Exception("请先在极星客户端登录您的交易账号")
+
+        tUserInfoModel = self._userInfo[self._selectedUserNo]
+        if len(tUserInfoModel._order) == 0:
+            return ""
+
+        for orderNo in list(tUserInfoModel._order.keys()):
+            orderModel = tUserInfoModel._order[orderNo]
+            if orderModel._metaData['OrderId'] == orderId:
+                return orderModel._metaData['Cont']
+        return ""
+
     def deleteOrder(self, eSession):
         '''
         针对当前公式应用的帐户、商品发送撤单指令。
