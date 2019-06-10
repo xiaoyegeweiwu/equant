@@ -5092,19 +5092,19 @@ class BaseApi(object):
         '''
         return self._dataModel.setPlotVertLine(color, main, axis, barsback)
 
-    def PlotPartLine(self, name, index1, price1, index2, price2, color, main, axis, width):
+    def PlotPartLine(self, name, index1, price1, count, price2, color, main, axis, width):
         '''
         【说明】
             绘制斜线段
 
         【语法】
-            PlotPartLine(string name, int index1, float price1, int index2, float price2, int color, bool main, bool axis, int width)
+            PlotPartLine(string name, int index1, float price1, int count, float price2, int color, bool main, bool axis, int width)
 
         【参数】
             name   名称
-            index1 起始索引, 目前只对当前Bar有效
+            index1 起始bar索引
             price1 起始价格
-            index2 结束索引
+            count  从起始bar回溯到结束bar的根数
             price2 结束价格
             color  输出值的显示颜色，默认表示使用属性设置框中的颜色；
             main   指标是否加载到主图，True-主图，False-幅图，默认主图
@@ -5118,11 +5118,11 @@ class BaseApi(object):
             idx1 = CurrentBar()
             p1 = Close()[-1]
             if idx1 >= 100:
-                idx2 = 1
+                count = 1
                 p2 = Close()[-2]
-                PlotPartLine("PartLine", idx1, p1, idx2, p2, RGB_Red(), True, True, 1)
+                PlotPartLine("PartLine", idx1, p1, count, p2, RGB_Red(), True, True, 1)
         '''
-        return self._dataModel.setPlotPartLine(name, index1, price1, index2, price2, color, main, axis, width)
+        return self._dataModel.setPlotPartLine(name, index1, price1, count, price2, color, main, axis, width)
 
     def PlotStickLine(self, name, price1, price2, color, main, axis, barsback):
         '''
@@ -5267,26 +5267,26 @@ class BaseApi(object):
         '''
         return self._dataModel.setUnPlotNumeric(name, main, barsback)
 
-    def UnPlotPartLine(self, name, index1, index2, main):
+    def UnPlotPartLine(self, name, index1, count, main):
         '''
         【说明】
             在当前Bar取消输出的斜线段
 
         【语法】
-            void UnPlotPartLine(string name, int index1, int index2, bool main)
+            void UnPlotPartLine(string name, int index1, int count, bool main)
 
         【参数】
             name  名称
-            index1 起始索引, 目前只对当前Bar有效
-            index2 结束索引
+            index1 起始bar索引
+            count  从起始bar回溯到结束bar的根数
             main  指标是否加载到主图，True-主图，False-幅图，默认主图
 
         【备注】
 
         【示例】
-            UnPlotPartLine("PartLine", idx1, idx2, True)
+            UnPlotPartLine("PartLine", idx1, count, True)
         '''
-        return self._dataModel.setUnPlotPartLine(name, index1, index2, main)
+        return self._dataModel.setUnPlotPartLine(name, index1, count, main)
 
     def UnPlotStickLine(self, name, main, barsback):
         '''
@@ -6358,8 +6358,8 @@ def PlotText(value, text, color=0x999999, main=True, barsback=0):
 def PlotVertLine(color=0xdd0000, main=True, axis=False, barsback=0):
     return baseApi.PlotVertLine(color, main, axis, barsback)
 
-def PlotPartLine(name, index1, price1, index2, price2, color=0xdd0000, main=True, axis=False, width=1):
-    return baseApi.PlotPartLine(name, index1, price1, index2, price2, color, main, axis, width)
+def PlotPartLine(name, index1, price1, count, price2, color=0xdd0000, main=True, axis=False, width=1):
+    return baseApi.PlotPartLine(name, index1, price1, count, price2, color, main, axis, width)
 
 def PlotStickLine(name, price1, price2, color=0xdd0000, main=True, axis=False, barsback=0):
     return baseApi.PlotStickLine(name, price1, price2, color, main, axis, barsback)
@@ -6382,8 +6382,8 @@ def UnPlotBar(name, main=True, barsback=0):
 def UnPlotNumeric(name, main=True, barsback=0):
     return baseApi.UnPlotNumeric(name, main, barsback)
 
-def UnPlotPartLine(name, index1, index2, main=True):
-    return baseApi.UnPlotPartLine(name, index1, index2, main)
+def UnPlotPartLine(name, index1, count, main=True):
+    return baseApi.UnPlotPartLine(name, index1, count, main)
 
 def UnPlotStickLine(name, main=True, barsback=0):
     return baseApi.UnPlotStickLine(name, main, barsback)

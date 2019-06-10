@@ -1206,17 +1206,17 @@ class StrategyModel(object):
 
         self._plotNumeric(self._strategyName, np.nan, 0, main, EEQU_ISNOT_AXIS, EEQU_VERTLINE, barsback, data)
 
-    def setPlotPartLine(self, name, index1, price1, index2, price2, color, main, axis, width):
+    def setPlotPartLine(self, name, index1, price1, count, price2, color, main, axis, width):
         main = '0' if main else '1'
         axis = '0' if axis else '1'
 
-        if index1<= 0 or index2 <= 0:
+        if index1<= 0 or count <= 0:
             return
 
         data = [{
             'KLineIndex' : index1,
             'Value'      : price1,
-            'Idx2'       : index2,
+            'Idx2'       : count,
             'LineValue'  : price2,
             'ClrLine'    : color,
             'LinWid'     : width
@@ -1224,16 +1224,16 @@ class StrategyModel(object):
 
         self._plotNumeric(name, 0, color, main, axis, EEQU_PARTLINE, 0, data)
 
-    def setUnPlotPartLine(self, name, index1, index2, main):
+    def setUnPlotPartLine(self, name, index1, count, main):
         main = '0' if main else '1'
 
-        if index1<= 0 or index2 <= 0:
+        if index1<= 0 or count <= 0:
             return
 
         data = [{
             'KLineIndex' : index1,
             'Value'      : np.nan,
-            'Idx2'       : index2,
+            'Idx2'       : count,
             'LineValue'  : np.nan,
             'ClrLine'    : 0,
             'LinWid'     : 1
