@@ -104,6 +104,9 @@ class StrategyTrade(TradeModel):
         '''
         return self.getDataFromTMoneyModel('Available')
 
+    def getAMargin(self):
+        return self.getDataFromTMoneyModel('Deposit')
+
     def getProfitLoss(self):
         '''
         :return:当前公式应用的交易帐户的浮动盈亏

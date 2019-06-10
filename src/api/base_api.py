@@ -2511,13 +2511,13 @@ class BaseApi(object):
         '''
         return self._dataModel.getCost()
 
-    def A_CurrentEquity(self):
+    def A_Assets(self):
         '''
         【说明】
               返回当前公式应用的交易帐户的动态权益。
 
         【语法】
-              float A_CurrentEquity()
+              float A_Assets()
 
         【参数】
               无
@@ -2530,13 +2530,13 @@ class BaseApi(object):
         '''
         return self._dataModel.getCurrentEquity()
 
-    def A_FreeMargin(self):
+    def A_Available(self):
         '''
         【说明】
               返回当前公式应用的交易帐户的可用资金。
 
         【语法】
-              float A_FreeMargin()
+              float A_Available()
 
         【参数】
               无
@@ -2549,6 +2549,26 @@ class BaseApi(object):
               无
         '''
         return self._dataModel.getFreeMargin()
+
+    def A_Margin(self):
+        '''
+        【说明】
+              返回当前公式应用的交易帐户的持仓保证金。
+
+        【语法】
+              float A_Margin()
+
+        【参数】
+              无
+
+        【备注】
+              返回当前公式应用的交易帐户的持仓保证金，返回值为浮点数。
+              注：不能使用于历史测试，仅适用于实时行情交易。
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getAMargin()
 
     def A_ProfitLoss(self):
         '''
@@ -4625,7 +4645,7 @@ class BaseApi(object):
 
         【示例】
               SetBarInterval('ZCE|F|SR|906', 'M', 3, 'A') 订阅合约ZCE|F|SR|906的3分钟K线数据，并使用所有K线样本进行历史回测
-              SetBarInterval('ZCE|F|SR|906', 'M', 3, 'N') 订阅合约ZCE|F|SR|906的3分钟K线数据，并使用所有K线样本进行历史回测
+              SetBarInterval('ZCE|F|SR|906', 'M', 3, 'N') 订阅合约ZCE|F|SR|906的3分钟K线数据，并不使用K线样本进行历史回测
               SetBarInterval('ZCE|F|SR|906', 'M', 3, 2000) 订阅合约ZCE|F|SR|906的3分钟K线数据，并使用2000根K线样本进行历史回测
               SetBarInterval('ZCE|F|SR|906', 'M', 3) 订阅合约ZCE|F|SR|906的3分钟K线数据，由于sampleConfig的默认值为2000，所以使用2000根K线样本进行历史回测
               SetBarInterval('ZCE|F|SR|906', 'M', 3, '20190430') 订阅合约ZCE|F|SR|906的3分钟K线数据，并使用2019-04-30起的K线进行历史回测
@@ -5325,8 +5345,8 @@ class BaseApi(object):
         【示例】
               accountId = A_AccountID()
               LogDebug("当前使用的用户账户ID为 : ", accountId)
-              freeMargin = A_FreeMargin()
-              LogDebug("当前使用的用户账户ID为 : %s，可用资金为 : %10.2f" % (accountId, freeMargin))
+              available = A_Available()
+              LogDebug("当前使用的用户账户ID为 : %s，可用资金为 : %10.2f" % (accountId, available))
         '''
         return self._dataModel.LogDebug(args)
 
@@ -5347,8 +5367,8 @@ class BaseApi(object):
         【示例】
               accountId = A_AccountID()
               LogInfo("当前使用的用户账户ID为 : ", accountId)
-              freeMargin = A_FreeMargin()
-              LogInfo("当前使用的用户账户ID为 : %s，可用资金为 : %10.2f" % (accountId, freeMargin))
+              available = A_Available()
+              LogInfo("当前使用的用户账户ID为 : %s，可用资金为 : %10.2f" % (accountId, available))
         '''
         return self._dataModel.LogInfo(args)
 
@@ -5369,8 +5389,8 @@ class BaseApi(object):
         【示例】
               accountId = A_AccountID()
               LogWarn("当前使用的用户账户ID为 : ", accountId)
-              freeMargin = A_FreeMargin()
-              LogWarn("当前使用的用户账户ID为 : %s，可用资金为 : %10.2f" % (accountId, freeMargin))
+              available = A_Available()
+              LogWarn("当前使用的用户账户ID为 : %s，可用资金为 : %10.2f" % (accountId, available))
         '''
         return self._dataModel.LogWarn(args)
 
@@ -5391,8 +5411,8 @@ class BaseApi(object):
         【示例】
               accountId = A_AccountID()
               LogError("当前使用的用户账户ID为 : ", accountId)
-              freeMargin = A_FreeMargin()
-              LogError("当前使用的用户账户ID为 : %s，可用资金为 : %10.2f" % (accountId, freeMargin))
+              available = A_Available()
+              LogError("当前使用的用户账户ID为 : %s，可用资金为 : %10.2f" % (accountId, available))
         '''
         return self._dataModel.LogError(args)
 
@@ -5885,11 +5905,14 @@ def A_GetAllPositionSymbol():
 def A_Cost():
     return baseApi.A_Cost()
 
-def A_CurrentEquity():
-    return baseApi.A_CurrentEquity()
+def A_Assets():
+    return baseApi.A_Assets()
 
-def A_FreeMargin():
-    return baseApi.A_FreeMargin()
+def A_Available():
+    return baseApi.A_Available()
+
+def A_Margin():
+    return baseApi.A_Margin()
 
 def A_ProfitLoss():
     return baseApi.A_ProfitLoss()

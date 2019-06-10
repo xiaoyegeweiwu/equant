@@ -538,6 +538,9 @@ class StrategyModel(object):
     def getFreeMargin(self):
         return self._trdModel.getFreeMargin()
 
+    def getAMargin(self):
+        return self._trdModel.getAMargin()
+
     def getProfitLoss(self):
         return self._trdModel.getProfitLoss()
 
