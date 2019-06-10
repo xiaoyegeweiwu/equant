@@ -685,6 +685,7 @@ class Strategy:
                 "IsActualRun"  : self._dataModel.getConfigModel().isActualRun(),
                 "InitialFund"  : self._dataModel.getConfigModel().getInitCapital(),
                 "Config"       : cfg,
+                "Params"       : self._context.params,
             }
         })
         self.sendEvent2UI(revent)
