@@ -273,13 +273,15 @@ class RunWin(QuantToplevel, QuantFrame):
     bgColor = rgb_to_hex(245, 245, 245)
     bgColorW = "white"
 
-    def __init__(self, control, master=None):
+    def __init__(self, control, master=None, param={}):
         super().__init__(master)
         self._control = control
         self._exchange = self._control.model.getExchange()
         self._commodity = self._control.model.getCommodity()
         self._contract = self._control.model.getContract()
         self._userNo = self._control.model.getUserNo()
+        # 获取用户参数
+        self._userParam = param
 
         self.title("策略属性设置")
         self.attributes("-toolwindow", 1)
@@ -291,6 +293,8 @@ class RunWin(QuantToplevel, QuantFrame):
 
         # 用于保存用户所选的用户合约
         self.userContList = []
+        # 参数设置中的树控件child的id
+        self._paramId = 0
 
         # 将函数包装一下(初始资金只能输入数字、浮点数)
         self.testContent = self.register(self.testDigit)
@@ -357,18 +361,21 @@ class RunWin(QuantToplevel, QuantFrame):
         self.fColor = self.bgColor
         self.sColor = self.bgColor
         self.rColor = self.bgColorW
+        self.pColor = self.bgColor
 
         self.createNotebook(self.topFrame)
 
         self.fundFrame = tk.Frame(self.topFrame, bg=rgb_to_hex(255, 255, 255))
         self.sampleFrame = tk.Frame(self.topFrame, bg=rgb_to_hex(255, 255, 255))
         self.runFrame = tk.Frame(self.topFrame, bg=rgb_to_hex(255, 255, 255))
+        self.paramFrame = tk.Frame(self.topFrame, bg=rgb_to_hex(255, 255, 255))
 
         self.runFrame.pack(side=tk.TOP, fill=tk.BOTH, expand=tk.YES)
 
         self.createRun(self.runFrame)
         self.createFund(self.fundFrame)
         self.createSample(self.sampleFrame)
+        self.createParma(self.paramFrame)
         self.addButton(self.topFrame)
 
         # TODO： 如果将配置文件内容删除会报错
@@ -493,6 +500,9 @@ class RunWin(QuantToplevel, QuantFrame):
             self.canClose.set(conf[VCanClose]),
             self.canOpen.set(conf[VCanOpen]),
 
+            # 用户配置参数信息
+            self._userParam = conf[VParams]
+
         # if True:
         else:
             # 设置默认值
@@ -568,6 +578,9 @@ class RunWin(QuantToplevel, QuantFrame):
         self.defaultUnitSetting()
         self.setCycleEntryState()
 
+        # 插入参数
+        self.insertParams()
+
     def getConfig(self):
         """获取用户配置的config"""
         return self.config
@@ -609,12 +622,15 @@ class RunWin(QuantToplevel, QuantFrame):
                                 bd=0, highlightthickness=1, command=self.toRunFrame)
         self.sampleBtn = tk.Button(nbFrame, text="样本设置", relief=tk.FLAT, padx=14, pady=1.5, bg=self.sColor,
                                    bd=0, highlightthickness=1, command=self.toSampFrame)
+        self.paramBtn = tk.Button(nbFrame, text="参数设置", relief=tk.FLAT, padx=13, pady=1.5, bg=self.pColor,
+                                  bd=0, highlightthickness=1, command=self.toParamFrame)
 
         self.runBtn.pack(side=tk.LEFT, expand=tk.NO)
         self.fundBtn.pack(side=tk.LEFT, expand=tk.NO)
         self.sampleBtn.pack(side=tk.LEFT, expand=tk.NO)
+        self.paramBtn.pack(side=tk.LEFT, expand=tk.NO)
 
-        for btn in (self.fundBtn, self.sampleBtn, self.runBtn):
+        for btn in (self.fundBtn, self.sampleBtn, self.runBtn, self.paramBtn):
             btn.bind("<Enter>", self.handlerAdaptor(self.onEnter, button=btn))
             btn.bind("<Leave>", self.handlerAdaptor(self.onLeave, button=btn))
 
@@ -623,11 +639,14 @@ class RunWin(QuantToplevel, QuantFrame):
         self.fColor = self.fundBtn['bg']
         self.rColor = self.bgColor
         self.sColor = self.bgColor
+        self.pColor = self.bgColor
         self.runBtn.config(bg=self.rColor)
         self.sampleBtn.config(bg=self.sColor)
+        self.paramBtn.config(bg=self.pColor)
 
         self.runFrame.pack_forget()
         self.sampleFrame.pack_forget()
+        self.paramFrame.pack_forget()
         self.fundFrame.pack(side=tk.TOP, fill=tk.BOTH, expand=tk.YES)
 
     def toSampFrame(self):
@@ -635,11 +654,14 @@ class RunWin(QuantToplevel, QuantFrame):
         self.sColor = self.sampleBtn['bg']
         self.rColor = self.bgColor
         self.fColor = self.bgColor
+        self.pColor = self.bgColor
         self.fundBtn.config(bg=self.fColor)
         self.runBtn.config(bg=self.rColor)
+        self.paramBtn.config(bg=self.pColor)
 
         self.fundFrame.pack_forget()
         self.runFrame.pack_forget()
+        self.paramFrame.pack_forget()
         self.sampleFrame.pack(side=tk.TOP, fill=tk.BOTH, expand=tk.YES)
 
     def toRunFrame(self):
@@ -647,26 +669,52 @@ class RunWin(QuantToplevel, QuantFrame):
         self.rColor = self.runBtn['bg']
         self.fColor = self.bgColor
         self.sColor = self.bgColor
+        self.pColor = self.bgColor
         self.fundBtn.config(bg=self.fColor)
         self.sampleBtn.config(bg=self.sColor)
+        self.paramBtn.config(bg=self.pColor)
 
         self.fundFrame.pack_forget()
         self.sampleFrame.pack_forget()
+        self.paramFrame.pack_forget()
         self.runFrame.pack(side=tk.TOP, fill=tk.BOTH, expand=tk.YES)
+
+    def toParamFrame(self):
+        self.paramBtn.config(bg="white")
+        self.pColor = self.paramBtn['bg']
+        self.sColor = self.bgColor
+        self.rColor = self.bgColor
+        self.fColor = self.bgColor
+        self.fundBtn.config(bg=self.fColor)
+        self.runBtn.config(bg=self.rColor)
+        self.sampleBtn.config(bg=self.sColor)
+
+        self.fundFrame.pack_forget()
+        self.runFrame.pack_forget()
+        self.sampleFrame.pack_forget()
+        self.paramFrame.pack(side=tk.TOP, fill=tk.BOTH, expand=tk.YES)
 
     def onEnter(self, event, button):
         if button == self.fundBtn:
             button.config(bg='white')
             self.sampleBtn.config(bg=self.bgColor)
             self.runBtn.config(bg=self.bgColor)
+            self.paramBtn.config(bg=self.bgColor)
         elif button == self.sampleBtn:
             button.config(bg='white')
             self.fundBtn.config(bg=self.bgColor)
             self.runBtn.config(bg=self.bgColor)
+            self.paramBtn.config(bg=self.bgColor)
+        elif button == self.runBtn:
+            button.config(bg='white')
+            self.fundBtn.config(bg=self.bgColor)
+            self.sampleBtn.config(bg=self.bgColor)
+            self.paramBtn.config(bg=self.bgColor)
         else:
             button.config(bg='white')
             self.fundBtn.config(bg=self.bgColor)
             self.sampleBtn.config(bg=self.bgColor)
+            self.runBtn.config(bg=self.bgColor)
 
     def onLeave(self, event, button):
         button.config(bg=rgb_to_hex(227, 230, 233))
@@ -674,14 +722,22 @@ class RunWin(QuantToplevel, QuantFrame):
             button['bg'] = self.fColor
             self.runBtn['bg'] = self.rColor
             self.sampleBtn['bg'] = self.sColor
+            self.paramBtn['bg'] = self.pColor
         elif button == self.runBtn:
             button['bg'] = self.rColor
             self.fundBtn['bg'] = self.fColor
             self.sampleBtn['bg'] = self.sColor
+            self.paramBtn['bg'] = self.pColor
         elif button == self.sampleBtn:
             button['bg'] = self.sColor
             self.fundBtn['bg'] = self.fColor
             self.runBtn['bg'] = self.rColor
+            self.paramBtn['bg'] = self.pColor
+        elif button == self.paramBtn:
+            button['bg'] = self.pColor
+            self.fundBtn['bg'] = self.fColor
+            self.runBtn['bg'] = self.rColor
+            self.sampleBtn['bg'] = self.sColor
         else:
             pass
 
@@ -709,6 +765,86 @@ class RunWin(QuantToplevel, QuantFrame):
         self.setUser(baseFrame)
         self.setKLineType(baseFrame)
         self.setKLineSlice(baseFrame)
+
+    def createParma(self, frame):
+        self.setParamLabel(frame)
+        self.setParamTree(frame)
+
+    def setParamLabel(self, frame):
+        tk.Label(frame, text='鼠标单击"当前值"进行参数修改:', bg=rgb_to_hex(255, 255, 255),
+                 justif=tk.LEFT,  anchor=tk.W, width=40).pack(side=tk.TOP, anchor=tk.W, padx=15, pady=5)
+
+    # 生成参数设置的目录树
+    def setParamTree(self, frame):
+        headList = ["参数", "当前值", "类型", "描述"]
+        widthList = [5, 20, 5, 200]
+
+        self.paramBar = ttk.Scrollbar(frame, orient="horizontal")
+        self.paramBar.pack(side=tk.BOTTOM, fill=tk.X)
+
+        self.paramTree = ttk.Treeview(frame, show="headings", height=28, columns=tuple(headList),
+                                      yscrollcommand=self.paramBar.set)
+        self.paramBar.config(command=self.paramTree.xview)
+        self.paramTree.pack(fill=tk.BOTH, expand=tk.YES, padx=15)
+
+        for key, w in zip(headList, widthList):
+            self.paramTree.column(key, width=w, anchor=tk.W)
+            self.paramTree.heading(key, text=key, anchor=tk.W)
+
+
+        # for key in self._userParam:
+        #     self.paramTree.insert("", tk.END, values=tuple([key, self._userParam[key]]), tags=key)
+
+        #TODO: tag怎么实现颜色配置
+        # self._paramId += 1
+
+        # self.paramTree.insert("", tk.END, values=tuple(["N", 20,  "整形", ""]), tag="tag0")
+        # self.paramTree.insert("", tk.END, values=tuple(["N0", 30, "整形", ""]), tag="tag1")
+        # self.paramTree.insert("", tk.END, values=tuple(["N1", 40, "整形", ""]), tag="tag0")
+
+        self.paramTree.bind("<Button-1>", self.onClick)
+
+    def insertParams(self):
+        """将参数插入参数树中"""
+        for key in self._userParam:
+            self.paramTree.insert("", tk.END, values=tuple([key, self._userParam[key]]), tags=key)
+
+    def onClick(self, event):
+        """单击更改策略值"""
+        x, y, widget = event.x, event.y, event.widget
+
+        select = widget.identify_row(event.y)
+        widget.selection_set(select)
+        widget.focus(select)
+
+        item = widget.item(widget.focus())
+        itemValues = item['values']
+        iid = widget.identify_row(y)
+        column = event.widget.identify_column(x)
+
+        if column != "#2":
+            return
+
+        if not column or not iid:
+            return
+
+        # Leave method if selected item's value is empty
+        if not len(itemValues):
+            return
+
+        self.cell_value = itemValues[int(column[1]) - 1]
+
+        # if not self.cell_value:
+        #     return
+
+        bbox = widget.bbox(iid, column)
+        if not bbox:
+            return
+
+        x, y, width, height = bbox
+
+        self.entryedit = EntryPopup(self.paramTree, self.cell_value)
+        self.entryedit.place(x=x, y=y, width=width, height=height)
 
     # 资金设置
     def setUser(self, frame):
@@ -1573,6 +1709,15 @@ class RunWin(QuantToplevel, QuantFrame):
         else:
             self.config["Other"]["TradeDirection"] = 2
 
+        # 用户参数设置信息
+        self.config["Params"] = {}
+        for item in self.paramTree.get_children():
+            item = self.paramTree.item(item)
+            # itemValues是一个列表
+            itemValues = item['values']
+            # print("111111: ", itemValues)
+            self.config["Params"][itemValues[0]] = itemValues[1]
+
         # -------------保存用户配置--------------------------
         strategyPath = self._control.getEditorText()["path"]
         userConfig = {
@@ -1612,6 +1757,8 @@ class RunWin(QuantToplevel, QuantFrame):
                 VConOpenTimes: conOpenTimes,
                 VCanClose: canClose,
                 VCanOpen: canOpen,
+
+                VParams: self.config["Params"]
             }
         }
 
@@ -1850,3 +1997,49 @@ class SelectContractWin(QuantToplevel, QuantFrame):
         self.contractText.config(state="normal")
         self.contractText.delete(str(line)+'.0', str(line)+'.end+1c')
         self.contractText.config(state="disabled")
+
+
+
+class EntryPopup(tk.Entry):
+    """单击参数进行修改Entry类"""
+
+    def __init__(self, parent, text, **kw):
+        ''' If relwidth is set, then width is ignored '''
+        super().__init__(parent, **kw)
+
+        self.parent = parent
+
+        self.insert(0, text)
+        # self['state'] = 'readonly'
+        self['readonlybackground'] = 'white'
+        self['selectbackground'] = '#1BA1E2'
+        self['exportselection'] = False
+        self['borderwidth'] = 2
+        self['relief'] = tk.GROOVE
+
+        self.focus_force()
+        self.selection_range(0, 'end')
+        self.bind("<Control-a>", self.selectAll)
+        self.bind("<Escape>", lambda *ignore: self.destroy())
+        self.bind("<Return>", self.saveEdit)
+        self.bind("<FocusOut>", self.onFocusOut)
+        self.bind("<FocusIn>", self.onFocusIn)
+
+    def selectAll(self, *ignore):
+        ''' Set selection on the whole text '''
+        self.selection_range(0, 'end')
+        return 'break'
+
+    def saveEdit(self, event):
+        item = self.parent.focus()
+        self.parent.set(item, column="#2", value=self.get())
+        self.destroy()
+
+    def onFocusIn(self, event):
+        # 记录获取焦点的item
+        self.item = self.parent.focus()
+
+    def onFocusOut(self, event):
+        self.parent.set(self.item, column="#2", value=self.get())
+        self.destroy()
+        pass
