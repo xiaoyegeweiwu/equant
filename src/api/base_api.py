@@ -5029,6 +5029,50 @@ class BaseApi(object):
         '''
         return self._dataModel.setTriggerMode('', type, value)
 
+    def SetWinPoint(self, winPoint, nPriceType, nAddTick, contractNo):
+        '''
+        【说明】
+             设置触发方式
+
+        【语法】
+              int SetWinPoint(int winPoint, int nPriceType, int nAddTick, string contractNo)
+
+        【参数】
+              winPoint 赢利点数值，若当前价格相对于最近一次开仓价格的盈利点数达到或超过该值，就进行止盈；
+              nPriceType 平仓下单价格类型 0:最新价 1：对盘价 2：挂单价 3：市价 4：停板价；
+              nAddTick 超价点数 仅当nPrice为0，1，2时有效；
+              contractNo 合约代码，默认为基准合约。
+
+        【备注】
+              无
+
+        【示例】
+              SetWinPoint(10) # 当价格相对于最近一次开仓价格超过10个点，进行止盈平仓。如郑棉合约多头：开仓价格为15000，当前价格大于或等于5*10=50时，即达到15050，则进行平仓。
+        '''
+        return self._dataModel.setWinPoint(winPoint, nPriceType, nAddTick, contractNo)
+
+    def SetStopPoint(self, stopPoint, nPriceType, nAddTick, contractNo):
+        '''
+        【说明】
+             设置触发方式
+
+        【语法】
+              int SetWinPoint(int stopPoint, int nPriceType, int nAddTick, string contractNo)
+
+        【参数】
+              stopPoint 止损点数，若当前价格相对于最近一次开仓价格亏损点数达到或跌破该值，就进行止损；
+              nPriceType 平仓下单价格类型 0:最新价 1：对盘价 2：挂单价 3：市价 4：停板价；
+              nAddTick 超价点数 仅当nPrice为0，1，2时有效；
+              contractNo 合约代码，默认为基准合约。
+
+        【备注】
+              无
+
+        【示例】
+              SetStopPoint(10) # 当价格跌破10个点，进行止损平仓。 如：如郑棉合约多头：开仓价格为15000，当前价格小于或等于5*10=50时，即达到14950，则进行平仓。
+        '''
+        return self._dataModel.setStopPoint(stopPoint, nPriceType, nAddTick, contractNo)
+
     # //////////////////////其他函数////////////////////
 
     def PlotNumeric(self, name, value, color, main, axis, type, barsback):
@@ -6400,6 +6444,12 @@ def SetTriggerCont(*contractNo):
 
 def SetTriggerType(type, value=None):
     return baseApi.SetTriggerType(type, value)
+
+def SetWinPoint(winPoint, nPriceType=0, nAddTick=0, contractNo=''):
+    return baseApi.SetWinPoint(winPoint, nPriceType, nAddTick, contractNo)
+
+def SetStopPoint(stopPoint, nPriceType=0, nAddTick=0, contractNo=''):
+    return baseApi.SetStopPoint(stopPoint, nPriceType, nAddTick, contractNo)
 
 # 属性函数
 def BarInterval():

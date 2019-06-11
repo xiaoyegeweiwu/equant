@@ -279,6 +279,8 @@ _all_func_ = {
                     ['SetHedge'            , '设置投保标志'],
                     ['SetSlippage'         , '设置滑点损耗'],
                     ['SetTriggerType'      , '设置触发方式'],
+                    ['SetWinPoint'         , '设置策略的止盈点'],
+                    ['SetStopPoint'        , '设置策略的止损点'],
                 ],
 
     '绘图函数': [

@@ -522,6 +522,16 @@ class StrategyModel(object):
     def setTriggerMode(self, contNo, type, value):
         return self._cfgModel.setTrigger(contNo, type, value)
 
+    def setWinPoint(self, winPoint, nPriceType, nAddTick, contNo):
+        if not contNo:
+            contNo = self._cfgModel.getBenchmark()
+        return self._cfgModel.setWinPoint(winPoint, nPriceType, nAddTick, contNo)
+
+    def setStopPoint(self, stopPoint, nPriceType, nAddTick, contNo):
+        if not contNo:
+            contNo = self._cfgModel.getBenchmark()
+        return self._cfgModel.setStopPoint(stopPoint, nPriceType, nAddTick, contNo)
+
     # ///////////////////////账户函数///////////////////////////
     def getAccountId(self):
         return self._trdModel.getAccountId()
