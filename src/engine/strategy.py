@@ -194,6 +194,7 @@ class StrategyContext:
         self._tradeDate = None
         self._dateTimeStamp = None
         self._triggerData = None
+        self._parameter = {}
 
     def strategyStatus(self):
         return self._strategyStatus
@@ -234,6 +235,14 @@ class StrategyContext:
         self._tradeDate = copy.deepcopy(args["TradeDate"])
         self._dateTimeStamp = copy.deepcopy(args["DateTimeStamp"])
         self._triggerData = copy.deepcopy(args["TriggerData"])
+
+    @property
+    def params(self):
+        return self._parameter
+
+    @params.setter
+    def params(self, parameter):
+        self._parameter = parameter
 
 
 class TradeRecord(object):
@@ -676,6 +685,7 @@ class Strategy:
                 "IsActualRun"  : self._dataModel.getConfigModel().isActualRun(),
                 "InitialFund"  : self._dataModel.getConfigModel().getInitCapital(),
                 "Config"       : cfg,
+                "Params"       : self._context.params,
             }
         })
         self.sendEvent2UI(revent)

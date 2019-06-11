@@ -1853,6 +1853,27 @@ class BaseApi(object):
         '''
         return self._dataModel.getBarsSinceLastEntry(contractNo)
 
+    def BarsSinceToday(self, contractNo, kLineType, kLineValue):
+        '''
+        【说明】
+              获得当天的第一根Bar到当前的Bar个数。
+
+        【语法】
+              int BarsSinceToday(string contractNo, char kLineType, int kLineValue)
+
+        【参数】
+              contractNo 合约编号，默认为基准合约
+              kLineType K线类型
+              kLineValue K线周期
+
+        【备注】
+              无。
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getBarsSinceToday(contractNo, kLineType, kLineValue)
+
     def ContractProfit(self, contractNo):
         '''
         【说明】
@@ -2511,13 +2532,13 @@ class BaseApi(object):
         '''
         return self._dataModel.getCost()
 
-    def A_CurrentEquity(self):
+    def A_Assets(self):
         '''
         【说明】
               返回当前公式应用的交易帐户的动态权益。
 
         【语法】
-              float A_CurrentEquity()
+              float A_Assets()
 
         【参数】
               无
@@ -2530,13 +2551,13 @@ class BaseApi(object):
         '''
         return self._dataModel.getCurrentEquity()
 
-    def A_FreeMargin(self):
+    def A_Available(self):
         '''
         【说明】
               返回当前公式应用的交易帐户的可用资金。
 
         【语法】
-              float A_FreeMargin()
+              float A_Available()
 
         【参数】
               无
@@ -2549,6 +2570,26 @@ class BaseApi(object):
               无
         '''
         return self._dataModel.getFreeMargin()
+
+    def A_Margin(self):
+        '''
+        【说明】
+              返回当前公式应用的交易帐户的持仓保证金。
+
+        【语法】
+              float A_Margin()
+
+        【参数】
+              无
+
+        【备注】
+              返回当前公式应用的交易帐户的持仓保证金，返回值为浮点数。
+              注：不能使用于历史测试，仅适用于实时行情交易。
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getAMargin()
 
     def A_ProfitLoss(self):
         '''
@@ -4625,7 +4666,7 @@ class BaseApi(object):
 
         【示例】
               SetBarInterval('ZCE|F|SR|906', 'M', 3, 'A') 订阅合约ZCE|F|SR|906的3分钟K线数据，并使用所有K线样本进行历史回测
-              SetBarInterval('ZCE|F|SR|906', 'M', 3, 'N') 订阅合约ZCE|F|SR|906的3分钟K线数据，并使用所有K线样本进行历史回测
+              SetBarInterval('ZCE|F|SR|906', 'M', 3, 'N') 订阅合约ZCE|F|SR|906的3分钟K线数据，并不使用K线样本进行历史回测
               SetBarInterval('ZCE|F|SR|906', 'M', 3, 2000) 订阅合约ZCE|F|SR|906的3分钟K线数据，并使用2000根K线样本进行历史回测
               SetBarInterval('ZCE|F|SR|906', 'M', 3) 订阅合约ZCE|F|SR|906的3分钟K线数据，由于sampleConfig的默认值为2000，所以使用2000根K线样本进行历史回测
               SetBarInterval('ZCE|F|SR|906', 'M', 3, '20190430') 订阅合约ZCE|F|SR|906的3分钟K线数据，并使用2019-04-30起的K线进行历史回测
@@ -5092,19 +5133,19 @@ class BaseApi(object):
         '''
         return self._dataModel.setPlotVertLine(color, main, axis, barsback)
 
-    def PlotPartLine(self, name, index1, price1, index2, price2, color, main, axis, width):
+    def PlotPartLine(self, name, index1, price1, count, price2, color, main, axis, width):
         '''
         【说明】
             绘制斜线段
 
         【语法】
-            PlotPartLine(string name, int index1, float price1, int index2, float price2, int color, bool main, bool axis, int width)
+            PlotPartLine(string name, int index1, float price1, int count, float price2, int color, bool main, bool axis, int width)
 
         【参数】
             name   名称
-            index1 起始索引, 目前只对当前Bar有效
+            index1 起始bar索引
             price1 起始价格
-            index2 结束索引
+            count  从起始bar回溯到结束bar的根数
             price2 结束价格
             color  输出值的显示颜色，默认表示使用属性设置框中的颜色；
             main   指标是否加载到主图，True-主图，False-幅图，默认主图
@@ -5118,11 +5159,11 @@ class BaseApi(object):
             idx1 = CurrentBar()
             p1 = Close()[-1]
             if idx1 >= 100:
-                idx2 = 1
+                count = 1
                 p2 = Close()[-2]
-                PlotPartLine("PartLine", idx1, p1, idx2, p2, RGB_Red(), True, True, 1)
+                PlotPartLine("PartLine", idx1, p1, count, p2, RGB_Red(), True, True, 1)
         '''
-        return self._dataModel.setPlotPartLine(name, index1, price1, index2, price2, color, main, axis, width)
+        return self._dataModel.setPlotPartLine(name, index1, price1, count, price2, color, main, axis, width)
 
     def PlotStickLine(self, name, price1, price2, color, main, axis, barsback):
         '''
@@ -5267,26 +5308,26 @@ class BaseApi(object):
         '''
         return self._dataModel.setUnPlotNumeric(name, main, barsback)
 
-    def UnPlotPartLine(self, name, index1, index2, main):
+    def UnPlotPartLine(self, name, index1, count, main):
         '''
         【说明】
             在当前Bar取消输出的斜线段
 
         【语法】
-            void UnPlotPartLine(string name, int index1, int index2, bool main)
+            void UnPlotPartLine(string name, int index1, int count, bool main)
 
         【参数】
             name  名称
-            index1 起始索引, 目前只对当前Bar有效
-            index2 结束索引
+            index1 起始bar索引
+            count  从起始bar回溯到结束bar的根数
             main  指标是否加载到主图，True-主图，False-幅图，默认主图
 
         【备注】
 
         【示例】
-            UnPlotPartLine("PartLine", idx1, idx2, True)
+            UnPlotPartLine("PartLine", idx1, count, True)
         '''
-        return self._dataModel.setUnPlotPartLine(name, index1, index2, main)
+        return self._dataModel.setUnPlotPartLine(name, index1, count, main)
 
     def UnPlotStickLine(self, name, main, barsback):
         '''
@@ -5325,8 +5366,8 @@ class BaseApi(object):
         【示例】
               accountId = A_AccountID()
               LogDebug("当前使用的用户账户ID为 : ", accountId)
-              freeMargin = A_FreeMargin()
-              LogDebug("当前使用的用户账户ID为 : %s，可用资金为 : %10.2f" % (accountId, freeMargin))
+              available = A_Available()
+              LogDebug("当前使用的用户账户ID为 : %s，可用资金为 : %10.2f" % (accountId, available))
         '''
         return self._dataModel.LogDebug(args)
 
@@ -5347,8 +5388,8 @@ class BaseApi(object):
         【示例】
               accountId = A_AccountID()
               LogInfo("当前使用的用户账户ID为 : ", accountId)
-              freeMargin = A_FreeMargin()
-              LogInfo("当前使用的用户账户ID为 : %s，可用资金为 : %10.2f" % (accountId, freeMargin))
+              available = A_Available()
+              LogInfo("当前使用的用户账户ID为 : %s，可用资金为 : %10.2f" % (accountId, available))
         '''
         return self._dataModel.LogInfo(args)
 
@@ -5369,8 +5410,8 @@ class BaseApi(object):
         【示例】
               accountId = A_AccountID()
               LogWarn("当前使用的用户账户ID为 : ", accountId)
-              freeMargin = A_FreeMargin()
-              LogWarn("当前使用的用户账户ID为 : %s，可用资金为 : %10.2f" % (accountId, freeMargin))
+              available = A_Available()
+              LogWarn("当前使用的用户账户ID为 : %s，可用资金为 : %10.2f" % (accountId, available))
         '''
         return self._dataModel.LogWarn(args)
 
@@ -5391,8 +5432,8 @@ class BaseApi(object):
         【示例】
               accountId = A_AccountID()
               LogError("当前使用的用户账户ID为 : ", accountId)
-              freeMargin = A_FreeMargin()
-              LogError("当前使用的用户账户ID为 : %s，可用资金为 : %10.2f" % (accountId, freeMargin))
+              available = A_Available()
+              LogError("当前使用的用户账户ID为 : %s，可用资金为 : %10.2f" % (accountId, available))
         '''
         return self._dataModel.LogError(args)
 
@@ -5441,6 +5482,50 @@ class BaseApi(object):
             ParabolicSAR(High(), Low(), 0.02, 0.2)
         '''
         return self._dataModel.ParabolicSAR(high, low, afstep, aflimit)
+
+    def Highest(self, price, length):
+        '''
+        【说明】
+            求最高
+
+        【语法】
+            numpy.array Highest(list price, int length)
+
+        【参数】
+            price 用于求最高值的值，必须是数值型列表；
+            length 需要计算的周期数，为整型。
+
+        【备注】
+            该函数计算指定周期内的数值型序列值的最高值，返回值为浮点数数字列表;
+            当price的类型不是list或者price的长度为0时，则返回为空的numpy.array()
+
+        【示例】
+            Highest (Close(), 12); 计算12周期以来的收盘价的最高值；
+            Highest ((Close() + High() + Low())/ 3, 10); 计算10周期以来高低收价格的平均值的最高值。
+        '''
+        return self._dataModel.getHighest(price, length)
+
+    def Lowest(self, price, length):
+        '''
+        【说明】
+            求最低
+
+        【语法】
+            numpy.array Lowest(list price, int length)
+
+        【参数】
+            price 用于求最低值的值，必须是数值型列表；
+            length 需要计算的周期数，为整型。
+
+        【备注】
+            该函数计算指定周期内的数值型序列值的最低值，返回值为浮点数数字列表;
+            当price的类型不是list或者price的长度为0时，则返回为空的numpy.array()
+
+        【示例】
+            Highest (Close(), 12); 计算12周期以来的收盘价的最低值；
+            Highest ((Close() + High() + Low())/ 3, 10); 计算10周期以来高低收价格的平均值的最低值。
+        '''
+        return self._dataModel.getLowest(price, length)
 
     def strategyStatus(self):
         '''
@@ -5782,6 +5867,9 @@ def BarsSinceExit(contractNo=''):
 def BarsSinceLastEntry(contractNo=''):
     return baseApi.BarsSinceLastEntry(contractNo)
 
+def BarsSinceToday(contractNo='', barType='', barValue=''):
+    return baseApi.BarsSinceToday(contractNo, barType, barValue)
+
 def ContractProfit(contractNo=''):
     return baseApi.ContractProfit(contractNo)
 
@@ -5885,11 +5973,14 @@ def A_GetAllPositionSymbol():
 def A_Cost():
     return baseApi.A_Cost()
 
-def A_CurrentEquity():
-    return baseApi.A_CurrentEquity()
+def A_Assets():
+    return baseApi.A_Assets()
 
-def A_FreeMargin():
-    return baseApi.A_FreeMargin()
+def A_Available():
+    return baseApi.A_Available()
+
+def A_Margin():
+    return baseApi.A_Margin()
 
 def A_ProfitLoss():
     return baseApi.A_ProfitLoss()
@@ -6358,8 +6449,8 @@ def PlotText(value, text, color=0x999999, main=True, barsback=0):
 def PlotVertLine(color=0xdd0000, main=True, axis=False, barsback=0):
     return baseApi.PlotVertLine(color, main, axis, barsback)
 
-def PlotPartLine(name, index1, price1, index2, price2, color=0xdd0000, main=True, axis=False, width=1):
-    return baseApi.PlotPartLine(name, index1, price1, index2, price2, color, main, axis, width)
+def PlotPartLine(name, index1, price1, count, price2, color=0xdd0000, main=True, axis=False, width=1):
+    return baseApi.PlotPartLine(name, index1, price1, count, price2, color, main, axis, width)
 
 def PlotStickLine(name, price1, price2, color=0xdd0000, main=True, axis=False, barsback=0):
     return baseApi.PlotStickLine(name, price1, price2, color, main, axis, barsback)
@@ -6382,8 +6473,8 @@ def UnPlotBar(name, main=True, barsback=0):
 def UnPlotNumeric(name, main=True, barsback=0):
     return baseApi.UnPlotNumeric(name, main, barsback)
 
-def UnPlotPartLine(name, index1, index2, main=True):
-    return baseApi.UnPlotPartLine(name, index1, index2, main)
+def UnPlotPartLine(name, index1, count, main=True):
+    return baseApi.UnPlotPartLine(name, index1, count, main)
 
 def UnPlotStickLine(name, main=True, barsback=0):
     return baseApi.UnPlotStickLine(name, main, barsback)
@@ -6405,3 +6496,9 @@ def SMA(price, period, weight):
 
 def ParabolicSAR(high, low, afstep, aflimit):
     return baseApi.ParabolicSAR(high, low, afstep, aflimit)
+
+def Highest(price, length):
+    return baseApi.Highest(price, length)
+
+def Lowest(price, length):
+    return baseApi.Lowest(price, length)

@@ -565,7 +565,8 @@ class StrategyEngine(object):
             # 客户端手动开仓平仓
             if not contractNo:
                 contractNo = apiEvent.getData()[0]["Cont"]
-            assert contractNo, " error "
+            if not contractNo:
+                return
             apiEvent.setContractNo(contractNo)
             self._sendEvent2AllStrategy(apiEvent)
 
@@ -664,15 +665,12 @@ class StrategyEngine(object):
         })
         self._sendEvent2Strategy(stragetyId, trdEvent)
 
-        # 订单恢复
-        orderEvents = self._engineOrderModel.getStrategyOrder(event.getStrategyId())
+        # 订单恢复, 获取当前所有订单
+        orderEvents = self._engineOrderModel.getStrategyOrder(0)
         for orderEvent in orderEvents:
-            contractNo = orderEvent.getContractNo()
-            condition = orderEvent.getStrategyId() == 0 and contractNo in self._quoteOberverDict and stragetyId in self._quoteOberverDict[contractNo].keys()
-            if orderEvent.getStrategyId() == event.getStrategyId() or condition:
-                self._sendEvent2Strategy(stragetyId, orderEvent)
+            self._sendEvent2Strategy(stragetyId, orderEvent)
 
-    #///////////////策略进程事件////////////////////////////// 
+    # ///////////////策略进程事件//////////////////////////////
     def _addSubscribe(self, contractNo, strategyId):
         stDict = self._quoteOberverDict[contractNo]
         # 重复订阅

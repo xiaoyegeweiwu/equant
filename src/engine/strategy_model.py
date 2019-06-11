@@ -538,6 +538,9 @@ class StrategyModel(object):
     def getFreeMargin(self):
         return self._trdModel.getFreeMargin()
 
+    def getAMargin(self):
+        return self._trdModel.getAMargin()
+
     def getProfitLoss(self):
         return self._trdModel.getProfitLoss()
 
@@ -1206,17 +1209,17 @@ class StrategyModel(object):
 
         self._plotNumeric(self._strategyName, np.nan, 0, main, EEQU_ISNOT_AXIS, EEQU_VERTLINE, barsback, data)
 
-    def setPlotPartLine(self, name, index1, price1, index2, price2, color, main, axis, width):
+    def setPlotPartLine(self, name, index1, price1, count, price2, color, main, axis, width):
         main = '0' if main else '1'
         axis = '0' if axis else '1'
 
-        if index1<= 0 or index2 <= 0:
+        if index1<= 0 or count <= 0:
             return
 
         data = [{
             'KLineIndex' : index1,
             'Value'      : price1,
-            'Idx2'       : index2,
+            'Idx2'       : count,
             'LineValue'  : price2,
             'ClrLine'    : color,
             'LinWid'     : width
@@ -1224,16 +1227,16 @@ class StrategyModel(object):
 
         self._plotNumeric(name, 0, color, main, axis, EEQU_PARTLINE, 0, data)
 
-    def setUnPlotPartLine(self, name, index1, index2, main):
+    def setUnPlotPartLine(self, name, index1, count, main):
         main = '0' if main else '1'
 
-        if index1<= 0 or index2 <= 0:
+        if index1<= 0 or count <= 0:
             return
 
         data = [{
             'KLineIndex' : index1,
             'Value'      : np.nan,
-            'Idx2'       : index2,
+            'Idx2'       : count,
             'LineValue'  : np.nan,
             'ClrLine'    : 0,
             'LinWid'     : 1
@@ -1602,6 +1605,18 @@ class StrategyModel(object):
         curBar = self._hisModel.getCurBar()
         return (int(curBar['KLineIndex']) - barIndex)
 
+    def getBarsSinceToday(self, contractNo, barType, barValue):
+        key = self.getKey(contractNo, barType, barValue)
+        curBar = self._hisModel.getCurBar(key)
+        tradeDate = curBar['TradeDate']
+        barList = self._hisModel._curBarDict[key].getTradeDateKLine(tradeDate)
+        if len(barList) == 0:
+            return 0
+
+        firstBar = barList[0]
+        res = curBar['KLineIndex'] - firstBar['KLineIndex']
+        return res if res > 0 else 0
+
     def getPositionValue(self, contNo, key):
         if not contNo:
             contNo = self._cfgModel.getBenchmark()
@@ -1837,3 +1852,23 @@ class StrategyModel(object):
     def ParabolicSAR(self, high, low, afstep, aflimit):
         '''计算抛物线转向'''
         return self._staModel.ParabolicSAR(high, low, afstep, aflimit)
+
+    def getHighest(self, price, length):
+        if not isinstance(price, list) or len(price) == 0:
+            return np.array()
+
+        if length <= 1:
+            return np.array(price)
+
+        arr = np.array(price)
+        return talib.MAX(arr, length)
+
+    def getLowest(self, price, length):
+        if not isinstance(price, list) or len(price) == 0:
+            return np.array()
+
+        if length <= 1:
+            return np.array(price)
+
+        arr = np.array(price)
+        return talib.MIN(arr, length)

@@ -128,15 +128,20 @@ class StrategyMenu(object):
         newTop = NewDirToplevel(self._controller.top)
 
         def save():
-            # 新建策略前先保存当前选中的策略
+            # 新建前先保存当前选中的策略
             self._controller.saveStrategy()
 
             tempPath = self.get_file_path()
             path =tempPath[0]
+
             if os.path.isdir(path):
+                #TODO: 新建策略有问题
                 dir_path = path
+                # dir_path = os.path.dirname(path)
+
             if os.path.isfile(path):
                 dir_path = os.path.dirname(path)
+                # dir_path = os.path.dirname(par_path)
             file_name = newTop.nameEntry.get()
             if file_name == "":
                 messagebox.showinfo(self.language.get_text(8), self.language.get_text(22), parent=newTop)

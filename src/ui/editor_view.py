@@ -70,6 +70,7 @@ class StrategyTree(QuantFrame):
         # TODO：怎么可以实现新建策略按正确的顺序插入呢？
         dir_name = os.path.dirname(fullname)
         file_name = os.path.basename(fullname)
+        print("1111: ", self.tree_node_dict)
         parent = self.tree_node_dict[dir_name]
         
         if not parent:
@@ -278,6 +279,8 @@ class QuantEditor(StrategyTree):
                 self.updateEditorText(data)
                 self.updateEditorHead(header)
                 self._dModifyFlag = False
+                # 清空editor的恢复和撤消栈内容
+                self.editor_text.edit_reset()
 
     def doubleClickFlag(self):
         """是否双击策略目录标志位"""
