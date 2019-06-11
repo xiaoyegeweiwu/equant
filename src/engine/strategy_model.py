@@ -613,6 +613,12 @@ class StrategyModel(object):
     def getNextOrderNo(self, orderId, contNo1, contNo2):
         return self._trdModel.getNextOrderNo(orderId, contNo1, contNo2)
 
+    def getFirstQueueOrderNo(self, contNo1, contNo2):
+        return self._trdModel.getFirstQueueOrderNo(contNo1, contNo2)
+
+    def getNextQueueOrderNo(self, orderId, contNo1, contNo2):
+        return self._trdModel.getNextQueueOrderNo(orderId, contNo1, contNo2)
+
     def getOrderContractNo(self, orderId):
         return self._trdModel.getOrderContractNo(orderId)
 

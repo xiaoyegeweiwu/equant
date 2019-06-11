@@ -465,6 +465,52 @@ class StrategyTrade(TradeModel):
 
         return minOrderId
 
+    def getFirstQueueOrderNo(self, contNo1, contNo2):
+        if self._selectedUserNo not in self._userInfo:
+            raise Exception("请先在极星客户端登录您的交易账号")
+
+        tUserInfoModel = self._userInfo[self._selectedUserNo]
+        if len(tUserInfoModel._order) == 0:
+            return -1
+
+        orderId = -1
+        for orderNo in list(tUserInfoModel._order.keys()):
+            orderModel = tUserInfoModel._order[orderNo]
+            if not contNo1 or contNo1 == orderModel._metaData['Cont']:
+                # 排队中
+                if orderModel._metaData['OrderState'] != osQueued:
+                    continue
+                if orderId == -1 or orderId > orderModel._metaData['OrderId']:
+                    orderId = orderModel._metaData['OrderId']
+
+        return orderId
+
+    def getNextQueueOrderNo(self, orderId, contNo1, contNo2):
+        if self._selectedUserNo not in self._userInfo:
+            raise Exception("请先在极星客户端登录您的交易账号")
+
+        tUserInfoModel = self._userInfo[self._selectedUserNo]
+        if len(tUserInfoModel._order) == 0:
+            return -1
+
+        minOrderId = -1
+        for orderNo in list(tUserInfoModel._order.keys()):
+            orderModel = tUserInfoModel._order[orderNo]
+            if not contNo1 or contNo1 == orderModel._metaData['Cont']:
+                # 排队中
+                if orderModel._metaData['OrderState'] != osQueued:
+                    continue
+                if orderModel._metaData['OrderId'] <= orderId:
+                    continue
+                # 获取大于orderId的值
+                if minOrderId == -1:
+                    minOrderId = orderModel._metaData['OrderId']
+                # 找到大于orderId并最接近orderId的值
+                if orderModel._metaData['OrderId'] < minOrderId:
+                    minOrderId = orderModel._metaData['OrderId']
+
+        return minOrderId
+
     def getOrderContractNo(self, orderId):
         if self._selectedUserNo not in self._userInfo:
             raise Exception("请先在极星客户端登录您的交易账号")

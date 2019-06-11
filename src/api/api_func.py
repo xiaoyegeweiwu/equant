@@ -177,6 +177,8 @@ _all_func_ = {
                     ['A_OrderTime'         , '下单时间'],
                     ['A_FirstOrderNo'      , '当前账户第一个订单号'],
                     ['A_NextOrderNo'       , '当前账户下一个订单号'],
+                    ['A_FirstQueueOrderNo' , '当前账户第一个排队(可撤)订单'],
+                    ['A_NextQueueOrderNo'  , '当前账户下一个排队(可撤)订单'],
                     ['A_OrderContractNo'   , '订单的合约号'],
                     ['A_SendOrder'         , '下单'],
                     ['A_DeleteOrder'       , '撤单'],

@@ -3110,6 +3110,47 @@ class BaseApi(object):
          '''
         return self._dataModel.getNextOrderNo(orderId, contractNo1, contractNo2)
 
+    def A_FirstQueueOrderNo(self, contractNo1, contractNo2):
+        '''
+        【说明】
+              返回当前账户第一个排队(可撤)订单号。
+
+        【语法】
+              int A_FirstQueueOrderNo(string contractNo)
+
+        【参数】
+              contractNo 合约代码，默认为遍历所有合约。
+
+        【备注】
+              若返回值为-1，表示没有任何可撤排队订单，否则，返回第一个订单的索引值。，
+              该函数经常和A_NextQueueOrderNo函数合用，用于遍历排队中的订单。
+
+        【示例】
+              无
+         '''
+        return self._dataModel.getFirstQueueOrderNo(contractNo1, contractNo2)
+
+    def A_NextQueueOrderNo(self, orderId, contractNo1, contractNo2):
+        '''
+        【说明】
+              返回当前账户下一个排队(可撤)订单号。
+
+        【语法】
+              int A_NextQueueOrderNo(int orderId, string contractNo)
+
+        【参数】
+              orderId 定单号，不能为空，
+              contractNo 合约代码，默认为遍历所有合约。
+
+        【备注】
+              若返回值为-1，表示没有任何排队订单，否则，返回处在OrderNo后面的订单索引值，
+              该函数常和A_FirstQueueOrderNo联合使用。
+
+        【示例】
+              无
+         '''
+        return self._dataModel.getNextQueueOrderNo(orderId, contractNo1, contractNo2)
+
     def A_OrderContractNo(self, orderId):
         '''
         【说明】
@@ -6053,6 +6094,12 @@ def A_FirstOrderNo(contractNo1='', contractNo2=''):
 
 def A_NextOrderNo(orderId=0, contractNo1='', contractNo2=''):
     return baseApi.A_NextOrderNo(orderId, contractNo1, contractNo2)
+
+def A_FirstQueueOrderNo(contractNo1='', contractNo2=''):
+    return baseApi.A_FirstQueueOrderNo(contractNo1, contractNo2)
+
+def A_NextQueueOrderNo(orderId=0, contractNo1='', contractNo2=''):
+    return baseApi.A_NextQueueOrderNo(orderId, contractNo1, contractNo2)
 
 def A_OrderContractNo(orderId):
     return baseApi.A_OrderContractNo(orderId)
