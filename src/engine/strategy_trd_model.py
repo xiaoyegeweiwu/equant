@@ -372,7 +372,25 @@ class StrategyTrade(TradeModel):
         :return: 当前公式应用的帐户下当前商品的某个委托单的状态
         '''
         orderNo = self._strategy.getOrderNo(eSession)
-        return self.getDataFromTOrderModel(orderNo, 'OrderState')
+        if orderNo == 0:
+            return 'N'
+
+        if len(self._userInfo) == 0 or self._selectedUserNo not in self._userInfo:
+            raise Exception("请确保您的账号已经在客户端登录")
+
+        tUserInfoModel = self._userInfo[self._selectedUserNo]
+
+        if len(tUserInfoModel._order) == 0:
+            return '0'
+
+        if orderNo and orderNo not in tUserInfoModel._order:
+            return 'N'
+
+        if not orderNo:
+            return '0'
+
+        tOrderModel = tUserInfoModel._order[orderNo]
+        return tOrderModel._metaData['OrderState']
 
     def getOrderTime(self, eSession):
         '''
