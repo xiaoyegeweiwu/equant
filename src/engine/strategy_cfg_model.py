@@ -367,7 +367,7 @@ class StrategyConfig(object):
         contNo = self.getBenchmark() if not contractNo else contractNo
 
         if 'WinPoint' not in self._metaData or contNo not in self._metaData['WinPoint']:
-            raise Exception("请确保合约%s已经通过设置界面或者SetWinPoint方法设置了止盈信息"%contNo)
+            return None
 
         return self._metaData['WinPoint'][contNo]
 
@@ -392,7 +392,7 @@ class StrategyConfig(object):
         contNo = self.getBenchmark() if not contractNo else contractNo
 
         if 'StopPoint' not in self._metaData or contNo not in self._metaData['StopPoint']:
-            raise Exception("请确保合约%s已经通过设置界面或者SetStopPoint方法设置了止损信息" % contNo)
+            return None
 
         return self._metaData['StopPoint'][contNo]
 
