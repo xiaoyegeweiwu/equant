@@ -346,6 +346,56 @@ class StrategyConfig(object):
 
         return 0
 
+    def setWinPoint(self, winPoint, nPriceType, nAddTick, contractNo):
+        if 'WinPoint' not in self._metaData:
+            self._metaData['WinPoint'] = {}
+
+        if nPriceType not in (0, 1, 2, 3, 4):
+            raise Exception("参数nPriceType代表的平仓下单价格类型必须为0: 最新价，1：对盘价，2：挂单价，3：市价，4：停板价中的一个")
+
+        if nAddTick not in (0, 1, 2):
+            raise Exception("参数nAddTick代表的超价点数仅能为0，1，2")
+
+        self._metaData['WinPoint'][contractNo] = {
+            "StopPoint": winPoint,
+            "AddPoint": nAddTick,
+            "CoverPosOrderType": nPriceType,
+        }
+        return 0
+
+    def getStopWinParams(self, contractNo=None):
+        contNo = self.getBenchmark() if not contractNo else contractNo
+
+        if 'WinPoint' not in self._metaData or contNo not in self._metaData['WinPoint']:
+            return None
+
+        return self._metaData['WinPoint'][contNo]
+
+    def setStopPoint(self, stopPoint, nPriceType, nAddTick, contractNo):
+        if 'StopPoint' not in self._metaData:
+            self._metaData['StopPoint'] = {}
+
+        if nPriceType not in (0, 1, 2, 3, 4):
+            raise Exception("参数nPriceType代表的平仓下单价格类型必须为0: 最新价，1：对盘价，2：挂单价，3：市价，4：停板价中的一个")
+
+        if nAddTick not in (0, 1, 2):
+            raise Exception("参数nAddTick代表的超价点数仅能为0，1，2")
+
+        self._metaData['StopPoint'][contractNo] = {
+            "StopPoint": stopPoint,
+            "AddPoint": nAddTick,
+            "CoverPosOrderType": nPriceType,
+        }
+        return 0
+
+    def getStopLoseParams(self, contractNo=None):
+        contNo = self.getBenchmark() if not contractNo else contractNo
+
+        if 'StopPoint' not in self._metaData or contNo not in self._metaData['StopPoint']:
+            return None
+
+        return self._metaData['StopPoint'][contNo]
+
     def setSample(self, sampleType, sampleValue):
         '''设置样本数据'''
         pass

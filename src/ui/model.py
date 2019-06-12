@@ -299,7 +299,7 @@ class GetEgData(object):
         stId = event.getStrategyId()
         data = event.getData()
         # 实时更新监控界面信息
-        self._stManager.addStrategyData(stId, data)
+        self._stManager.addStrategyRunData(stId, data)
 
     def _onEgExchangeInfo(self, event):
         """获取引擎推送交易所信息"""
@@ -436,7 +436,8 @@ class StrategyManager(object):
         id = dataDict['StrategyId']
         self._strategyDict[id] = dataDict
 
-    def addStrategyData(self, id, data):
+    def addStrategyRunData(self, id, data):
+        """策略运行数据实时更新"""
         self._strategyDict[id].update({"RunningData": data})
 
     def removeStrategy(self, id):
@@ -449,14 +450,19 @@ class StrategyManager(object):
     def queryStrategyRunType(self, id):
         return self._strategyDict[id]["RunType"]
 
-    def getStrategyData(self, id):
-        return self._strategyDict[id]["Config"]
-
     def queryStrategyName(self, id):
         return self._strategyDict[id]["StrategyName"]
 
     def updateStrategyStatus(self, id, status):
         self._strategyDict[id]["StrategyState"] = status
+
+    def getStrategyConfigData(self, id):
+        """获取运行设置信息"""
+        return self._strategyDict[id]["Config"]
+
+    def getStrategyParamData(self, id):
+        """获取用户参数设置信息"""
+        return self._strategyDict[id]["Params"]
 
     def getStrategyDict(self):
         """获取全部运行策略"""

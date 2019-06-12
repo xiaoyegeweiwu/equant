@@ -947,7 +947,8 @@ class PyAPI(object):
         req.TriggerPrice = data['TriggerPrice']
         req.TriggerMode = data['TriggerMode'].encode()
         req.TriggerCondition = data['TriggerCondition'].encode()
-        req.OrderQty = data['OrderQty']
+        # todo float/double 支持
+        req.OrderQty = int(data['OrderQty'])
         req.StrategyType = data['StrategyType'].encode()
         req.Remark = data['Remark'].encode()
         req.AddOneIsValid = data['AddOneIsValid'].encode()

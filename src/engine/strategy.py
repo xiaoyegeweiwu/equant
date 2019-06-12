@@ -525,9 +525,9 @@ class Strategy:
                 "EventCode": EV_EG2ST_MONITOR_INFO,
                 "Data": self._dataModel.getMonResult()
             })
-        
+
             self.sendEvent2UI(event)
-            
+
         
     def _runTimer(self):
         timeList = self._dataModel.getConfigTimer()
@@ -620,28 +620,21 @@ class Strategy:
         self._dataModel.onQuoteNotice(event)
         self._snapShotTrigger(event)
 
-        # 阶段
-        if self.isRealTimeStatus():
-            try:
-                self._calcProfitByQuote(event)
-            except Exception as e:
-                self.logger.error("即时行情计算浮动盈亏出现错误")
+    # def _calcProfitByQuote(self, event):
+    #     data = event.getData()
+    #     if len(data) == 0 or (4 not in data[0]["FieldData"]):
+    #         # 4:最新价
+    #         return
+    #
+    #     priceInfos = {}
+    #     priceInfos[event.getContractNo()] = {
+    #         "LastPrice": data[0]["FieldData"][4],
+    #         "TradeDate": data[0]["UpdateTime"]//1000000000,
+    #         "DateTimeStamp" : data[0]["UpdateTime"],
+    #         "LastPriceSource": LastPriceFromQuote
+    #     }
+    #     self._dataModel.getHisQuoteModel().calcProfitByQuote(event.getContractNo(), priceInfos)
 
-    def _calcProfitByQuote(self, event):
-        data = event.getData()
-        if len(data) == 0 or (4 not in data[0]["FieldData"]):
-            # 4:最新价
-            return
-
-        priceInfos = {}
-        priceInfos[event.getContractNo()] = {
-            "LastPrice": data[0]["FieldData"][4],
-            "TradeDate": data[0]["UpdateTime"]//1000000000,
-            "DateTimeStamp" : data[0]["UpdateTime"],
-            "LastPriceSource": LastPriceFromQuote
-        }
-        self._dataModel.getHisQuoteModel().calcProfitByQuote(event.getContractNo(), priceInfos)
-        
     def _onDepthNotice(self, event):
         self._dataModel.onDepthNotice(event)
 
@@ -920,11 +913,14 @@ class Strategy:
 
     def _snapShotTrigger(self, event):
         # 未选择即时行情触发
-        if not self._dataModel.getConfigModel().hasSnapShotTrigger() or not self.isRealTimeStatus():
-            return
+        # if not self._dataModel.getConfigModel().hasSnapShotTrigger() or not self.isRealTimeStatus():
+        #     return
+        #
+        # # 该合约不触发
+        # if event.getContractNo() not in self._dataModel.getConfigModel().getTriggerContract():
+        #     return
 
-        # 该合约不触发
-        if event.getContractNo() not in self._dataModel.getConfigModel().getTriggerContract():
+        if not self.isRealTimeStatus():
             return
 
         # 对应字段没有变化不触发
@@ -935,7 +931,7 @@ class Strategy:
 
         dateTimeStamp, tradeDate, lv1Data = self.getTriggerTimeAndData(event.getContractNo())
         event = Event({
-            "EventCode" : ST_TRIGGER_SANPSHOT,
+            "EventCode" : ST_TRIGGER_SANPSHOT_FILL,
             "ContractNo": event.getContractNo(),
             "KLineType" : None,
             "KLineSlice": None,
@@ -943,6 +939,7 @@ class Strategy:
                 "Data": lv1Data,
                 "DateTimeStamp": dateTimeStamp,
                 "TradeDate": tradeDate,
+                "IsLastPriceChanged": 4 in data[0]["FieldData"],   # 最新价是否改变
             }
         })
         self.sendTriggerQueue(event)

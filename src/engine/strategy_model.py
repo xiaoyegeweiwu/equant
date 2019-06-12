@@ -35,7 +35,7 @@ class StrategyModel(object):
         self._calcCenter = CalcCenter(self.logger)
 
         self._qteModel = StrategyQuote(strategy, self._cfgModel)
-        self._hisModel = StrategyHisQuote(strategy, self._cfgModel, self._calcCenter)
+        self._hisModel = StrategyHisQuote(strategy, self._cfgModel, self._calcCenter, self)
         self._trdModel = StrategyTrade(strategy, self._cfgModel)
         self._staModel = StatisticsModel(strategy, self._cfgModel)
 
@@ -206,6 +206,26 @@ class StrategyModel(object):
     def getBarClose(self, contractNo, kLineType, kLineValue):
         multiContKey = self.getKey(contractNo, kLineType, kLineValue)
         return self._hisModel.getBarClose(multiContKey)
+
+    def getOpenD(self, daysAgo, contractNo):
+        contNo = self._cfgModel.getBenchmark() if not contractNo else contractNo
+        multiContKey = self.getKey(contNo, 'D', 1)
+        return self._hisModel.getOpenD(daysAgo, multiContKey)
+
+    def getCloseD(self, daysAgo, contractNo):
+        contNo = self._cfgModel.getBenchmark() if not contractNo else contractNo
+        multiContKey = self.getKey(contNo, 'D', 1)
+        return self._hisModel.getCloseD(daysAgo, multiContKey)
+
+    def getHighD(self, daysAgo, contractNo):
+        contNo = self._cfgModel.getBenchmark() if not contractNo else contractNo
+        multiContKey = self.getKey(contNo, 'D', 1)
+        return self._hisModel.getHighD(daysAgo, multiContKey)
+
+    def getLowD(self, daysAgo, contractNo):
+        contNo = self._cfgModel.getBenchmark() if not contractNo else contractNo
+        multiContKey = self.getKey(contNo, 'D', 1)
+        return self._hisModel.getLowD(daysAgo, multiContKey)
 
     def getBarVol(self, contractNo, kLineType, kLineValue):
         multiContKey = self.getKey(contractNo, kLineType, kLineValue)
@@ -522,6 +542,16 @@ class StrategyModel(object):
     def setTriggerMode(self, contNo, type, value):
         return self._cfgModel.setTrigger(contNo, type, value)
 
+    def setWinPoint(self, winPoint, nPriceType, nAddTick, contNo):
+        if not contNo:
+            contNo = self._cfgModel.getBenchmark()
+        return self._cfgModel.setWinPoint(winPoint, nPriceType, nAddTick, contNo)
+
+    def setStopPoint(self, stopPoint, nPriceType, nAddTick, contNo):
+        if not contNo:
+            contNo = self._cfgModel.getBenchmark()
+        return self._cfgModel.setStopPoint(stopPoint, nPriceType, nAddTick, contNo)
+
     # ///////////////////////账户函数///////////////////////////
     def getAccountId(self):
         return self._trdModel.getAccountId()
@@ -612,6 +642,12 @@ class StrategyModel(object):
 
     def getNextOrderNo(self, orderId, contNo1, contNo2):
         return self._trdModel.getNextOrderNo(orderId, contNo1, contNo2)
+
+    def getFirstQueueOrderNo(self, contNo1, contNo2):
+        return self._trdModel.getFirstQueueOrderNo(contNo1, contNo2)
+
+    def getNextQueueOrderNo(self, orderId, contNo1, contNo2):
+        return self._trdModel.getNextQueueOrderNo(orderId, contNo1, contNo2)
 
     def getOrderContractNo(self, orderId):
         return self._trdModel.getOrderContractNo(orderId)
@@ -1855,7 +1891,7 @@ class StrategyModel(object):
 
     def getHighest(self, price, length):
         if not isinstance(price, list) or len(price) == 0:
-            return np.array()
+            return np.array([])
 
         if length <= 1:
             return np.array(price)
@@ -1865,7 +1901,7 @@ class StrategyModel(object):
 
     def getLowest(self, price, length):
         if not isinstance(price, list) or len(price) == 0:
-            return np.array()
+            return np.array([])
 
         if length <= 1:
             return np.array(price)

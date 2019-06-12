@@ -144,10 +144,10 @@ class QuantApplication(object):
     def updateSingleExecute(self, dataDict):
         self.quant_monitor.updateSingleExecute(dataDict)
 
-    def createRunWin(self):
+    def createRunWin(self, param):
         """弹出量化设置界面"""
         self.setLoadState("disabled")
-        self.runWin = RunWin(self.control, self.root)
+        self.runWin = RunWin(self.control, self.root, param)
         self.runWin.display()
         self.setLoadState("normal")
 

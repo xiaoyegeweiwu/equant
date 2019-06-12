@@ -6,10 +6,14 @@ _all_func_ = {
                 
     'K线数据': [
                     ['BarCount'            , 'Bar总数'],
-                    ['Close'               , '收盘价,简写C'],
                     ['Open'                , '开盘价,简写O'],
+                    ['Close'               , '收盘价,简写C'],
                     ['High'                , '最高价,简写H'],
                     ['Low'                 , '最低价,简写L'],
+                    ['OpenD'               , 'N天前的开盘价'],
+                    ['CloseD'              , 'N天前的收盘价'],
+                    ['HighD'               , 'N天前的最高价'],
+                    ['LowD'                , 'N天前的最低价'],
                     ['Vol'                 , '成交量,简写V'],
                     ['OpenInt'             , '持仓量'],
                     ['BarStatus'           , '当前Bar状态值'],
@@ -177,6 +181,8 @@ _all_func_ = {
                     ['A_OrderTime'         , '下单时间'],
                     ['A_FirstOrderNo'      , '当前账户第一个订单号'],
                     ['A_NextOrderNo'       , '当前账户下一个订单号'],
+                    ['A_FirstQueueOrderNo' , '当前账户第一个排队(可撤)订单'],
+                    ['A_NextQueueOrderNo'  , '当前账户下一个排队(可撤)订单'],
                     ['A_OrderContractNo'   , '订单的合约号'],
                     ['A_SendOrder'         , '下单'],
                     ['A_DeleteOrder'       , '撤单'],
@@ -277,6 +283,8 @@ _all_func_ = {
                     ['SetHedge'            , '设置投保标志'],
                     ['SetSlippage'         , '设置滑点损耗'],
                     ['SetTriggerType'      , '设置触发方式'],
+                    ['SetWinPoint'         , '设置策略的止盈点'],
+                    ['SetStopPoint'        , '设置策略的止损点'],
                 ],
 
     '绘图函数': [
@@ -309,11 +317,14 @@ _all_func_ = {
                     ['triggerData'         ,'获取当前触发类型对应的数据'],
                 ],
 
-    '其他函数': [
+    '数学函数': [
                     ['SMA'                 ,'计算加权移动平均值'],
                     ['ParabolicSAR'        ,'计算抛物线转向'],
                     ['Highest'             ,'求最高'],
                     ['Lowest'              ,'求最低'],
+                ],
+
+    '日志函数': [
                     ['LogDebug'            ,'打印调试信息'],
                     ['LogInfo'             ,'打印普通信息'],
                     ['LogWarn'             ,'打印警告信息'],

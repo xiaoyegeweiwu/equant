@@ -107,9 +107,10 @@ class TkinterController(object):
         """保存当前策略"""
         self.app.quant_editor.saveEditor()
 
-    def load(self, strategyPath):
+    def load(self, strategyPath, param={}):
+        #TODO：新增param参数，用于接收用户策略的参数
         """加载合约事件"""
-        self.app.createRunWin()
+        self.app.createRunWin(param)
 
         config = self.app.runWin.getConfig()
         if config:   # 获取到config
@@ -245,6 +246,12 @@ class TkinterController(object):
         if len(strategyIdList) >= 1:
             id = strategyIdList[0]
             self._request.strategySignal(id)
+
+    def getUserParam(self, strategyIdList):
+        """获取用户设置的参数信息"""
+        for id in strategyIdList:
+            return self.strategyManager.getStrategyParamData(id)
+        return {}
 
 
 class ChildThread(threading.Thread):

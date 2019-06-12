@@ -159,6 +159,90 @@ class BaseApi(object):
         '''
         return self._dataModel.getBarClose(contractNo, kLineType, kLineValue)
 
+    def OpenD(self, daysAgo, contractNo):
+        '''
+        【说明】
+              指定合约指定周期N天前的开盘价
+
+        【语法】
+              float OpenD(int daysAgo, string contractNo)
+
+        【参数】
+              daysAgo 第几天前，默认值为0，即当天
+              contractNo 合约编号, 默认基准合约
+
+        【备注】
+              使用该函数前请确保在策略的initial方法中使用SetBarInterval(contractNo, 'D', 1)方法订阅contractNo合约的日线信息；
+              若daysAgo超过了订阅合约contractNo日线数据的样本数量，则返回为-1。
+
+        【实例】
+              OpenD(3，'ZCE|F|SR|905') 获取白糖905合约3天前的开盘价
+        '''
+        return self._dataModel.getOpenD(daysAgo, contractNo)
+
+    def CloseD(self, daysAgo, contractNo):
+        '''
+        【说明】
+              指定合约指定周期N天前的收盘价
+
+        【语法】
+              float CloseD(int daysAgo, string contractNo)
+
+        【参数】
+              daysAgo 第几天前，默认值为0，即当天
+              contractNo 合约编号, 默认基准合约
+
+        【备注】
+              使用该函数前请确保在策略的initial方法中使用SetBarInterval(contractNo, 'D', 1)方法订阅contractNo合约的日线信息；
+              若daysAgo超过了订阅合约contractNo日线数据的样本数量，则返回为-1。
+
+        【实例】
+              CloseD(3，'ZCE|F|SR|905') 获取白糖905合约3天前的收盘价
+        '''
+        return self._dataModel.getCloseD(daysAgo, contractNo)
+
+    def HighD(self, daysAgo, contractNo):
+        '''
+        【说明】
+              指定合约指定周期N天前的最高价
+
+        【语法】
+              float HighD(int daysAgo, string contractNo)
+
+        【参数】
+              daysAgo 第几天前，默认值为0，即当天
+              contractNo 合约编号, 默认基准合约
+
+        【备注】
+              使用该函数前请确保在策略的initial方法中使用SetBarInterval(contractNo, 'D', 1)方法订阅contractNo合约的日线信息；
+              若daysAgo超过了订阅合约contractNo日线数据的样本数量，则返回为-1。
+
+        【实例】
+              HighD(3，'ZCE|F|SR|905') 获取白糖905合约3天前的最高价
+        '''
+        return self._dataModel.getHighD(daysAgo, contractNo)
+
+    def LowD(self, daysAgo, contractNo):
+        '''
+        【说明】
+              指定合约指定周期N天前的最低价
+
+        【语法】
+              float LowD(int daysAgo, string contractNo)
+
+        【参数】
+              daysAgo 第几天前，默认值为0，即当天
+              contractNo 合约编号, 默认基准合约
+
+        【备注】
+              使用该函数前请确保在策略的initial方法中使用SetBarInterval(contractNo, 'D', 1)方法订阅contractNo合约的日线信息；
+              若daysAgo超过了订阅合约contractNo日线数据的样本数量，则返回为-1。
+
+        【实例】
+              LowD(3，'ZCE|F|SR|905') 获取白糖905合约3天前的最低价
+        '''
+        return self._dataModel.getLowD(daysAgo, contractNo)
+
     def Vol(self, contractNo, kLineType, kLineValue):
         '''
         【说明】
@@ -2872,16 +2956,16 @@ class BaseApi(object):
          '''
         return self._dataModel.getTodaySellPosition(contractNo)
 
-    def A_OrderBuyOrSell(self, orderId):
+    def A_OrderBuyOrSell(self, localOrderId):
         '''
         【说明】
               返回当前公式应用的帐户下当前商品的某个委托单的买卖类型。
 
         【语法】
-              char A_OrderBuyOrSell(string orderId)
+              char A_OrderBuyOrSell(string localOrderId)
 
         【参数】
-              orderId 使用A_SendOrder返回的下单编号。
+              localOrderId 使用A_SendOrder返回的下单编号。
 
         【备注】
               返回当前公式应用的帐户下当前商品的某个委托单的买卖类型，返回值为：
@@ -2896,18 +2980,18 @@ class BaseApi(object):
               if nBorS == Enum_Buy():
                 ...
          '''
-        return self._dataModel.getOrderBuyOrSell(orderId)
+        return self._dataModel.getOrderBuyOrSell(localOrderId)
 
-    def A_OrderEntryOrExit(self, orderId):
+    def A_OrderEntryOrExit(self, localOrderId):
         '''
         【说明】
               返回当前公式应用的帐户下当前商品的某个委托单的开平仓状态。
 
         【语法】
-              char A_OrderEntryOrExit(string orderId)
+              char A_OrderEntryOrExit(string localOrderId)
 
         【参数】
-              orderId 使用A_SendOrder返回的下单编号。
+              localOrderId 使用A_SendOrder返回的下单编号。
 
         【备注】
               返回当前公式应用的帐户下当前商品的某个委托单的开平仓状态，返回值：
@@ -2925,18 +3009,18 @@ class BaseApi(object):
               if orderFlag == Enum_Exit():
                 ...
          '''
-        return self._dataModel.getOrderEntryOrExit(orderId)
+        return self._dataModel.getOrderEntryOrExit(localOrderId)
 
-    def A_OrderFilledLot(self, orderId):
+    def A_OrderFilledLot(self, localOrderId):
         '''
         【说明】
               返回当前公式应用的帐户下当前商品的某个委托单的成交数量。
 
         【语法】
-              float A_OrderFilledLot(string orderId)
+              float A_OrderFilledLot(string localOrderId)
 
         【参数】
-              orderId 使用A_SendOrder返回的下单编号。
+              localOrderId 使用A_SendOrder返回的下单编号。
 
         【备注】
               返回当前公式应用的帐户下当前商品的某个委托单的成交数量，返回值为浮点数。
@@ -2945,18 +3029,18 @@ class BaseApi(object):
         【示例】
               无
          '''
-        return self._dataModel.getOrderFilledLot(orderId)
+        return self._dataModel.getOrderFilledLot(localOrderId)
 
-    def A_OrderFilledPrice(self, orderId):
+    def A_OrderFilledPrice(self, localOrderId):
         '''
         【说明】
               返回当前公式应用的帐户下当前商品的某个委托单的成交价格。
 
         【语法】
-              float A_OrderFilledPrice(string orderId)
+              float A_OrderFilledPrice(string localOrderId)
 
         【参数】
-              orderId 使用A_SendOrder返回的下单编号。
+              localOrderId 使用A_SendOrder返回的下单编号。
 
         【备注】
               返回当前公式应用的帐户下当前商品的某个委托单的成交价格，返回值为浮点数。
@@ -2966,18 +3050,18 @@ class BaseApi(object):
         【示例】
               无
          '''
-        return self._dataModel.getOrderFilledPrice(orderId)
+        return self._dataModel.getOrderFilledPrice(localOrderId)
 
-    def A_OrderLot(self, orderId):
+    def A_OrderLot(self, localOrderId):
         '''
         【说明】
               返回当前公式应用的帐户下当前商品的某个委托单的委托数量。
 
         【语法】
-              float A_OrderLot(string orderId)
+              float A_OrderLot(string localOrderId)
 
         【参数】
-              orderId 使用A_SendOrder返回的下单编号。
+              localOrderId 使用A_SendOrder返回的下单编号。
 
         【备注】
               返回当前公式应用的帐户下当前商品的某个委托单的委托数量，返回值为浮点数。
@@ -2986,18 +3070,18 @@ class BaseApi(object):
         【示例】
               无
          '''
-        return self._dataModel.getOrderLot(orderId)
+        return self._dataModel.getOrderLot(localOrderId)
 
-    def A_OrderPrice(self, orderId):
+    def A_OrderPrice(self, localOrderId):
         '''
         【说明】
               返回当前公式应用的帐户下当前商品的某个委托单的委托价格。
 
         【语法】
-              float A_OrderPrice(string orderId)
+              float A_OrderPrice(string localOrderId)
 
         【参数】
-              orderId 使用A_SendOrder返回的下单编号。
+              localOrderId 使用A_SendOrder返回的下单编号。
 
         【备注】
               返回当前公式应用的帐户下当前商品的某个委托单的委托价格，返回值为浮点数。
@@ -3006,18 +3090,18 @@ class BaseApi(object):
         【示例】
               无
          '''
-        return self._dataModel.getOrderPrice(orderId)
+        return self._dataModel.getOrderPrice(localOrderId)
 
-    def A_OrderStatus(self, orderId):
+    def A_OrderStatus(self, localOrderId):
         '''
         【说明】
               返回当前公式应用的帐户下当前商品的某个委托单的状态。
 
         【语法】
-              char A_OrderStatus(string orderId)
+              char A_OrderStatus(string localOrderId)
 
         【参数】
-              orderId 使用A_SendOrder返回的下单编号。
+              localOrderId 使用A_SendOrder返回的下单编号。
 
         【备注】
               返回当前公式应用的帐户下当前商品的某个委托单的状态，返回值：
@@ -3047,27 +3131,27 @@ class BaseApi(object):
         【示例】
               无
          '''
-        return self._dataModel.getOrderStatus(orderId)
+        return self._dataModel.getOrderStatus(localOrderId)
 
-    def A_OrderTime(self, orderId):
+    def A_OrderTime(self, localOrderId):
         '''
         【说明】
               返回当前公式应用的帐户下当前商品的某个委托单的委托时间。
 
         【语法】
-              struct_time A_OrderTime(string orderId)
+              struct_time A_OrderTime(string localOrderId)
 
         【参数】
-              orderId 使用A_SendOrder返回的下单编号。
+              localOrderId 使用A_SendOrder返回的下单编号。
 
         【备注】
-              返回当前公式应用的帐户下当前商品的某个委托单的委托时间，返回值为格式化的时间。
+              返回当前公式应用的帐户下当前商品的某个委托单的委托时间，返回格式为YYYYMMDD.hhmmss的数值。
               注：不能使用于历史测试，仅适用于实时行情交易。
 
         【示例】
               无
          '''
-        return self._dataModel.getOrderTime(orderId)
+        return self._dataModel.getOrderTime(localOrderId)
 
     def A_FirstOrderNo(self, contractNo1, contractNo2):
         '''
@@ -3089,16 +3173,16 @@ class BaseApi(object):
          '''
         return self._dataModel.getFirstOrderNo(contractNo1, contractNo2)
 
-    def A_NextOrderNo(self, orderId, contractNo1, contractNo2):
+    def A_NextOrderNo(self, localOrderId, contractNo1, contractNo2):
         '''
         【说明】
               返回当前账户下一个订单号。
 
         【语法】
-              int A_NextOrderNo(int orderId, string contractNo)
+              int A_NextOrderNo(int localOrderId, string contractNo)
 
         【参数】
-              orderId 定单号，不能为空，
+              localOrderId 定单号，不能为空，
               contractNo 合约代码，默认为遍历所有合约。
 
         【备注】
@@ -3108,27 +3192,68 @@ class BaseApi(object):
         【示例】
               无
          '''
-        return self._dataModel.getNextOrderNo(orderId, contractNo1, contractNo2)
+        return self._dataModel.getNextOrderNo(localOrderId, contractNo1, contractNo2)
 
-    def A_OrderContractNo(self, orderId):
+    def A_FirstQueueOrderNo(self, contractNo1, contractNo2):
+        '''
+        【说明】
+              返回当前账户第一个排队(可撤)订单号。
+
+        【语法】
+              int A_FirstQueueOrderNo(string contractNo)
+
+        【参数】
+              contractNo 合约代码，默认为遍历所有合约。
+
+        【备注】
+              若返回值为-1，表示没有任何可撤排队订单，否则，返回第一个订单的索引值。，
+              该函数经常和A_NextQueueOrderNo函数合用，用于遍历排队中的订单。
+
+        【示例】
+              无
+         '''
+        return self._dataModel.getFirstQueueOrderNo(contractNo1, contractNo2)
+
+    def A_NextQueueOrderNo(self, localOrderId, contractNo1, contractNo2):
+        '''
+        【说明】
+              返回当前账户下一个排队(可撤)订单号。
+
+        【语法】
+              int A_NextQueueOrderNo(int localOrderId, string contractNo)
+
+        【参数】
+              localOrderId 定单号，不能为空，
+              contractNo 合约代码，默认为遍历所有合约。
+
+        【备注】
+              若返回值为-1，表示没有任何排队订单，否则，返回处在OrderNo后面的订单索引值，
+              该函数常和A_FirstQueueOrderNo联合使用。
+
+        【示例】
+              无
+         '''
+        return self._dataModel.getNextQueueOrderNo(localOrderId, contractNo1, contractNo2)
+
+    def A_OrderContractNo(self, localOrderId):
         '''
         【说明】
               返回订单的合约号。
 
         【语法】
-              string A_OrderContractNo(int orderId)
+              string A_OrderContractNo(int localOrderId)
 
         【参数】
-              orderId 定单号，整数类型。
+              localOrderId 定单号，整数类型。
 
         【备注】
               返回结果如："ZCE|F|TA|305"等，
-              如果orderId没有对应的委托单，则返回结果为字符串。
+              如果localOrderId没有对应的委托单，则返回结果为字符串。
 
         【示例】
               无
          '''
-        return self._dataModel.getOrderContractNo(orderId)
+        return self._dataModel.getOrderContractNo(localOrderId)
 
     def A_SendOrder(self, userNo, contractNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty, triggerType, triggerMode, triggerCondition, triggerPrice):
         '''
@@ -3197,7 +3322,7 @@ class BaseApi(object):
         【备注】
               针对当前公式指定的帐户、商品发送委托单，发送成功返回如"1-2"的下单编号，发送失败返回空字符串""。
               返回结果形式未：retCode, retMsg，retCode的数据类型为可以为负的整数, retMsg的数据类型为字符串。
-              其中发送成功时retCode为0，retMsg为返回的下单编号，其组成规则为：策略id-该策略中发送委托单的次数，所以下单编号"1-2"表示在策略id为1的策略中的第2次发送委托单返回的下单编号。
+              其中发送成功时retCode为0，retMsg为返回的下单编号localOrderId，其组成规则为：策略id-该策略中发送委托单的次数，所以下单编号"1-2"表示在策略id为1的策略中的第2次发送委托单返回的下单编号。
               当发送失败时retCode为负数，retMsg为返回的发送失败的原因，retCode可能返回的值及含义如下：
                 -1 : 未选择实盘运行，请在设置界面勾选"实盘运行"，或者在策略代码中调用SetActual()方法选择实盘运行；
                 -2 : 策略当前状态不是实盘运行状态，请勿在历史回测阶段调用该函数；
@@ -3209,23 +3334,23 @@ class BaseApi(object):
 
         【示例】
               retCode, retMsg = A_SendOrder(UserId, ContractId, Enum_Order_Limit(), Enum_FOK(), Enum_Buy(), Enum_Exit(), Enum_Speculate(), Q_AskPrice(), OrderNum)
-              当retCode为0时表明发送订单信息成功。
+              当retCode为0时表明发送订单信息成功，retMsg为返回的下单编号localOrderId。
          '''
         if triggerType in ('P', 'A', 'C'):
             return self._dataModel.sendConditionOrder(userNo, contractNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty, \
                                                       triggerType, triggerMode, triggerCondition, triggerPrice)
         return self._dataModel.sendOrder(userNo, contractNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty)
 
-    def A_DeleteOrder(self, orderId):
+    def A_DeleteOrder(self, localOrderId):
         '''
         【说明】
               针对当前公式应用的帐户、商品发送撤单指令。
 
         【语法】
-              bool A_DeleteOrder(string orderId)
+              bool A_DeleteOrder(string localOrderId)
 
         【参数】
-              orderId 使用A_SendOrder返回的下单编号。
+              localOrderId 使用A_SendOrder返回的下单编号。
 
         【备注】
               针对当前公式应用的帐户、商品发送撤单指令，发送成功返回True, 发送失败返回False。
@@ -3235,25 +3360,25 @@ class BaseApi(object):
         【示例】
               无
          '''
-        return self._dataModel.deleteOrder(orderId)
+        return self._dataModel.deleteOrder(localOrderId)
 
-    def A_GetOrderNo(self, orderId):
+    def A_GetOrderNo(self, localOrderId):
         '''
         【说明】
               针对当前公式应用的帐户获取下单编号对应的定单号和委托号。
 
         【语法】
-              string, string A_GetOrderNo(string orderId)
+              string, string A_GetOrderNo(string localOrderId)
 
         【参数】
-              orderId 使用A_SendOrder返回的下单编号。
+              localOrderId 使用A_SendOrder返回的下单编号。
 
         【备注】
               针对当前策略使用A_SendOrder返回的下单编号，可以使用A_GetOrderNo获取下单编号对应的定单号和委托号。
-              由于使用A_SendOrder返回的下单编号orderId与策略相关，所以在策略重启后orderId会发生变化。
+              由于使用A_SendOrder返回的下单编号localOrderId与策略相关，所以在策略重启后localOrderId会发生变化。
               由于委托单对应的定单号与客户端有关，所以在客户端重启后，委托单对应的定单号可能会发生变化。
               由于委托号是服务器生成的，所以在使用A_SendOrder得到下单编号后，如果服务器还没有返回相应的委托单信息，可能获取不到相应的定单号和委托号。
-              当orderId对应的定单号和委托号还没有从服务器返回，则对应的值为空字符串。
+              当localOrderId对应的定单号和委托号还没有从服务器返回，则对应的值为空字符串。
               注：不能使用于历史测试，仅适用于实时行情交易。
 
         【示例】
@@ -3262,7 +3387,7 @@ class BaseApi(object):
               if retCode == 0:
                 sessionId, orderNo =  A_GetOrderNo(retMsg)
          '''
-        return self._dataModel.getAOrderNo(orderId)
+        return self._dataModel.getAOrderNo(localOrderId)
         
     #/////////////////////////////枚举函数/////////////////
     def Enum_Buy(self):
@@ -4988,6 +5113,50 @@ class BaseApi(object):
         '''
         return self._dataModel.setTriggerMode('', type, value)
 
+    def SetWinPoint(self, winPoint, nPriceType, nAddTick, contractNo):
+        '''
+        【说明】
+             设置触发方式
+
+        【语法】
+              int SetWinPoint(int winPoint, int nPriceType, int nAddTick, string contractNo)
+
+        【参数】
+              winPoint 赢利点数值，若当前价格相对于最近一次开仓价格的盈利点数达到或超过该值，就进行止盈；
+              nPriceType 平仓下单价格类型 0:最新价 1：对盘价 2：挂单价 3：市价 4：停板价；
+              nAddTick 超价点数 仅当nPrice为0，1，2时有效；
+              contractNo 合约代码，默认为基准合约。
+
+        【备注】
+              无
+
+        【示例】
+              SetWinPoint(10) # 当价格相对于最近一次开仓价格超过10个点，进行止盈平仓。如郑棉合约多头：开仓价格为15000，当前价格大于或等于5*10=50时，即达到15050，则进行平仓。
+        '''
+        return self._dataModel.setWinPoint(winPoint, nPriceType, nAddTick, contractNo)
+
+    def SetStopPoint(self, stopPoint, nPriceType, nAddTick, contractNo):
+        '''
+        【说明】
+             设置触发方式
+
+        【语法】
+              int SetWinPoint(int stopPoint, int nPriceType, int nAddTick, string contractNo)
+
+        【参数】
+              stopPoint 止损点数，若当前价格相对于最近一次开仓价格亏损点数达到或跌破该值，就进行止损；
+              nPriceType 平仓下单价格类型 0:最新价 1：对盘价 2：挂单价 3：市价 4：停板价；
+              nAddTick 超价点数 仅当nPrice为0，1，2时有效；
+              contractNo 合约代码，默认为基准合约。
+
+        【备注】
+              无
+
+        【示例】
+              SetStopPoint(10) # 当价格跌破10个点，进行止损平仓。 如：如郑棉合约多头：开仓价格为15000，当前价格小于或等于5*10=50时，即达到14950，则进行平仓。
+        '''
+        return self._dataModel.setStopPoint(stopPoint, nPriceType, nAddTick, contractNo)
+
     # //////////////////////其他函数////////////////////
 
     def PlotNumeric(self, name, value, color, main, axis, type, barsback):
@@ -5718,6 +5887,18 @@ def L(contractNo='', kLineType='', kLineValue=0):
 def Close(contractNo='', kLineType='', kLineValue=0):
     return baseApi.Close(contractNo, kLineType, kLineValue)
 
+def OpenD(daysAgo=0, contractNo=''):
+    return baseApi.OpenD(daysAgo, contractNo)
+
+def CloseD(daysAgo=0, contractNo=''):
+    return baseApi.CloseD(daysAgo, contractNo)
+
+def HighD(daysAgo=0, contractNo=''):
+    return baseApi.HighD(daysAgo, contractNo)
+
+def LowD(daysAgo=0, contractNo=''):
+    return baseApi.LowD(daysAgo, contractNo)
+
 def C(contractNo='', kLineType='', kLineValue=0):
     return baseApi.Close(contractNo, kLineType, kLineValue)
 
@@ -6024,47 +6205,53 @@ def A_TodayBuyPosition(contractNo=''):
 def A_TodaySellPosition(contractNo=''):
     return baseApi.A_TodaySellPosition(contractNo)
 
-def A_OrderBuyOrSell(orderId=''):
-    return baseApi.A_OrderBuyOrSell(orderId)
+def A_OrderBuyOrSell(localOrderId=''):
+    return baseApi.A_OrderBuyOrSell(localOrderId)
 
-def A_OrderEntryOrExit(orderId=''):
-    return baseApi.A_OrderEntryOrExit(orderId)
+def A_OrderEntryOrExit(localOrderId=''):
+    return baseApi.A_OrderEntryOrExit(localOrderId)
 
-def A_OrderFilledLot(orderId=''):
-    return baseApi.A_OrderFilledLot(orderId)
+def A_OrderFilledLot(localOrderId=''):
+    return baseApi.A_OrderFilledLot(localOrderId)
 
-def A_OrderFilledPrice(orderId=''):
-    return baseApi.A_OrderFilledPrice(orderId)
+def A_OrderFilledPrice(localOrderId=''):
+    return baseApi.A_OrderFilledPrice(localOrderId)
 
-def A_OrderLot(orderId=''):
-    return baseApi.A_OrderLot(orderId)
+def A_OrderLot(localOrderId=''):
+    return baseApi.A_OrderLot(localOrderId)
 
-def A_OrderPrice(orderId=''):
-    return baseApi.A_OrderPrice(orderId)
+def A_OrderPrice(localOrderId=''):
+    return baseApi.A_OrderPrice(localOrderId)
 
-def A_OrderStatus(orderId=''):
-    return baseApi.A_OrderStatus(orderId)
+def A_OrderStatus(localOrderId=''):
+    return baseApi.A_OrderStatus(localOrderId)
 
-def A_OrderTime(orderId=''):
-    return baseApi.A_OrderTime(orderId)
+def A_OrderTime(localOrderId=''):
+    return baseApi.A_OrderTime(localOrderId)
 
 def A_FirstOrderNo(contractNo1='', contractNo2=''):
     return baseApi.A_FirstOrderNo(contractNo1, contractNo2)
 
-def A_NextOrderNo(orderId=0, contractNo1='', contractNo2=''):
-    return baseApi.A_NextOrderNo(orderId, contractNo1, contractNo2)
+def A_NextOrderNo(localOrderId=0, contractNo1='', contractNo2=''):
+    return baseApi.A_NextOrderNo(localOrderId, contractNo1, contractNo2)
 
-def A_OrderContractNo(orderId):
-    return baseApi.A_OrderContractNo(orderId)
+def A_FirstQueueOrderNo(contractNo1='', contractNo2=''):
+    return baseApi.A_FirstQueueOrderNo(contractNo1, contractNo2)
+
+def A_NextQueueOrderNo(localOrderId=0, contractNo1='', contractNo2=''):
+    return baseApi.A_NextQueueOrderNo(localOrderId, contractNo1, contractNo2)
+
+def A_OrderContractNo(localOrderId):
+    return baseApi.A_OrderContractNo(localOrderId)
 
 def A_SendOrder(userNo, contractNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty, triggerType='N', triggerMode='N', triggerCondition='N', triggerPrice=0):
     return baseApi.A_SendOrder(userNo, contractNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty, triggerType, triggerMode, triggerCondition, triggerPrice)
 
-def A_DeleteOrder(orderId):
-    return baseApi.A_DeleteOrder(orderId)
+def A_DeleteOrder(localOrderId):
+    return baseApi.A_DeleteOrder(localOrderId)
 
-def A_GetOrderNo(orderId):
-    return baseApi.A_GetOrderNo(orderId)
+def A_GetOrderNo(localOrderId):
+    return baseApi.A_GetOrderNo(localOrderId)
 
 #策略交易
 def Buy(share=0, price=0, contractNo=None):
@@ -6353,6 +6540,12 @@ def SetTriggerCont(*contractNo):
 
 def SetTriggerType(type, value=None):
     return baseApi.SetTriggerType(type, value)
+
+def SetWinPoint(winPoint, nPriceType=0, nAddTick=0, contractNo=''):
+    return baseApi.SetWinPoint(winPoint, nPriceType, nAddTick, contractNo)
+
+def SetStopPoint(stopPoint, nPriceType=0, nAddTick=0, contractNo=''):
+    return baseApi.SetStopPoint(stopPoint, nPriceType, nAddTick, contractNo)
 
 # 属性函数
 def BarInterval():

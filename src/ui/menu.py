@@ -304,6 +304,7 @@ class RunMenu(object):
         self.menu.add_command(label="删除", command=self.onDelete)
         self.menu.add_command(label="投资报告", command=self.onReport)
         self.menu.add_command(label="图表展示", command=self.onSignal)
+        self.menu.add_command(label="属性设置", command=self.onParam)
 
     def popupmenu(self, event):
         select = self.widget.identify_row(event.y)
@@ -363,3 +364,9 @@ class RunMenu(object):
         """查看信号图"""
         # 当查看信号图时，如果策略选择多个，则只显示第一个
         self._controller.signalDisplay(self._strategyId)
+
+    def onParam(self):
+        """属性设置"""
+        param = self._controller.getUserParam(self._strategyId)
+        path = self._controller.getEditorText()["path"]
+        self._controller.load(path, param)
