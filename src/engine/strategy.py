@@ -101,7 +101,10 @@ class StartegyManager(object):
 
     def removeRunningStrategy(self, event):
         strategyId = event.getStrategyId()
-        assert strategyId in self._strategyInfo, "error"
+        if strategyId not in self._strategyInfo:
+            self.logger.error(f"策略{strategyId}在engine已经被删除了")
+            return
+        # assert strategyId in self._strategyInfo, "error"
         self.destroyProcess(self._strategyInfo[strategyId]['Process'], strategyId)
         self._strategyInfo.pop(strategyId)
         self._strategyAttribute.pop(event.getStrategyId())
@@ -588,6 +591,8 @@ class Strategy:
             EV_UI2EG_EQUANT_EXIT            : self._onEquantExit,
             EV_UI2EG_STRATEGY_FIGURE        : self._switchStrategy,
             EV_UI2EG_STRATEGY_REMOVE        : self._onStrategyRemove,
+
+            EV_EG2ST_STRATEGY_SYNC          : self._onSyncEngineInfo,
         }
     
     # ////////////////////////////内部数据请求接口////////////////////
@@ -1025,4 +1030,9 @@ class Strategy:
             }
         })
         self.sendEvent2Engine(event)
+
+    def _onSyncEngineInfo(self, event):
+        orderId = event.getData()["MaxOrderId"]
+        self._eSessionId = orderId
+        # print("22222222222222222222 = ", orderId)
 

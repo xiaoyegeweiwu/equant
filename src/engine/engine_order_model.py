@@ -4,7 +4,7 @@ from capi.event import *
 
 class EngineOrderModel:
     def __init__(self, strategyOrder={}):
-
+        self._strategyMaxOrderId = {}
         self._localOrder = {}
         self._epoleStarOrder = {}
         # 从文件中恢复的对应关系
@@ -14,6 +14,9 @@ class EngineOrderModel:
             # self._localOrder = strategyOrder["LocalOrder"]
             # self._epoleStarOrder = strategyOrder["EpoleStarOrder"]
             self._orderNo2OtherMap = strategyOrder["EpoleStarOrder2LocalOrderMap"]
+            if "StrategyMaxOrderId" in strategyOrder:
+                for k, v in strategyOrder["StrategyMaxOrderId"].items():
+                    self._strategyMaxOrderId[int(k)] = int(v)
 
         strategyId = 0
         self._localOrder.update({strategyId:SingleStrategyLocalOrder(strategyId)})
@@ -41,6 +44,22 @@ class EngineOrderModel:
         record = event.getData()
         record['StrategyId'] = strategyId; record['ESessionId'] = event.getESessionId()
         self._localOrder[strategyId].updateLocalOrder(record)
+
+        #
+        self.updateMaxOrderId(strategyId, event.getESessionId())
+
+    def updateMaxOrderId(self, strategyId, orderId):
+        curOrderId = int(orderId.split("-")[-1])
+        nextOrderId = curOrderId + 1
+        if strategyId not in self._strategyMaxOrderId:
+            self._strategyMaxOrderId[strategyId] = 1
+        if nextOrderId > self._strategyMaxOrderId[strategyId]:
+            self._strategyMaxOrderId[strategyId] = nextOrderId
+
+    def getMaxOrderId(self, strategyId):
+        if strategyId not in self._strategyMaxOrderId:
+            self._strategyMaxOrderId[strategyId] = 1
+        return int(self._strategyMaxOrderId[strategyId])
 
     # response and notice
     def updateEpoleStarOrder(self, apiEvent):
@@ -116,7 +135,8 @@ class EngineOrderModel:
         result = {
             "LocalOrder":{},                                        # self.getLocalOrderData(),
             "EpoleStarOrder":{},                                    # self.getEpoleStarOrder(),
-            "EpoleStarOrder2LocalOrderMap":self._orderNo2OtherMap
+            "EpoleStarOrder2LocalOrderMap":self._orderNo2OtherMap,
+            "StrategyMaxOrderId":self._strategyMaxOrderId,
         }
         return result
 

@@ -64,6 +64,7 @@ EV_UI2EG_STRATEGY_QUIT            = 0x006           # 策略停止
 EV_UI2EG_STRATEGY_FIGURE          = 0x007           # 策略信号和指标图
 EV_UI2EG_STRATEGY_REMOVE          = 0x008           # 删除策略
 
+
 #////////////////////引擎->界面事件定义////////////////////////
 EV_EG2UI_LOADSTRATEGY_RESPONSE    = 0x101           # 策略加载应答
 EV_EG2UI_REPORT_RESPONSE          = 0x102           # 回测报告应答
@@ -120,6 +121,7 @@ EV_EG2ST_LOGINNO_RSP              = 0x330           #请求登录账号
 EV_EG2ST_USERNO_RSP               = 0x331           #请求资金账号
 
 EV_EG2ST_TRADEINFO_RSP            = 0x340           #交易信息应答
+EV_EG2ST_STRATEGY_SYNC            = 0x009           # 引擎向策略同步信息
 
         
 
