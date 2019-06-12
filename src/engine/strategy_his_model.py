@@ -292,6 +292,50 @@ class StrategyHisQuote(object):
             
         return self._curBarDict[multiContKey].getBarClose()
 
+    def getOpenD(self, daysAgo, multiContKey):
+        openList = self.getBarOpen(multiContKey)
+
+        if len(openList) == 0:
+            contNo = multiContKey[0]
+            raise Exception("请确保在策略的initialize方法中使用SetBarInterval(\"%s\", 'D', 1)方法订阅%s合约的日线信息"%(contNo, contNo))
+
+        if daysAgo+1 > len(openList):
+            return -1
+        return openList[-(daysAgo + 1)]
+
+    def getCloseD(self, daysAgo, multiContKey):
+        priceList = self.getBarClose(multiContKey)
+
+        if len(priceList) == 0:
+            contNo = multiContKey[0]
+            raise Exception("请确保在策略的initialize方法中使用SetBarInterval(\"%s\", 'D', 1)方法订阅%s合约的日线信息"%(contNo, contNo))
+
+        if daysAgo+1 > len(priceList):
+            return -1
+        return priceList[-(daysAgo + 1)]
+
+    def getHighD(self, daysAgo, multiContKey):
+        priceList = self.getBarHigh(multiContKey)
+
+        if len(priceList) == 0:
+            contNo = multiContKey[0]
+            raise Exception("请确保在策略的initialize方法中使用SetBarInterval(\"%s\", 'D', 1)方法订阅%s合约的日线信息"%(contNo, contNo))
+
+        if daysAgo+1 > len(priceList):
+            return -1
+        return priceList[-(daysAgo + 1)]
+
+    def getLowD(self, daysAgo, multiContKey):
+        priceList = self.getBarLow(multiContKey)
+
+        if len(priceList) == 0:
+            contNo = multiContKey[0]
+            raise Exception("请确保在策略的initialize方法中使用SetBarInterval(\"%s\", 'D', 1)方法订阅%s合约的日线信息"%(contNo, contNo))
+
+        if daysAgo+1 > len(priceList):
+            return -1
+        return priceList[-(daysAgo + 1)]
+
     def getBarVol(self, multiContKey):
         if multiContKey not in self._curBarDict:
             return np.array([])

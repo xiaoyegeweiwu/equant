@@ -6,10 +6,14 @@ _all_func_ = {
                 
     'K线数据': [
                     ['BarCount'            , 'Bar总数'],
-                    ['Close'               , '收盘价,简写C'],
                     ['Open'                , '开盘价,简写O'],
+                    ['Close'               , '收盘价,简写C'],
                     ['High'                , '最高价,简写H'],
                     ['Low'                 , '最低价,简写L'],
+                    ['OpenD'               , 'N天前的开盘价'],
+                    ['CloseD'              , 'N天前的收盘价'],
+                    ['HighD'               , 'N天前的最高价'],
+                    ['LowD'                , 'N天前的最低价'],
                     ['Vol'                 , '成交量,简写V'],
                     ['OpenInt'             , '持仓量'],
                     ['BarStatus'           , '当前Bar状态值'],

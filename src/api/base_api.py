@@ -159,6 +159,90 @@ class BaseApi(object):
         '''
         return self._dataModel.getBarClose(contractNo, kLineType, kLineValue)
 
+    def OpenD(self, daysAgo, contractNo):
+        '''
+        【说明】
+              指定合约指定周期N天前的开盘价
+
+        【语法】
+              float OpenD(int daysAgo, string contractNo)
+
+        【参数】
+              daysAgo 第几天前，默认值为0，即当天
+              contractNo 合约编号, 默认基准合约
+
+        【备注】
+              使用该函数前请确保在策略的initial方法中使用SetBarInterval(contractNo, 'D', 1)方法订阅contractNo合约的日线信息；
+              若daysAgo超过了订阅合约contractNo日线数据的样本数量，则返回为-1。
+
+        【实例】
+              OpenD(3，'ZCE|F|SR|905') 获取白糖905合约3天前的开盘价
+        '''
+        return self._dataModel.getOpenD(daysAgo, contractNo)
+
+    def CloseD(self, daysAgo, contractNo):
+        '''
+        【说明】
+              指定合约指定周期N天前的收盘价
+
+        【语法】
+              float CloseD(int daysAgo, string contractNo)
+
+        【参数】
+              daysAgo 第几天前，默认值为0，即当天
+              contractNo 合约编号, 默认基准合约
+
+        【备注】
+              使用该函数前请确保在策略的initial方法中使用SetBarInterval(contractNo, 'D', 1)方法订阅contractNo合约的日线信息；
+              若daysAgo超过了订阅合约contractNo日线数据的样本数量，则返回为-1。
+
+        【实例】
+              CloseD(3，'ZCE|F|SR|905') 获取白糖905合约3天前的收盘价
+        '''
+        return self._dataModel.getCloseD(daysAgo, contractNo)
+
+    def HighD(self, daysAgo, contractNo):
+        '''
+        【说明】
+              指定合约指定周期N天前的最高价
+
+        【语法】
+              float HighD(int daysAgo, string contractNo)
+
+        【参数】
+              daysAgo 第几天前，默认值为0，即当天
+              contractNo 合约编号, 默认基准合约
+
+        【备注】
+              使用该函数前请确保在策略的initial方法中使用SetBarInterval(contractNo, 'D', 1)方法订阅contractNo合约的日线信息；
+              若daysAgo超过了订阅合约contractNo日线数据的样本数量，则返回为-1。
+
+        【实例】
+              HighD(3，'ZCE|F|SR|905') 获取白糖905合约3天前的最高价
+        '''
+        return self._dataModel.getHighD(daysAgo, contractNo)
+
+    def LowD(self, daysAgo, contractNo):
+        '''
+        【说明】
+              指定合约指定周期N天前的最低价
+
+        【语法】
+              float LowD(int daysAgo, string contractNo)
+
+        【参数】
+              daysAgo 第几天前，默认值为0，即当天
+              contractNo 合约编号, 默认基准合约
+
+        【备注】
+              使用该函数前请确保在策略的initial方法中使用SetBarInterval(contractNo, 'D', 1)方法订阅contractNo合约的日线信息；
+              若daysAgo超过了订阅合约contractNo日线数据的样本数量，则返回为-1。
+
+        【实例】
+              LowD(3，'ZCE|F|SR|905') 获取白糖905合约3天前的最低价
+        '''
+        return self._dataModel.getLowD(daysAgo, contractNo)
+
     def Vol(self, contractNo, kLineType, kLineValue):
         '''
         【说明】
@@ -5802,6 +5886,18 @@ def L(contractNo='', kLineType='', kLineValue=0):
 
 def Close(contractNo='', kLineType='', kLineValue=0):
     return baseApi.Close(contractNo, kLineType, kLineValue)
+
+def OpenD(daysAgo=0, contractNo=''):
+    return baseApi.OpenD(daysAgo, contractNo)
+
+def CloseD(daysAgo=0, contractNo=''):
+    return baseApi.CloseD(daysAgo, contractNo)
+
+def HighD(daysAgo=0, contractNo=''):
+    return baseApi.HighD(daysAgo, contractNo)
+
+def LowD(daysAgo=0, contractNo=''):
+    return baseApi.LowD(daysAgo, contractNo)
 
 def C(contractNo='', kLineType='', kLineValue=0):
     return baseApi.Close(contractNo, kLineType, kLineValue)

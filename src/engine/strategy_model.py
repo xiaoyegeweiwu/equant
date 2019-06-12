@@ -207,6 +207,26 @@ class StrategyModel(object):
         multiContKey = self.getKey(contractNo, kLineType, kLineValue)
         return self._hisModel.getBarClose(multiContKey)
 
+    def getOpenD(self, daysAgo, contractNo):
+        contNo = self._cfgModel.getBenchmark() if not contractNo else contractNo
+        multiContKey = self.getKey(contNo, 'D', 1)
+        return self._hisModel.getOpenD(daysAgo, multiContKey)
+
+    def getCloseD(self, daysAgo, contractNo):
+        contNo = self._cfgModel.getBenchmark() if not contractNo else contractNo
+        multiContKey = self.getKey(contNo, 'D', 1)
+        return self._hisModel.getCloseD(daysAgo, multiContKey)
+
+    def getHighD(self, daysAgo, contractNo):
+        contNo = self._cfgModel.getBenchmark() if not contractNo else contractNo
+        multiContKey = self.getKey(contNo, 'D', 1)
+        return self._hisModel.getHighD(daysAgo, multiContKey)
+
+    def getLowD(self, daysAgo, contractNo):
+        contNo = self._cfgModel.getBenchmark() if not contractNo else contractNo
+        multiContKey = self.getKey(contNo, 'D', 1)
+        return self._hisModel.getLowD(daysAgo, multiContKey)
+
     def getBarVol(self, contractNo, kLineType, kLineValue):
         multiContKey = self.getKey(contractNo, kLineType, kLineValue)
         return self._hisModel.getBarVol(multiContKey)
