@@ -1871,7 +1871,7 @@ class StrategyModel(object):
 
     def getHighest(self, price, length):
         if not isinstance(price, list) or len(price) == 0:
-            return np.array()
+            return np.array([])
 
         if length <= 1:
             return np.array(price)
@@ -1881,7 +1881,7 @@ class StrategyModel(object):
 
     def getLowest(self, price, length):
         if not isinstance(price, list) or len(price) == 0:
-            return np.array()
+            return np.array([])
 
         if length <= 1:
             return np.array(price)
