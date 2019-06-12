@@ -5,6 +5,7 @@ sys.path.append("..")
 import re
 import json
 import pandas as pd
+import traceback
 
 import tkinter as tk
 import tkinter.ttk as ttk
@@ -502,8 +503,12 @@ class RunWin(QuantToplevel, QuantFrame):
 
             # 用户配置参数信息
             # 若保存的设置中用户参数为空，则不对self._userParam赋值
-            if conf[VParams]:
-                self._userParam = conf[VParams]
+            try:
+                if conf[VParams]:
+                    self._userParam = conf[VParams]
+            except KeyError as e:
+                traceback.print_exc()
+
 
         # if True:
         else:
