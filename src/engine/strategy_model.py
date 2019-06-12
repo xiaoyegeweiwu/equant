@@ -35,7 +35,7 @@ class StrategyModel(object):
         self._calcCenter = CalcCenter(self.logger)
 
         self._qteModel = StrategyQuote(strategy, self._cfgModel)
-        self._hisModel = StrategyHisQuote(strategy, self._cfgModel, self._calcCenter)
+        self._hisModel = StrategyHisQuote(strategy, self._cfgModel, self._calcCenter, self)
         self._trdModel = StrategyTrade(strategy, self._cfgModel)
         self._staModel = StatisticsModel(strategy, self._cfgModel)
 

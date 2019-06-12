@@ -191,7 +191,9 @@ ST_STATUS_EXCEPTION               = 'E'
 ST_TRIGGER_TIMER                  = 'T'              # 定时触发
 ST_TRIGGER_CYCLE                  = 'C'              # 周期性触发
 ST_TRIGGER_KLINE                  = 'K'              # K线触发
-ST_TRIGGER_SANPSHOT               = 'S'              # 即时行情触发
+# 即时行情到来了,  处理的时候才决定是否触发
+ST_TRIGGER_SANPSHOT_FILL          = 'S'
+# *****************************************
 ST_TRIGGER_TRADE_ORDER            = 'O'              # 交易触发
 ST_TRIGGER_TRADE_MATCH            = 'M'              # 交易触发
 ST_TRIGGER_FILL_DATA              = 'F'
