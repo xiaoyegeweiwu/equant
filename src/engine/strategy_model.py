@@ -643,11 +643,22 @@ class StrategyModel(object):
     def getNextOrderNo(self, orderId, contNo1, contNo2):
         return self._trdModel.getNextOrderNo(orderId, contNo1, contNo2)
 
-    def getFirstQueueOrderNo(self, contNo1, contNo2):
+    def getFirstQueueOrderNo(self, contNo1, contNo2=''):
         return self._trdModel.getFirstQueueOrderNo(contNo1, contNo2)
 
-    def getNextQueueOrderNo(self, orderId, contNo1, contNo2):
+    def getNextQueueOrderNo(self, orderId, contNo1, contNo2=''):
         return self._trdModel.getNextQueueOrderNo(orderId, contNo1, contNo2)
+
+    def getAllQueueOrderNo(self, contNo):
+        orderIdList = []
+        orderId = self.getFirstQueueOrderNo(contNo)
+        if orderId != -1:
+            orderIdList.append(orderId)
+        while (orderId != -1):
+            orderId = self.getNextQueueOrderNo(orderId, contNo)
+            if orderId != -1:
+                orderIdList.append(orderId)
+        return orderIdList
 
     def getOrderContractNo(self, orderId):
         return self._trdModel.getOrderContractNo(orderId)
@@ -838,6 +849,16 @@ class StrategyModel(object):
         if not orderNo:
             orderNo = ''
         return orderId, orderNo
+
+    def deleteAllOrders(self, contNo):
+        orderList = self.getAllQueueOrderNo(contNo)
+        if len(orderList) == 0:
+            return True
+
+        for orderId in orderList:
+            self._trdModel.deleteOrderByOrderId(orderId)
+
+        return True
 
     # ///////////////////////枚举函数///////////////////////////
     def getEnumBuy(self):
