@@ -692,11 +692,11 @@ class StrategyHisQuote(object):
             kLineTrigger = self._config.hasKLineTrigger()
             if not kLineTrigger:
                 pass
-            elif self._strategy.isHisStatus() and len(localDataList) >= 2 and localDataList[-2]["IsKLineStable"]:
+            elif self._strategy.isHisStatus() and len(localDataList) >= 2 and localDataList[-2]["IsKLineStable"] and isNewKLine:
                 self._sendHisKLineTriggerEvent(key, localDataList[-2])
             elif isRealTimeStatus:
                 # 一种特殊情况
-                if self._firstRealTimeKLine[key] and isNewKLine and len(localDataList) >=2  and localDataList[-2]["IsKLineStable"] and orderWay==SendOrderRealTime:
+                if self._firstRealTimeKLine[key] and isNewKLine and len(localDataList) >=2 and localDataList[-2]["IsKLineStable"] and orderWay==SendOrderRealTime:
                     self._sendHisKLineTriggerEvent(key, localDataList[-2])
                 self._firstRealTimeKLine[key] = False
 
@@ -1213,18 +1213,25 @@ class StrategyHisQuote(object):
         if isStopLoseTrigger:
             coverPosPriceLose = self.getCoverPosPrice(lv1Data, stopLoseParams["CoverPosOrderType"], stopLoseParams["AddPoint"], priceTick)
             if allPos["TotalBuy"] >= 1:
-                self._dataModel.setSell(contractNo, allPos["TotalBuy"], coverPosPriceLose)
+                self._dataModel.setSell(contractNo, allPos["TotalBuy"], coverPosPriceLose, dSell)
             elif allPos["TotalSell"] >= 1:
-                self._dataModel.setBuyToCover(contractNo, allPos["TotalSell"], coverPosPriceLose)
+                self._dataModel.setBuyToCover(contractNo, allPos["TotalSell"], coverPosPriceLose, dBuy)
             # allPos = self._calc.getPositionInfo(contractNo)
             # print(f"after cover pos , TotalBuy: {allPos['TotalBuy']}, TotalSell: {allPos['TotalSell']}")
         elif isStopWinTrigger:
             coverPosPriceWin = self.getCoverPosPrice(lv1Data, stopWinParams["CoverPosOrderType"], stopWinParams["AddPoint"], priceTick)
             if allPos["TotalBuy"] >= 1:
-                self._dataModel.setSell(contractNo, allPos["TotalBuy"], coverPosPriceWin)
+                self._dataModel.setSell(contractNo, allPos["TotalBuy"], coverPosPriceWin, dSell)
             elif allPos["TotalSell"] >= 1:
-                self._dataModel.setBuyToCover(contractNo, allPos["TotalSell"], coverPosPriceWin)
+                self._dataModel.setBuyToCover(contractNo, allPos["TotalSell"], coverPosPriceWin, dBuy)
 
-    def getCoverPosPrice(self, lv1Data, coverPosOrderType, addPoint, priceTick):
+    def getCoverPosPrice(self, lv1Data, coverPosOrderType, addPoint, priceTick, direction):
+        # price 应该根据coverPosOrderType调整, todo
         price = lv1Data[4]
-        return price+addPoint*priceTick
+        # 根据超价点数买+ 卖-
+        if direction==dBuy:
+            return price+addPoint*priceTick
+        elif direction==dSell:
+            return price-addPoint*priceTick
+        else:
+            return None
