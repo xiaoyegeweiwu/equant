@@ -501,7 +501,9 @@ class RunWin(QuantToplevel, QuantFrame):
             self.canOpen.set(conf[VCanOpen]),
 
             # 用户配置参数信息
-            self._userParam = conf[VParams]
+            # 若保存的设置中用户参数为空，则不对self._userParam赋值
+            if conf[VParams]:
+                self._userParam = conf[VParams]
 
         # if True:
         else:
