@@ -33,7 +33,11 @@ class QuantApplication(object):
         self.quant_editor_head = None
         self.quant_helper_head = None
         self.quant_monitor = None
-        self.runWin = None  # 运行按钮弹出窗口
+        # 运行按钮弹出窗口
+        self.runWin = None
+
+        # 历史回测窗口
+        self.hisTop = None
 
     def mainloop(self):
         self.root.mainloop()
@@ -112,9 +116,6 @@ class QuantApplication(object):
         # self.create_monitor()
         self.quant_monitor.createSignal()
         self.quant_monitor.createErr()
-
-        # 历史回测窗口
-        self.hisTop = None
 
     def updateLogText(self):
         self.quant_monitor.updateLogText()

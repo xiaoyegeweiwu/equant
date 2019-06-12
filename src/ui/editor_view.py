@@ -70,7 +70,6 @@ class StrategyTree(QuantFrame):
         # TODO：怎么可以实现新建策略按正确的顺序插入呢？
         dir_name = os.path.dirname(fullname)
         file_name = os.path.basename(fullname)
-        print("1111: ", self.tree_node_dict)
         parent = self.tree_node_dict[dir_name]
         
         if not parent:
@@ -250,6 +249,9 @@ class QuantEditor(StrategyTree):
         # 策略树双击事件标志位
         self._dModifyFlag = False
 
+        # 焦点移出标志位
+        self.outFlag = False
+
         self._context = Context()
 
     # 将strategyTree的get_file_path先放在这里
@@ -376,6 +378,34 @@ class QuantEditor(StrategyTree):
         self.editor_text.insert("%s.%s" % (line, column), "\n" + " " * space_num)  # 插入空格
         return 'break'  # 阻断自身的换行操作
 
+    def onFocusIn(self, event):
+        """获取焦点事件"""
+        path = self.control.getEditorText()["path"]
+        # 过滤双击事件
+        if self._dModifyFlag:
+            return
+
+        if not self.outFlag:
+            return
+
+        self.outFlag = False
+
+        if path:
+            editorCodeBefore = self.control.getEditorText()["code"]
+
+            self.control.setEditorTextCode(path)
+            editorCodeAfter = self.control.getEditorText()["code"]
+            if editorCodeBefore == editorCodeAfter:
+                return
+
+            self.editor_text.delete(0.0, END + "-1c")
+
+            self.updateEditorText(editorCodeAfter)
+            self.editor_text.edit_reset()
+
+    def onFocusOut(self, event):
+        self.outFlag = True
+
     def buttonDown(self, event):
         """鼠标按下记录按下位置"""
         self.start = self.editor_text.index('@%s, %s' % (event.x, event.y))
@@ -400,6 +430,12 @@ class QuantEditor(StrategyTree):
         self.editor_text.bind("<Tab>", self.tab_key)
         # 回车键
         # self.editor_text.bind("<Return>", self.return_key)
+
+        # FocusIn
+        self.editor_text.bind("<FocusIn>", self.onFocusIn)
+
+        # FocusOut
+        self.editor_text.bind("<FocusOut>", self.onFocusOut)
 
         # TODO：事件绑定有问题---回车键有bug
         # self.editor_text.bind("<Button-1>", self.buttonDown)
