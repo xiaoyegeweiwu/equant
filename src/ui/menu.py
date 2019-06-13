@@ -108,10 +108,10 @@ class StrategyMenu(object):
             else:
                 file = file_name + file_type
                 if not os.path.exists(os.path.join(dir_path, file)):
-                    filePath = os.path.join(dir_path, file)
-                    self._controller.newStrategy(filePath)
                     # TODO：怎么把文件按文件名插入到合适的位置呢？
                     newFileWin.destroy()
+                    filePath = os.path.join(dir_path, file)
+                    self._controller.newStrategy(filePath)
                 else:
                     messagebox.showinfo(self.language.get_text(8),
                                         self.language.get_text(17) + file + self.language.get_text(18), parent=newFileWin)
@@ -147,11 +147,12 @@ class StrategyMenu(object):
                 messagebox.showinfo(self.language.get_text(8), self.language.get_text(22), parent=newTop)
             else:
                 if not os.path.exists(os.path.join(dir_path, file_name)):
-                    filePath = os.path.join(dir_path, file_name)
                     # TODO: insert的位置问题。。。
                     # TODO：新建目录和新建文件在目录树种无法区别
-                    self._controller.newDir(filePath)
                     newTop.destroy()
+
+                    filePath = os.path.join(dir_path, file_name)
+                    self._controller.newDir(filePath)
                 else:
                     messagebox.showinfo(self.language.get_text(8),
                                         self.language.get_text(23) + file_name + self.language.get_text(24), parent=newTop)
@@ -247,6 +248,10 @@ class StrategyMenu(object):
         def enter():
             # 新建策略前先保存当前选中的策略
             self._controller.saveStrategy()
+            
+            # 先关闭窗口
+            deleteTop.destroy()
+
             for path, select in zip(tempPath, selected_item):
                 if os.path.exists(path):
                     if os.path.isdir(path):
@@ -273,8 +278,6 @@ class StrategyMenu(object):
                         self.widget.delete(select)
                 else:  # 文件不存在（本地文件已经删除）
                     self.widget.delete(select)
-
-            deleteTop.destroy()
 
         def cancel():
             deleteTop.destroy()

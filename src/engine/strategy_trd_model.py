@@ -545,6 +545,9 @@ class StrategyTrade(TradeModel):
             if orderModel._metaData['OrderNo'] == orderNo:
                 orderId = orderModel._metaData['OrderId']
 
+        return self.deleteOrderByOrderId(orderId)
+
+    def deleteOrderByOrderId(self, orderId):
         if not orderId:
             return False
 

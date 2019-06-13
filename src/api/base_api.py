@@ -3235,6 +3235,25 @@ class BaseApi(object):
          '''
         return self._dataModel.getNextQueueOrderNo(localOrderId, contractNo1, contractNo2)
 
+    def A_AllQueueOrderNo(self, contractNo):
+        '''
+        【说明】
+              返回当前账户所有排队(可撤)订单号。
+
+        【语法】
+              list A_AllQueueOrderNo(string contractNo)
+
+        【参数】
+              contractNo 合约代码，默认为遍历所有合约，指定后只遍历指定合约。
+
+        【备注】
+              若返回值为空列表，表示没有任何排队订单，否则，返回包含处于排队中的委托定单号的列表。
+
+        【示例】
+              无
+         '''
+        return self._dataModel.getAllQueueOrderNo(contractNo)
+
     def A_OrderContractNo(self, localOrderId):
         '''
         【说明】
@@ -3388,7 +3407,26 @@ class BaseApi(object):
                 sessionId, orderNo =  A_GetOrderNo(retMsg)
          '''
         return self._dataModel.getAOrderNo(localOrderId)
-        
+
+    def DeleteAllOrders(self, contractNo):
+        '''
+        【说明】
+              批量撤单函数。
+
+        【语法】
+              bool DeleteAllOrders(string contractNo)
+
+        【参数】
+              contractNo 合约代码，默认为所有合约，指定后只撤指定合约。
+
+        【备注】
+              本函数将检查当前账户下所有处于排队状态的订单，并依次发送撤单指令
+
+        【示例】
+              无
+         '''
+        return self._dataModel.deleteAllOrders(contractNo)
+
     #/////////////////////////////枚举函数/////////////////
     def Enum_Buy(self):
         '''
@@ -6241,6 +6279,9 @@ def A_FirstQueueOrderNo(contractNo1='', contractNo2=''):
 def A_NextQueueOrderNo(localOrderId=0, contractNo1='', contractNo2=''):
     return baseApi.A_NextQueueOrderNo(localOrderId, contractNo1, contractNo2)
 
+def A_AllQueueOrderNo(contractNo=''):
+    return baseApi.A_AllQueueOrderNo(contractNo)
+
 def A_OrderContractNo(localOrderId):
     return baseApi.A_OrderContractNo(localOrderId)
 
@@ -6252,6 +6293,9 @@ def A_DeleteOrder(localOrderId):
 
 def A_GetOrderNo(localOrderId):
     return baseApi.A_GetOrderNo(localOrderId)
+
+def DeleteAllOrders(contractNo=''):
+    return baseApi.DeleteAllOrders(contractNo)
 
 #策略交易
 def Buy(share=0, price=0, contractNo=None):

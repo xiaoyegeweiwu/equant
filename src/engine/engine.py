@@ -16,6 +16,7 @@ import traceback
 from .engine_order_model import EngineOrderModel
 from .strategy_cfg_model import StrategyConfig
 
+
 class StrategyEngine(object):
     '''策略引擎'''
     def __init__(self, logger, eg2uiQueue, ui2egQueue):
@@ -263,6 +264,7 @@ class StrategyEngine(object):
         elif code == EV_UI2EG_EQUANT_EXIT:
             self._onEquantExit(event)
         elif code == EV_UI2EG_STRATEGY_REMOVE:
+            self.logger.info(f"收到策略删除信号，策略id:{event.getStrategyId()}")
             self._onStrategyRemove(event)
         elif code == EV_UI2EG_STRATEGY_FIGURE:
             self._switchStrategy(event)
@@ -298,6 +300,7 @@ class StrategyEngine(object):
         elif event.getData()["Status"] == ST_STATUS_CONTINUES:
             self._eg2uiQueue.put(event)
         elif event.getData()["Status"] == ST_STATUS_REMOVE:
+            self.logger.info(f"策略删除完成，策略id:{event.getStrategyId()}")
             self._onStrategyRemoveCom(event)
         elif event.getData()["Status"] == ST_STATUS_EXCEPTION:
             self._isEffective[event.getStrategyId()] = False
@@ -669,6 +672,17 @@ class StrategyEngine(object):
         orderEvents = self._engineOrderModel.getStrategyOrder(0)
         for orderEvent in orderEvents:
             self._sendEvent2Strategy(stragetyId, orderEvent)
+        # 策略最大订单id恢复,
+        # todo 这里放进订单、成交
+        strategyMaxOrderId = self._engineOrderModel.getMaxOrderId(stragetyId)
+        event = Event({
+            "EventCode":EV_EG2ST_STRATEGY_SYNC,
+            "StrategyId":stragetyId,
+            "Data":{
+                "MaxOrderId":strategyMaxOrderId
+            }
+        })
+        self._sendEvent2Strategy(stragetyId, event)
 
     # ///////////////策略进程事件//////////////////////////////
     def _addSubscribe(self, contractNo, strategyId):
