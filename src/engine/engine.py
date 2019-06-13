@@ -963,6 +963,7 @@ class StrategyEngine(object):
 
         allConfig = copy.deepcopy(self._strategyMgr.getStrategyAttribute(strategyId)["Config"])
         allConfig["Params"] = event.getData()["Config"]["Params"]
+        self._strategyMgr.getStrategyAttribute(strategyId)['Config'] = allConfig
         loadEvent = Event({
             "EventCode":EV_UI2EG_LOADSTRATEGY,
             "StragetgyId":strategyId,

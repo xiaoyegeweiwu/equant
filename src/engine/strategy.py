@@ -368,6 +368,7 @@ class Strategy:
         if not self._noInitialize:
             userModule.initialize(self._context)
             self._argsDict["Params"] = self._context.params
+            self._dataModel.getConfigModel().setParams(self._context.params)
         else:
             self._context.params = self._argsDict["Params"]
 

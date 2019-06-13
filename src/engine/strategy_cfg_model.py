@@ -773,3 +773,11 @@ class StrategyConfig(object):
 
     def getLimit(self):
         return self._metaData['Limit']
+
+    def setParams(self, params):
+        self._metaData["Params"] = params
+
+    def getParams(self):
+        if "Params" not in self._metaData:
+            return {}
+        return self._metaData["Params"]
