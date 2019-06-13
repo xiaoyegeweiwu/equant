@@ -964,6 +964,7 @@ class StrategyEngine(object):
         if strategyId in self._eg2stQueueDict and strategyId in self._isEffective and self._isEffective[strategyId]:
             self._isEffective[strategyId] = False
             self._isSt2EngineDataEffective[strategyId] = False
+            self._cleanStrategyInfo(strategyId)
             self._strategyMgr.destroyProcessByStrategyId(strategyId)
 
         allConfig = copy.deepcopy(self._strategyMgr.getStrategyAttribute(strategyId)["Config"])

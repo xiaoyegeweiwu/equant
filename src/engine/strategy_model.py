@@ -112,7 +112,6 @@ class StrategyModel(object):
         else:
             self._hisModel.runRealTime(context, handle_data, event)
 
-
     # ///////////////////////即时行情接口//////////////////////////
     def reqExchange(self):
         self._qteModel.reqExchange()
@@ -777,7 +776,7 @@ class StrategyModel(object):
             "ESessionId": eId,
         })
         self._strategy.sendEvent2Engine(aOrderEvent)
-
+        self.logger.trade_info(self._strategy.getStrategyId(), aOrder)
         # 更新策略的订单信息
         self._strategy.setESessionId(self._strategy.getESessionId() + 1)
         self._strategy.updateLocalOrder(eId, aOrder)
@@ -835,7 +834,7 @@ class StrategyModel(object):
             "ESessionId": eId,
         })
         self._strategy.sendEvent2Engine(aOrderEvent)
-
+        self.logger.trade_info(self._strategy.getStrategyId(), aOrder)
         # 更新策略的订单信息
         self._strategy.setESessionId(self._strategy.getESessionId() + 1)
         self._strategy.updateLocalOrder(eId, aOrder)
