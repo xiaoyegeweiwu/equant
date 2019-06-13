@@ -112,10 +112,10 @@ class QuantMonitor(object):
         :param dataDict: 策略的所有信息
         :return: 需要展示的信息
         """
-        # print("11111111111: ", dataDict)
+        print("11111111111: ", dataDict)
         try:
             Id = dataDict['StrategyId']
-            UserNo = "Default"
+            UserNo = dataDict["Config"]["Money"]["UserNo"]
             StName = dataDict['StrategyName']
             BenchCon = dataDict['ContractNo']
             kLineType = dataDict['KLineType']

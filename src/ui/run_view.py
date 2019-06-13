@@ -696,7 +696,6 @@ class RunWin(QuantToplevel, QuantFrame):
         """合约增加事件"""
         addWin = AddContWin(self, self._exchange, self._commodity, self._contract)
         addWin.display()
-        pass
 
     def contDel(self):
         """合约删除事件"""
@@ -1768,12 +1767,14 @@ class SelectContractWin(QuantToplevel, QuantFrame):
 
         self._master.codeEntry.config(state="disabled")
 
-        # 不加focus会出现选择合约确定后设置窗口后移
-        self._master.focus()
+        # 不加self._master.display()会出现选择合约确定后设置窗口后移
+        # self._master.focus()
         self.destroy()
+        self._master.display()
 
     def cancel(self):
         self.destroy()
+        self._master.display()
 
     def updateContractFrame(self, event):
         contractItems = self.contractTree.get_children()
@@ -1878,7 +1879,6 @@ class AddContWin(QuantToplevel, QuantFrame):
         self.closeFee.set("1")
         self.openType.set(0)
         self.closeType.set(0)
-        pass
 
     def setPos(self):
         # TODO: setPos需要重新设计下么？
@@ -2072,18 +2072,16 @@ class AddContWin(QuantToplevel, QuantFrame):
         else:
             self._master.contTree.insert("", tk.END, values=selectRst)
 
-        # 不加focus会出现选择合约确定后设置窗口后移
-        self._master.focus()
+        # 不加self._master.display()会出现选择合约确定后设置窗口后移
+        # self._master.focus()
+        # TODO：点击量化主界面后master窗口会消失
         self.destroy()
+        self._master.display()
 
     def cancel(self):
         """关闭窗口"""
         self.destroy()
-
-    def getUserContract(self):
-        """获取用户所选的数据合约信息"""
-        # return self.contract.get()
-        return self.userContList
+        self._master.display()
 
     def setUserContract(self, contList):
         """设置用户所选数据合约"""
