@@ -300,8 +300,8 @@ class StrategyEngine(object):
         elif event.getData()["Status"] == ST_STATUS_CONTINUES:
             self._eg2uiQueue.put(event)
         elif event.getData()["Status"] == ST_STATUS_REMOVE:
-            self.logger.info(f"策略删除完成，策略id:{event.getStrategyId()}")
             self._onStrategyRemoveCom(event)
+            self.logger.info(f"策略删除完成，策略id:{event.getStrategyId()}")
         elif event.getData()["Status"] == ST_STATUS_EXCEPTION:
             self._isEffective[event.getStrategyId()] = False
             self._strategyMgr.handleStrategyException(event)
@@ -944,7 +944,6 @@ class StrategyEngine(object):
     def _onStrategyRemoveCom(self, event):
         self._cleanStrategyInfo(event.getStrategyId())
         self._strategyMgr.removeRunningStrategy(event)
-        self._eg2uiQueue.put(event)  # todo，
 
     def _switchStrategy(self, event):
         self._sendEvent2Strategy(event.getStrategyId(), event)
