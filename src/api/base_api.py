@@ -2962,10 +2962,10 @@ class BaseApi(object):
               返回当前公式应用的帐户下当前商品的某个委托单的买卖类型。
 
         【语法】
-              char A_OrderBuyOrSell(string localOrderId)
+              char A_OrderBuyOrSell(int|string localOrderId)
 
         【参数】
-              localOrderId 使用A_SendOrder返回的下单编号。
+              localOrderId 定单号，或者使用A_SendOrder返回的下单编号。
 
         【备注】
               返回当前公式应用的帐户下当前商品的某个委托单的买卖类型，返回值为：
@@ -2988,10 +2988,10 @@ class BaseApi(object):
               返回当前公式应用的帐户下当前商品的某个委托单的开平仓状态。
 
         【语法】
-              char A_OrderEntryOrExit(string localOrderId)
+              char A_OrderEntryOrExit(int|string localOrderId)
 
         【参数】
-              localOrderId 使用A_SendOrder返回的下单编号。
+              localOrderId 定单号，或者使用A_SendOrder返回的下单编号。
 
         【备注】
               返回当前公式应用的帐户下当前商品的某个委托单的开平仓状态，返回值：
@@ -3017,10 +3017,10 @@ class BaseApi(object):
               返回当前公式应用的帐户下当前商品的某个委托单的成交数量。
 
         【语法】
-              float A_OrderFilledLot(string localOrderId)
+              float A_OrderFilledLot(int|string localOrderId)
 
         【参数】
-              localOrderId 使用A_SendOrder返回的下单编号。
+              localOrderId 定单号，或者使用A_SendOrder返回的下单编号。
 
         【备注】
               返回当前公式应用的帐户下当前商品的某个委托单的成交数量，返回值为浮点数。
@@ -3037,10 +3037,10 @@ class BaseApi(object):
               返回当前公式应用的帐户下当前商品的某个委托单的成交价格。
 
         【语法】
-              float A_OrderFilledPrice(string localOrderId)
+              float A_OrderFilledPrice(int|string localOrderId)
 
         【参数】
-              localOrderId 使用A_SendOrder返回的下单编号。
+              localOrderId 定单号，或者使用A_SendOrder返回的下单编号。
 
         【备注】
               返回当前公式应用的帐户下当前商品的某个委托单的成交价格，返回值为浮点数。
@@ -3058,10 +3058,10 @@ class BaseApi(object):
               返回当前公式应用的帐户下当前商品的某个委托单的委托数量。
 
         【语法】
-              float A_OrderLot(string localOrderId)
+              float A_OrderLot(int|string localOrderId)
 
         【参数】
-              localOrderId 使用A_SendOrder返回的下单编号。
+              localOrderId 定单号，或者使用A_SendOrder返回的下单编号。
 
         【备注】
               返回当前公式应用的帐户下当前商品的某个委托单的委托数量，返回值为浮点数。
@@ -3078,10 +3078,10 @@ class BaseApi(object):
               返回当前公式应用的帐户下当前商品的某个委托单的委托价格。
 
         【语法】
-              float A_OrderPrice(string localOrderId)
+              float A_OrderPrice(int|string localOrderId)
 
         【参数】
-              localOrderId 使用A_SendOrder返回的下单编号。
+              localOrderId 定单号，或者使用A_SendOrder返回的下单编号。
 
         【备注】
               返回当前公式应用的帐户下当前商品的某个委托单的委托价格，返回值为浮点数。
@@ -3098,10 +3098,10 @@ class BaseApi(object):
               返回当前公式应用的帐户下当前商品的某个委托单的状态。
 
         【语法】
-              char A_OrderStatus(string localOrderId)
+              char A_OrderStatus(int|string localOrderId)
 
         【参数】
-              localOrderId 使用A_SendOrder返回的下单编号。
+              localOrderId 定单号，或者使用A_SendOrder返回的下单编号。
 
         【备注】
               返回当前公式应用的帐户下当前商品的某个委托单的状态，返回值：
@@ -3139,10 +3139,10 @@ class BaseApi(object):
               返回当前公式应用的帐户下当前商品的某个委托单的委托时间。
 
         【语法】
-              struct_time A_OrderTime(string localOrderId)
+              struct_time A_OrderTime(int|string localOrderId)
 
         【参数】
-              localOrderId 使用A_SendOrder返回的下单编号。
+              localOrderId 定单号，或者使用A_SendOrder返回的下单编号。
 
         【备注】
               返回当前公式应用的帐户下当前商品的某个委托单的委托时间，返回格式为YYYYMMDD.hhmmss的数值。
@@ -3254,13 +3254,13 @@ class BaseApi(object):
          '''
         return self._dataModel.getAllQueueOrderNo(contractNo)
 
-    def A_OrderContractNo(self, localOrderId):
+    def A_OrderContractNo(self, orderId):
         '''
         【说明】
               返回订单的合约号。
 
         【语法】
-              string A_OrderContractNo(int localOrderId)
+              string A_OrderContractNo(int orderId)
 
         【参数】
               localOrderId 定单号，整数类型。
@@ -3272,7 +3272,7 @@ class BaseApi(object):
         【示例】
               无
          '''
-        return self._dataModel.getOrderContractNo(localOrderId)
+        return self._dataModel.getOrderContractNo(orderId)
 
     def A_SendOrder(self, userNo, contractNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty, triggerType, triggerMode, triggerCondition, triggerPrice):
         '''
