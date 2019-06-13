@@ -1044,6 +1044,7 @@ class StrategyHisQuote(object):
             return
 
         key = (curTriggerInfo["ContractNo"], curTriggerInfo["KLineType"], curTriggerInfo["KLineSlice"])
+
         curBar = self._curBarDict[key].getCurBar()
         #assert key[0] and key[1] and key[2] and curBar, " Error "
         # priceInfos[key] = {

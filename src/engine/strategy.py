@@ -725,9 +725,6 @@ class Strategy:
         :param apiEvent: 引擎返回事件
         :return: None
         '''
-        if str(apiEvent.getStrategyId()) != str(self._strategyId):
-            return
-
         self._dataModel._trdModel.updateOrderData(apiEvent)
 
         # 更新本地订单信息
@@ -735,7 +732,8 @@ class Strategy:
         eSessionId = apiEvent.getESessionId()
         for data in dataList:
             self.updateLocalOrder(eSessionId, data)
-        self._tradeTriggerOrder(apiEvent)
+        if self.isRealTimeStatus():
+            self._tradeTriggerOrder(apiEvent)
 
     def _onTradeLoginQry(self, apiEvent):
         self._dataModel._trdModel.updateLoginInfo(apiEvent)

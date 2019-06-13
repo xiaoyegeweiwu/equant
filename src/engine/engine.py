@@ -13,7 +13,7 @@ import psutil
 import os, json
 from collections import OrderedDict
 import traceback
-from .engine_order_model import EngineOrderModel
+from .engine_order_model import EngineOrderModel, EnginePosModel
 from .strategy_cfg_model import StrategyConfig
 
 
@@ -70,6 +70,7 @@ class StrategyEngine(object):
         self._strategyOrder = {}
         self._resumeStrategy()
         self._engineOrderModel = EngineOrderModel(self._strategyOrder)
+        self._enginePosModel = EnginePosModel()
         self.logger.debug('Initialize strategy engine ok!')
 
     def _resumeStrategy(self):
@@ -426,9 +427,8 @@ class StrategyEngine(object):
         '''
         #
 
-    def _onApiExchange(self, apiEvent):  
+    def _onApiExchange(self, apiEvent):
         self._qteModel.updateExchange(apiEvent)
-
         self._sendEvent2Strategy(apiEvent.getStrategyId(), apiEvent)
 
         self._eg2uiQueue.put(apiEvent)
@@ -452,7 +452,7 @@ class StrategyEngine(object):
             })
             self._pyApi.reqTimebucket(event)
         
-    def _onApiContract(self, apiEvent):  
+    def _onApiContract(self, apiEvent):
         self._qteModel.updateContract(apiEvent)
         self._eg2uiQueue.put(apiEvent)
         if apiEvent.isChainEnd():
@@ -541,6 +541,7 @@ class StrategyEngine(object):
         
     def _onApiOrderDataQry(self, apiEvent):
         self._trdModel.updateOrderData(apiEvent)
+        self._sendEvent2AllStrategy(apiEvent)
         # 获取关联的策略id和订单id
         self._engineOrderModel.updateEpoleStarOrder(apiEvent)
         if not apiEvent.isChainEnd():
@@ -578,11 +579,9 @@ class StrategyEngine(object):
             self._sendEvent2AllStrategy(apiEvent)
 
     def _onApiMatchDataQry(self, apiEvent):
+        self._engineOrderModel.updateEpoleStarOrder(apiEvent)
         self._trdModel.updateMatchData(apiEvent)
-        # print("++++++ 成交信息 引擎 查询 ++++++", apiEvent.getData())
-        # TODO: 分块传递
         self._sendEvent2AllStrategy(apiEvent)
-
         if not apiEvent.isChainEnd():
             return
         if not apiEvent.isSucceed():
@@ -599,6 +598,7 @@ class StrategyEngine(object):
         self._reqPosition(allPosReqEvent)
             
     def _onApiMatchData(self, apiEvent):
+        self._engineOrderModel.updateEpoleStarOrder(apiEvent)
         # 成交信息
         self._trdModel.updateMatchData(apiEvent)
         # print("++++++ 成交信息 引擎 变化 ++++++", apiEvent.getData())
@@ -606,9 +606,9 @@ class StrategyEngine(object):
         self._sendEvent2AllStrategy(apiEvent)
         
     def _onApiPosDataQry(self, apiEvent):
+        self._enginePosModel.updatePosRsp(apiEvent)
         self._trdModel.updatePosData(apiEvent)
         # print("++++++ 持仓信息 引擎 查询 ++++++", apiEvent.getData())
-        # TODO: 分块传递
         self._sendEvent2AllStrategy(apiEvent)
 
         if not apiEvent.isChainEnd():
@@ -622,6 +622,7 @@ class StrategyEngine(object):
         self._createMoneyTimer()
             
     def _onApiPosData(self, apiEvent):
+        self._enginePosModel.updatePosNotice(apiEvent)
         # 持仓信息
         self._trdModel.updatePosData(apiEvent)
         # print("++++++ 持仓信息 引擎 变化 ++++++", apiEvent.getData())
@@ -676,8 +677,12 @@ class StrategyEngine(object):
         orderEvents = self._engineOrderModel.getStrategyOrder(0)
         for orderEvent in orderEvents:
             self._sendEvent2Strategy(stragetyId, orderEvent)
+        # 持仓恢复
+        matchEvents = self._engineOrderModel.getStrategyMatch(0)
+        for matchEvent in matchEvents:
+            self._sendEvent2Strategy(stragetyId, matchEvent)
+
         # 策略最大订单id恢复,
-        # todo 这里放进订单、成交
         strategyMaxOrderId = self._engineOrderModel.getMaxOrderId(stragetyId)
         event = Event({
             "EventCode":EV_EG2ST_STRATEGY_SYNC,
