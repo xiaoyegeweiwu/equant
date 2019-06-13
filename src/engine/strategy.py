@@ -47,8 +47,8 @@ class StartegyManager(object):
         if strategyId not in self._strategyInfo:
             return
         self._strategyInfo[strategyId]["StrategyState"] = ST_STATUS_EXCEPTION
-        # self.destroyProcessByStrategyId(event.getStrategyId())
-        # self._strategyInfo[strategyId]["Process"] = None
+        self.destroyProcessByStrategyId(event.getStrategyId())
+        self._strategyInfo[strategyId]["Process"] = None
 
     def create(self, strategyId, eg2stQueue, eg2uiQueue, st2egQueue, event):
         qdict = {'eg2st': eg2stQueue, 'st2eg': st2egQueue, 'st2ui':eg2uiQueue}
@@ -157,7 +157,9 @@ class StartegyManager(object):
         self.destroyProcess(process, strategyId)
 
     def destroyProcess(self, process, strategyId):
-        assert process.is_alive(), " error "
+        if not process or not process.is_alive:
+            self.logger.info(f"策略{strategyId}所在进程已经退出，将忽略")
+            return
         try:
             process.terminate()
             process.join(timeout=1)
@@ -851,9 +853,6 @@ class Strategy:
         })
         self.sendEvent2EngineForce(event)
         self._onStrategyQuit(None, ST_STATUS_EXCEPTION)
-        # 保证该进程is_alive， 使得队列可用
-        while True:
-            time.sleep(2)
 
     # 停止策略
     def _onStrategyQuit(self, event=None, status=ST_STATUS_QUIT):
@@ -876,7 +875,11 @@ class Strategy:
             }
         })
         self.sendEvent2UI(quitEvent)
+        self.logger.info(f"策略已经将停止完成信号发送到UI和engine,策略{self._strategyId}")
         self.sendEvent2EngineForce(quitEvent)
+        # 保证该进程is_alive， 使得队列可用
+        while True:
+            time.sleep(2)
 
     def _onEquantExit(self, event):
         self._isSt2EgQueueEffective = False
@@ -913,8 +916,13 @@ class Strategy:
                 "StrategyName": self._strategyName,
             }
         })
-        self.sendEvent2UI(event)
+        self.sendEvent2UI(responseEvent)
+        self.logger.info(f"策略已经将删除完成信号发送到UI和engine,策略{self._strategyId}, {EV_EG2UI_STRATEGY_STATUS}")
         self.sendEvent2EngineForce(responseEvent)
+
+        # 保证该进程is_alive， 使得队列可用
+        while True:
+            time.sleep(2)
 
     def _snapShotTrigger(self, event):
         # 未选择即时行情触发
