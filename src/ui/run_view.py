@@ -57,6 +57,8 @@ class RunWin(QuantToplevel, QuantFrame):
         self.initVariable()
         # 初始化config
         self.config = {
+            'Contract': (),
+
             'Trigger': {
                 'Timer': None,
                 'Cycle': None,
@@ -66,8 +68,7 @@ class RunWin(QuantToplevel, QuantFrame):
             },
 
             'Sample': {
-                'KLineType': 'D',
-                'KLineSlice': 1
+
             },
 
             'DefaultSample': {
@@ -1530,6 +1531,9 @@ class RunWin(QuantToplevel, QuantFrame):
             contValues = self.contTree.item(item)['values']
             contsInfo.append(contValues)
 
+            if not self.config["Contract"]:
+                self.config["Contract"] = (contValues[0],)
+
             value = {}
             # 样本设置
             if contValues[1] == "日":
@@ -1549,6 +1553,8 @@ class RunWin(QuantToplevel, QuantFrame):
             else:
                 self.config["DefaultSample"][contValues[0]] = []
                 self.config["DefaultSample"][contValues[0]].append(value)
+
+        # print("1111111111: ", self.config)
 
 
         # -------------保存用户配置--------------------------
@@ -1748,6 +1754,7 @@ class SelectContractWin(QuantToplevel, QuantFrame):
 
     def enter(self):
         self._master.codeEntry.config(state="normal")
+        self._master.codeEntry.delete(0, tk.END)
 
         # 多合约
         # for con in self._selectCon:
