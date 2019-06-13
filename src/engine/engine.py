@@ -179,6 +179,7 @@ class StrategyEngine(object):
             EV_UI2EG_STRATEGY_RESUME        : self._onStrategyResume,
             EV_UI2EG_EQUANT_EXIT            : self._onEquantExit,
             EV_UI2EG_STRATEGY_FIGURE        : self._switchStrategy,
+            EV_UI2EG_STRATEGY_RESTART       : self._restartStrategyWhenParamsChanged,
 
             EV_ST2EG_UPDATE_STRATEGYDATA    : self._reqStrategyDataUpdateNotice,
             EV_EG2UI_REPORT_RESPONSE        : self._reportResponse,
@@ -268,6 +269,8 @@ class StrategyEngine(object):
             self._onStrategyRemove(event)
         elif code == EV_UI2EG_STRATEGY_FIGURE:
             self._switchStrategy(event)
+        elif code == EV_UI2EG_STRATEGY_RESTART:
+            self._restartStrategyWhenParamsChanged(event)
 
     #
     def _noticeStrategyReport(self, event):
@@ -285,6 +288,7 @@ class StrategyEngine(object):
         self._strategyMgr.create(id, eg2stQueue, self._eg2uiQueue, self._st2egQueue, event)
         # broken pip error 修复
         self._isEffective[id] = True
+        self._isSt2EngineDataEffective[id] = True
 
         # =================
         self._sendEvent2Strategy(id, event)
@@ -948,6 +952,28 @@ class StrategyEngine(object):
     def _switchStrategy(self, event):
         self._sendEvent2Strategy(event.getStrategyId(), event)
 
+    def _restartStrategyWhenParamsChanged(self, event):
+        # print("=====================")
+        # print(event.getData())
+        strategyId = event.getStrategyId()
+        if strategyId in self._eg2stQueueDict and strategyId in self._isEffective and self._isEffective[strategyId]:
+            self._isEffective[strategyId] = False
+            self._isSt2EngineDataEffective[strategyId] = False
+            self._strategyMgr.destroyProcessByStrategyId(strategyId)
+
+        allConfig = copy.deepcopy(self._strategyMgr.getStrategyAttribute(strategyId)["Config"])
+        allConfig["Params"] = event.getData()["Config"]["Params"]
+        loadEvent = Event({
+            "EventCode":EV_UI2EG_LOADSTRATEGY,
+            "StragetgyId":strategyId,
+            "Data":{
+                "Path"  : self._strategyMgr.getStrategyAttribute(strategyId)["Path"],
+                "Args": allConfig,
+                "NoInitialize": True
+            }
+        })
+        self._loadStrategy(loadEvent, strategyId)
+
     def saveStrategyContext2File(self):
         self.logger.debug("保存到文件")
         jsonFile = open('config/StrategyContext.json', 'w', encoding='utf-8')
@@ -957,8 +983,11 @@ class StrategyEngine(object):
         result["StrategyOrder"] = self._engineOrderModel.getData()
         json.dump(result, jsonFile, ensure_ascii=False, indent=4)
         for child in multiprocessing.active_children():
-            child.terminate()
-            child.join()
+            try:
+                child.terminate()
+                child.join(timeout=0.5)
+            except Exception as e:
+                pass
         self.logger.debug("engine和各策略完整退出")
 
     def sendErrorMsg(self, errorCode, errorText):

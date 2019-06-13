@@ -122,7 +122,7 @@ EV_EG2ST_LOGINNO_RSP              = 0x330           #请求登录账号
 EV_EG2ST_USERNO_RSP               = 0x331           #请求资金账号
 
 EV_EG2ST_TRADEINFO_RSP            = 0x340           #交易信息应答
-EV_EG2ST_STRATEGY_SYNC            = 0x009           # 引擎向策略同步信息
+EV_EG2ST_STRATEGY_SYNC            = 0x350           # 引擎向策略同步信息
 
 
 # /////////////CAPI->PyAPI、PyAPi->引擎事件定义////////////////

@@ -124,6 +124,7 @@ class StartegyManager(object):
             'Data': {
                 'Path': strategyInfo["Path"],
                 'Args': strategyInfo["Config"],
+                "NoInitialize": True,
             }
         })
         engineLoadFunc(loadStrategyEvent, strategyId=event.getStrategyId())
@@ -155,6 +156,7 @@ class StartegyManager(object):
         assert strategyId in self._strategyInfo, " error "
         process = self._strategyInfo[strategyId]["Process"]
         self.destroyProcess(process, strategyId)
+        self._strategyInfo[strategyId]["Process"] = None
 
     def destroyProcess(self, process, strategyId):
         if not process or not process.is_alive:
@@ -162,7 +164,7 @@ class StartegyManager(object):
             return
         try:
             process.terminate()
-            process.join(timeout=1)
+            process.join(timeout=0.1)
             self.logger.debug("strategy %d exit success" % strategyId)
         except Exception as e:
             # traceback.print_exc()
@@ -187,6 +189,9 @@ class StartegyManager(object):
             }
         result = OrderedDict(sorted(result.items(), key=lambda obj: str(obj[0])))
         return result
+
+    def getStrategyAttribute(self, strategyId):
+        return self._strategyAttribute[strategyId]
 
 
 class StrategyContext:
@@ -250,6 +255,8 @@ class StrategyContext:
         self._parameter = parameter
 
 
+
+
 class TradeRecord(object):
     def __init__(self, eSessionId, orderData={}):
         self._eSessionId = eSessionId   # eSessionId
@@ -309,11 +316,9 @@ class Strategy:
         data = event.getData()
         self._filePath = data['Path']
         self._argsDict = data['Args']
+        # 是否运行initialize函数
+        self._noInitialize = "NoInitialize" in data and data["NoInitialize"]
         self._uiConfig = copy.deepcopy(data['Args'])
-
-        # print("now config is")
-        # for k, v in self._argsDict.items():
-        #    print(k,":",v)
 
         self._eg2stQueue = args['eg2st']
         self._st2egQueue = args['st2eg']
@@ -360,7 +365,12 @@ class Strategy:
         userModule.__dict__.update(base_api.__dict__)
 
         # 5. 初始化用户策略参数
-        userModule.initialize(self._context)
+        if not self._noInitialize:
+            userModule.initialize(self._context)
+            self._argsDict["Params"] = self._context.params
+        else:
+            self._context.params = self._argsDict["Params"]
+
         self._userModule = userModule
         # 5.1 同步配置
         self._sendConfig2Engine()
@@ -670,7 +680,6 @@ class Strategy:
     def _onLoadStrategyResponse(self, event):
         '''向界面返回策略加载应答'''
         cfg = self._dataModel.getConfigData()
-
         key = self._dataModel.getConfigModel().getKLineShowInfoSimple()
         revent = Event({
             "EventCode" : EV_EG2UI_LOADSTRATEGY_RESPONSE,
@@ -1042,5 +1051,4 @@ class Strategy:
     def _onSyncEngineInfo(self, event):
         orderId = event.getData()["MaxOrderId"]
         self._eSessionId = orderId
-        # print("22222222222222222222 = ", orderId)
 
