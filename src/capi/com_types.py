@@ -524,6 +524,7 @@ VConOpenTimes                = "31"     # 最大连续同向开仓次数
 VCanClose                    = "32"     # 开仓的当前K线不允许平仓
 VCanOpen                     = "33"     # 平仓的当前K线不允许开仓
 VParams                      = "34"     # 用户设置的参数
+VContSettings                = "35"     # 多合约设置信息
 
 # K线数据类型
 BarDataClose        = 'C' # 收盘价

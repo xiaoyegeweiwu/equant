@@ -35,8 +35,12 @@ class RunWin(QuantToplevel, QuantFrame):
         self._commodity = self._control.model.getCommodity()
         self._contract = self._control.model.getContract()
         self._userNo = self._control.model.getUserNo()
+
         # 获取用户参数
         self._userParam = param
+
+        # 用户设置的多合约信息
+        self._contsInfo = []
 
         self.title("策略属性设置")
         self.attributes("-toolwindow", 1)
@@ -46,9 +50,6 @@ class RunWin(QuantToplevel, QuantFrame):
         self.setPos()
         self.protocol("WM_DELETE_WINDOW", self.cancel)
 
-        # 用于保存用户所选的用户合约
-        self.userContList = []
-
         # 将函数包装一下(初始资金只能输入数字、浮点数)
         self.testContent = self.register(self.testDigit)
         self.testFlt     = self.register(self.testFloat)
@@ -56,8 +57,6 @@ class RunWin(QuantToplevel, QuantFrame):
         self.initVariable()
         # 初始化config
         self.config = {
-            'Contract': ( ),
-
             'Trigger': {
                 'Timer': None,
                 'Cycle': None,
@@ -67,48 +66,55 @@ class RunWin(QuantToplevel, QuantFrame):
             },
 
             'Sample': {
-                    'KLineType': 'D',
-                    'KLineSlice': 1
+                'KLineType': 'D',
+                'KLineSlice': 1
             },
 
-        'RunMode': {
-            'SendOrder': '1',
-            'Simulate': {
+            'DefaultSample': {
+
+            },
+
+            'RunMode': {
+                'SendOrder': '1',
+                'Simulate': {
                 'Continues': True,
                 'UseSample': True
+                },
+                'Actual': {
+                    'SendOrder2Actual': False
+                }
             },
-            'Actual': {
-                'SendOrder2Actual': False
+
+            'Money': {
+                'UserNo': 'ET001',
+                'InitFunds': '10000000',
+                "MinQty": 1,
+                 'OrderQty': {
+                    'Type': '1',
+                    'Count': 1,
+                 },
+                 'Hedge': "T",
+                 'Margin': {'Type': 'F', 'Value': 0.08},
+                 'OpenFee': {'Type': 'F', 'Value': 1},
+                 'CloseFee': {'Type': 'F', 'Value': 1},
+                 'CloseTodayFee': {'Type': 'F', 'Value': 0},
+            },
+
+            'Limit': {
+                'OpenTimes': -1,
+                'ContinueOpenTimes': -1,
+                'OpenAllowClose': True,
+                'CloseAllowOpen': True,
+
+            },
+
+            'Other': {
+                'Slippage': 0,
+                'TradeDirection': 0
+            },
+            'Params': {
+
             }
-        },
-
-        'Money': {
-            'UserNo': 'ET001',
-            'InitFunds': '10000000',
-            "MinQty": 1,
-             'OrderQty': {
-                'Type': '1',
-                'Count': 1,
-        },
-             'Hedge': "T",
-             'Margin': {'Type': 'F', 'Value': 0.08},
-             'OpenFee': {'Type': 'F', 'Value': 1},
-             'CloseFee': {'Type': 'F', 'Value': 1},
-             'CloseTodayFee': {'Type': 'F', 'Value': 0},
-        },
-
-        'Limit': {
-            'OpenTimes': -1,
-            'ContinueOpenTimes': -1,
-            'OpenAllowClose': True,
-            'CloseAllowOpen': True,
-
-        },
-
-        'Other': {
-            'Slippage': 0,
-            'TradeDirection': 0
-          }
         }
 
         self.fColor = self.bgColor
@@ -141,7 +147,6 @@ class RunWin(QuantToplevel, QuantFrame):
 
     def initVariable(self):
         # 变量
-        self.contract = tk.StringVar()  # 基准合约
         self.user = tk.StringVar()  # 用户
         self.initFund = tk.StringVar()  # 初始资金
         self.defaultType = tk.StringVar()  # 默认下单方式
@@ -156,7 +161,6 @@ class RunWin(QuantToplevel, QuantFrame):
         self.closeFee = tk.StringVar()  # 平仓手续费（率）
         self.dir = tk.StringVar()  # 交易方向
         self.slippage = tk.StringVar()  # 滑点损耗
-        # self.contract = tk.StringVar()  # 合约
         # self.timer = tk.StringVar()       # 定时触发
         self.isCycle = tk.IntVar()  # 是否按周期触发
         self.cycle = tk.StringVar()  # 周期
@@ -170,8 +174,6 @@ class RunWin(QuantToplevel, QuantFrame):
         self.beginDate = tk.StringVar()  # 起始日期
         self.fixQty = tk.StringVar()  # 固定根数
 
-        self.kLineType = tk.StringVar()  # K线类型
-        self.kLineSlice = tk.StringVar()  # K线周期
         self.sendOrderMode = tk.IntVar()  # 发单时机： 0. 实时发单 1. K线稳定后发单
         self.isActual = tk.IntVar()  # 实时发单
         # self.isContinue = tk.IntVar()       # K线稳定后发单
@@ -220,15 +222,6 @@ class RunWin(QuantToplevel, QuantFrame):
             self.dir.set(conf[VDirection]),
             self.slippage.set(conf[VSlippage]),
 
-            # 合约设置
-            # self.contract.set(conf[VContract])
-            if len(conf[VContract]) > 1:
-                self.contract.set(conf[VContract][0] + ", ...")
-            else:
-                self.contract.set(conf[VContract])
-            self.userContList = conf[VContract]
-            # self.setText(self.contractInfo, conf[VContract])
-
             self.isCycle.set(conf[VIsCycle]),
             self.cycle.set(conf[VCycle]),
 
@@ -244,8 +237,6 @@ class RunWin(QuantToplevel, QuantFrame):
             self.beginDate.set(conf[VBeginDate]),
             self.fixQty.set(conf[VFixQty]),
 
-            self.kLineType.set(conf[VKLineType]),
-            self.kLineSlice.set(conf[VKLineSlice]),
             self.sendOrderMode.set(conf[VSendOrderMode]),
             self.isActual.set(conf[VIsActual]),
 
@@ -264,6 +255,12 @@ class RunWin(QuantToplevel, QuantFrame):
             except KeyError as e:
                 traceback.print_exc()
 
+            #TODO: DefaultSample
+            try:
+                if conf[VContSettings]:
+                    self._contsInfo = conf[VContSettings]
+            except KeyError as e:
+                traceback.print_exc()
 
         # if True:
         else:
@@ -280,14 +277,7 @@ class RunWin(QuantToplevel, QuantFrame):
             # 运行模式
             self.isActual.set(0)
 
-            # 数据合约
-
             # 账户
-
-            # K线类型
-            self.kLineType.set("分钟")
-            # K线周期
-            self.kLineSlice.set("1")
 
             # 初始资金
             self.initFund.set(10000000)
@@ -340,21 +330,14 @@ class RunWin(QuantToplevel, QuantFrame):
         self.defaultUnitSetting()
         self.setCycleEntryState()
 
-        # 插入参数
+        # 设置用户参数
         self.insertParams()
+        # 恢复用户最新保存的多合约信息
+        self.insertContInfo()
 
     def getConfig(self):
         """获取用户配置的config"""
         return self.config
-
-    def getUserContract(self):
-        """获取用户所选的数据合约信息"""
-        # return self.contract.get()
-        return self.userContList
-
-    def setUserContract(self, contList):
-        """设置用户所选数据合约"""
-        self.userContList = contList
 
     def setPos(self):
         # 获取主窗口大小和位置，根据主窗口调整输入框位置
@@ -513,7 +496,7 @@ class RunWin(QuantToplevel, QuantFrame):
             button.config(bg='white')
             self.fundBtn.config(bg=self.bgColor)
             self.sampleBtn.config(bg=self.bgColor)
-            self.paramBtn.config(bg=self.bgColor)
+            self.runBtn.config(bg=self.bgColor)
             self.contBtn.config(bg=self.bgColor)
         else:
             button.config(bg='white')
@@ -522,7 +505,6 @@ class RunWin(QuantToplevel, QuantFrame):
             self.runBtn.config(bg=self.bgColor)
             self.paramBtn.config(bg=self.bgColor)
 
-
     def onLeave(self, event, button):
         button.config(bg=rgb_to_hex(227, 230, 233))
         if button == self.fundBtn:
@@ -530,21 +512,25 @@ class RunWin(QuantToplevel, QuantFrame):
             self.runBtn['bg'] = self.rColor
             self.sampleBtn['bg'] = self.sColor
             self.paramBtn['bg'] = self.pColor
+            self.contBtn['bg'] = self.cColor
         elif button == self.runBtn:
             button['bg'] = self.rColor
             self.fundBtn['bg'] = self.fColor
             self.sampleBtn['bg'] = self.sColor
             self.paramBtn['bg'] = self.pColor
+            self.contBtn['bg'] = self.cColor
         elif button == self.sampleBtn:
             button['bg'] = self.sColor
             self.fundBtn['bg'] = self.fColor
             self.runBtn['bg'] = self.rColor
             self.paramBtn['bg'] = self.pColor
+            self.contBtn['bg'] = self.cColor
         elif button == self.paramBtn:
             button['bg'] = self.pColor
             self.fundBtn['bg'] = self.fColor
             self.runBtn['bg'] = self.rColor
             self.sampleBtn['bg'] = self.sColor
+            self.contBtn['bg'] = self.cColor
         elif button == self.contBtn:
             button['bg'] = self.cColor
             self.fundBtn['bg'] = self.fColor
@@ -574,10 +560,10 @@ class RunWin(QuantToplevel, QuantFrame):
 
         self.SendOrderMode(baseFrame)
         self.setRunMode(baseFrame)
-        self.setContract(baseFrame)
+        # self.setContract(baseFrame)
         self.setUser(baseFrame)
-        self.setKLineType(baseFrame)
-        self.setKLineSlice(baseFrame)
+        # self.setKLineType(baseFrame)
+        # self.setKLineSlice(baseFrame)
 
     def createParma(self, frame):
         self.setParamLabel(frame)
@@ -618,10 +604,14 @@ class RunWin(QuantToplevel, QuantFrame):
         self.paramTree.bind("<Button-1>", self.onClick)
 
     def insertParams(self):
-        """将参数插入参数树中"""
-        print("self._userParam: ", self._userParam)
+        """恢复用户选择的参数信息"""
         for key in self._userParam:
             self.paramTree.insert("", tk.END, values=tuple([key, self._userParam[key]]), tags=key)
+
+    def insertContInfo(self):
+        """恢复配置文件中用户选择的多合约信息"""
+        for key in self._contsInfo:
+            self.contTree.insert("", tk.END, values=key)
 
     def onClick(self, event):
         """单击更改策略值"""
@@ -663,8 +653,11 @@ class RunWin(QuantToplevel, QuantFrame):
         """合约列表"""
         treeFrame = tk.Frame(frame, relief=tk.RAISED, bg=rgb_to_hex(255, 255, 255))
         treeFrame.pack(side=tk.LEFT, fill=tk.BOTH, expand=tk.YES, padx=2, pady=5)
-        headList = ["合约", "K线类型", "K线根数", "保证金(%)", "开仓手续费", "平仓手续费", ""]
-        widthList = [30, 5, 5, 5, 10, 10, 30]
+        # headList = ["合约", "K线类型", "K线根数", "保证金(%)", "开仓手续费", "平仓手续费", ""]
+        # widthList = [30, 5, 5, 5, 10, 10, 30]
+
+        headList = ["合约", "K线类型", "K线周期"]
+        widthList= [30, 5, 5]
 
         self.contTree = ttk.Treeview(treeFrame, show="headings", height=28, columns=tuple(headList))
         self.contTree.pack(fill=tk.BOTH, expand=tk.YES, padx=5)
@@ -699,18 +692,31 @@ class RunWin(QuantToplevel, QuantFrame):
         addButton.pack(side=tk.BOTTOM, ipadx=20, padx=5)
 
     def contAdd(self):
-        """策略增加事件"""
-        addWin = AddContWin(self)
+        """合约增加事件"""
+        addWin = AddContWin(self, self._exchange, self._commodity, self._contract)
         addWin.display()
         pass
 
     def contDel(self):
-        """策略删除事件"""
-        pass
+        """合约删除事件"""
+        item = self.contTree.selection()
+        for id in item:
+            self.contTree.delete(id)
 
     def contModify(self):
-        """策略修改事件"""
-        pass
+        """合约修改事件"""
+        #TODO：没有选择的情况下怎么办？？？？？？？？？？？？？
+        item = self.contTree.item(self.contTree.focus())
+        itemValues = item['values']
+        if not len(itemValues):
+            return
+
+        modWin = AddContWin(self, self._exchange, self._commodity, self._contract)
+        modWin.contractButton.config(state="disabled")
+        modWin.codeEntry.config(state="disabled")
+        modWin.setWinValue(self.contTree.focus(), itemValues)
+        modWin.display()
+
 
     # 资金设置
     def setUser(self, frame):
@@ -928,30 +934,6 @@ class RunWin(QuantToplevel, QuantFrame):
                              validate="key", validatecommand=(self.testContent, "%P"))
         # slipEntry.insert(tk.END, 1)
         slipEntry.pack(side=tk.LEFT, fill=tk.X, padx=5)
-
-    def setContract(self, frame):
-        contractFrame = tk.Frame(frame, relief=tk.RAISED, bg=rgb_to_hex(255, 255, 255))
-        contractFrame.pack(fill=tk.NONE, anchor=tk.W, padx=5, pady=5)
-
-        contractLabel = tk.Label(contractFrame, text="基准合约:", bg=rgb_to_hex(255, 255, 255),
-                                 justify=tk.LEFT, anchor=tk.NW, width=10)
-        contractLabel.pack(side=tk.LEFT, padx=5)
-
-        self.contractEntry = tk.Entry(contractFrame, bg=rgb_to_hex(255, 255, 255), bd=2, width=35, relief=tk.GROOVE,
-                                      state="disabled", textvariable=self.contract)
-        self.contractEntry.pack(side=tk.LEFT, fill=tk.X, expand=tk.YES, padx=10)
-
-        contractButton = tk.Button(contractFrame, text="选择", relief=tk.FLAT,
-                                   activebackground="lightblue",
-                                   overrelief="groove",
-                                   bg=rgb_to_hex(230, 230, 230),
-                                   command=self.selectContract)
-        contractButton.pack(side=tk.LEFT, ipadx=5, padx=5)
-
-    def selectContract(self):
-        """选择合约"""
-        self.selectWin = SelectContractWin(self._exchange, self._commodity, self._contract, self)
-        self.selectWin.display()
 
     def setTrigger(self, frame):
         """触发方式"""
@@ -1193,30 +1175,6 @@ class RunWin(QuantToplevel, QuantFrame):
         # self.setHelp(setFrame)
         # self.bindEvent()
 
-    def setKLineType(self, frame):
-        kLineTypeFrame = tk.Frame(frame, relief=tk.RAISED, bg=rgb_to_hex(255, 255, 255))
-        kLineTypeFrame.pack(fill=tk.NONE, anchor=tk.W, padx=5, pady=5)
-        kLineTypeLabel = tk.Label(kLineTypeFrame, text='K线类型:', bg=rgb_to_hex(255, 255, 255),
-                                  justify=tk.LEFT, anchor=tk.W, width=10)
-        kLineTypeLabel.pack(side=tk.LEFT, padx=5)
-
-        self.kLineTypeChosen = ttk.Combobox(kLineTypeFrame, state="readonly", textvariable=self.kLineType)
-        self.kLineTypeChosen['values'] = ['日', '分钟', '秒']
-        # self.kLineTypeChosen.current(0)
-        self.kLineTypeChosen.pack(side=tk.LEFT, fill=tk.X, padx=10)
-
-    def setKLineSlice(self, frame):
-        self.klineSliceFrame = tk.Frame(frame, relief=tk.RAISED, bg=rgb_to_hex(255, 255, 255))
-        self.klineSliceFrame.pack(fill=tk.X, padx=5, pady=5)
-        klineSliceLabel = tk.Label(self.klineSliceFrame, text="K线周期:", bg=rgb_to_hex(255, 255, 255),
-                                   justify=tk.LEFT, anchor=tk.W, width=10)
-        klineSliceLabel.pack(side=tk.LEFT, padx=5)
-
-        self.klineSliceChosen = ttk.Combobox(self.klineSliceFrame, state="readonly", textvariable=self.kLineSlice)
-        self.klineSliceChosen["values"] = ['1', '2', '3', '5', '10', '15', '30', '60', '120']
-        # self.klineSliceChosen.current(0)
-        self.klineSliceChosen.pack(side=tk.LEFT, fill=tk.X, padx=10)
-
     # 运行设置
     def setOpenTimes(self, frame):
         """每根K线同向开仓次数"""
@@ -1379,7 +1337,6 @@ class RunWin(QuantToplevel, QuantFrame):
         #     return
         # else:
         #     contractInfo = (contract.rstrip(", ")).split(", ")
-        contractInfo = self.userContList
 
         timer = self.timerText.get('1.0', "end-1c")   # 时间
 
@@ -1394,8 +1351,6 @@ class RunWin(QuantToplevel, QuantFrame):
         fixQty = self.fixQty.get()
         sampleVar = self.sampleVar.get()
 
-        kLineType = self.kLineType.get()
-        kLineSlice = self.kLineSlice.get()
         sendOrderMode = self.sendOrderMode.get()  # 发单时机： 0. 实时发单 1. K线稳定后发单
 
         isActual = self.isActual.get()
@@ -1461,26 +1416,12 @@ class RunWin(QuantToplevel, QuantFrame):
                 self.toSampFrame()
                 return
 
-        # self.config["Contract"] = (contractInfo,)
-        self.config["Contract"] = tuple(contractInfo)
 
         self.config["Trigger"]["Cycle"] = int(cycle) if isCycle else None
         self.config["Trigger"]["Timer"] = timerFormatter if timer else None
         self.config["Trigger"]["KLine"] = True if isKLine else False
         self.config["Trigger"]["SnapShot"] = True if isMarket else False
         self.config["Trigger"]["Trade"] = True if isTrade else False
-
-        #样本设置
-        if kLineType == "日":
-            self.config["Sample"]["KLineType"] = "D"
-        elif kLineType == "分钟":
-            self.config["Sample"]["KLineType"] = "M"
-        elif kLineType == "秒":
-            self.config["Sample"]["KLineType"] = "S"
-        else:
-            raise Exception("K线类型未知异常")
-
-        self.config["Sample"]["KLineSlice"] = int(kLineSlice)
 
         if sampleVar == 0:
             self.config["Sample"]["AllK"] = True
@@ -1576,15 +1517,39 @@ class RunWin(QuantToplevel, QuantFrame):
             self.config["Other"]["TradeDirection"] = 2
 
         # 用户参数设置信息
-        self.config["Params"] = {}
         for item in self.paramTree.get_children():
-            item = self.paramTree.item(item)
             # itemValues是一个列表
-            itemValues = item['values']
-            # print("111111: ", itemValues)
-            self.config["Params"][itemValues[0]] = itemValues[1]
+            paramValues = self.paramTree.item(item)['values']
 
-        print("1111111111: ", self.config["Params"])
+            # print("111111: ", itemValues)
+            self.config["Params"][paramValues[0]] = paramValues[1]
+
+        # 多合约信息：
+        contsInfo = []
+        for item in self.contTree.get_children():
+            contValues = self.contTree.item(item)['values']
+            contsInfo.append(contValues)
+
+            value = {}
+            # 样本设置
+            if contValues[1] == "日":
+                value["KLineType"] = "D"
+            elif contValues[1] == "分钟":
+                value["KLineType"] = "M"
+            elif contValues[1] == "秒":
+                value["KLineType"] = "S"
+            else:
+                raise Exception("K线类型未知异常")
+
+            value["KLineSlice"] = int(contValues[2])
+
+            if contValues[0] in self.config["DefaultSample"].keys():
+                if value not in self.config["DefaultSample"][contValues[0]]:
+                    self.config["DefaultSample"][contValues[0]].append(value)
+            else:
+                self.config["DefaultSample"][contValues[0]] = []
+                self.config["DefaultSample"][contValues[0]].append(value)
+
 
         # -------------保存用户配置--------------------------
         strategyPath = self._control.getEditorText()["path"]
@@ -1603,7 +1568,6 @@ class RunWin(QuantToplevel, QuantFrame):
                 VCloseFee: closeFee,
                 VDirection: tradeDirection,
                 VSlippage: slippage,
-                VContract: contractInfo,
                 VTimer: timer,
                 VIsCycle: isCycle,
                 VCycle: cycle,
@@ -1615,8 +1579,6 @@ class RunWin(QuantToplevel, QuantFrame):
                 VBeginDate: beginDate,
                 VFixQty: fixQty,
 
-                VKLineType: kLineType,
-                VKLineSlice: kLineSlice,
                 VSendOrderMode: sendOrderMode,
                 VIsActual: isActual,
                 VIsOpenTimes: isOpenTimes,
@@ -1626,7 +1588,8 @@ class RunWin(QuantToplevel, QuantFrame):
                 VCanClose: canClose,
                 VCanOpen: canOpen,
 
-                VParams: self.config["Params"]
+                VParams: self.config["Params"],
+                VContSettings: contsInfo
             }
         }
 
@@ -1681,7 +1644,7 @@ class SelectContractWin(QuantToplevel, QuantFrame):
     commodityType = {"P": '现货', 'F': '期货', 'O': '期权', 'S': '跨期', 'M': '跨品种', 'Z': '指数'}
     exchangeList = ["CFFEX", "CME", "DCE", "SGE", "SHFE", "ZCE", "INE", "NYMEX", "SSE", "SZSE"]
 
-    def __init__(self, exchange, commodity, contract, master):
+    def __init__(self, master, exchange, commodity, contract):
         super().__init__(master)
         self._master = master
         self._selectCon = []   # 所选合约列表
@@ -1764,20 +1727,7 @@ class SelectContractWin(QuantToplevel, QuantFrame):
         textFrame.pack(side=tk.LEFT, fill=tk.BOTH, expand=tk.YES, anchor=tk.W)
         self.contractText = ContractText(textFrame)
         self.contractText.pack(side=tk.LEFT, fill=tk.Y)
-        # 选择合约界面增加原始信息
-        contractText = self._master.getUserContract()
-        # con = contractText.strip("\n")
-        # if len(con) != 0:
-        #     contractInfo = con.split("\n")
-        #     for contract in contractInfo:
-        #         self._selectCon.append(contract)
-        #         self.contractText.setText(contract)
 
-        for contract in contractText:
-            self._selectCon.append(contract)
-            self.contractText.setText(contract)
-
-        # self.addScroll(frame, self.contractText, xscroll=False)
         self.contractText.bind("<Double-Button-1>", self.deleteSelectedContract)
 
     def addButton(self, frame):
@@ -1797,20 +1747,19 @@ class SelectContractWin(QuantToplevel, QuantFrame):
         enterButton.pack(side=tk.RIGHT, ipadx=20, padx=5, pady=5)
 
     def enter(self):
-        self._master.contractEntry.config(state="normal")
-        self._master.contractEntry.delete('0', tk.END)
+        self._master.codeEntry.config(state="normal")
 
         # 多合约
         # for con in self._selectCon:
         #     self._master.contractEntry.insert(tk.END, con)
         if len(self._selectCon) > 1:
-            self._master.contractEntry.insert(tk.END, self._selectCon[0] + ", ...")
+            self._master.codeEntry.insert(tk.END, self._selectCon[0] + ", ...")
         else:
             # self._master.contractEntry.insert(tk.END, self._selectCon[0])
-            self._master.contractEntry.insert(tk.END, self._selectCon)
+            self._master.codeEntry.insert(tk.END, self._selectCon)
         self._master.setUserContract(self._selectCon)
 
-        self._master.contractEntry.config(state="disabled")
+        self._master.codeEntry.config(state="disabled")
 
         # 不加focus会出现选择合约确定后设置窗口后移
         self._master.focus()
@@ -1840,11 +1789,12 @@ class SelectContractWin(QuantToplevel, QuantFrame):
         select = event.widget.selection()
         # cont = self.contractText.get_text()
         # contList = (self.contractText.get_text()).strip("\n")
-        contList = ((self.contractText.get_text()).strip("\n")).split("\n")
-        # contList = ((self.contractText.get_text()).strip("\n")).split()
+        # contList = ((self.contractText.get_text()).strip("\n")).split("\n")
+        contList = ((self.contractText.get_text()).strip("\n")).split()
 
-        if len(contList) > 9:
-            messagebox.showinfo("提示", "选择合约数量不能超过10个", parent=self)
+
+        if len(contList) > 0:
+            messagebox.showinfo("提示", "选择合约数量不能超过1个", parent=self)
             return
 
         for idx in select:
@@ -1869,11 +1819,21 @@ class SelectContractWin(QuantToplevel, QuantFrame):
 
 class AddContWin(QuantToplevel, QuantFrame):
     """增加合约窗口"""
-    def __init__(self, master):
+    def __init__(self, master, exchange, commodity, contract):
         super().__init__(master)
         self._master = master
         self.title("商品属性")
         self.attributes("-toolwindow", 1)
+
+        self._exchange = exchange
+        self._commodity = commodity
+        self._contract = pd.DataFrame(contract)
+
+        # 用于保存用户所选的用户合约
+        self.userContList = []
+
+        # 用于记录需要修改的合约对应的树控件的item
+        self.selectedItem = ''
 
         self.setPos()
 
@@ -1928,7 +1888,7 @@ class AddContWin(QuantToplevel, QuantFrame):
 
         #弹出输入窗口，输入文件名称
         self.geometry('%dx%d+%d+%d' % (w, h, x, y))
-        self.minsize(400, 320)
+        self.minsize(400, 260)
         self.resizable(0, 0)
 
     def testFloat(self, content):
@@ -1939,14 +1899,20 @@ class AddContWin(QuantToplevel, QuantFrame):
         except:
             return False
 
+    def setWinValue(self, item, value):
+        self.selectedItem = item
+        self.contCode.set(value[0])
+        self.kLineType.set(value[1])
+        self.kLineSlice.set(value[2])
+
     def createWidgets(self, frame):
         self.setContCode(frame)
         self.setKLineType(frame)
         self.setKLineSlice(frame)
-        self.setMargin(frame)
-        self.setCommision(frame)
-        self.setSeperator(frame)
-        self.setSeperator(frame)
+        # self.setMargin(frame)
+        # self.setCommision(frame)
+        # self.setSeperator(frame)
+        self.addButton(frame)
 
     def setContCode(self, frame):
         """设置商品代码"""
@@ -1956,8 +1922,15 @@ class AddContWin(QuantToplevel, QuantFrame):
         codeLabel = tk.Label(contCodeFrame, text='商品代码:', bg=rgb_to_hex(245, 245, 245),
                                 justif=tk.LEFT, anchor=tk.W, width=15)
         codeLabel.pack(side=tk.LEFT)
-        self.codeEntry = tk.Entry(contCodeFrame, relief=tk.GROOVE, bd=2)
+        self.codeEntry = tk.Entry(contCodeFrame, relief=tk.GROOVE, bd=2, textvariable=self.contCode)
         self.codeEntry.pack(side=tk.LEFT, fill=tk.X, padx=5)
+
+        self.contractButton = tk.Button(contCodeFrame, text="选择", relief=tk.FLAT,
+                                   activebackground="lightblue",
+                                   overrelief="groove",
+                                   bg=rgb_to_hex(230, 230, 230),
+                                   command=self.selectContract)
+        self.contractButton.pack(side=tk.LEFT, ipadx=5, padx=5)
 
     def setKLineType(self, frame):
         kLineTypeFrame = tk.Frame(frame, relief=tk.RAISED, bg=rgb_to_hex(245, 245, 245))
@@ -2046,12 +2019,68 @@ class AddContWin(QuantToplevel, QuantFrame):
         if closeType == 1:
             self.closeTypeUnitVar.set("%")
 
+    # 弃用
     def setSeperator(self, frame):
         seperatorFrame = tk.Frame(frame, relief=tk.RAISED, bg=rgb_to_hex(245, 245, 245))
         seperatorFrame.pack(fill=tk.X, padx=15, pady=15)
         cv = tk.Canvas(seperatorFrame, bg=rgb_to_hex(245, 245, 245))
         cv.create_line(0, 0, 360, 0, width=5, fill=rgb_to_hex(25, 25, 25))
         cv.pack(expand=tk.YES, fill=tk.BOTH)
+
+    def addButton(self, frame):
+        #TODO: 和加载的addButton代码相同
+        enterFrame = tk.Frame(frame, relief=tk.RAISED, bg=rgb_to_hex(245, 245, 245))
+        enterFrame.pack(side=tk.BOTTOM, fill=tk.X, padx=2, pady=5)
+        cancelButton = tk.Button(enterFrame, text="取消", relief=tk.FLAT, bg=rgb_to_hex(230, 230, 230),
+                                 activebackground="lightblue", highlightbackground="red",
+                                 overrelief="groove",
+                                 command=self.cancel)
+        cancelButton.pack(side=tk.RIGHT, ipadx=20, padx=5, pady=5)
+
+        enterButton = tk.Button(enterFrame, text="确定", relief=tk.FLAT,
+                                activebackground="lightblue",
+                                overrelief="groove",
+                                command=self.enter, bg=rgb_to_hex(230, 230, 230))
+        enterButton.pack(side=tk.RIGHT, ipadx=20, padx=5, pady=5)
+
+    def selectContract(self):
+        """选择合约"""
+        self.selectWin = SelectContractWin(self, self._exchange, self._commodity, self._contract)
+        self.selectWin.display()
+
+    def enter(self):
+        code = self.contCode.get()
+        kLineType = self.kLineType.get()
+        kLineSlice = self.kLineSlice.get()
+
+        if not code:
+            messagebox.showinfo(title="提示", message="商品代码不能为空!", parent=self)
+            return
+
+        selectRst = (code, kLineType, kLineSlice)
+
+        # 当父窗口按钮按下修改按钮时，修改条目值
+        if self.selectedItem:
+            self._master.contTree.item(self.selectedItem, values=selectRst)
+        else:
+            self._master.contTree.insert("", tk.END, values=selectRst)
+
+        # 不加focus会出现选择合约确定后设置窗口后移
+        self._master.focus()
+        self.destroy()
+
+    def cancel(self):
+        """关闭窗口"""
+        self.destroy()
+
+    def getUserContract(self):
+        """获取用户所选的数据合约信息"""
+        # return self.contract.get()
+        return self.userContList
+
+    def setUserContract(self, contList):
+        """设置用户所选数据合约"""
+        self.userContList = contList
 
 
 class EntryPopup(tk.Entry):
@@ -2093,6 +2122,7 @@ class EntryPopup(tk.Entry):
 
     def onFocusIn(self, event):
         # 记录获取焦点的item
+        # TODO: 多个时是不是会有问题
         self.item = self.parent.focus()
 
     def onFocusOut(self, event):
