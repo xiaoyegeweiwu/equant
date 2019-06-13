@@ -221,26 +221,28 @@ class StrategyTrade(TradeModel):
     def getOrderBuyOrSell(self, eSession):
         '''
         返回当前公式应用的帐户下当前商品的某个委托单的买卖类型。
-        :param orderNo: 委托单号，为空时，使用当日最后提交的委托编号作为查询依据
+        :param orderNo: 委托单号
         :return: 当前公式应用的帐户下当前商品的某个委托单的买卖类型
         '''
-        orderNo = self._strategy.getOrderNo(eSession)
-        if orderNo == 0 or not orderNo:
-            return 'N'
-
         if len(self._userInfo) == 0 or self._selectedUserNo not in self._userInfo:
             raise Exception("请确保您的账号已经在客户端登录")
 
         tUserInfoModel = self._userInfo[self._selectedUserNo]
 
-        if len(tUserInfoModel._match) == 0:
-            return 'N'
+        tMatchModel = None
+        if isinstance(eSession, str) and '-' in eSession:
+            orderNo = self._strategy.getOrderNo(eSession)
+            if not orderNo or orderNo not in tUserInfoModel._order:
+                return 'N'
+            tMatchModel = tUserInfoModel._order[orderNo]
+            return tMatchModel._metaData['Direct']
+        else:
+            for orderNo in list(tUserInfoModel._order.keys()):
+                tMatchModel = tUserInfoModel._order[orderNo]
+                if tMatchModel._metaData['OrderId'] == eSession:
+                    return tMatchModel._metaData['Direct']
+        return 'N'
 
-        if orderNo and orderNo not in tUserInfoModel._match:
-            return 'N'
-
-        tMatchModel = tUserInfoModel._order[orderNo]
-        return tMatchModel._metaData['Direct'] if 'Direct' in tMatchModel._metaData else 'N'
 
     def getOrderEntryOrExit(self, eSession):
         '''
@@ -248,24 +250,22 @@ class StrategyTrade(TradeModel):
         :param orderNo: 委托单号
         :return: 当前公式应用的帐户下当前商品的某个委托单的开平仓状态
         '''
-        orderNo = self._strategy.getOrderNo(eSession)
-        if orderNo == 0 or not orderNo:
-            return 'N'
-
         if len(self._userInfo) == 0 or self._selectedUserNo not in self._userInfo:
             raise Exception("请确保您的账号已经在客户端登录")
-
         tUserInfoModel = self._userInfo[self._selectedUserNo]
 
-        if len(tUserInfoModel._match) == 0:
-            return 'N'
-
-        if orderNo and orderNo not in tUserInfoModel._match:
-            return 'N'
-
-
-        tMatchModel = tUserInfoModel._order[orderNo]
-        return tMatchModel._metaData['Offset'] if 'Offset' in tMatchModel._metaData else 'N'
+        if isinstance(eSession, str) and '-' in eSession:
+            orderNo = self._strategy.getOrderNo(eSession)
+            if not orderNo or orderNo not in tUserInfoModel._order:
+                return 'N'
+            tMatchModel = tUserInfoModel._order[orderNo]
+            return tMatchModel._metaData['Offset']
+        else:
+            for orderNo in list(tUserInfoModel._order.keys()):
+                tMatchModel = tUserInfoModel._order[orderNo]
+                if tMatchModel._metaData['OrderId'] == eSession:
+                    return tMatchModel._metaData['Offset']
+        return 'N'
 
     def getOrderFilledLot(self, eSession):
         '''
@@ -273,24 +273,23 @@ class StrategyTrade(TradeModel):
         :param orderNo: 委托单号
         :return: 当前公式应用的帐户下当前商品的某个委托单的成交数量
         '''
-        orderNo = self._strategy.getOrderNo(eSession)
-        if orderNo == 0 or not orderNo:
-            return 0
-
         if len(self._userInfo) == 0 or self._selectedUserNo not in self._userInfo:
             raise Exception("请确保您的账号已经在客户端登录")
-
         tUserInfoModel = self._userInfo[self._selectedUserNo]
 
-        if len(tUserInfoModel._match) == 0:
-            return 0
+        if isinstance(eSession, str) and '-' in eSession:
+            orderNo = self._strategy.getOrderNo(eSession)
+            if not orderNo or orderNo not in tUserInfoModel._order:
+                return 0
 
-        if orderNo and orderNo not in tUserInfoModel._match:
-            return 0
-
-        tMatchModel = tUserInfoModel._order[orderNo]
-
-        return tMatchModel._metaData['MatchQty'] if 'MatchQty' in tMatchModel._metaData else 0
+            tMatchModel = tUserInfoModel._order[orderNo]
+            return tMatchModel._metaData['MatchQty']
+        else:
+            for orderNo in list(tUserInfoModel._order.keys()):
+                tMatchModel = tUserInfoModel._order[orderNo]
+                if tMatchModel._metaData['OrderId'] == eSession:
+                    return tMatchModel._metaData['MatchQty']
+        return 0
 
     def getOrderFilledPrice(self, eSession):
         '''
@@ -298,24 +297,24 @@ class StrategyTrade(TradeModel):
         :param orderNo: 委托单号
         :return: 当前公式应用的帐户下当前商品的某个委托单的成交价格
         '''
-        orderNo = self._strategy.getOrderNo(eSession)
-        if orderNo == 0 or not orderNo:
-            return 0
-
         if len(self._userInfo) == 0 or self._selectedUserNo not in self._userInfo:
             raise Exception("请确保您的账号已经在客户端登录")
-
         tUserInfoModel = self._userInfo[self._selectedUserNo]
 
-        if len(tUserInfoModel._match) == 0:
-            return 0
+        if isinstance(eSession, str) and '-' in eSession:
+            orderNo = self._strategy.getOrderNo(eSession)
+            if not orderNo or orderNo not in tUserInfoModel._order:
+                return 0
 
-        if orderNo and orderNo not in tUserInfoModel._match:
-            return 0
+            tMatchModel = tUserInfoModel._order[orderNo]
+            return tMatchModel._metaData['MatchPrice']
+        else:
+            for orderNo in list(tUserInfoModel._order.keys()):
+                tMatchModel = tUserInfoModel._order[orderNo]
+                if tMatchModel._metaData['OrderId'] == eSession:
+                    return tMatchModel._metaData['MatchPrice']
+        return 0
 
-        tMatchModel = tUserInfoModel._order[orderNo]
-
-        return tMatchModel._metaData['MatchPrice'] if 'MatchPrice' in tMatchModel._metaData else 0
 
     def getOrderLot(self, eSession):
         '''
@@ -323,24 +322,23 @@ class StrategyTrade(TradeModel):
         :param orderNo: 委托单号
         :return: 当前公式应用的帐户下当前商品的某个委托单的委托数量
         '''
-        orderNo = self._strategy.getOrderNo(eSession)
-        if orderNo == 0 or not orderNo:
-            return 0
-
         if len(self._userInfo) == 0 or self._selectedUserNo not in self._userInfo:
             raise Exception("请确保您的账号已经在客户端登录")
-
         tUserInfoModel = self._userInfo[self._selectedUserNo]
 
-        if len(tUserInfoModel._order) == 0:
-            return 0
+        if isinstance(eSession, str) and '-' in eSession:
+            orderNo = self._strategy.getOrderNo(eSession)
+            if not orderNo or orderNo not in tUserInfoModel._order:
+                return 0
 
-        if orderNo and orderNo not in tUserInfoModel._order:
-            return 0
-
-        tOrderModel = tUserInfoModel._order[orderNo]
-
-        return tOrderModel._metaData['OrderQty']
+            tOrderModel = tUserInfoModel._order[orderNo]
+            return tOrderModel._metaData['OrderQty']
+        else:
+            for orderNo in list(tUserInfoModel._order.keys()):
+                tMatchModel = tUserInfoModel._order[orderNo]
+                if tMatchModel._metaData['OrderId'] == eSession:
+                    return tMatchModel._metaData['OrderQty']
+        return 0
 
     def getOrderPrice(self, eSession):
         '''
@@ -348,24 +346,23 @@ class StrategyTrade(TradeModel):
         :param orderNo: 委托单号
         :return: 当前公式应用的帐户下当前商品的某个委托单的委托价格
         '''
-        orderNo = self._strategy.getOrderNo(eSession)
-        if orderNo == 0 or not orderNo:
-            return 0
-
         if len(self._userInfo) == 0 or self._selectedUserNo not in self._userInfo:
             raise Exception("请确保您的账号已经在客户端登录")
-
         tUserInfoModel = self._userInfo[self._selectedUserNo]
 
-        if len(tUserInfoModel._order) == 0:
-            return 0
+        if isinstance(eSession, str) and '-' in eSession:
+            orderNo = self._strategy.getOrderNo(eSession)
+            if not orderNo or orderNo not in tUserInfoModel._order:
+                return 0
 
-        if orderNo and orderNo not in tUserInfoModel._order:
-            return 0
-
-        tOrderModel = tUserInfoModel._order[orderNo]
-
-        return tOrderModel._metaData['OrderPrice']
+            tOrderModel = tUserInfoModel._order[orderNo]
+            return tOrderModel._metaData['OrderPrice']
+        else:
+            for orderNo in list(tUserInfoModel._order.keys()):
+                tMatchModel = tUserInfoModel._order[orderNo]
+                if tMatchModel._metaData['OrderId'] == eSession:
+                    return tMatchModel._metaData['OrderPrice']
+        return 0
 
     def getOrderStatus(self, eSession):
         '''
@@ -373,26 +370,22 @@ class StrategyTrade(TradeModel):
         :param orderNo: 委托单号
         :return: 当前公式应用的帐户下当前商品的某个委托单的状态
         '''
-        orderNo = self._strategy.getOrderNo(eSession)
-        if orderNo == 0:
-            return 'N'
-
         if len(self._userInfo) == 0 or self._selectedUserNo not in self._userInfo:
             raise Exception("请确保您的账号已经在客户端登录")
-
         tUserInfoModel = self._userInfo[self._selectedUserNo]
 
-        if len(tUserInfoModel._order) == 0:
-            return '0'
-
-        if orderNo and orderNo not in tUserInfoModel._order:
-            return 'N'
-
-        if not orderNo:
-            return '0'
-
-        tOrderModel = tUserInfoModel._order[orderNo]
-        return tOrderModel._metaData['OrderState'] if 'OrderState' in tOrderModel._metaData else 'N'
+        if isinstance(eSession, str) and '-' in eSession:
+            orderNo = self._strategy.getOrderNo(eSession)
+            if not orderNo or orderNo not in tUserInfoModel._order:
+                return 'N'
+            tOrderModel = tUserInfoModel._order[orderNo]
+            return tOrderModel._metaData['OrderState']
+        else:
+            for orderNo in list(tUserInfoModel._order.keys()):
+                tMatchModel = tUserInfoModel._order[orderNo]
+                if tMatchModel._metaData['OrderId'] == eSession:
+                    return tMatchModel._metaData['OrderState']
+        return 'N'
 
     def getOrderTime(self, eSession):
         '''
@@ -400,27 +393,29 @@ class StrategyTrade(TradeModel):
         :param orderNo: 委托单号
         :return: 当前公式应用的帐户下当前商品的某个委托单的委托时间
         '''
-        orderNo = self._strategy.getOrderNo(eSession)
-        if orderNo == 0 or not orderNo:
-            return 0
-
         if len(self._userInfo) == 0 or self._selectedUserNo not in self._userInfo:
             raise Exception("请确保您的账号已经在客户端登录")
-
         tUserInfoModel = self._userInfo[self._selectedUserNo]
 
-        if len(tUserInfoModel._order) == 0:
+        insertTime = ''
+        if isinstance(eSession, str) and '-' in eSession:
+            orderNo = self._strategy.getOrderNo(eSession)
+            if not orderNo or orderNo not in tUserInfoModel._order:
+                return 0
+            tOrderModel = tUserInfoModel._order[orderNo]
+
+            if 'InsertTime' not in tOrderModel._metaData:
+                return 0
+
+            insertTime = tOrderModel._metaData['InsertTime']
+        else:
+            for orderNo in list(tUserInfoModel._order.keys()):
+                tMatchModel = tUserInfoModel._order[orderNo]
+                if tMatchModel._metaData['OrderId'] == eSession:
+                    insertTime = tMatchModel._metaData['InsertTime']
+                    break
+        if not insertTime:
             return 0
-
-        if orderNo and orderNo not in tUserInfoModel._order:
-            return 0
-
-        tOrderModel = tUserInfoModel._order[orderNo]
-
-        if 'InsertTime' not in tOrderModel._metaData:
-            return 0
-
-        insertTime = tOrderModel._metaData['InsertTime']
         struct_time = time.strptime(insertTime, "%Y-%m-%d %H:%M:%S")
         timeStamp = time.strftime("%Y%m%d.%H%M%S", struct_time)
         return float(timeStamp)

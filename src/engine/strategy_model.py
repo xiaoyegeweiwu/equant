@@ -842,6 +842,9 @@ class StrategyModel(object):
         return 0, eId
 
     def getAOrderNo(self, eId):
+        if not (isinstance(eId, str) and '-' in eId):
+            return ('', '')
+
         orderId = self._strategy.getOrderId(eId)
         if not orderId:
             orderId = ''
