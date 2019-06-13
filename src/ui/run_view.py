@@ -619,6 +619,7 @@ class RunWin(QuantToplevel, QuantFrame):
 
     def insertParams(self):
         """将参数插入参数树中"""
+        print("self._userParam: ", self._userParam)
         for key in self._userParam:
             self.paramTree.insert("", tk.END, values=tuple([key, self._userParam[key]]), tags=key)
 
@@ -1583,6 +1584,8 @@ class RunWin(QuantToplevel, QuantFrame):
             # print("111111: ", itemValues)
             self.config["Params"][itemValues[0]] = itemValues[1]
 
+        print("1111111111: ", self.config["Params"])
+
         # -------------保存用户配置--------------------------
         strategyPath = self._control.getEditorText()["path"]
         userConfig = {
@@ -2075,6 +2078,8 @@ class EntryPopup(tk.Entry):
         self.bind("<Return>", self.saveEdit)
         self.bind("<FocusOut>", self.onFocusOut)
         self.bind("<FocusIn>", self.onFocusIn)
+        # 键盘键位释放
+        self.bind("<KeyRelease>", self.onKeyRelease)
 
     def selectAll(self, *ignore):
         ''' Set selection on the whole text '''
@@ -2093,4 +2098,6 @@ class EntryPopup(tk.Entry):
     def onFocusOut(self, event):
         self.parent.set(self.item, column="#2", value=self.get())
         self.destroy()
-        pass
+
+    def onKeyRelease(self, event):
+        self.parent.set(self.item, column="#2", value=self.get())
