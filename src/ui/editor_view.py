@@ -250,7 +250,7 @@ class QuantEditor(StrategyTree):
         self._dModifyFlag = False
 
         # 焦点移出标志位
-        self.outFlag = False
+        self._outFlag = False
 
         self._context = Context()
 
@@ -385,10 +385,10 @@ class QuantEditor(StrategyTree):
         if self._dModifyFlag:
             return
 
-        if not self.outFlag:
+        if not self._outFlag:
             return
 
-        self.outFlag = False
+        self._outFlag = False
 
         if path:
             editorCodeBefore = self.control.getEditorText()["code"]
@@ -404,7 +404,7 @@ class QuantEditor(StrategyTree):
             self.editor_text.edit_reset()
 
     def onFocusOut(self, event):
-        self.outFlag = True
+        self._outFlag = True
 
     def buttonDown(self, event):
         """鼠标按下记录按下位置"""
