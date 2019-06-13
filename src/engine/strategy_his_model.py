@@ -1182,11 +1182,10 @@ class StrategyHisQuote(object):
         dateTimeStamp = data["DateTimeStamp"]
         tradeDate = data["TradeDate"]
         isLastPriceChanged = data["IsLastPriceChanged"]
-        # 最新价
-        lastPrice = lv1Data[4]
         if not isLastPriceChanged:
             return
-
+        # 最新价
+        lastPrice = lv1Data[4]
         lastOpenPos = self._calc.getLatestOpenOrder(contractNo)
         allPos = self._calc.getPositionInfo(contractNo)
 
