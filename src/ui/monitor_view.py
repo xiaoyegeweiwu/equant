@@ -112,7 +112,6 @@ class QuantMonitor(object):
         :param dataDict: 策略的所有信息
         :return: 需要展示的信息
         """
-        print("11111111111: ", dataDict)
         try:
             Id = dataDict['StrategyId']
             UserNo = dataDict["Config"]["Money"]["UserNo"]
