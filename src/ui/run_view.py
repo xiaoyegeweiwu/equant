@@ -126,13 +126,13 @@ class RunWin(QuantToplevel, QuantFrame):
 
         self.createNotebook(self.topFrame)
 
-        self.fundFrame = tk.Frame(self.topFrame, bg=rgb_to_hex(255, 255, 255))
+        self.fundFrame   = tk.Frame(self.topFrame, bg=rgb_to_hex(255, 255, 255))
         self.sampleFrame = tk.Frame(self.topFrame, bg=rgb_to_hex(255, 255, 255))
-        self.runFrame = tk.Frame(self.topFrame, bg=rgb_to_hex(255, 255, 255))
-        self.paramFrame = tk.Frame(self.topFrame, bg=rgb_to_hex(255, 255, 255))
-        self.contFrame = tk.Frame(self.topFrame, bg=rgb_to_hex(255, 255, 255))
+        self.runFrame    = tk.Frame(self.topFrame, bg=rgb_to_hex(255, 255, 255))
+        self.paramFrame  = tk.Frame(self.topFrame, bg=rgb_to_hex(255, 255, 255))
+        self.contFrame   = tk.Frame(self.topFrame, bg=rgb_to_hex(255, 255, 255))
 
-        self.contFrame.pack(side=tk.TOP, fill=tk.BOTH, expand=tk.YES)
+        # self.contFrame.pack(side=tk.TOP, fill=tk.BOTH, expand=tk.YES)
 
         self.createCont(self.contFrame)
         self.createRun(self.runFrame)
@@ -140,6 +140,8 @@ class RunWin(QuantToplevel, QuantFrame):
         self.createSample(self.sampleFrame)
         self.createParma(self.paramFrame)
         self.addButton(self.topFrame)
+
+        self.contFrame.pack(side=tk.TOP, fill=tk.BOTH, expand=tk.YES)
 
         # TODO： 如果将配置文件内容删除会报错
         self.setDefaultConfigure()
@@ -362,7 +364,6 @@ class RunWin(QuantToplevel, QuantFrame):
         nbFrame.pack_propagate(0)
         nbFrame.pack(side=tk.TOP, fill=tk.X)
 
-
         self.contBtn = tk.Button(nbFrame, text="合约设置", relief=tk.FLAT, padx=14, pady=1.5, bg=self.cColor,
                                  bd=0, highlightthickness=1, command=self.toContFrame)
         self.fundBtn = tk.Button(nbFrame, text="资金设置", relief=tk.FLAT, padx=14, pady=1.5, bg=self.fColor,
@@ -373,7 +374,6 @@ class RunWin(QuantToplevel, QuantFrame):
                                    bd=0, highlightthickness=1, command=self.toSampFrame)
         self.paramBtn = tk.Button(nbFrame, text="参数设置", relief=tk.FLAT, padx=14, pady=1.5, bg=self.pColor,
                                   bd=0, highlightthickness=1, command=self.toParamFrame)
-
 
         self.contBtn.pack(side=tk.LEFT, expand=tk.NO)
         self.runBtn.pack(side=tk.LEFT, expand=tk.NO)
