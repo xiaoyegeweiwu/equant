@@ -929,8 +929,12 @@ class StrategyHisQuote(object):
             return
 
         newDF = pd.DataFrame(allHisData)
-        newDF.sort_values(['TradeDate', 'DateTimeStamp', 'Priority'], ascending=True, inplace=True)
+        newDF.sort_values(['TradeDate', 'Priority', 'DateTimeStamp'], ascending=True, inplace=True)
         newDF.reset_index(drop=True, inplace=True)
+
+
+        #print("new df is ")
+        #print(newDF[["TradeDate", "DateTimeStamp", "Priority", "KLineType", "KLineSlice"]])
         allHisData = newDF.to_dict(orient="index")
 
         # print(newDF[["ContractNo", "TradeDate", "DateTimeStamp"]])
@@ -1046,14 +1050,6 @@ class StrategyHisQuote(object):
         key = (curTriggerInfo["ContractNo"], curTriggerInfo["KLineType"], curTriggerInfo["KLineSlice"])
 
         curBar = self._curBarDict[key].getCurBar()
-        #assert key[0] and key[1] and key[2] and curBar, " Error "
-        # priceInfos[key] = {
-        #     "LastPrice": curBar['LastPrice'],
-        #     "DateTimeStamp": curBar['DateTimeStamp'],
-        #     "TradeDate": curBar['TradeDate'],
-        #     "LastPriceSource": KLineFromHis,
-        # }
-        # self._calc.calcProfit(priceInfos)
         priceInfos[key[0]] = {
             "LastPrice": curBar['LastPrice'],
             "DateTimeStamp": curBar['DateTimeStamp'],

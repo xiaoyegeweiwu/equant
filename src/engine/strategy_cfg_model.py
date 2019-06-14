@@ -280,12 +280,22 @@ class StrategyConfig(object):
             showInfoSimple.append(value)
         return tuple(showInfoSimple)
 
+    priorityDict = {
+        EEQU_KLINE_YEAR: 0,
+        EEQU_KLINE_MONTH: 1,
+        EEQU_KLINE_WEEK: 2,
+        EEQU_KLINE_DayX: 3,
+        EEQU_KLINE_DAY: 4,
+        EEQU_KLINE_HOUR: 5,
+        EEQU_KLINE_MINUTE: 6,
+        EEQU_KLINE_SECOND: 7,
+        EEQU_KLINE_TICK: 8,
+        EEQU_KLINE_TIMEDIVISION: 9,
+    }
+
     def getPriority(self, key):
         kLineTypetupleList = self.getKLineTriggerInfoSimple()
-        if key in kLineTypetupleList:
-            return 1 + kLineTypetupleList.index(key)
-        else:
-            raise IndexError
+        return kLineTypetupleList.index(key)+self.priorityDict[key[1]]+int(key[2])
 
     def _getKLineCount(self, sampleDict):
         if not sampleDict['UseSample']:
