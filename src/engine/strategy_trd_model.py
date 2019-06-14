@@ -229,19 +229,15 @@ class StrategyTrade(TradeModel):
 
         tUserInfoModel = self._userInfo[self._selectedUserNo]
 
-        tMatchModel = None
+        tOrderModel = None
         if isinstance(eSession, str) and '-' in eSession:
-            orderNo = self._strategy.getOrderNo(eSession)
-            if not orderNo or orderNo not in tUserInfoModel._order:
-                return 'N'
-            tMatchModel = tUserInfoModel._order[orderNo]
-            return tMatchModel._metaData['Direct']
+            orderId = self._strategy.getOrderId(eSession)
+            if orderId and orderId in tUserInfoModel._order:
+                tOrderModel = tUserInfoModel._order[orderId]
         else:
-            for orderNo in list(tUserInfoModel._order.keys()):
-                tMatchModel = tUserInfoModel._order[orderNo]
-                if tMatchModel._metaData['OrderId'] == eSession:
-                    return tMatchModel._metaData['Direct']
-        return 'N'
+            if eSession in tUserInfoModel._order:
+                tOrderModel = tUserInfoModel._order[eSession]
+        return tOrderModel._metaData['Direct'] if tOrderModel else 'N'
 
 
     def getOrderEntryOrExit(self, eSession):
@@ -254,18 +250,15 @@ class StrategyTrade(TradeModel):
             raise Exception("请确保您的账号已经在客户端登录")
         tUserInfoModel = self._userInfo[self._selectedUserNo]
 
+        tOrderModel = None
         if isinstance(eSession, str) and '-' in eSession:
-            orderNo = self._strategy.getOrderNo(eSession)
-            if not orderNo or orderNo not in tUserInfoModel._order:
-                return 'N'
-            tMatchModel = tUserInfoModel._order[orderNo]
-            return tMatchModel._metaData['Offset']
+            orderId = self._strategy.getOrderId(eSession)
+            if orderId and orderId in tUserInfoModel._order:
+                tOrderModel = tUserInfoModel._order[orderId]
         else:
-            for orderNo in list(tUserInfoModel._order.keys()):
-                tMatchModel = tUserInfoModel._order[orderNo]
-                if tMatchModel._metaData['OrderId'] == eSession:
-                    return tMatchModel._metaData['Offset']
-        return 'N'
+            if eSession in tUserInfoModel._order:
+                tOrderModel = tUserInfoModel._order[eSession]
+        return tOrderModel._metaData['Offset'] if tOrderModel else'N'
 
     def getOrderFilledLot(self, eSession):
         '''
@@ -277,19 +270,15 @@ class StrategyTrade(TradeModel):
             raise Exception("请确保您的账号已经在客户端登录")
         tUserInfoModel = self._userInfo[self._selectedUserNo]
 
+        tOrderModel = None
         if isinstance(eSession, str) and '-' in eSession:
-            orderNo = self._strategy.getOrderNo(eSession)
-            if not orderNo or orderNo not in tUserInfoModel._order:
-                return 0
-
-            tMatchModel = tUserInfoModel._order[orderNo]
-            return tMatchModel._metaData['MatchQty']
+            orderId = self._strategy.getOrderId(eSession)
+            if orderId and orderId in tUserInfoModel._order:
+                tOrderModel = tUserInfoModel._order[orderId]
         else:
-            for orderNo in list(tUserInfoModel._order.keys()):
-                tMatchModel = tUserInfoModel._order[orderNo]
-                if tMatchModel._metaData['OrderId'] == eSession:
-                    return tMatchModel._metaData['MatchQty']
-        return 0
+            if eSession in tUserInfoModel._order:
+                tOrderModel = tUserInfoModel._order[eSession]
+        return tOrderModel._metaData['MatchQty'] if tOrderModel else 0
 
     def getOrderFilledPrice(self, eSession):
         '''
@@ -301,19 +290,15 @@ class StrategyTrade(TradeModel):
             raise Exception("请确保您的账号已经在客户端登录")
         tUserInfoModel = self._userInfo[self._selectedUserNo]
 
+        tOrderModel = None
         if isinstance(eSession, str) and '-' in eSession:
-            orderNo = self._strategy.getOrderNo(eSession)
-            if not orderNo or orderNo not in tUserInfoModel._order:
-                return 0
-
-            tMatchModel = tUserInfoModel._order[orderNo]
-            return tMatchModel._metaData['MatchPrice']
+            orderId = self._strategy.getOrderId(eSession)
+            if orderId and orderId in tUserInfoModel._order:
+                tOrderModel = tUserInfoModel._order[orderId]
         else:
-            for orderNo in list(tUserInfoModel._order.keys()):
-                tMatchModel = tUserInfoModel._order[orderNo]
-                if tMatchModel._metaData['OrderId'] == eSession:
-                    return tMatchModel._metaData['MatchPrice']
-        return 0
+            if eSession in tUserInfoModel._order:
+                tOrderModel = tUserInfoModel._order[eSession]
+        return tOrderModel._metaData['MatchPrice'] if tOrderModel else 0
 
 
     def getOrderLot(self, eSession):
@@ -326,19 +311,15 @@ class StrategyTrade(TradeModel):
             raise Exception("请确保您的账号已经在客户端登录")
         tUserInfoModel = self._userInfo[self._selectedUserNo]
 
+        tOrderModel = None
         if isinstance(eSession, str) and '-' in eSession:
-            orderNo = self._strategy.getOrderNo(eSession)
-            if not orderNo or orderNo not in tUserInfoModel._order:
-                return 0
-
-            tOrderModel = tUserInfoModel._order[orderNo]
-            return tOrderModel._metaData['OrderQty']
+            orderId = self._strategy.getOrderId(eSession)
+            if orderId and orderId in tUserInfoModel._order:
+                tOrderModel = tUserInfoModel._order[orderId]
         else:
-            for orderNo in list(tUserInfoModel._order.keys()):
-                tMatchModel = tUserInfoModel._order[orderNo]
-                if tMatchModel._metaData['OrderId'] == eSession:
-                    return tMatchModel._metaData['OrderQty']
-        return 0
+            if eSession in tUserInfoModel._order:
+                tOrderModel = tUserInfoModel._order[eSession]
+        return tOrderModel._metaData['OrderQty'] if tOrderModel else 0
 
     def getOrderPrice(self, eSession):
         '''
@@ -350,19 +331,15 @@ class StrategyTrade(TradeModel):
             raise Exception("请确保您的账号已经在客户端登录")
         tUserInfoModel = self._userInfo[self._selectedUserNo]
 
+        tOrderModel = None
         if isinstance(eSession, str) and '-' in eSession:
-            orderNo = self._strategy.getOrderNo(eSession)
-            if not orderNo or orderNo not in tUserInfoModel._order:
-                return 0
-
-            tOrderModel = tUserInfoModel._order[orderNo]
-            return tOrderModel._metaData['OrderPrice']
+            orderId = self._strategy.getOrderId(eSession)
+            if orderId and orderId in tUserInfoModel._order:
+                tOrderModel = tUserInfoModel._order[orderId]
         else:
-            for orderNo in list(tUserInfoModel._order.keys()):
-                tMatchModel = tUserInfoModel._order[orderNo]
-                if tMatchModel._metaData['OrderId'] == eSession:
-                    return tMatchModel._metaData['OrderPrice']
-        return 0
+            if eSession in tUserInfoModel._order:
+                tOrderModel = tUserInfoModel._order[eSession]
+        return tOrderModel._metaData['OrderPrice'] if tOrderModel else 0
 
     def getOrderStatus(self, eSession):
         '''
@@ -374,18 +351,15 @@ class StrategyTrade(TradeModel):
             raise Exception("请确保您的账号已经在客户端登录")
         tUserInfoModel = self._userInfo[self._selectedUserNo]
 
+        tOrderModel = None
         if isinstance(eSession, str) and '-' in eSession:
-            orderNo = self._strategy.getOrderNo(eSession)
-            if not orderNo or orderNo not in tUserInfoModel._order:
-                return 'N'
-            tOrderModel = tUserInfoModel._order[orderNo]
-            return tOrderModel._metaData['OrderState']
+            orderId = self._strategy.getOrderId(eSession)
+            if orderId and orderId in tUserInfoModel._order:
+                tOrderModel = tUserInfoModel._order[orderId]
         else:
-            for orderNo in list(tUserInfoModel._order.keys()):
-                tMatchModel = tUserInfoModel._order[orderNo]
-                if tMatchModel._metaData['OrderId'] == eSession:
-                    return tMatchModel._metaData['OrderState']
-        return 'N'
+            if eSession in tUserInfoModel._order:
+                tOrderModel = tUserInfoModel._order[eSession]
+        return tOrderModel._metaData['OrderState'] if tOrderModel else 'N'
 
     def getOrderTime(self, eSession):
         '''
@@ -397,25 +371,21 @@ class StrategyTrade(TradeModel):
             raise Exception("请确保您的账号已经在客户端登录")
         tUserInfoModel = self._userInfo[self._selectedUserNo]
 
-        insertTime = ''
+        tOrderModel = None
         if isinstance(eSession, str) and '-' in eSession:
-            orderNo = self._strategy.getOrderNo(eSession)
-            if not orderNo or orderNo not in tUserInfoModel._order:
-                return 0
-            tOrderModel = tUserInfoModel._order[orderNo]
-
-            if 'InsertTime' not in tOrderModel._metaData:
-                return 0
-
-            insertTime = tOrderModel._metaData['InsertTime']
+            orderId = self._strategy.getOrderId(eSession)
+            if orderId and orderId in tUserInfoModel._order:
+                tOrderModel = tUserInfoModel._order[orderId]
         else:
-            for orderNo in list(tUserInfoModel._order.keys()):
-                tMatchModel = tUserInfoModel._order[orderNo]
-                if tMatchModel._metaData['OrderId'] == eSession:
-                    insertTime = tMatchModel._metaData['InsertTime']
-                    break
+            if eSession in tUserInfoModel._order:
+                tOrderModel = tUserInfoModel._order[eSession]
+        if not tOrderModel or 'InsertTime' not in tOrderModel._metaData:
+            return 0
+
+        insertTime = tOrderModel._metaData['InsertTime']
         if not insertTime:
             return 0
+
         struct_time = time.strptime(insertTime, "%Y-%m-%d %H:%M:%S")
         timeStamp = time.strftime("%Y%m%d.%H%M%S", struct_time)
         return float(timeStamp)
@@ -429,8 +399,8 @@ class StrategyTrade(TradeModel):
             return -1
 
         orderId = -1
-        for orderNo in list(tUserInfoModel._order.keys()):
-            orderModel = tUserInfoModel._order[orderNo]
+        for orderKey in list(tUserInfoModel._order.keys()):
+            orderModel = tUserInfoModel._order[orderKey]
             if not contNo1 or contNo1 == orderModel._metaData['Cont']:
                 if orderId == -1 or orderId > orderModel._metaData['OrderId']:
                     orderId = orderModel._metaData['OrderId']
@@ -446,8 +416,8 @@ class StrategyTrade(TradeModel):
             return -1
 
         minOrderId = -1
-        for orderNo in list(tUserInfoModel._order.keys()):
-            orderModel = tUserInfoModel._order[orderNo]
+        for orderKey in list(tUserInfoModel._order.keys()):
+            orderModel = tUserInfoModel._order[orderKey]
             if not contNo1 or contNo1 == orderModel._metaData['Cont']:
                 if orderModel._metaData['OrderId'] <= orderId:
                     continue
@@ -469,8 +439,8 @@ class StrategyTrade(TradeModel):
             return -1
 
         orderId = -1
-        for orderNo in list(tUserInfoModel._order.keys()):
-            orderModel = tUserInfoModel._order[orderNo]
+        for orderKey in list(tUserInfoModel._order.keys()):
+            orderModel = tUserInfoModel._order[orderKey]
             if not contNo1 or contNo1 == orderModel._metaData['Cont']:
                 # 排队中
                 if orderModel._metaData['OrderState'] != osQueued:
@@ -489,8 +459,8 @@ class StrategyTrade(TradeModel):
             return -1
 
         minOrderId = -1
-        for orderNo in list(tUserInfoModel._order.keys()):
-            orderModel = tUserInfoModel._order[orderNo]
+        for orderKey in list(tUserInfoModel._order.keys()):
+            orderModel = tUserInfoModel._order[orderKey]
             if not contNo1 or contNo1 == orderModel._metaData['Cont']:
                 # 排队中
                 if orderModel._metaData['OrderState'] != osQueued:
@@ -514,11 +484,10 @@ class StrategyTrade(TradeModel):
         if len(tUserInfoModel._order) == 0:
             return ""
 
-        for orderNo in list(tUserInfoModel._order.keys()):
-            orderModel = tUserInfoModel._order[orderNo]
-            if orderModel._metaData['OrderId'] == orderId:
-                return orderModel._metaData['Cont']
-        return ""
+        orderModel = None
+        if orderId in tUserInfoModel._order:
+            orderModel = tUserInfoModel._order[orderId]
+        return orderModel._metaData['Cont'] if orderModel else ""
 
     def deleteOrder(self, eSession):
         '''
@@ -526,24 +495,26 @@ class StrategyTrade(TradeModel):
         :param orderId: 所要撤委托单的定单号
         :return: 发送成功返回True, 发送失败返回False
         '''
-        if not eSession:
-            return False
+        if self._selectedUserNo not in self._userInfo:
+            raise Exception("请先在极星客户端登录您的交易账号")
 
-        orderNo = self._strategy.getOrderNo(eSession)
-        if not orderNo:
+        orderId = self._strategy.getOrderId(eSession)
+        if not orderId:
             return False
 
         orderId = None
-        userNo = self._selectedUserNo
-        userInfoModel = self._userInfo[userNo]
-        for orderModel in userInfoModel._order.values():
-            if orderModel._metaData['OrderNo'] == orderNo:
-                orderId = orderModel._metaData['OrderId']
+        userInfoModel = self._userInfo[self._selectedUserNo]
+        if orderId not in userInfoModel._order:
+            return False
 
         return self.deleteOrderByOrderId(orderId)
 
     def deleteOrderByOrderId(self, orderId):
-        if not orderId:
+        if self._selectedUserNo not in self._userInfo:
+            raise Exception("请先在极星客户端登录您的交易账号")
+
+        userInfoModel = self._userInfo[self._selectedUserNo]
+        if orderId not in userInfoModel._order:
             return False
 
         aOrder = {
