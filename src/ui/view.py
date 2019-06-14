@@ -6,7 +6,7 @@ from .language import Language
 from .editor_view import QuantEditor,QuantEditorHead
 from .helper_view import QuantHelper,QuantHelperHead, QuantHelperText
 from .monitor_view import QuantMonitor
-from .com_view import RunWin
+from .run_view import RunWin
 
 from report.reportview import ReportView
 from .com_view import HistoryToplevel

@@ -370,6 +370,8 @@ class RunMenu(object):
 
     def onParam(self):
         """属性设置"""
-        param = self._controller.getUserParam(self._strategyId)
-        path = self._controller.getEditorText()["path"]
-        self._controller.load(path, param)
+        # 选择多个时，则选择第一个策略生效
+        self._controller.paramSetting(self._strategyId)
+        # param = self._controller.getUserParam(self._strategyId)
+        # path = self._controller.getEditorText()["path"]
+        # self._controller.load(path, param)
