@@ -123,8 +123,6 @@ class StrategyConfig(object):
         sample = argsDict['Sample']
         useSample = ('BeginTime' in sample) or ('KLineCount' in sample) or ('AllK' in sample)
         sampleInfo = {
-            # 'KLineType' : sample['KLineType'],
-            # 'KLineSlice': sample['KLineSlice'],
             'BeginTime' : sample['BeginTime'] if 'BeginTime' in sample else '',
             'KLineCount': sample['KLineCount'] if 'KLineCount' in sample else 0,
             'AllK'      : sample['AllK'] if 'AllK' in sample else False,
@@ -569,21 +567,32 @@ class StrategyConfig(object):
             self._metaData['Sample']['Display'] = {"ContractNo" : contNo, "KLineType": barType, "KLineSlice": barInterval}
 
         # 更新回测起始点信息
-        kLineCount = 1
+        kLineCount = 0
+        beginTime = ''
+        allK = False
+        useSample = True
         if isinstance(sampleConfig, int):
-            if sampleConfig == 0:
-                kLineCount = 1
-            elif sampleConfig > 0:
+            # kLineCount
+            if sampleConfig > 0:
                 kLineCount = sampleConfig
+            else:
+                kLineCount = 1
         elif sampleConfig == 'N':
+            # 不使用K线
             kLineCount = 1
+            # useSample = False
+        elif isinstance(sampleConfig, str) and self.isVaildDate(sampleConfig, "%Y%m%d"):
+            # 日期
+            beginTime = sampleConfig
+        elif sampleConfig == 'A':
+            allK = True
         sampleInfo = {
             'KLineType': barType,
             'KLineSlice': barInterval,
-            'BeginTime' : sampleConfig if isinstance(sampleConfig, str) and self.isVaildDate(sampleConfig, "%Y%m%d") else '',
+            'BeginTime' : beginTime,
             'KLineCount' : kLineCount,
-            'AllK' : True if sampleConfig == 'A' else False,
-            'UseSample' : True,
+            'AllK' : allK,
+            'UseSample' : useSample,
             'Trigger' : trigger,
         }
 
