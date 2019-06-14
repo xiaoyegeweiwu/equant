@@ -217,12 +217,24 @@ class StrategyEngine(object):
         if event is None:
             return
         eg2stQueue = self._eg2stQueueDict[strategyId]
-        eg2stQueue.put(event)
+        while True:
+            try:
+                eg2stQueue.put_nowait(event)
+                break
+            except queue.Full:
+                time.sleep(0.1)
+                self.logger.error(f"engine向策略发事件时卡住，策略id:{strategyId}, 事件号: {event.getEventCode()}")
 
     def _sendEvent2StrategyForce(self, strategyId, event):
         eg2stQueue = self._eg2stQueueDict[strategyId]
-        eg2stQueue.put(event)
-        
+        while True:
+            try:
+                eg2stQueue.put_nowait(event)
+                break
+            except queue.Full:
+                time.sleep(0.1)
+                self.logger.error(f"engine强制向策略发事件时卡住，策略id:{strategyId}, 事件号: {event.getEventCode()}")
+
     def _sendEvent2AllStrategy(self, event):
         for id in self._eg2stQueueDict:
             self._sendEvent2Strategy(id, event)

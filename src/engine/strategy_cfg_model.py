@@ -249,6 +249,7 @@ class StrategyConfig(object):
 
     def getKLineSubsInfo(self):
         kLineTypetupleList, kLineTypeDictList, subDict = self.getSampleInfo()
+        print(subDict.values())
         return subDict.values()
 
     def getKLineKindsInfo(self):
