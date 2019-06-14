@@ -3254,6 +3254,25 @@ class BaseApi(object):
          '''
         return self._dataModel.getAllQueueOrderNo(contractNo)
 
+    def A_LatestFilledTime(self, contractNo):
+        '''
+        【说明】
+              返回当前账户最新一笔完全成交委托单对应的时间。
+
+        【语法】
+              float A_LatestFilledTime(string contractNo)
+
+        【参数】
+              contractNo 合约代码，默认为遍历所有合约，指定后只遍历指定合约。
+
+        【备注】
+              若返回值为-1，表示没有对应的完全成交的委托，否则，返回最新一笔完全成交委托单对应的时间，返回格式为YYYYMMDD.hhmmss的数值。
+
+        【示例】
+              无
+         '''
+        return self._dataModel.getALatestFilledTime(contractNo)
+
     def A_OrderContractNo(self, orderId):
         '''
         【说明】
@@ -6281,6 +6300,9 @@ def A_NextQueueOrderNo(localOrderId=0, contractNo1='', contractNo2=''):
 
 def A_AllQueueOrderNo(contractNo=''):
     return baseApi.A_AllQueueOrderNo(contractNo)
+
+def A_LatestFilledTime(contractNo=''):
+    return baseApi.A_LatestFilledTime(contractNo)
 
 def A_OrderContractNo(localOrderId):
     return baseApi.A_OrderContractNo(localOrderId)

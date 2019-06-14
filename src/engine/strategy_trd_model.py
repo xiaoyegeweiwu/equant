@@ -476,6 +476,23 @@ class StrategyTrade(TradeModel):
 
         return minOrderId
 
+    def getALatestFilledTime(self, contNo):
+        if self._selectedUserNo not in self._userInfo:
+            raise Exception("请先在极星客户端登录您的交易账号")
+
+        tUserInfoModel = self._userInfo[self._selectedUserNo]
+        latestTime = -1
+        for orderId in list(tUserInfoModel._order.keys()):
+            tOrderModel = tUserInfoModel._order[orderId]
+            if not contNo or tOrderModel._metaData['Cont'] == contNo:
+                if tOrderModel._metaData['OrderState'] == osFilled:
+                    updateTime = tOrderModel._metaData['UpdateTime']
+                    struct_time = time.strptime(updateTime, "%Y-%m-%d %H:%M:%S")
+                    timeStamp = time.strftime("%Y%m%d.%H%M%S", struct_time)
+                    if float(timeStamp) > latestTime:
+                        latestTime = float(timeStamp)
+        return latestTime
+
     def getOrderContractNo(self, orderId):
         if self._selectedUserNo not in self._userInfo:
             raise Exception("请先在极星客户端登录您的交易账号")

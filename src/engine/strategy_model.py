@@ -659,6 +659,9 @@ class StrategyModel(object):
                 orderIdList.append(orderId)
         return orderIdList
 
+    def getALatestFilledTime(self, contNo):
+        return self._trdModel.getALatestFilledTime(contNo)
+
     def getOrderContractNo(self, orderId):
         return self._trdModel.getOrderContractNo(orderId)
 
