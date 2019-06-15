@@ -631,7 +631,10 @@ class StrategyEngine(object):
             return
 
         self._trdModel.setStatus(TM_STATUS_POSITION)
-        
+
+        #
+        self._pyApi.reqSpreadContractMapping()
+        self._pyApi.reqTrendContractMapping()
         # 交易基础数据查询完成，定时查询资金
         self._createMoneyTimer()
             
