@@ -46,8 +46,7 @@ class StrategyEngine(object):
         self._api2egQueue = queue.Queue()
         # Strategy->Engine, 初始化、行情、K线、交易等
         self._st2egQueue = Queue()
-        # 创建主处理线程, 从api和策略进程收数据处理
-        self._startMainThread()
+
         # 创建_pyApi对象
         self._pyApi = PyAPI(self.logger, self._api2egQueue) 
         
@@ -71,6 +70,9 @@ class StrategyEngine(object):
         self._resumeStrategy()
         self._engineOrderModel = EngineOrderModel(self._strategyOrder)
         self._enginePosModel = EnginePosModel()
+
+        # 创建主处理线程, 从api和策略进程收数据处理
+        self._startMainThread()
         self.logger.debug('Initialize strategy engine ok!')
 
     def _resumeStrategy(self):
@@ -215,12 +217,24 @@ class StrategyEngine(object):
         if event is None:
             return
         eg2stQueue = self._eg2stQueueDict[strategyId]
-        eg2stQueue.put(event)
+        while True:
+            try:
+                eg2stQueue.put_nowait(event)
+                break
+            except queue.Full:
+                time.sleep(0.1)
+                self.logger.error(f"engine向策略发事件时卡住，策略id:{strategyId}, 事件号: {event.getEventCode()}")
 
     def _sendEvent2StrategyForce(self, strategyId, event):
         eg2stQueue = self._eg2stQueueDict[strategyId]
-        eg2stQueue.put(event)
-        
+        while True:
+            try:
+                eg2stQueue.put_nowait(event)
+                break
+            except queue.Full:
+                time.sleep(0.1)
+                self.logger.error(f"engine强制向策略发事件时卡住，策略id:{strategyId}, 事件号: {event.getEventCode()}")
+
     def _sendEvent2AllStrategy(self, event):
         for id in self._eg2stQueueDict:
             self._sendEvent2Strategy(id, event)

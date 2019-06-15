@@ -184,6 +184,7 @@ _all_func_ = {
                     ['A_FirstQueueOrderNo' , '当前账户第一个排队(可撤)订单'],
                     ['A_NextQueueOrderNo'  , '当前账户下一个排队(可撤)订单'],
                     ['A_AllQueueOrderNo'   , '当前账户所有排队(可撤)订单'],
+                    ['A_LatestFilledTime'  , '当前账户最新一笔成交委托对应的时间'],
                     ['A_OrderContractNo'   , '订单的合约号'],
                     ['A_SendOrder'         , '下单'],
                     ['A_DeleteOrder'       , '撤单'],

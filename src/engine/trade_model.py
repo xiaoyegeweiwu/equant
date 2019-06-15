@@ -69,11 +69,11 @@ class TUserInfoModel:
             self._money[currencyNo].updateMoney(data)
 
     def updateOrder(self, data):
-        orderNo = data['OrderNo']
-        if orderNo not in self._order:
-            self._order[orderNo] = TOrderModel(self.logger, data)
+        orderId = data['OrderId']
+        if orderId not in self._order:
+            self._order[orderId] = TOrderModel(self.logger, data)
         else:
-            order = self._order[orderNo]
+            order = self._order[orderId]
             order.updateOrder(data)
 
     def updateMatch(self, data):
