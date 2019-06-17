@@ -1280,14 +1280,6 @@ class PyAPI(object):
         apiEvent.setContractNo(self.getUserContractNo(apiEvent.getContractNo()))
         # print("[py2c] response 2", apiEvent.getContractNo())
 
-        # 3T表示3S
-        if klineType == EEQU_KLINE_TICK and apiEvent.getKLineSlice() >=1 :
-            apiEvent.setKLineType(EEQU_KLINE_SECOND)
-
-        # 套利合约映射
-
-        # 合约映射
-
         dataList = []
         for i in range(fieldCount):
             buf = string_at(dataAddr + fieldSize * i, fieldSize)
