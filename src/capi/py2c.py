@@ -313,15 +313,15 @@ class PyAPI(object):
             data.KLineIndex                                 = d['KLineIndex']
             data.TradeDate                                  = d['TradeDate']
             data.DateTimeStamp                              = d['DateTimeStamp']
-            data.TotalQty                                   = d['TotalQty']
-            data.PositionQty                                = d['PositionQty']
+            data.TotalQty                                   = int(d['TotalQty']+0.5)
+            data.PositionQty                                = int(d['PositionQty']+0.5)
             data.LastPrice                                  = d['LastPrice']
-            data.KLineData.KLineData1.LastQty               = d['LastQty']
-            data.KLineData.KLineData1.PositionChg           = d['PositionChg']
+            data.KLineData.KLineData1.LastQty               = int(d['LastQty']+0.5)
+            data.KLineData.KLineData1.PositionChg           = int(d['PositionChg']+0.5)
             data.KLineData.KLineData1.BuyPrice              = d['BuyPrice']
             data.KLineData.KLineData1.SellPrice             = d['SellPrice']
-            data.KLineData.KLineData1.BuyQty                = d['BuyQty']
-            data.KLineData.KLineData1.SellQty               = d['SellQty']
+            data.KLineData.KLineData1.BuyQty                = int(d['BuyQty']+0.5)
+            data.KLineData.KLineData1.SellQty               = int(d['SellQty']+0.5)
             curBuf = cbuf + sizeof(EEquKLineData) * i
             cData = string_at(addressof(data), sizeof(EEquKLineData))
             memmove(curBuf, cData, sizeof(EEquKLineData))
@@ -950,7 +950,7 @@ class PyAPI(object):
         req.UserNo = data['UserNo'].encode()
         req.Sign = data['Sign'].encode()
 
-        contractNo = self.getInnerContractNo(data["ContractNo"])
+        contractNo = self.getInnerContractNo(data["Cont"])
         req.Cont = contractNo.encode()
         req.OrderType = data['OrderType'].encode()
         req.ValidType = data['ValidType'].encode()
@@ -996,7 +996,7 @@ class PyAPI(object):
         modifyReq.UserNo = data['UserNo'].encode()
         modifyReq.Sign = data['Sign'].encode()
 
-        contractNo = self.getInnerContractNo(data["ContractNo"])
+        contractNo = self.getInnerContractNo(data["Cont"])
         modifyReq.Cont = contractNo.encode()
         modifyReq.OrderType = data['OrderType'].encode()
         modifyReq.ValidType = data['ValidType'].encode()
@@ -1279,14 +1279,6 @@ class PyAPI(object):
         # print("[py2c] response 1", apiEvent.getContractNo())
         apiEvent.setContractNo(self.getUserContractNo(apiEvent.getContractNo()))
         # print("[py2c] response 2", apiEvent.getContractNo())
-
-        # 3T表示3S
-        if klineType == EEQU_KLINE_TICK and apiEvent.getKLineSlice >=1 :
-            apiEvent.setKLineType(EEQU_KLINE_SECOND)
-
-        # 套利合约映射
-
-        # 合约映射
 
         dataList = []
         for i in range(fieldCount):
