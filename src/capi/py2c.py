@@ -1281,7 +1281,7 @@ class PyAPI(object):
         # print("[py2c] response 2", apiEvent.getContractNo())
 
         # 3T表示3S
-        if klineType == EEQU_KLINE_TICK and apiEvent.getKLineSlice >=1 :
+        if klineType == EEQU_KLINE_TICK and apiEvent.getKLineSlice() >=1 :
             apiEvent.setKLineType(EEQU_KLINE_SECOND)
 
         # 套利合约映射
