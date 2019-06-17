@@ -758,7 +758,7 @@ class BaseApi(object):
               contractNo 合约编号
 
         【备注】
-              返回Date类型
+              返回当前公式应用商品的最新成交日期，格式为YYYYMMDD整数表示的日期。
 
         【实例】
               无
@@ -796,7 +796,8 @@ class BaseApi(object):
               contractNo 合约编号
 
         【备注】
-              返回Time类型
+              返回当前公式应用商品的最新成交时间，以格式为0.HHMMSSmmm浮点数表示的时间。
+
 
         【实例】
               无
