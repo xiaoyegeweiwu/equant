@@ -920,6 +920,8 @@ class StrategyEngine(object):
 
     # 当策略退出成功时
     def _cleanStrategyInfo(self, strategyId):
+        self._isEffective[strategyId] = False
+        self._isSt2EngineDataEffective[strategyId] = False
         # 清除即时行情数据观察者
         for k, v in self._quoteOberverDict.items():
             if strategyId in v:
@@ -959,6 +961,7 @@ class StrategyEngine(object):
         strategyId = event.getStrategyId()
         # 还在正常运行
         if strategyId in self._isEffective and self._isEffective[strategyId]:
+            self._isEffective[strategyId] = False
             self._sendEvent2StrategyForce(strategyId, event)
         # 停止
         elif self._strategyMgr.getStrategyState(strategyId) == ST_STATUS_QUIT:

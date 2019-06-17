@@ -165,7 +165,7 @@ class PyAPI(object):
                 'Data' : 品种编号 str
             }
         '''
-        #self.logger.debug('request timebucket')
+        # self.logger.debug('request timebucket')
         if event.getData() == '':
             return
         
@@ -282,7 +282,9 @@ class PyAPI(object):
         data = event.getData()
         req.StrategyId = event.getStrategyId()
         req.StrategyName = data['StrategyName'].encode()
-        req.ContractNo = data['ContractNo'].encode()
+
+        innerContractNo = self.getInnerContractNo(data["ContractNo"])
+        req.ContractNo = innerContractNo.encode()
         req.KLineType = data['KLineType'].encode()
         req.KLineSlice = data['KLineSlice']
         self._cDll.E_KLineStrategySwitch(byref(sessionId), byref(req))
@@ -353,7 +355,7 @@ class PyAPI(object):
             data.TotalQty                                    = d['TotalQty']
             data.PositionQty                                 = d['PositionQty']
             data.LastPrice                                   = d['LastPrice']
-            data.KLineData.KLineData0.KLineQty               = int(d['KLineQty'])
+            data.KLineData.KLineData0.KLineQty               = int(d['KLineQty']+0.5)
             data.KLineData.KLineData0.OpeningPrice           = d['OpeningPrice']
             data.KLineData.KLineData0.HighPrice              = d['HighPrice']
             data.KLineData.KLineData0.LowPrice               = d['LowPrice']
