@@ -313,15 +313,15 @@ class PyAPI(object):
             data.KLineIndex                                 = d['KLineIndex']
             data.TradeDate                                  = d['TradeDate']
             data.DateTimeStamp                              = d['DateTimeStamp']
-            data.TotalQty                                   = d['TotalQty']
-            data.PositionQty                                = d['PositionQty']
+            data.TotalQty                                   = int(d['TotalQty']+0.5)
+            data.PositionQty                                = int(d['PositionQty']+0.5)
             data.LastPrice                                  = d['LastPrice']
-            data.KLineData.KLineData1.LastQty               = d['LastQty']
-            data.KLineData.KLineData1.PositionChg           = d['PositionChg']
+            data.KLineData.KLineData1.LastQty               = int(d['LastQty']+0.5)
+            data.KLineData.KLineData1.PositionChg           = int(d['PositionChg']+0.5)
             data.KLineData.KLineData1.BuyPrice              = d['BuyPrice']
             data.KLineData.KLineData1.SellPrice             = d['SellPrice']
-            data.KLineData.KLineData1.BuyQty                = d['BuyQty']
-            data.KLineData.KLineData1.SellQty               = d['SellQty']
+            data.KLineData.KLineData1.BuyQty                = int(d['BuyQty']+0.5)
+            data.KLineData.KLineData1.SellQty               = int(d['SellQty']+0.5)
             curBuf = cbuf + sizeof(EEquKLineData) * i
             cData = string_at(addressof(data), sizeof(EEquKLineData))
             memmove(curBuf, cData, sizeof(EEquKLineData))
