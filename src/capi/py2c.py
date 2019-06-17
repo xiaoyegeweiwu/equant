@@ -950,7 +950,7 @@ class PyAPI(object):
         req.UserNo = data['UserNo'].encode()
         req.Sign = data['Sign'].encode()
 
-        contractNo = self.getInnerContractNo(data["ContractNo"])
+        contractNo = self.getInnerContractNo(data["Cont"])
         req.Cont = contractNo.encode()
         req.OrderType = data['OrderType'].encode()
         req.ValidType = data['ValidType'].encode()
@@ -996,7 +996,7 @@ class PyAPI(object):
         modifyReq.UserNo = data['UserNo'].encode()
         modifyReq.Sign = data['Sign'].encode()
 
-        contractNo = self.getInnerContractNo(data["ContractNo"])
+        contractNo = self.getInnerContractNo(data["Cont"])
         modifyReq.Cont = contractNo.encode()
         modifyReq.OrderType = data['OrderType'].encode()
         modifyReq.ValidType = data['ValidType'].encode()
