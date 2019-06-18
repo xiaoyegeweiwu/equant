@@ -512,17 +512,13 @@ class StrategyTrade(TradeModel):
         :param orderId: 所要撤委托单的定单号
         :return: 发送成功返回True, 发送失败返回False
         '''
-        if self._selectedUserNo not in self._userInfo:
-            raise Exception("请先在极星客户端登录您的交易账号")
-
-        orderId = self._strategy.getOrderId(eSession)
-        if not orderId:
-            return False
-
-        orderId = None
-        userInfoModel = self._userInfo[self._selectedUserNo]
-        if orderId not in userInfoModel._order:
-            return False
+        orderId = ''
+        if isinstance(eSession, str) and '-' in eSession:
+            orderId = self._strategy.getOrderId(eSession)
+            if not orderId:
+                return False
+        else:
+            orderId = eSession
 
         return self.deleteOrderByOrderId(orderId)
 
