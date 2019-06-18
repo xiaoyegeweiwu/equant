@@ -910,6 +910,7 @@ class StrategyEngine(object):
         # prevent other threads put data in the queue
         # make sure quit event is the last
         strategyId = event.getStrategyId()
+        self.logger.info(f"策略{strategyId}收到停止信号")
         if strategyId not in self._eg2stQueueDict or self._isEffective[strategyId] is False:
             return
         self._isEffective[event.getStrategyId()] = False
@@ -932,6 +933,7 @@ class StrategyEngine(object):
 
     # 队列里面不会有其他事件
     def _onStrategyQuitCom(self, event):
+        self.sendEvent2UI(event)
         self._cleanStrategyInfo(event.getStrategyId())
         self._strategyMgr.quitStrategy(event)
 
@@ -971,6 +973,7 @@ class StrategyEngine(object):
             self._strategyMgr.removeExceptionStrategy(event)
 
     def _onStrategyRemoveCom(self, event):
+        self.sendEvent2UI(event)
         self._cleanStrategyInfo(event.getStrategyId())
         self._strategyMgr.removeRunningStrategy(event)
 
@@ -1052,3 +1055,6 @@ class StrategyEngine(object):
 
     def _syncStrategyConfig(self, event):
         self._strategyMgr.syncStrategyConfig(event)
+
+    def sendEvent2UI(self, event):
+        self._eg2uiQueue.put(event)
