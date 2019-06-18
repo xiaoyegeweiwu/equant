@@ -433,7 +433,8 @@ class SignalText(ParentText):
     def setText(self, text="", file=None):
         self.config(state="normal")
         self.config(state="normal")
-        self.insert("end", text + "\n")
+        # self.insert("end", text + "\n")
+        self.insert("end", text)
         self.config(state="disabled")
         self.update()
         self.see("end")
@@ -468,7 +469,8 @@ class MonitorText(ParentText):
     def setText(self, text="", file=None):
         self.config(state="normal")
         self.config(state="normal")
-        self.insert("end", text + "\n")
+        # self.insert("end", text + "\n")
+        self.insert("end", text)
         self.config(state="disabled")
         self.update()
         self.see("end")
