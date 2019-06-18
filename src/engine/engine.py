@@ -913,7 +913,7 @@ class StrategyEngine(object):
         self.logger.info(f"策略{strategyId}收到停止信号")
         if strategyId not in self._eg2stQueueDict or self._isEffective[strategyId] is False:
             return
-        self._isEffective[event.getStrategyId()] = False
+        self._isEffective[strategyId] = False
 
         # to solve broken pip error
         eg2stQueue = self._eg2stQueueDict[strategyId]
@@ -964,6 +964,7 @@ class StrategyEngine(object):
         # 还在正常运行
         if strategyId in self._isEffective and self._isEffective[strategyId]:
             self._isEffective[strategyId] = False
+            self._isSt2EngineDataEffective[strategyId] = False
             self._sendEvent2StrategyForce(strategyId, event)
         # 停止
         elif self._strategyMgr.getStrategyState(strategyId) == ST_STATUS_QUIT:
