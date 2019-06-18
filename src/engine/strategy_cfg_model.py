@@ -785,7 +785,7 @@ class StrategyConfig(object):
         return self._metaData['RunMode']['SendOrder']
 
     def hasKLineTrigger(self):
-        return bool(self._metaData['Trigger']['KLine'])
+        return True
 
     def hasTimerTrigger(self):
         return bool(self._metaData['Trigger']['Timer'])
