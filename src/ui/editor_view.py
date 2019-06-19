@@ -251,6 +251,8 @@ class QuantEditor(StrategyTree):
 
         # 焦点移出标志位
         self._outFlag = False
+        # 记录文件的修改时间
+        self._modifyTime = 0
 
         self._context = Context()
 
@@ -300,6 +302,7 @@ class QuantEditor(StrategyTree):
         self.editor_text.delete(END + "-1c")
         self.editor_text.update()
         self.editor_text.focus_set()
+        self.editor_text.see("end")
         self.editor_text.tag_add("TODO", "0.0", "end")
         self.editor_text.recolorize_main()
 
@@ -391,20 +394,25 @@ class QuantEditor(StrategyTree):
         self._outFlag = False
 
         if path:
-            editorCodeBefore = self.control.getEditorText()["code"]
-
-            self.control.setEditorTextCode(path)
-            editorCodeAfter = self.control.getEditorText()["code"]
-            if editorCodeBefore == editorCodeAfter:
+            modifyTime = os.path.getmtime(path)
+            # 初始化self._modifyTime
+            if self._modifyTime == 0:
+                self._modifyTime = os.path.getmtime(path)
+            if modifyTime == self._modifyTime:
                 return
 
-            self.editor_text.delete(0.0, END + "-1c")
-
-            self.updateEditorText(editorCodeAfter)
-            self.editor_text.edit_reset()
+            if messagebox.askokcancel("重新加载", "此策略被另一个程序修改了\n是否重新加载？"):
+                self.control.setEditorTextCode(path)
+                editorCode = self.control.getEditorText()["code"]
+                self.editor_text.delete(0.0, END + "-1c")
+                self.updateEditorText(editorCode)
+                # self.editor_text.edit_reset()
 
     def onFocusOut(self, event):
         self._outFlag = True
+        path = self.control.getEditorText()["path"]
+        if path:
+            self._modifyTime = os.path.getmtime(path)
 
     def buttonDown(self, event):
         """鼠标按下记录按下位置"""
