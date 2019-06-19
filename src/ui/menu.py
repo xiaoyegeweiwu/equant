@@ -91,7 +91,7 @@ class StrategyMenu(object):
     def newStrategy(self):
         newFileWin = NewFileToplevel(self._controller.top)
 
-        def save_():
+        def save(event=None):
             # 新建策略前先保存当前选中的策略
             self._controller.saveStrategy()
             # TODO：目录树多选时path为list，新建文件的存储位置可能会有问题（总是新建到item最小的文件所在的文件夹）
@@ -119,7 +119,8 @@ class StrategyMenu(object):
         def cancel():
             newFileWin.destroy()
 
-        newFileWin.saveBtn.configure(command=save_)
+        newFileWin.nameEntry.bind("<Return>", save)
+        newFileWin.saveBtn.configure(command=save)
         newFileWin.cancelBtn.configure(command=cancel)
         # 模态窗口
         newFileWin.display()
@@ -127,7 +128,7 @@ class StrategyMenu(object):
     def newDir(self):
         newTop = NewDirToplevel(self._controller.top)
 
-        def save():
+        def save(event=None):
             # 新建前先保存当前选中的策略
             self._controller.saveStrategy()
 
@@ -160,6 +161,7 @@ class StrategyMenu(object):
         def cancel():
             newTop.destroy()
 
+        newTop.nameEntry.bind("<Return>", save)
         newTop.saveBtn.config(command=save)
         newTop.cancelBtn.config(command=cancel)
         newTop.display()
@@ -180,7 +182,7 @@ class StrategyMenu(object):
 
         renameTop = RenameToplevel(path, self._controller.top)
 
-        def enter():
+        def enter(event=None):
             self._controller.saveStrategy()
             newPath = os.path.join(os.path.dirname(path), renameTop.newEntry.get())
 
@@ -228,6 +230,7 @@ class StrategyMenu(object):
         def cancel():
             renameTop.destroy()
 
+        renameTop.newEntry.bind("<Return>", enter)
         renameTop.saveBtn.config(command=enter)
         renameTop.cancelBtn.config(command=cancel)
         renameTop.display()
@@ -245,7 +248,7 @@ class StrategyMenu(object):
         selected_item = self._lClickSelectedItem
         # 当前选中的策略路径
         editorPath = self._controller.getEditorText()["path"]
-        def enter():
+        def enter(event=None):
             # 新建策略前先保存当前选中的策略
             self._controller.saveStrategy()
             
@@ -282,6 +285,8 @@ class StrategyMenu(object):
         def cancel():
             deleteTop.destroy()
 
+        deleteTop.saveBtn.focus_set()
+        deleteTop.bind("<Return>", enter)
         deleteTop.saveBtn.config(command=enter)
         deleteTop.cancelBtn.config(command=cancel)
         deleteTop.display()
@@ -289,7 +294,6 @@ class StrategyMenu(object):
     def onRefresh(self):
         """刷新目录"""
         self.parent.update_all_tree()
-        pass
 
 
 class RunMenu(object):
