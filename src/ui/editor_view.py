@@ -34,6 +34,11 @@ class StrategyTree(QuantFrame):
         self.tree_menu = None
         self.tree_node_dict = {}   # 刷新父节点用的
         self.strategyTreeScl = None
+
+        # 记录节点的开关状态
+        self._openState = {}
+        # 记录被选中的节点
+        self._selected = None
         
         #print("StrategyTree:%d,%d"%(frame['width'], frame['height']))
 
@@ -56,6 +61,10 @@ class StrategyTree(QuantFrame):
     def update_all_tree(self):
         """销毁策略目录"""
         if self.root_tree:
+            # 获取目录树的开关状态
+            self._getOpenState("")
+            self._selected = self.root_tree.selection()
+
             self.root_tree.destroy()
         if self.strategyTreeScl:
             if self.strategyTreeScl[0]:
@@ -64,6 +73,26 @@ class StrategyTree(QuantFrame):
                 self.strategyTreeScl[1].destroy()
 
         self.insert_tree()
+        # 恢复策略目录的开关状态
+        self._setOpenState("")
+        # 恢复选中状态
+        if self._selected:
+            self.root_tree.selection_set(self._selected)
+
+    def _getOpenState(self, item):
+        """遍历树目录的开关状态， 需要循环遍历所有item"""
+        for itemId in self.root_tree.get_children(item):
+            self._openState[itemId] = self.root_tree.item(itemId)["open"]
+            self._getOpenState(itemId)
+
+    def _setOpenState(self, item):
+        for itemId in self.root_tree.get_children(item):
+            # 不在量化客户端新建策略时，刷新时会出现keyerror
+            try:
+                self.root_tree.item(itemId, open=self._openState[itemId])
+                self._setOpenState(itemId)
+            except KeyError:
+                pass
 
     def update_tree(self, fullname):
         '''只刷新父节点'''
@@ -75,7 +104,13 @@ class StrategyTree(QuantFrame):
         if not parent:
             messagebox.showinfo("提示", "更新策略树失败")
         else:
-            self.root_tree.insert(parent, 'end', text=file_name, open=False, values=[fullname, "!@#$%^&*"])
+            itemId = self.root_tree.insert(parent, 'end', text=file_name, open=False, values=[fullname, "!@#$%^&*"])
+
+            # 设置新建的条目选中
+            self.root_tree.selection_set(itemId)
+            # 设置父条目的开关状态
+            self.root_tree.item(self.root_tree.parent(itemId), open=True)
+            self.root_tree.item(itemId, open=True)
 
     def insert_tree(self):
         #作为类成员，用于树更新

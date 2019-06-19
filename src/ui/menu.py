@@ -126,6 +126,7 @@ class StrategyMenu(object):
         newFileWin.display()
 
     def newDir(self):
+        #TODO: 有错误需要更改
         newTop = NewDirToplevel(self._controller.top)
 
         def save(event=None):
