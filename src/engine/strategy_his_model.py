@@ -758,6 +758,8 @@ class StrategyHisQuote(object):
     def _sendHisKLineTriggerEvent(self, key, data):
         if not data["IsKLineStable"]:
             return
+
+        assert key[1] is not None, "k line type error"
         event = Event({
             'EventCode': ST_TRIGGER_HIS_KLINE,
             'ContractNo': key[0],
@@ -910,6 +912,7 @@ class StrategyHisQuote(object):
         # 不使用历史K线，也需要切换
         # 切换K线
         key = self._config.getKLineShowInfoSimple()
+
         self._switchKLine(key)
         # 增加信号线
         self._addSignal()
@@ -931,22 +934,28 @@ class StrategyHisQuote(object):
             return
 
         newDF = pd.DataFrame(allHisData)
+        test = newDF[["DateTimeStamp", "KLineType", "KLineSlice"]].values
+        effectiveDTS = []
+        for i, record in enumerate(test):
+            curBarDTS = datetime.strptime(str(record[0]), "%Y%m%d%H%M%S%f")
+            if record[1] == EEQU_KLINE_MINUTE:
+                curEffectiveDTS = curBarDTS-relativedelta(minutes=record[2])
+            elif record[1] == EEQU_KLINE_DAY:
+                curEffectiveDTS = curBarDTS-relativedelta(days=record[2])
+            elif record[1] == EEQU_KLINE_SECOND:
+                curEffectiveDTS = curBarDTS-relativedelta(seconds=record[2])
+            elif record[1] == EEQU_KLINE_SECOND:
+                curBarDTS = curBarDTS
+            else:
+                raise NotImplementedError("未实现的k线类型支持")
+            effectiveDTS.append(curEffectiveDTS.strftime("%Y%m%d%H%M%S%f"))
 
-        # 日线排序， 减去10天，防止假期、周末干扰
-        localMap = {
-            EEQU_KLINE_DAY      : 10*1000000*1000,
-            EEQU_KLINE_MINUTE   : 100*1000,
-            EEQU_KLINE_SECOND   : 1*1000,
-            EEQU_KLINE_TICK     : 0*1000,
-        }
-        newDF["DateTimeStampForInnerSort"] = newDF["KLineType"].map(localMap)*newDF["KLineSlice"]
-        newDF["DateTimeStampForInnerSort"] = np.int64(newDF["DateTimeStamp"])-np.int64(newDF["DateTimeStampForInnerSort"])
-
-        newDF.sort_values(['TradeDate',  'DateTimeStampForInnerSort', 'Priority'], ascending=True, inplace=True)
+        newDF["DateTimeStampForSort"] = effectiveDTS
+        newDF.sort_values(['TradeDate', 'DateTimeStampForSort', 'Priority'], ascending=[True, True, False], inplace=True)
         newDF.reset_index(drop=True, inplace=True)
 
-        print("new df is ")
-        print(newDF[["TradeDate", "DateTimeStampForInnerSort", "DateTimeStamp", "KLineType"]])
+        # print("new df is ")
+        # print(newDF[["TradeDate", "DateTimeStampForSort", "DateTimeStamp", "KLineType"]])
         allHisData = newDF.to_dict(orient="index")
 
         # print(newDF[["ContractNo", "TradeDate", "DateTimeStamp"]])
@@ -958,6 +967,7 @@ class StrategyHisQuote(object):
         for index, row in allHisData.items():
             key = (row["ContractNo"], row["KLineType"], row["KLineSlice"])
             isShow = key == self._config.getKLineShowInfoSimple()
+
             # print(key, self._config.getKLineShowInfoSimple(),
             lastBar = self.getCurBar(key)
             self._updateCurBar(key, row)
@@ -1060,6 +1070,7 @@ class StrategyHisQuote(object):
             return
 
         key = (curTriggerInfo["ContractNo"], curTriggerInfo["KLineType"], curTriggerInfo["KLineSlice"])
+        assert key[1] is not None, "error"
 
         curBar = self._curBarDict[key].getCurBar()
         priceInfos[key[0]] = {
