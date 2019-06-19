@@ -567,9 +567,6 @@ class StrategyConfig(object):
             self._metaData['SubContract'].append(contNo)
 
         # 记录展示的合约和K线信息
-        if barType == EEQU_KLINE_SECOND:
-            barType = EEQU_KLINE_TICK
-
         if 'Display' not in self._metaData['Sample'] or not self._metaData['Sample']['Display']:
             self._metaData['Sample']['Display'] = {"ContractNo" : contNo, "KLineType": barType, "KLineSlice": barInterval}
 
