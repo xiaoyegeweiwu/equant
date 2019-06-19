@@ -931,11 +931,22 @@ class StrategyHisQuote(object):
             return
 
         newDF = pd.DataFrame(allHisData)
-        newDF.sort_values(['TradeDate', 'Priority', 'DateTimeStamp'], ascending=True, inplace=True)
+
+        # 日线排序， 减去10天，防止假期、周末干扰
+        localMap = {
+            EEQU_KLINE_DAY      : 10*1000000*1000,
+            EEQU_KLINE_MINUTE   : 100*1000,
+            EEQU_KLINE_SECOND   : 1*1000,
+            EEQU_KLINE_TICK     : 0*1000,
+        }
+        newDF["DateTimeStampForInnerSort"] = newDF["KLineType"].map(localMap)*newDF["KLineSlice"]
+        newDF["DateTimeStampForInnerSort"] = np.int64(newDF["DateTimeStamp"])-np.int64(newDF["DateTimeStampForInnerSort"])
+
+        newDF.sort_values(['TradeDate',  'DateTimeStampForInnerSort', 'Priority'], ascending=True, inplace=True)
         newDF.reset_index(drop=True, inplace=True)
-        #
-        # print("new df is ")
-        # print(newDF[["TradeDate", "DateTimeStamp", "Priority", "KLineType", "KLineSlice"]])
+
+        print("new df is ")
+        print(newDF[["TradeDate", "DateTimeStampForInnerSort", "DateTimeStamp", "KLineType"]])
         allHisData = newDF.to_dict(orient="index")
 
         # print(newDF[["ContractNo", "TradeDate", "DateTimeStamp"]])
