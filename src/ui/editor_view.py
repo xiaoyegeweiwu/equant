@@ -432,10 +432,10 @@ class QuantEditor(StrategyTree):
         # self.editor_text.bind("<Return>", self.return_key)
 
         # FocusIn
-        self.editor_text.bind("<FocusIn>", self.onFocusIn)
+        # self.editor_text.bind("<FocusIn>", self.onFocusIn)
 
         # FocusOut
-        self.editor_text.bind("<FocusOut>", self.onFocusOut)
+        # self.editor_text.bind("<FocusOut>", self.onFocusOut)
 
         # TODO：事件绑定有问题---回车键有bug
         # self.editor_text.bind("<Button-1>", self.buttonDown)
