@@ -726,6 +726,7 @@ class StrategyModel(object):
             self.sendSignalEvent(self._signalName, contNo, orderDirct, entryOrExit, orderPrice, orderQty, curBar)
 
         retCode, eSessionId = self.sendOrder(userNo, contNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty)
+        # print("now actual id = ", retCode, eSessionId)
         return eSessionId if retCode == 0 else ""
         
     def sendOrder(self, userNo, contNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty):

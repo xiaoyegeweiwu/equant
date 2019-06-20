@@ -281,16 +281,16 @@ class StrategyConfig(object):
         return tuple(showInfoSimple)
 
     priorityDict = {
-        EEQU_KLINE_YEAR: 0,
-        EEQU_KLINE_MONTH: 1,
-        EEQU_KLINE_WEEK: 2,
-        EEQU_KLINE_DayX: 3,
-        EEQU_KLINE_DAY: 4,
-        EEQU_KLINE_HOUR: 5,
-        EEQU_KLINE_MINUTE: 6,
-        EEQU_KLINE_SECOND: 7,
-        EEQU_KLINE_TICK: 8,
-        EEQU_KLINE_TIMEDIVISION: 9,
+        EEQU_KLINE_YEAR     : 90000,
+        EEQU_KLINE_MONTH    : 80000,
+        EEQU_KLINE_WEEK     : 70000,
+        EEQU_KLINE_DayX     : 60000,
+        EEQU_KLINE_DAY      : 50000,
+        EEQU_KLINE_HOUR     : 40000,
+        EEQU_KLINE_MINUTE   : 30000,
+        EEQU_KLINE_SECOND   : 20000,
+        EEQU_KLINE_TICK     : 10000,
+        EEQU_KLINE_TIMEDIVISION: 0,
     }
 
     def getPriority(self, key):
