@@ -1501,6 +1501,11 @@ class StrategyModel(object):
         for index in range(0, sessionCount):
             startTime = self.getGetSessionStartTime(contNo, index)
             endTime = self.getSessionEndTime(contNo, index)
+
+            if startTime >= endTime:
+                endTime += 0.24
+                if currentTime <= startTime:
+                    currentTime += 0.24
             if currentTime >= startTime and currentTime <endTime:
                 return True
         return False
