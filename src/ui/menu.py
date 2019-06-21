@@ -2,6 +2,7 @@ import os
 import sys
 sys.path.append("..")
 
+import shutil
 from tkinter import *
 from tkinter import messagebox
 
@@ -24,7 +25,7 @@ class StrategyMenu(object):
 
     def add_event(self):
         new_menu = Menu(self.menu, tearoff=0)
-        if len(self._lClickSelectedItem) == 1 and self.widget.parent(self._lClickSelectedItem):  # 保证只选中一个
+        if len(self._lClickSelectedItem) == 1 and self.widget.parent(self._lClickSelectedItem[0]):  # 保证只选中一个
             # self.menu.add_command(label="运行", command=self.runStrategy, state=DISABLED)
             pass
 
@@ -126,7 +127,6 @@ class StrategyMenu(object):
         newFileWin.display()
 
     def newDir(self):
-        # TODO: 有错误需要更改
         newTop = NewDirToplevel(self._controller.top)
 
         def save(event=None):
@@ -268,8 +268,12 @@ class StrategyMenu(object):
                                     # 更新策略编辑界面显示信息
                                     self._controller.updateEditor("")
                                     os.remove(deletePath)
+                                    # shutil.rmtree(deletePath)
                             for name in dirs:
-                                os.rmdir(os.path.join(root, name))
+                                shutil.rmtree(os.path.join(root, name))
+                        # 删除本地文件
+                        shutil.rmtree(path)
+                        # 删除控件中的条目
                         self.widget.delete(select)
                     else:
                         if editorPath == path:

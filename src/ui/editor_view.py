@@ -107,22 +107,30 @@ class StrategyTree(QuantFrame):
         dir_name = os.path.dirname(fullname)
         file_name = os.path.basename(fullname)
         parent = self.tree_node_dict[dir_name]
-        
+
         if not parent:
             messagebox.showinfo("提示", "更新策略树失败")
         else:
             if os.path.isdir(fullname):
                 iimage = self.gdiricon
-            else:
+            elif os.path.isfile(fullname):
                 iimage = self.gfileicon
-            itemId = self.root_tree.insert(parent, 'end', text=file_name, open=False, values=[fullname, "!@#$%^&*"],
+            else:
+                return
+            itemId = self.root_tree.insert(parent, 'end', iid=fullname, text=file_name, open=False,
+                                           values=[fullname, "!@#$%^&*"],
                                            image=iimage)
+
+            self.tree_node_dict[fullname] = itemId
 
             # 设置新建的条目选中
             self.root_tree.selection_set(itemId)
             # 设置父条目的开关状态
             self.root_tree.item(self.root_tree.parent(itemId), open=True)
             self.root_tree.item(itemId, open=True)
+
+            # 新建之后排序
+            self.update_all_tree()
 
     def insert_tree(self):
         #作为类成员，用于树更新
@@ -164,7 +172,6 @@ class StrategyTree(QuantFrame):
         """策略树选择回调事件，更改图标样式"""
         # 恢复上一次选择的图标样式
         if self._selected:
-            print("1111111: ", self._selected)
             for id in self._selected:
                 try:
                     path = self.root_tree.item(id)['values'][0]
@@ -200,7 +207,8 @@ class StrategyTree(QuantFrame):
                 iimage = self.gdiricon
             else:
                 iimage = self.gfileicon
-            oid = self.root_tree.insert(parent, 'end', text=path, open=False, values=[abspath, "!@#$%^&*"], image=iimage)
+            oid = self.root_tree.insert(parent, 'end', iid=abspath, text=path, open=False,
+                                        values=[abspath, "!@#$%^&*"], image=iimage)
             # TODO: 2000代表一个比较大的数值
             self.root_tree.column("#0", stretch=False, width=2000)
             self.tree_node_dict[abspath] = oid
