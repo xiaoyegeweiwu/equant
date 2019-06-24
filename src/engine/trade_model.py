@@ -139,7 +139,6 @@ class TUserInfoModel:
     # 内盘有买卖两个方向， 外盘会对冲只有一个方向
     def getPositionInfo(self, contractNo, direct=None):
         isChinese = contractNo.split("|")[0].upper() in ["SHFE", "ZCE", "DCE", "CFFEX", "INE"]
-        print(f"when getPositionInfo isChinese:{isChinese} ")
         if self._position is None:
             return None
         for positionNo, positionObj in self._position.items():
