@@ -1501,6 +1501,11 @@ class StrategyModel(object):
         if not contNo:
             contNo = self._cfgModel.getBenchmark()
 
+        # 兼容跨期套利
+        contNoInfo = contNo.split('|')
+        if len(contNoInfo) >= 4 and (contNoInfo[1] == 'S' or contNoInfo[1] == 's'):
+            contNo = contNoInfo[0] + '|F|' + contNoInfo[2] + '|' + contNoInfo[3]
+
         currentTime = self.getCurrentTime()
         sessionCount = self.getGetSessionCount(contNo)
         for index in range(0, sessionCount):
