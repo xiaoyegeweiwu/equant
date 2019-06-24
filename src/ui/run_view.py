@@ -1647,9 +1647,12 @@ class RunWin(QuantToplevel, QuantFrame):
 
 class SelectContractWin(QuantToplevel, QuantFrame):
 
-    # commodityType = {"P": '现货', 'F': '期货', 'O': '期权', 'S': '跨期', 'M': '跨品种', 'Z': '指数'}
-    exchangeList = ["CFFEX", "CME", "DCE", "SGE", "SHFE", "ZCE", "SPD", "INE", "NYMEX", "SSE", "SZSE"]
-    commodityType = ["P", "Y", "F", "O", "S", "M", "s", "m", "y", "Z", "T", "X", "I", "C"]
+    # exchangeList = ["CFFEX", "CME", "DCE", "SGE", "SHFE", "ZCE", "SPD", "INE", "NYMEX", "SSE", "SZSE"]
+    exchangeList = ["SPD", "ZCE", "DCE", "SHFE", "INE", "CFFEX", "SSE", "SZSE", "SGE", "CBOT", "CME", "NYMEX"]
+    commodityType = {"P": "现货", "Y": "现货", "F": "期货", "O": "期权",
+                     "S": "跨期套利", "M": "跨品种套利", "s": "", "m": "",
+                     "y": "", "Z": "指数", "T": "股票", "X": "外汇",
+                     "I": "外汇", "C": "外汇"}
 
     def __init__(self, master, exchange, commodity, contract):
         super().__init__(master)
@@ -1658,7 +1661,7 @@ class SelectContractWin(QuantToplevel, QuantFrame):
 
         self._exchange = exchange
         self._commodity = commodity
-        self._contract = pd.DataFrame(contract)
+        self._contract = contract
 
         # print(datetime.now().strftime('%H:%M:%S.%f'))
 
@@ -1706,16 +1709,28 @@ class SelectContractWin(QuantToplevel, QuantFrame):
 
         self.exchangeTree = ttk.Treeview(exchangeFrame, show="tree")
         self.contractScroll = self.addScroll(exchangeFrame, self.exchangeTree, xscroll=False)
-        for exch in self._exchange:
-            if exch["ExchangeNo"] in self.exchangeList:   #TODO: 暂时先取六个交易所
-                exchangeId = self.exchangeTree.insert("", tk.END,
-                                                      text=exch["ExchangeNo"] + "【" + exch["ExchangeName"] + "】",
-                                                      values=exch["ExchangeNo"])
-                for commodity in self._commodity:
-                    if commodity["ExchangeNo"] == exch["ExchangeNo"]:
-                        commId = self.exchangeTree.insert(exchangeId, tk.END,
-                                                          text=commodity["CommodityName"],
-                                                          values=commodity["CommodityNo"])
+        # for exch in self._exchange:
+        #     if exch["ExchangeNo"] in self.exchangeList:
+        #         exchangeId = self.exchangeTree.insert("", tk.END,
+        #                                               text=exch["ExchangeNo"] + "【" + exch["ExchangeName"] + "】",
+        #                                               values=exch["ExchangeNo"])
+
+        for exchangeNo in self.exchangeList:
+            for exch in self._exchange:
+                if exch["ExchangeNo"] == exchangeNo:
+                    exchangeId = self.exchangeTree.insert("", tk.END,
+                                                         text=exch["ExchangeNo"] + "【" + exch["ExchangeName"] + "】",
+                                                         values=exch["ExchangeNo"])
+
+                    for commodity in self._commodity:
+                        if commodity["ExchangeNo"] == exch["ExchangeNo"] and commodity["CommodityType"] in self.commodityType.keys():
+                            if commodity["ExchangeNo"] == "SPD":
+                                text = commodity["CommodityName"]
+                            else:
+                                text = commodity["CommodityName"] + " [" + self.commodityType[commodity["CommodityType"]] + "]"
+                            commId = self.exchangeTree.insert(exchangeId, tk.END,
+                                                              text=text,
+                                                              values=commodity["CommodityNo"])
 
         self.exchangeTree.pack(fill=tk.BOTH, expand=tk.YES)
         self.exchangeTree.bind("<ButtonRelease-1>", self.updateContractFrame)
@@ -1791,7 +1806,8 @@ class SelectContractWin(QuantToplevel, QuantFrame):
                 directory_id = self.exchangeTree.parent(idx)
                 exchangeNo = self.exchangeTree.item(directory_id)['values']
                 contract = self._contract.loc[
-                    (self._contract.ExchangeNo == exchangeNo[0]) & (self._contract.CommodityNo == commodityNo[0])]
+                    (self._contract.ExchangeNo == exchangeNo[0])
+                    & (self._contract.CommodityNo == commodityNo[0])]
                 for index, row in contract.iterrows():
                     self.contractTree.insert("", tk.END, text=row["ContractNo"], values=row["CommodityNo"])
 
