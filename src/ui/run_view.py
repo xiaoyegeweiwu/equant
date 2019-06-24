@@ -271,7 +271,7 @@ class RunWin(QuantToplevel, QuantFrame):
             self.isCycle.set(0),
             self.cycle.set(200),
             self.isKLine.set(1),
-            self.isMarket.set(1),
+            self.isMarket.set(0),
             self.isTrade.set(0),
             # 指定时刻不好存
 
@@ -1647,8 +1647,9 @@ class RunWin(QuantToplevel, QuantFrame):
 
 class SelectContractWin(QuantToplevel, QuantFrame):
 
-    commodityType = {"P": '现货', 'F': '期货', 'O': '期权', 'S': '跨期', 'M': '跨品种', 'Z': '指数'}
-    exchangeList = ["CFFEX", "CME", "DCE", "SGE", "SHFE", "ZCE", "INE", "NYMEX", "SSE", "SZSE"]
+    # commodityType = {"P": '现货', 'F': '期货', 'O': '期权', 'S': '跨期', 'M': '跨品种', 'Z': '指数'}
+    exchangeList = ["CFFEX", "CME", "DCE", "SGE", "SHFE", "ZCE", "SPD", "INE", "NYMEX", "SSE", "SZSE"]
+    commodityType = ["P", "Y", "F", "O", "S", "M", "s", "m", "y", "Z", "T", "X", "I", "C"]
 
     def __init__(self, master, exchange, commodity, contract):
         super().__init__(master)

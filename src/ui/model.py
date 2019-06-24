@@ -329,16 +329,19 @@ class GetEgData(object):
     def _onEgExchangeInfo(self, event):
         """获取引擎推送交易所信息"""
         exData = event.getData()
+        print("1111111: ", exData)
         self._exchangeList.extend(exData)
 
     def _onEgCommodityInfo(self, event):
         """获取引擎推送品种信息"""
         commData = event.getData()
+        print("222222: commData")
         self._commodityList.extend(commData)
 
     def _onEgContractInfo(self, event):
         """获取引擎推送合约信息"""
         contData = event.getData()
+        # print("33333: ", contData)
         self._contractList.extend(contData)
         #TODO: contract信息太多和userinfo一起打印
 

@@ -106,9 +106,9 @@ class StrategyTree(QuantFrame):
         # TODO：怎么可以实现新建策略按正确的顺序插入呢？
         dir_name = os.path.dirname(fullname)
         file_name = os.path.basename(fullname)
-        parent = self.tree_node_dict[dir_name]
+        selectId = self.tree_node_dict[dir_name]
 
-        if not parent:
+        if not selectId:
             messagebox.showinfo("提示", "更新策略树失败")
         else:
             if os.path.isdir(fullname):
@@ -117,7 +117,11 @@ class StrategyTree(QuantFrame):
                 iimage = self.gfileicon
             else:
                 return
-            itemId = self.root_tree.insert(parent, 'end', iid=fullname, text=file_name, open=False,
+            # itemId = self.root_tree.insert(parent, 'end', iid=fullname, text=file_name, open=False,
+            #                                values=[fullname, "!@#$%^&*"],
+            #                                image=iimage)
+
+            itemId = self.root_tree.insert(self.root_tree.parent(selectId), 'end', iid=fullname, text=file_name, open=False,
                                            values=[fullname, "!@#$%^&*"],
                                            image=iimage)
 
