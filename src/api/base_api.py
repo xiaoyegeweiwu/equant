@@ -3304,7 +3304,7 @@ class BaseApi(object):
 
     def A_SendOrder(self, userNo, contractNo, orderDirct, entryOrExit, orderQty, orderPrice, orderType, validType, hedge, triggerType, triggerMode, triggerCondition, triggerPrice):
         '''
-        【说明】A_SendOrder
+        【说明】
               针对指定的帐户、商品发送委托单。
 
         【语法】
