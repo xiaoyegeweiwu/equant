@@ -1548,6 +1548,11 @@ class StrategyModel(object):
         for index in range(0, sessionCount):
             startTime = self.getGetSessionStartTime(contNo, index)
             endTime = self.getSessionEndTime(contNo, index)
+
+            if startTime >= endTime:
+                endTime += 0.24
+                if currentTime <= startTime:
+                    currentTime += 0.24
             if currentTime >= startTime and currentTime <endTime:
                 return True
         return False
@@ -1964,21 +1969,21 @@ class StrategyModel(object):
         return self._staModel.ParabolicSAR(high, low, afstep, aflimit)
 
     def getHighest(self, price, length):
-        if not isinstance(price, list) or len(price) == 0:
+        if (not isinstance(price, np.ndarray) and not isinstance(price, list)) or len(price) == 0:
             return np.array([])
 
+        arr = np.array(price) if isinstance(price, list) else price
         if length <= 1:
-            return np.array(price)
+            return arr
 
-        arr = np.array(price)
         return talib.MAX(arr, length)
 
     def getLowest(self, price, length):
-        if not isinstance(price, list) or len(price) == 0:
+        if (not isinstance(price, np.ndarray) and not isinstance(price, list)) or len(price) == 0:
             return np.array([])
 
+        arr = np.array(price) if isinstance(price, list) else price
         if length <= 1:
-            return np.array(price)
+            return arr
 
-        arr = np.array(price)
         return talib.MIN(arr, length)
