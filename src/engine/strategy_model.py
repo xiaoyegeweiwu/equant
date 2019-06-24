@@ -1922,7 +1922,7 @@ class StrategyModel(object):
         return self._staModel.ParabolicSAR(high, low, afstep, aflimit)
 
     def getHighest(self, price, length):
-        if not isinstance(price, list) or len(price) == 0:
+        if (not isinstance(price, np.ndarray) and not isinstance(price, list)) or len(price) == 0:
             return np.array([])
 
         if length <= 1:
@@ -1932,7 +1932,7 @@ class StrategyModel(object):
         return talib.MAX(arr, length)
 
     def getLowest(self, price, length):
-        if not isinstance(price, list) or len(price) == 0:
+        if (not isinstance(price, np.ndarray) and not isinstance(price, list)) or len(price) == 0:
             return np.array([])
 
         if length <= 1:

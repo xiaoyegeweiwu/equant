@@ -398,7 +398,7 @@ class BaseApi(object):
               获取各种历史数据数组
 
         【语法】
-               numpy.array HisData(enum dataType, enum kLineType, int kLineValue, string contractNo, int maxLength)
+               numpy.array HisData(enum dataType, enum kLineType='', int kLineValue=0, string contractNo='', int maxLength=100)
 
         【参数】
               dataType 指定历史数据的种类，可选的枚举函数和相应含义为：
@@ -5716,7 +5716,7 @@ class BaseApi(object):
             求最高
 
         【语法】
-            numpy.array Highest(list price, int length)
+            numpy.array Highest(list|numpy.array price, int length)
 
         【参数】
             price 用于求最高值的值，必须是数值型列表；
@@ -5728,7 +5728,7 @@ class BaseApi(object):
 
         【示例】
             Highest (Close(), 12); 计算12周期以来的收盘价的最高值；
-            Highest ((Close() + High() + Low())/ 3, 10); 计算10周期以来高低收价格的平均值的最高值。
+            Highest (HisData(Enum_Data_Typical()), 10); 计算10周期以来高低收价格的平均值的最高值。
         '''
         return self._dataModel.getHighest(price, length)
 
@@ -5738,7 +5738,7 @@ class BaseApi(object):
             求最低
 
         【语法】
-            numpy.array Lowest(list price, int length)
+            numpy.array Lowest(list|numpy.array price, int length)
 
         【参数】
             price 用于求最低值的值，必须是数值型列表；
@@ -5750,7 +5750,7 @@ class BaseApi(object):
 
         【示例】
             Highest (Close(), 12); 计算12周期以来的收盘价的最低值；
-            Highest ((Close() + High() + Low())/ 3, 10); 计算10周期以来高低收价格的平均值的最低值。
+            Lowest (HisData(Enum_Data_Typical()), 10); 计算10周期以来高低收价格的平均值的最低值。
         '''
         return self._dataModel.getLowest(price, length)
 
@@ -5984,7 +5984,7 @@ def BarStatus(contractNo='', kLineType='', kLineValue=0):
 def HistoryDataExist(contractNo='', kLineType='', kLineValue=0):
     return baseApi.HistoryDataExist(contractNo, kLineType, kLineValue)
 
-def HisData(type, period, interval, contractNo='', maxLength=100):
+def HisData(type, period='', interval=0, contractNo='', maxLength=100):
     return baseApi.HisData(type, period, interval, contractNo, maxLength)
 
 def HisBarsInfo(contractNo='', kLineType='', kLineValue=0, maxLength=None):
