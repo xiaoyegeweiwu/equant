@@ -3294,18 +3294,22 @@ class BaseApi(object):
          '''
         return self._dataModel.getOrderContractNo(orderId)
 
-    def A_SendOrder(self, userNo, contractNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty, triggerType, triggerMode, triggerCondition, triggerPrice):
+    def A_SendOrder(self, userNo, contractNo, orderDirct, entryOrExit, orderQty, orderPrice, orderType, validType, hedge, triggerType, triggerMode, triggerCondition, triggerPrice):
         '''
         【说明】A_SendOrder
               针对指定的帐户、商品发送委托单。
 
         【语法】
-              int, string A_SendOrder(string userNo, string contractNo, char orderType, char validType, char orderDirct, char entryOrExit, char hedge, float orderPrice, int orderQty, char triggerType, char triggerMode, char triggerCondition, float triggerPrice)
+              int. string A_SendOrder(char orderDirct, char entryOrExit, int orderQty, float orderPrice, string contractNo='', string userNo='', char orderType='2', char validType='0', char hedge='T', char triggerType='N', char triggerMode='N', char triggerCondition='N', float triggerPrice=0)
 
         【参数】
-              userNo 指定的账户名称，
-              contractNo 商品合约编号，
-              orderType 订单类型，字符类型，可选值为：
+              orderDirct 发送委托单的买卖类型，取值为Enum_Buy或Enum_Sell之一，
+              entryOrExit 发送委托单的开平仓类型，取值为Enum_Entry,Enum_Exit,Enum_ExitToday之一，
+              orderQty 委托单的交易数量，
+              orderPrice 委托单的交易价格，
+              contractNo 商品合约编号，默认值为基准合约，
+              userNo 指定的账户名称，默认为界面选定的账户名称，
+              orderType 订单类型，字符类型，默认值为'2'，可选值为：
                 '1' : 市价单
                 '2' : 限价单
                 '3' : 市价止损
@@ -3323,34 +3327,30 @@ class BaseApi(object):
                 'G' : 履约期货自对冲申请
                 'H' : 做市商留仓
                 可使用如Enum_Order_Market、Enum_Order_Limit等订单类型枚举函数获取相应的类型，
-              validType 订单有效类型，字符类型， 可选值为：
+              validType 订单有效类型，字符类型，默认值为'0'， 可选值为：
                 '0' : 当日有效
                 '1' : 长期有效
                 '2' : 限期有效
                 '3' : 即时部分
                 '4' : 即时全部
                 可使用如Enum_GFD、Enum_GTC等订单有效类型枚举函数获取相应的类型，
-              orderDirct 发送委托单的买卖类型，取值为Enum_Buy或Enum_Sell之一，
-              entryOrExit 发送委托单的开平仓类型，取值为Enum_Entry,Enum_Exit,Enum_ExitToday之一，
-              hedge 投保标记，字符类型，可选值为：
+              hedge 投保标记，字符类型，默认值为'T'，可选值为：
                 'T' : 投机
                 'B' : 套保
                 'S' : 套利
                 'M' : 做市
                 可使用如Enum_Speculate、Enum_Hedge等订单投保标记枚举函数获取相应的类型，
-              orderPrice 委托单的交易价格，
-              orderQty 委托单的交易数量，
-              triggerType 触发委托类型，默认值为N，可用的值为：
+              triggerType 触发委托类型，默认值为'N'，可用的值为：
                 'N' : 普通单
                 'P' : 预备单(埋单)
                 'A' : 自动单
                 'C' : 条件单
-              triggerMode 触发模式，默认值为N，可用的值为：
+              triggerMode 触发模式，默认值为'N'，可用的值为：
                 'N' : 普通单
                 'L' : 最新价
                 'B' : 买价
                 'A' : 卖价
-              triggerCondition 触发条件，默认值为N，可用的值为：
+              triggerCondition 触发条件，默认值为'N'，可用的值为：
                 'N' : 无
                 'g' : 大于
                 'G' : 大于等于
@@ -3372,13 +3372,11 @@ class BaseApi(object):
               注：不能使用于历史测试，仅适用于实时行情交易。
 
         【示例】
-              retCode, retMsg = A_SendOrder(UserId, ContractId, Enum_Order_Limit(), Enum_FOK(), Enum_Buy(), Enum_Exit(), Enum_Speculate(), Q_AskPrice(), OrderNum)
+              retCode, retMsg = A_SendOrder(Enum_Buy(), Enum_Exit(), 1, Q_AskPrice())
               当retCode为0时表明发送订单信息成功，retMsg为返回的下单编号localOrderId。
          '''
-        if triggerType in ('P', 'A', 'C'):
-            return self._dataModel.sendConditionOrder(userNo, contractNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty, \
+        return self._dataModel.sendOrder(userNo, contractNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty, \
                                                       triggerType, triggerMode, triggerCondition, triggerPrice)
-        return self._dataModel.sendOrder(userNo, contractNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty)
 
     def A_DeleteOrder(self, localOrderId):
         '''
@@ -6308,8 +6306,8 @@ def A_LatestFilledTime(contractNo=''):
 def A_OrderContractNo(localOrderId):
     return baseApi.A_OrderContractNo(localOrderId)
 
-def A_SendOrder(userNo, contractNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty, triggerType='N', triggerMode='N', triggerCondition='N', triggerPrice=0):
-    return baseApi.A_SendOrder(userNo, contractNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty, triggerType, triggerMode, triggerCondition, triggerPrice)
+def A_SendOrder(orderDirct, entryOrExit, orderQty, orderPrice, contractNo='', userNo='', orderType='2', validType='0', hedge='T', triggerType='N', triggerMode='N', triggerCondition='N', triggerPrice=0):
+    return baseApi.A_SendOrder(userNo, contractNo, orderDirct, entryOrExit, orderQty, orderPrice, orderType, validType, hedge, triggerType, triggerMode, triggerCondition, triggerPrice)
 
 def A_DeleteOrder(localOrderId):
     return baseApi.A_DeleteOrder(localOrderId)

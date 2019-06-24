@@ -731,111 +731,15 @@ class StrategyModel(object):
         # print("now actual id = ", retCode, eSessionId)
         return eSessionId if retCode == 0 else ""
         
-    def sendOrder(self, userNo, contNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty):
-        '''A账户下单函数，不经过calc模块，不产生信号，直接发单'''
-        # 是否暂停实盘下单
-        if self._cfgModel.getPending():
-            return -5, "请调用StartTrade方法开启实盘下单功能"
-
-        # 发送下单信号,K线触发、即时行情触发
-        # 未选择实盘运行
-        if not self._cfgModel.isActualRun():
-            return -1, '未选择实盘运行，请在设置界面勾选"实盘运行"，或者在策略代码中调用SetActual()方法选择实盘运行'
-
-        if not self._strategy.isRealTimeStatus():
-            return -2, "策略当前状态不是实盘运行状态，请勿在历史回测阶段调用该函数"
-
-        # 账户错误
-        if not userNo or userNo == 'Default':
-            return -3, "未指定下单账户信息"
-
-        # 指定的用户未登录
-        if self._trdModel.getSign(userNo) is None:
-            return -4, "输入的账户没有在极星客户端登录"
-
-        eId = str(self._strategy.getStrategyId()) + '-' + str(self._strategy.getESessionId())
-        # 上期所特殊处理
-        if "SHFE|" in contNo and entryOrExit == oCover:
-            if orderDirct == dBuy:
-                positionInfo = self._trdModel.getUserModel(userNo).getPositionInfo(contNo, dSell)
-            elif orderDirct == dSell:
-                positionInfo = self._trdModel.getUserModel(userNo).getPositionInfo(contNo, dBuy)
-            else:
-                pass
-
-            if positionInfo is None:
-                self.logger.error("持仓查询没有查询到对应方向的持仓, 无法平仓")
-                return -6, "持仓查询没有查询到对应方向的持仓, 无法平仓"
-
-            entryOrExitToday = oCoverT
-            orderQtyToday = positionInfo["TodayPos"]
-            aOrder = {
-                'UserNo': userNo,
-                'Sign': self._trdModel.getSign(userNo),
-                'Cont': contNo,
-                'OrderType': orderType,
-                'ValidType': validType,
-                'ValidTime': '0',
-                'Direct': orderDirct,
-                'Offset': entryOrExitToday,
-                'Hedge': hedge,
-                'OrderPrice': orderPrice,
-                'TriggerPrice': 0,
-                'TriggerMode': tmNone,
-                'TriggerCondition': tcNone,
-                'OrderQty': orderQtyToday,
-                'StrategyType': stNone,
-                'Remark': '',
-                'AddOneIsValid': tsDay,
-            }
-            self.sendActualOrder2Engine(aOrder, eId, self._strategy.getStrategyId())
-            if orderQty>positionInfo["TodayPos"]:
-                orderQty = orderQty-positionInfo["TodayPos"]
-                entryOrExit = oCover
-            else:
-                self._strategy.setESessionId(self._strategy.getESessionId() + 1)
-                self._strategy.updateLocalOrder(eId, aOrder)
-                return 0, eId
-
-        # 发送定单到实盘
-        aOrder = {
-            'UserNo': userNo,
-            'Sign': self._trdModel.getSign(userNo),
-            'Cont': contNo,
-            'OrderType': orderType,
-            'ValidType': validType,
-            'ValidTime': '0',
-            'Direct': orderDirct,
-            'Offset': entryOrExit,
-            'Hedge': hedge,
-            'OrderPrice': orderPrice,
-            'TriggerPrice': 0,
-            'TriggerMode': tmNone,
-            'TriggerCondition': tcNone,
-            'OrderQty': orderQty,
-            'StrategyType': stNone,
-            'Remark': '',
-            'AddOneIsValid': tsDay,
-        }
-        self.sendActualOrder2Engine(aOrder, eId, self._strategy.getStrategyId())
-        # self.logger.trade_info(self._strategy.getStrategyId(), aOrder)
-        # 更新策略的订单信息
-        self._strategy.setESessionId(self._strategy.getESessionId() + 1)
-        self._strategy.updateLocalOrder(eId, aOrder)
-        return 0, eId
-
-    def sendActualOrder2Engine(self, aOrder, eId, strategyId):
-        aOrderEvent = Event({
-            "EventCode": EV_ST2EG_ACTUAL_ORDER,
-            "StrategyId": strategyId,
-            "Data": aOrder,
-            "ESessionId": eId,
-        })
-        self._strategy.sendEvent2Engine(aOrderEvent)
-
-    def sendConditionOrder(self, userNo, contNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty, \
+    def sendOrder(self, userNo, contNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty, \
                            triggerType=stNone, triggerMode=tmNone, triggerCondition=tcNone, triggerPrice=0):
         '''A账户下单函数，不经过calc模块，不产生信号，直接发单'''
+        if not userNo:
+            userNo = self._cfgModel.getUserNo()
+
+        if not contNo:
+            contNo = self._cfgModel.getBenchmark()
+
         # 是否暂停实盘下单
         if self._cfgModel.getPending():
             return -5, "请调用StartTrade方法开启实盘下单功能"
@@ -890,6 +794,15 @@ class StrategyModel(object):
         self._strategy.setESessionId(self._strategy.getESessionId() + 1)
         self._strategy.updateLocalOrder(eId, aOrder)
         return 0, eId
+
+    def sendActualOrder2Engine(self, aOrder, eId, strategyId):
+        aOrderEvent = Event({
+            "EventCode": EV_ST2EG_ACTUAL_ORDER,
+            "StrategyId": strategyId,
+            "Data": aOrder,
+            "ESessionId": eId,
+        })
+        self._strategy.sendEvent2Engine(aOrderEvent)
 
     def getAOrderNo(self, eId):
         if not (isinstance(eId, str) and '-' in eId):
