@@ -1129,17 +1129,19 @@ class BaseApi(object):
         return self._dataModel.getQuoteDataExist(contractNo)
 
     #/////////////////////////策略交易/////////////////////////////
-    def Buy(self, contractNo, share=0, price=0):
+    def Buy(self, contractNo, share=0, price=0, userNo=''):
         '''
         【说明】
               产生一个多头建仓操作
 
         【语法】
-              Bool Buy(int Share=0,float Price=0)
+              Bool Buy(int Share=0, float Price=0, string ContractNo=None, string UserNo=')
 
         【参数】
-              Share 买入数量，为整型值，默认使用系统设置
-              Price 买入价格，为浮点数，默认使用现价(非最后Bar为Close)。
+              Share 买入数量，为整型值，默认为0；
+              Price 买入价格，为浮点数，默认为0；
+              Contract 合约代码，为字符串，默认使用基准合约；
+              UserNo 用户编号，为字符串，默认使用界面选定用户编号。
 
         【备注】
               产生一个多头建仓操作，返回值为布尔型，执行成功返回True，否则返回False。
@@ -1160,19 +1162,21 @@ class BaseApi(object):
               在当前持有空头仓位的情况下：
               Buy(10,Close) 表示平掉所有空仓，并用当前Bar收盘价买入10张合约，马上发送委托。
         '''
-        return self._dataModel.setBuy(contractNo, share, price)
+        return self._dataModel.setBuy(userNo, contractNo, share, price)
 
-    def BuyToCover(self, contractNo, share=0, price=0):
+    def BuyToCover(self, contractNo, share=0, price=0, userNo=''):
         '''
         【说明】
               产生一个空头平仓操作
 
         【语法】
-              Bool BuyToCover(int Share=0,float Price=0)
+              Bool BuyToCover(int Share=0, float Price=0, string ContractNo=None, string UserNo='')
 
         【参数】
-              Share 买入数量，为整型值，默认为平掉当前所有持仓；
-              Price 买入价格，为浮点数，默认=0时为使用现价(非最后Bar为Close)。
+              Share 买入数量，为整型值，默认为0；
+              Price 买入价格，为浮点数，默认为0；
+              Contract 合约代码，为字符串，默认使用基准合约；
+              UserNo 用户编号，为字符串，默认使用界面选定用户编号。
 
         【备注】
               产生一个空头平仓操作，返回值为布尔型，执行成功返回True，否则返回False。
@@ -1190,19 +1194,21 @@ class BaseApi(object):
               BuyToCover(5,0) 表示用现价空头买入5张合约)，马上发送委托。
               BuyToCover(0,0) 表示用现价按交易设置中的设置,马上发送委托。
         '''
-        return self._dataModel.setBuyToCover(contractNo, share, price)
+        return self._dataModel.setBuyToCover(userNo, contractNo, share, price)
 
-    def Sell(self, contractNo, share=0, price=0):
+    def Sell(self, contractNo, share=0, price=0, userNo=''):
         '''
         【说明】
               产生一个多头平仓操作
 
         【语法】
-              Bool Sell(int Share=0,float Price=0)
+              Bool Sell(int Share=0, float Price=0, string ContractNo=None, string UserNo='')
 
         【参数】
-              Share 卖出数量，为整型值，默认为平掉当前所有持仓；
-              Price 卖出价格，为浮点数，默认=0时为使用现价(非最后Bar为Close)。
+              Share 买入数量，为整型值，默认为0；
+              Price 买入价格，为浮点数，默认为0；
+              Contract 合约代码，为字符串，默认使用基准合约；
+              UserNo 用户编号，为字符串，默认使用界面选定用户编号。
 
         【备注】
               产生一个多头平仓操作，返回值为布尔型，执行成功返回True，否则返回False。
@@ -1220,19 +1226,21 @@ class BaseApi(object):
               Sell(5,0) 表示用现价卖出5张合约，马上发送委托。
               Sell(0,0) 表示用现价按交易设置中的设置,马上发送委托。
         '''
-        return self._dataModel.setSell(contractNo, share, price)
+        return self._dataModel.setSell(userNo, contractNo, share, price)
 
-    def SellShort(self, contractNo, share=0, price=0):
+    def SellShort(self, contractNo, share=0, price=0, userNo=''):
         '''
         【说明】
               产生一个空头建仓操作
 
         【语法】
-              Bool SellShort(int Share=0,float Price=0)
+              Bool SellShort(int Share=0, float Price=0, string ContractNo=None, string UserNo='')
 
         【参数】
-              Share 卖出数量，为整型值，默认为使用系统设置参数；
-              Price 卖出价格，为浮点数，默认=0时为使用现价(非最后Bar为Close)。
+              Share 买入数量，为整型值，默认为0；
+              Price 买入价格，为浮点数，默认为0；
+              Contract 合约代码，为字符串，默认使用基准合约；
+              UserNo 用户编号，为字符串，默认使用界面选定用户编号。
 
         【备注】
               产生一个空头建仓操作，返回值为布尔型，执行成功返回True，否则返回False。
@@ -1253,7 +1261,7 @@ class BaseApi(object):
               SellShort(10,Close) 表示平掉所有多头仓位，并用当前Bar收盘价空头卖出10张合约，马上发送委托。
 
         '''
-        return self._dataModel.setSellShort(contractNo, share, price)
+        return self._dataModel.setSellShort(userNo, contractNo, share, price)
 
     def StartTrade(self):
         '''
@@ -6319,17 +6327,17 @@ def DeleteAllOrders(contractNo=''):
     return baseApi.DeleteAllOrders(contractNo)
 
 #策略交易
-def Buy(share=0, price=0, contractNo=None):
-    return baseApi.Buy(contractNo, share, price)
+def Buy(share=0, price=0, contractNo=None, userNo=''):
+    return baseApi.Buy(contractNo, share, price, userNo)
 
-def BuyToCover(share=0, price=0, contractNo=None):
-    return baseApi.BuyToCover(contractNo, share, price)
+def BuyToCover(share=0, price=0, contractNo=None, userNo=''):
+    return baseApi.BuyToCover(contractNo, share, price, userNo)
 
-def Sell(share=0, price=0, contractNo=None):
-    return baseApi.Sell(contractNo, share, price)
+def Sell(share=0, price=0, contractNo=None, userNo=''):
+    return baseApi.Sell(contractNo, share, price, userNo)
 
-def SellShort(share=0, price=0, contractNo=None):
-    return baseApi.SellShort(contractNo, share, price)
+def SellShort(share=0, price=0, contractNo=None, userNo=''):
+    return baseApi.SellShort(contractNo, share, price, userNo)
 
 def StartTrade():
     return baseApi.StartTrade()

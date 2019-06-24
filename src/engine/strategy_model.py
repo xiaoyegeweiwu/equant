@@ -350,13 +350,16 @@ class StrategyModel(object):
         return self._qteModel.getQuoteDataExist(symbol)
 
     # ////////////////////////策略函数////////////////////////////
-    def setBuy(self, contractNo, share, price):
+    def setBuy(self, userNo, contractNo, share, price):
         contNo = contractNo if contractNo else self._cfgModel.getBenchmark()
         
         # 非K线触发的策略，不使用Bar
         curBar = None
         # 账户
-        userNo = self._cfgModel.getUserNo() if self._cfgModel.isActualRun() else "Default"
+        if self._cfgModel.isActualRun():
+            userNo = self._cfgModel.getUserNo() if not userNo else userNo
+        else:
+            userNo = "Default"
 
         # 对于开仓，需要平掉反向持仓
         qty = self._calcCenter.needCover(userNo, contNo, dBuy, share, price)
@@ -367,31 +370,40 @@ class StrategyModel(object):
         eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtGFD, dBuy, oOpen, hSpeculate, price, share, curBar)
         if eSessionId != "": self._strategy.updateBarInfoInLocalOrder(eSessionId, curBar)
 
-    def setBuyToCover(self, contractNo, share, price):
+    def setBuyToCover(self, userNo, contractNo, share, price):
         contNo = contractNo if contractNo is not None else self._cfgModel.getBenchmark()
         curBar = None
 
         # 交易计算、生成回测报告
         # 产生信号
-        userNo = self._cfgModel.getUserNo() if self._cfgModel.isActualRun() else "Default"
+        if self._cfgModel.isActualRun():
+            userNo = self._cfgModel.getUserNo() if not userNo else userNo
+        else:
+            userNo = "Default"
         eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtGFD, dBuy, oCover, hSpeculate, price, share, curBar)
         if eSessionId != "": self._strategy.updateBarInfoInLocalOrder(eSessionId, curBar)
 
-    def setSell(self, contractNo, share, price):
+    def setSell(self, userNo, contractNo, share, price):
         contNo = contractNo if contractNo is not None else self._cfgModel.getBenchmark()
         curBar = None
 
         # 交易计算、生成回测报告
         # 产生信号
-        userNo = self._cfgModel.getUserNo() if self._cfgModel.isActualRun() else "Default"
+        if self._cfgModel.isActualRun():
+            userNo = self._cfgModel.getUserNo() if not userNo else userNo
+        else:
+            userNo = "Default"
         eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtGFD, dSell, oCover, hSpeculate, price, share, curBar)
         if eSessionId != "": self._strategy.updateBarInfoInLocalOrder(eSessionId, curBar)
 
-    def setSellShort(self, contractNo, share, price):
+    def setSellShort(self, userNo, contractNo, share, price):
         contNo = contractNo if contractNo is not None else self._cfgModel.getBenchmark()
         curBar = None
-        
-        userNo = self._cfgModel.getUserNo() if self._cfgModel.isActualRun() else "Default"
+
+        if self._cfgModel.isActualRun():
+            userNo = self._cfgModel.getUserNo() if not userNo else userNo
+        else:
+            userNo = "Default"
         qty = self._calcCenter.needCover(userNo, contNo, dSell, share, price)
         if qty > 0:
             eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtGFD, dSell, oCover, hSpeculate, price, qty, curBar)
