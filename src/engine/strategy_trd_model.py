@@ -139,7 +139,8 @@ class StrategyTrade(TradeModel):
 
         contractNo = self._config.getBenchmark() if not contNo else contNo
         itemSum = 0.0
-        for orderNo, tPositionModel in tUserInfoModel._position.items():
+        for orderNo in list(tUserInfoModel._position.keys()):
+            tPositionModel = tUserInfoModel._position[orderNo]
             if tPositionModel._metaData['Cont'] == contractNo and key in tPositionModel._metaData:
                 if not direct or tPositionModel._metaData['Direct'] == direct:
                     itemSum += tPositionModel._metaData[key]
