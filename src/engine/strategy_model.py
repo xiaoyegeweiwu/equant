@@ -1925,18 +1925,18 @@ class StrategyModel(object):
         if (not isinstance(price, np.ndarray) and not isinstance(price, list)) or len(price) == 0:
             return np.array([])
 
+        arr = np.array(price) if isinstance(price, list) else price
         if length <= 1:
-            return np.array(price)
+            return arr
 
-        arr = np.array(price)
         return talib.MAX(arr, length)
 
     def getLowest(self, price, length):
         if (not isinstance(price, np.ndarray) and not isinstance(price, list)) or len(price) == 0:
             return np.array([])
 
+        arr = np.array(price) if isinstance(price, list) else price
         if length <= 1:
-            return np.array(price)
+            return arr
 
-        arr = np.array(price)
         return talib.MIN(arr, length)
