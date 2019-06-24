@@ -136,6 +136,21 @@ class TUserInfoModel:
             else:
                 self._position[positionNo].updatePosition(positionDict)
 
+    # 内盘有买卖两个方向， 外盘会对冲只有一个方向
+    def getPositionInfo(self, contractNo, direct=None):
+        isChinese = contractNo.split("|")[0].upper() in ["SHFE", "ZCE", "DCE", "CFFEX", "INE"]
+        print(f"when getPositionInfo isChinese:{isChinese} ")
+        if self._position is None:
+            return None
+        for positionNo, positionObj in self._position.items():
+            if isChinese:
+                if positionObj.getContractNo() == contractNo and direct==positionObj.getPositionInfo()["Direct"]:
+                    return positionObj.getPositionInfo()
+            else:
+                if positionObj.getContractNo() == contractNo:
+                    return positionObj.getPositionInfo()
+
+
     def formatUserInfo(self):
         data = {
             'metaData' : {},
@@ -177,6 +192,7 @@ class TUserInfoModel:
             data['position'] = positionDict
 
         return data
+
 
 class TMoneyModel:
     '''资金信息'''
@@ -291,7 +307,22 @@ class TPositionModel:
         self._metaData['ProfitCalcPrice']   =  data['ProfitCalcPrice']          # 浮盈计算价
         self._metaData['FloatProfit']       =  data['FloatProfit']     # 浮盈
         self._metaData['FloatProfitTBT']    =  data['FloatProfitTBT']            # 逐笔浮盈
-        
+
+    def getContractNo(self):
+        return self._metaData["Cont"]
+
+    def getPositionDirect(self):
+        return self._metaData["Direct"]
+
+    def getPositionInfo(self):
+        return {
+            "TotalPos":self._metaData["PositionQty"],
+            "TodayPos":self._metaData["PositionQty"]-self._metaData["PrePositionQty"],
+            "PrePos"  :self._metaData["PrePositionQty"],
+            "Direct"  :self._metaData["Direct"]
+        }
+
+
 class TradeModel:
     
     def __init__(self, logger):
