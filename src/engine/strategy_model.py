@@ -847,6 +847,7 @@ class StrategyModel(object):
             "ESessionId": eId,
         })
         self._strategy.sendEvent2Engine(aOrderEvent)
+        self.logger.trade_info(f"发送实盘订单，策略Id:{strategyId}, 本地订单号：{eId}, 订单数据：{repr(aOrder)}")
 
     def getAOrderNo(self, eId):
         if not (isinstance(eId, str) and '-' in eId):
