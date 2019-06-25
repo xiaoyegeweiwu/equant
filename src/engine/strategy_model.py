@@ -595,6 +595,9 @@ class StrategyModel(object):
     def getBuyPosition(self, contNo):
         return self._trdModel.getBuyPosition(contNo)
 
+    def getBuyPositionCanCover(self, contNo):
+        return self._trdModel.getBuyPositionCanCover(contNo)
+
     def getBuyProfitLoss(self, contNo):
         return self._trdModel.getBuyProfitLoss(contNo)
 
@@ -603,6 +606,9 @@ class StrategyModel(object):
 
     def getSellPosition(self, contNo):
         return self._trdModel.getSellPosition(contNo)
+
+    def getSellPositionCanCover(self, contNo):
+        return self._trdModel.getSellPositionCanCover(contNo)
 
     def getSellProfitLoss(self, contNo):
         return self._trdModel.getSellProfitLoss(contNo)

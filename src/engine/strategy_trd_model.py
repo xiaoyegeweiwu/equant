@@ -37,7 +37,7 @@ class StrategyTrade(TradeModel):
         :return:所有持仓合约
         '''
         if len(self._userInfo) == 0 or self._selectedUserNo not in self._userInfo:
-            return []
+            raise Exception("请确保您的账号已经在客户端登录")
 
         tUserInfoModel = self._userInfo[self._selectedUserNo]
         if len(tUserInfoModel._position) == 0:
@@ -58,7 +58,7 @@ class StrategyTrade(TradeModel):
         :return:资金信息
         '''
         if len(self._userInfo) == 0 or self._selectedUserNo not in self._userInfo:
-            return 0
+            raise Exception("请确保您的账号已经在客户端登录")
 
         tUserInfoModel = self._userInfo[self._selectedUserNo]
         if len(tUserInfoModel._money) == 0:
@@ -131,7 +131,7 @@ class StrategyTrade(TradeModel):
         :return:
         '''
         if len(self._userInfo) == 0 or self._selectedUserNo not in self._userInfo:
-            return 0
+            raise Exception("请确保您的账号已经在客户端登录")
 
         tUserInfoModel = self._userInfo[self._selectedUserNo]
         if len(tUserInfoModel._position) == 0:
@@ -159,7 +159,35 @@ class StrategyTrade(TradeModel):
         '''
         :return:当前公式应用的帐户下当前商品的买入持仓
         '''
-        return self.getItemSumFromPositionModel('B', contNo, 'PositionQty')
+        return int(self.getItemSumFromPositionModel('B', contNo, 'PositionQty'))
+
+    def getBuyPositionCanCover(self, contNo):
+        '''买仓可平数量'''
+        if not contNo:
+            contNo = self._config.getBenchmark()
+        buyPos = self.getBuyPosition(contNo) - self.getQueueSumFromOrderModel('S', contNo, ('C', 'T'))
+        return int(buyPos)
+
+    def getQueueSumFromOrderModel(self, direct, contNo, offset):
+        if len(self._userInfo) == 0 or self._selectedUserNo not in self._userInfo:
+            raise Exception("请确保您的账号已经在客户端登录")
+        tUserInfoModel = self._userInfo[self._selectedUserNo]
+
+        if len(tUserInfoModel._order) == 0:
+            return 0
+
+        queueSum = 0
+        for orderKey in list(tUserInfoModel._order.keys()):
+            orderModel = tUserInfoModel._order[orderKey]
+            if contNo == orderModel._metaData['Cont'] and direct == orderModel._metaData['Direct'] and orderModel._metaData['Offset'] in offset:
+                if orderModel._metaData['OrderState'] == '4':
+                    # 已排队
+                    queueSum += orderModel._metaData['OrderQty']
+                elif orderModel._metaData['OrderState'] == '5':
+                    # 部分成交
+                    queueSum += orderModel._metaData['OrderQty'] - orderModel._metaData['MatchQty']
+
+        return queueSum
 
     def getBuyProfitLoss(self, contNo):
         '''
@@ -179,7 +207,15 @@ class StrategyTrade(TradeModel):
         '''
         :return: 当前公式应用的帐户下当前商品的卖出持仓
         '''
-        return self.getItemSumFromPositionModel('S', contNo, 'PositionQty')
+        return int(self.getItemSumFromPositionModel('S', contNo, 'PositionQty'))
+
+    def getSellPositionCanCover(self, contNo):
+        '''卖仓可平数量'''
+        if not contNo:
+            contNo = self._config.getBenchmark()
+        sellPos = self.getSellPosition(contNo) - self.getQueueSumFromOrderModel('B', contNo, ('C', 'T'))
+        return int(sellPos)
+
 
     def getSellProfitLoss(self, contNo):
         '''
@@ -199,7 +235,7 @@ class StrategyTrade(TradeModel):
         '''
         :return: 当前公式应用的帐户下当前商品的总持仓
         '''
-        return self.getItemSumFromPositionModel('', contNo, 'PositionQty')
+        return int(self.getItemSumFromPositionModel('', contNo, 'PositionQty'))
 
     def getTotalProfitLoss(self, contNo):
         '''
@@ -211,13 +247,15 @@ class StrategyTrade(TradeModel):
         '''
         :return: 当前公式应用的帐户下当前商品的当日买入持仓
         '''
-        return self.getItemSumFromPositionModel('B', contNo, 'PositionQty') - self.getItemSumFromPositionModel('B', contNo, 'PrePositionQty')
+        todayBuyPos = self.getItemSumFromPositionModel('B', contNo, 'PositionQty') - self.getItemSumFromPositionModel('B', contNo, 'PrePositionQty')
+        return int(todayBuyPos)
 
     def getTodaySellPosition(self, contNo):
         '''
         :return: 当前公式应用的帐户下当前商品的当日卖出持仓
         '''
-        return self.getItemSumFromPositionModel('S', contNo, 'PositionQty') - self.getItemSumFromPositionModel('S', contNo, 'PrePositionQty')
+        todaySellPos = self.getItemSumFromPositionModel('S', contNo, 'PositionQty') - self.getItemSumFromPositionModel('S', contNo, 'PrePositionQty')
+        return int(todaySellPos)
 
     def getOrderBuyOrSell(self, eSession):
         '''
@@ -494,18 +532,18 @@ class StrategyTrade(TradeModel):
                         latestTime = float(timeStamp)
         return latestTime
 
-    def getOrderContractNo(self, orderId):
+    def getOrderContractNo(self, eSession):
         if self._selectedUserNo not in self._userInfo:
             raise Exception("请先在极星客户端登录您的交易账号")
-
         tUserInfoModel = self._userInfo[self._selectedUserNo]
-        if len(tUserInfoModel._order) == 0:
-            return ""
 
-        orderModel = None
-        if orderId in tUserInfoModel._order:
-            orderModel = tUserInfoModel._order[orderId]
-        return orderModel._metaData['Cont'] if orderModel else ""
+        if isinstance(eSession, str) and '-' in eSession:
+            return self._strategy.getContNo(eSession)
+        else:
+            if eSession in tUserInfoModel._order:
+                orderModel = tUserInfoModel._order[eSession]
+                return orderModel._metaData['Cont'] if orderModel else ''
+        return ''
 
     def deleteOrder(self, eSession):
         '''
