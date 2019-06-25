@@ -177,8 +177,6 @@ class StrategyModel(object):
     def getCurrentBar(self, contNo, kLineType, kLineValue):
         multiContKey = self.getKey(contNo, kLineType, kLineValue)
         curBar = self._hisModel.getCurBar(multiContKey)
-        # TODO: 为什么要减1
-        # return curBar["KLineIndex"] - 1
         if not curBar:
             return None
         return curBar['KLineIndex']
@@ -840,6 +838,8 @@ class StrategyModel(object):
         return 0, eId
 
     def sendActualOrder2Engine(self, aOrder, eId, strategyId):
+        if int(aOrder["OrderQty"]+0.5) <= 0:
+            return
         aOrderEvent = Event({
             "EventCode": EV_ST2EG_ACTUAL_ORDER,
             "StrategyId": strategyId,
