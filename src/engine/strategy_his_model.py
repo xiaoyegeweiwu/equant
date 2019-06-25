@@ -614,8 +614,8 @@ class StrategyHisQuote(object):
     def onHisQuoteRsp(self, event):
         key = (event.getContractNo(), event.getKLineType(), event.getKLineSlice())
         kindInfo = {"ContractNo":key[0], "KLineType":key[1],"KLineSlice":key[2]}
-        # print("key = ", key, len(event.getData()), event.isChainEnd(), kindInfo)
-        # print(self._config.getKLineKindsInfo())
+        #print("key = ", key, len(event.getData()), event.isChainEnd(), kindInfo)
+        #print(self._config.getKLineKindsInfo())
 
         assert kindInfo in self._config.getKLineKindsInfo(), " Error "
         if not self._isReqByDate[key]:                        # req by count
@@ -813,7 +813,7 @@ class StrategyHisQuote(object):
     def onHisQuoteNotice(self, event):
         key = (event.getContractNo(), event.getKLineType(), event.getKLineSlice())
         kindInfo = {"ContractNo": key[0], "KLineType": key[1], "KLineSlice": key[2]}
-        # print("kind = ", event.getData()[0]["DateTimeStamp"], kindInfo, event.getData())
+        # print("kind = ", event.getData()[0]["DateTimeStamp"], kindInfo, )
         # 丢掉
         if not self._kLineRspData[key]["KLineReady"]:
             return
@@ -944,8 +944,8 @@ class StrategyHisQuote(object):
                 curEffectiveDTS = curBarDTS-relativedelta(days=record[2])
             elif record[1] == EEQU_KLINE_SECOND:
                 curEffectiveDTS = curBarDTS-relativedelta(seconds=record[2])
-            elif record[1] == EEQU_KLINE_SECOND:
-                curBarDTS = curBarDTS
+            elif record[1] == EEQU_KLINE_TICK:
+                curEffectiveDTS = curBarDTS
             else:
                 raise NotImplementedError("未实现的k线类型支持")
             effectiveDTS.append(curEffectiveDTS.strftime("%Y%m%d%H%M%S%f"))
