@@ -21,6 +21,7 @@ class StrategyQuote(QuoteModel):
         
     def subQuote(self):
         contList = []
+        self._contractTuple = self._config.getContract()
         for cno in self._contractTuple:
             contList.append(cno)
 

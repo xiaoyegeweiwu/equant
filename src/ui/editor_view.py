@@ -103,12 +103,17 @@ class StrategyTree(QuantFrame):
 
     def update_tree(self, fullname):
         '''只刷新父节点'''
-        # TODO：怎么可以实现新建策略按正确的顺序插入呢？
+
         dir_name = os.path.dirname(fullname)
         file_name = os.path.basename(fullname)
-        parent = self.tree_node_dict[dir_name]
+        # debug模式下新建文件时会发现新建文件的位置在树上不对，update_all_tree之后才对。
 
-        if not parent:
+        try:  # 在最外层创建目录
+            selectId = self.tree_node_dict[dir_name]
+        except:
+            selectId = dir_name
+
+        if not selectId:
             messagebox.showinfo("提示", "更新策略树失败")
         else:
             if os.path.isdir(fullname):
@@ -117,6 +122,12 @@ class StrategyTree(QuantFrame):
                 iimage = self.gfileicon
             else:
                 return
+
+            try:   # 在最外层创建文件夹
+                parent = self.root_tree.parent(selectId)
+            except:
+                parent = ""
+
             itemId = self.root_tree.insert(parent, 'end', iid=fullname, text=file_name, open=False,
                                            values=[fullname, "!@#$%^&*"],
                                            image=iimage)

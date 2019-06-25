@@ -133,31 +133,36 @@ class StrategyMenu(object):
             # 新建前先保存当前选中的策略
             self._controller.saveStrategy()
 
-            tempPath = self.get_file_path()
-            path =tempPath[0]
-
-            if os.path.isdir(path):
-                #TODO: 新建策略有问题
-                dir_path = path
-                # dir_path = os.path.dirname(path)
-
-            if os.path.isfile(path):
-                dir_path = os.path.dirname(path)
-                # dir_path = os.path.dirname(par_path)
             file_name = newTop.nameEntry.get()
             if file_name == "":
                 messagebox.showinfo(self.language.get_text(8), self.language.get_text(22), parent=newTop)
             else:
-                if not os.path.exists(os.path.join(dir_path, file_name)):
+                tempPath = self.get_file_path()
+                path = tempPath[0]
+                if os.path.isdir(path):
+                    # TODO: 新建策略有问题
+                    dir_path = path
+                    # dir_path = os.path.dirname(path)
+                    if self.widget.parent(dir_path) == "":
+                        newPath = os.path.abspath(os.path.join(dir_path, "..\\%s" % file_name))
+                    else:
+                        newPath = os.path.abspath(os.path.join(dir_path, file_name))
+
+                if os.path.isfile(path):
+                    dir_path = os.path.dirname(path)
+                    newPath = os.path.join(dir_path, file_name)
+
+                if not os.path.exists(newPath):
                     # TODO: insert的位置问题。。。
                     # TODO：新建目录和新建文件在目录树种无法区别
                     newTop.destroy()
 
-                    filePath = os.path.join(dir_path, file_name)
-                    self._controller.newDir(filePath)
+                    # filePath = os.path.join(dir_path, file_name)
+                    self._controller.newDir(newPath)
                 else:
                     messagebox.showinfo(self.language.get_text(8),
-                                        self.language.get_text(23) + file_name + self.language.get_text(24), parent=newTop)
+                                        self.language.get_text(23) + file_name + self.language.get_text(24),
+                                        parent=newTop)
 
         def cancel():
             newTop.destroy()
@@ -250,7 +255,6 @@ class StrategyMenu(object):
         # 当前选中的策略路径
         editorPath = self._controller.getEditorText()["path"]
         def enter(event=None):
-            # 新建策略前先保存当前选中的策略
             self._controller.saveStrategy()
             
             # 先关闭窗口
@@ -284,8 +288,11 @@ class StrategyMenu(object):
 
                         os.remove(path)
                         self.widget.delete(select)
-                else:  # 文件不存在（本地文件已经删除）
-                    self.widget.delete(select)
+                else:  # 文件不存在
+                    try:
+                        self.widget.delete(select)
+                    except:
+                        pass
 
         def cancel():
             deleteTop.destroy()

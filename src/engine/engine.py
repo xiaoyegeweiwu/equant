@@ -406,6 +406,9 @@ class StrategyEngine(object):
         
     #////////////////api回调事件//////////////////////////////
     def _onApiConnect(self, apiEvent):
+        self._pyApi.reqSpreadContractMapping()
+        self._pyApi.reqTrendContractMapping()
+
         self._pyApi.reqExchange(Event({'StrategyId':0, 'Data':''}))
         self._eg2uiQueue.put(apiEvent)
         
@@ -631,10 +634,6 @@ class StrategyEngine(object):
             return
 
         self._trdModel.setStatus(TM_STATUS_POSITION)
-
-        #
-        self._pyApi.reqSpreadContractMapping()
-        self._pyApi.reqTrendContractMapping()
         # 交易基础数据查询完成，定时查询资金
         self._createMoneyTimer()
             
