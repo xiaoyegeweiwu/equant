@@ -408,7 +408,6 @@ class StrategyEngine(object):
     def _onApiConnect(self, apiEvent):
         self._pyApi.reqSpreadContractMapping()
         self._pyApi.reqTrendContractMapping()
-
         self._pyApi.reqExchange(Event({'StrategyId':0, 'Data':''}))
         self._eg2uiQueue.put(apiEvent)
         

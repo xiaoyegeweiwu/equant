@@ -177,8 +177,10 @@ class StrategyModel(object):
     def getCurrentBar(self, contNo, kLineType, kLineValue):
         multiContKey = self.getKey(contNo, kLineType, kLineValue)
         curBar = self._hisModel.getCurBar(multiContKey)
-        #TODO: 为什么要减1
-        #return curBar["KLineIndex"] - 1
+        # TODO: 为什么要减1
+        # return curBar["KLineIndex"] - 1
+        if not curBar:
+            return None
         return curBar['KLineIndex']
 
     def getBarStatus(self, contNo, kLineType, kLineValue):
@@ -941,7 +943,7 @@ class StrategyModel(object):
         return EEQU_KLINE_TIMEDIVISION
 
     def getEnumPeriodSecond(self):
-        return EEQU_KLINE_SECOND
+        return EEQU_KLINE_TICK
 
     def getEnumPeriodMin(self):
         return EEQU_KLINE_MINUTE

@@ -277,6 +277,7 @@ class PyAPI(object):
                     }
             }
         '''
+        # print(event.getData())
         sessionId = c_uint()
         req = EEquKLineStrategySwitch()
         data = event.getData()
