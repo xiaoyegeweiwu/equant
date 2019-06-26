@@ -378,7 +378,8 @@ class CalcCenter(object):
             ret = self._limitCtl.allowOrder(order, [])
         else:
             ret = self._limitCtl.allowOrder(order, self._orders[-1]["Order"])
-        if ret == -1:
+
+        if ret == 0:
             return 0
 
         order.update({"OrderId": self._orderId})
