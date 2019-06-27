@@ -29,6 +29,8 @@ class TkinterController(object):
         self.top = Tk()
         self.app = QuantApplication(self.top, self)
         self.app.create_window()
+        self.top.bind("<FocusIn>", self.app.quant_editor.onFocusIn)
+        self.top.bind("<FocusOut>", self.app.quant_editor.onFocusOut)
 
         # 创建模块
         self.model = QuantModel(self.app, self._ui2egQueue, self._eg2uiQueue, self.logger)
@@ -178,6 +180,8 @@ class TkinterController(object):
                     'def initialize(context): \n    pass\n\n\n'
                     'def handle_data(context):\n    pass')
             f.close()
+
+        self.app.updateEditorModifyTime(os.path.getmtime(path))
 
         # 更新策略路径
         self.setEditorTextCode(path)
