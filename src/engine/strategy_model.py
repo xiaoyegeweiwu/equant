@@ -25,7 +25,6 @@ class StrategyModel(object):
         self._strategyName = strategy.getStrategyName()
         self._signalName = self._strategyName + "_Signal"
         self._textName = self._strategyName + "_Text"
-       
         self._plotedDict = {}
         
         # Notice：会抛异常
@@ -178,8 +177,8 @@ class StrategyModel(object):
     def getCurrentBar(self, contNo, kLineType, kLineValue):
         multiContKey = self.getKey(contNo, kLineType, kLineValue)
         curBar = self._hisModel.getCurBar(multiContKey)
-        #TODO: 为什么要减1
-        #return curBar["KLineIndex"] - 1
+        if not curBar:
+            return None
         return curBar['KLineIndex']
 
     def getBarStatus(self, contNo, kLineType, kLineValue):
@@ -409,8 +408,8 @@ class StrategyModel(object):
             eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtGFD, dSell, oCover, hSpeculate, price, qty, curBar)
             if eSessionId != "": self._strategy.updateBarInfoInLocalOrder(eSessionId, curBar)
 
-        #交易计算、生成回测报告
-        #产生信号
+        # 交易计算、生成回测报告
+        # 产生信号
         userNo = self._cfgModel.getUserNo() if self._cfgModel.isActualRun() else "Default"
         eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtGFD, dSell, oOpen, hSpeculate, price, share, curBar)
         if eSessionId != "": self._strategy.updateBarInfoInLocalOrder(eSessionId, curBar)
@@ -445,7 +444,6 @@ class StrategyModel(object):
                 'Data': data,
             }
         })
-        
         self._strategy.sendEvent2Engine(signalNoticeEvent)
 
     def setStartTrade(self):
@@ -597,6 +595,9 @@ class StrategyModel(object):
     def getBuyPosition(self, contNo):
         return self._trdModel.getBuyPosition(contNo)
 
+    def getBuyPositionCanCover(self, contNo):
+        return self._trdModel.getBuyPositionCanCover(contNo)
+
     def getBuyProfitLoss(self, contNo):
         return self._trdModel.getBuyProfitLoss(contNo)
 
@@ -605,6 +606,9 @@ class StrategyModel(object):
 
     def getSellPosition(self, contNo):
         return self._trdModel.getSellPosition(contNo)
+
+    def getSellPositionCanCover(self, contNo):
+        return self._trdModel.getSellPositionCanCover(contNo)
 
     def getSellProfitLoss(self, contNo):
         return self._trdModel.getSellProfitLoss(contNo)
@@ -732,22 +736,17 @@ class StrategyModel(object):
         if self._strategy.isRealTimeStatus() and canAdded < 1:
             return ""
 
+        '''发送历史回测信号'''
+        curBar = self.getHisQuoteModel().getCurBar(self._config.getKLineShowInfoSimple())
+        if not self._strategy.isRealTimeStatus() and self._config.hasKLineTrigger() and curBar:
+            self.sendSignalEvent(self._signalName, contNo, orderDirct, entryOrExit, orderPrice, orderQty, curBar)
+
         retCode, eSessionId = self.sendOrder(userNo, contNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty)
-        # print(signal, isSendSignal, key, self._config.getKLineShowInfoSimple())
-        # print("now actual id = ", retCode, eSessionId)
         return eSessionId if retCode == 0 else ""
         
     def sendOrder(self, userNo, contNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty, \
                            triggerType=stNone, triggerMode=tmNone, triggerCondition=tcNone, triggerPrice=0):
         '''A账户下单函数，不经过calc模块，直接发单'''
-        curBar = self.getHisQuoteModel().getCurBar(self._config.getKLineShowInfoSimple())
-        '''A账户下单函数，不经过calc模块，不产生信号，直接发单'''
-        if self._config.hasKLineTrigger() and curBar:
-            self.sendSignalEvent(self._signalName, contNo, orderDirct, entryOrExit, orderPrice, orderQty, curBar)
-
-        if not self._strategy.isRealTimeStatus():
-            return -2, "策略当前状态不是实盘运行状态， 不会产生实盘订单"
-
         if not userNo:
             userNo = self._cfgModel.getUserNo()
 
@@ -762,6 +761,9 @@ class StrategyModel(object):
         # 未选择实盘运行
         if not self._cfgModel.isActualRun():
             return -1, '未选择实盘运行，请在设置界面勾选"实盘运行"，或者在策略代码中调用SetActual()方法选择实盘运行'
+
+        if not self._strategy.isRealTimeStatus():
+            return -2, "策略当前状态不是实盘运行状态， 不会产生实盘订单"
 
         # 账户错误
         if not userNo or userNo == 'Default':
@@ -809,6 +811,8 @@ class StrategyModel(object):
             else:
                 self._strategy.setESessionId(self._strategy.getESessionId() + 1)
                 self._strategy.updateLocalOrder(eId, aOrder)
+                # 新的eId
+                eId = str(self._strategy.getStrategyId()) + '-' + str(self._strategy.getESessionId())
                 return 0, eId
 
         # 发送定单到实盘
@@ -840,6 +844,8 @@ class StrategyModel(object):
         return 0, eId
 
     def sendActualOrder2Engine(self, aOrder, eId, strategyId):
+        if int(aOrder["OrderQty"]+0.5) <= 0:
+            return
         aOrderEvent = Event({
             "EventCode": EV_ST2EG_ACTUAL_ORDER,
             "StrategyId": strategyId,
@@ -847,6 +853,10 @@ class StrategyModel(object):
             "ESessionId": eId,
         })
         self._strategy.sendEvent2Engine(aOrderEvent)
+        '''发送实盘信号'''
+        curBar = self.getHisQuoteModel().getCurBar(self._config.getKLineShowInfoSimple())
+        if self._config.hasKLineTrigger() and curBar:
+            self.sendSignalEvent(self._signalName, aOrder["Cont"], aOrder["Direct"], aOrder["Offset"], aOrder["OrderPrice"], aOrder["OrderQty"], curBar)
         self.logger.trade_info(f"发送实盘订单，策略Id:{strategyId}, 本地订单号：{eId}, 订单数据：{repr(aOrder)}")
 
     def getAOrderNo(self, eId):
@@ -939,7 +949,7 @@ class StrategyModel(object):
         return EEQU_KLINE_TIMEDIVISION
 
     def getEnumPeriodSecond(self):
-        return EEQU_KLINE_SECOND
+        return EEQU_KLINE_TICK
 
     def getEnumPeriodMin(self):
         return EEQU_KLINE_MINUTE

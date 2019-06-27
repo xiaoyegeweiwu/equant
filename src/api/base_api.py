@@ -2784,6 +2784,25 @@ class BaseApi(object):
          '''
         return self._dataModel.getBuyPosition(contractNo)
 
+    def A_BuyPositionCanCover(self, contractNo):
+        '''
+        【说明】
+              返回当前公式应用的帐户下买仓可平数量。
+
+        【语法】
+              int A_BuyPositionCanCover(string contractNo)
+
+        【参数】
+              contractNo，指定商品的合约编号，为空时采用基准合约编号。
+
+        【备注】
+              可平仓数量=持仓数量-已排队的挂单数量
+
+        【示例】
+              无
+         '''
+        return self._dataModel.getBuyPositionCanCover(contractNo)
+
     def A_BuyProfitLoss(self, contractNo):
         '''
         【说明】
@@ -2843,6 +2862,25 @@ class BaseApi(object):
               当前持空仓3手，A_SellPosition返回3。
          '''
         return self._dataModel.getSellPosition(contractNo)
+
+    def A_SellPositionCanCover(self, contractNo):
+        '''
+        【说明】
+              返回当前公式应用的帐户下卖仓可平数量。
+
+        【语法】
+              int A_SellPositionCanCover(string contractNo)
+
+        【参数】
+              contractNo，指定商品的合约编号，为空时采用基准合约编号。
+
+        【备注】
+              可平仓数量=持仓数量-已排队的挂单数量
+
+        【示例】
+              无
+         '''
+        return self._dataModel.getSellPositionCanCover(contractNo)
 
     def A_SellProfitLoss(self, contractNo):
         '''
@@ -3282,16 +3320,16 @@ class BaseApi(object):
          '''
         return self._dataModel.getALatestFilledTime(contractNo)
 
-    def A_OrderContractNo(self, orderId):
+    def A_OrderContractNo(self, localOrderId):
         '''
         【说明】
               返回订单的合约号。
 
         【语法】
-              string A_OrderContractNo(int orderId)
+              string A_OrderContractNo(int|string localOrderId)
 
         【参数】
-              localOrderId 定单号，整数类型。
+              localOrderId 定单号，或者使用A_SendOrder返回的下单编号。
 
         【备注】
               返回结果如："ZCE|F|TA|305"等，
@@ -3300,7 +3338,7 @@ class BaseApi(object):
         【示例】
               无
          '''
-        return self._dataModel.getOrderContractNo(orderId)
+        return self._dataModel.getOrderContractNo(localOrderId)
 
     def A_SendOrder(self, userNo, contractNo, orderDirct, entryOrExit, orderQty, orderPrice, orderType, validType, hedge, triggerType, triggerMode, triggerCondition, triggerPrice):
         '''
@@ -6242,6 +6280,9 @@ def A_BuyAvgPrice(contractNo=''):
 def A_BuyPosition(contractNo=''):
     return baseApi.A_BuyPosition(contractNo)
 
+def A_BuyPositionCanCover(contractNo=''):
+    return baseApi.A_BuyPositionCanCover(contractNo)
+
 def A_BuyProfitLoss(contractNo=''):
     return baseApi.A_BuyProfitLoss(contractNo)
 
@@ -6250,6 +6291,9 @@ def A_SellAvgPrice(contractNo=''):
 
 def A_SellPosition(contractNo=''):
     return baseApi.A_SellPosition(contractNo)
+
+def A_SellPositionCanCover(contractNo=''):
+    return baseApi.A_SellPositionCanCover(contractNo)
 
 def A_SellProfitLoss(contractNo=''):
     return baseApi.A_SellProfitLoss(contractNo)

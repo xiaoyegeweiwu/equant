@@ -378,7 +378,8 @@ class CalcCenter(object):
             ret = self._limitCtl.allowOrder(order, [])
         else:
             ret = self._limitCtl.allowOrder(order, self._orders[-1]["Order"])
-        if ret == -1:
+
+        if ret == 0:
             return 0
 
         order.update({"OrderId": self._orderId})
@@ -401,8 +402,8 @@ class CalcCenter(object):
                                                         ftOrder["OrderQty"],
                                                         ftOrder["OrderType"],
                                                         ftOrder["Hedge"]))
-        self._logger.trade_info(f"发送虚拟订单，策略Id:{ftOrder['StrategyId']}, 本地订单号：{ftOrder['OrderId']},"
-                                f" 订单数据：{repr(order)}， 运行阶段：{ftOrder['StrategyStage']}")
+        self._logger.trade_info(f"发送虚拟订单，策略Id:{ftOrder['StrategyId']}, 运行阶段：{ftOrder['StrategyStage']}，"
+                                f"本地订单号：{ftOrder['OrderId']},订单数据：{repr(order)}")
 
         # self._logger.sig_info(self._formatOrder(order))
 

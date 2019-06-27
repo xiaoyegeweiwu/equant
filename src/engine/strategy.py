@@ -813,6 +813,12 @@ class Strategy:
         tradeRecode = self._localOrder[eSessionId]
         tradeRecode._barInfo = barInfo
 
+    def getContNo(self, eSessionId):
+        if eSessionId not in self._localOrder:
+            return ''
+        tradeRecord = self._localOrder[eSessionId]
+        return tradeRecord._contNo
+
     def getOrderNo(self, eSessionId):
         if eSessionId not in self._localOrder:
             return 0
