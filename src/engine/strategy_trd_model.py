@@ -207,7 +207,7 @@ class StrategyTrade(TradeModel):
         '''
         :return:当前公式应用的帐户下当前商品的买入持仓盈亏
         '''
-        return self.getItemSumFromPositionModel('B', contNo, 'FloatProfit')
+        return self.getItemSumFromPositionModel('B', contNo, 'FloatProfitTBT')
 
     def getSellAvgPrice(self, contNo):
         '''
@@ -249,7 +249,7 @@ class StrategyTrade(TradeModel):
         '''
         :return: 当前公式应用的帐户下当前商品的卖出持仓盈亏
         '''
-        return self.getItemSumFromPositionModel('S', contNo, 'FloatProfit')
+        return self.getItemSumFromPositionModel('S', contNo, 'FloatProfitTBT')
 
     def getTotalAvgPrice(self, contNo):
         '''
