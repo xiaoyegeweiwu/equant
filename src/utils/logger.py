@@ -1,6 +1,8 @@
 import logging
 import sys,os
 from multiprocessing import Queue, Process
+import queue
+import time
 
 
 class MyHandlerText(logging.StreamHandler):
@@ -32,24 +34,36 @@ class MyHandlerQueue(logging.StreamHandler):
         record.msg = record.msg[0]
         msg = self.format(record)
         if target == 'S':
-            self.sig_queue.put(msg, block=False, timeout=1)
+            try:
+                self.sig_queue.put_nowait(msg)
+            except queue.Full:
+                time.sleep(0.1)
+                print("订单放入队列时阻塞")
         elif target == 'E':
-            self.err_queue.put(msg, block=False, timeout=1)
+            try:
+                self.err_queue.put_nowait(msg)
+            except queue.Full:
+                time.sleep(0.1)
+                print("调试信息放入队列时阻塞")
         elif target == 'T':
             self.trade_log.write(msg+"\n")
             self.trade_log.flush()
         else:
-            self.gui_queue.put(msg, block=False, timeout=1)
-
+            try:
+                self.gui_queue.put_nowait(msg)
+            except queue.Full:
+                time.sleep(0.1)
+                print("界面日志放入队列时阻塞")
+            # self.gui_queue.put_nowait(msg, block=False, timeout=1)
 
 class Logger(object):
     def __init__(self):
         #process queue
-        self.log_queue = Queue()
-        self.gui_queue = Queue()
+        self.log_queue = Queue(2000)
+        self.gui_queue = Queue(2000)
         # 信号队列
-        self.sig_queue = Queue()
-        self.err_queue = Queue()
+        self.sig_queue = Queue(2000)
+        self.err_queue = Queue(100)
         
     def _initialize(self):
 
