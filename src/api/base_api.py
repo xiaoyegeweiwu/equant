@@ -765,25 +765,6 @@ class BaseApi(object):
         '''
         return self._dataModel.getQLastDate(contractNo)
 
-    def Q_LastFlag(self, contractNo=''):
-        '''
-        【说明】
-              最新价变化标志
-
-        【语法】
-              int Q_LastFlag(string contractNo)
-
-        【参数】
-              contractNo 合约编号
-
-        【备注】
-              返回整型, 1为上涨, -1为下跌, 0为不变
-
-        【实例】
-              无
-        '''
-        return self._dataModel.getQLastFlag(contractNo)
-
     def Q_LastTime(self, contractNo=''):
         '''
         【说明】
@@ -6079,9 +6060,6 @@ def Q_Last(contractNo=''):
 
 def Q_LastDate(contractNo=''):
     return baseApi.Q_LastDate(contractNo)
-
-def Q_LastFlag(contractNo=''):
-    return baseApi.Q_LastFlag(contractNo)
 
 def Q_LastTime(contractNo=''):
     return baseApi.Q_LastTime(contractNo)

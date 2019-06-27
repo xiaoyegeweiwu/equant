@@ -43,7 +43,6 @@ _all_func_ = {
                     ['Q_Last'              , '最新价'],
                     ['Q_LastDate'          , '最新成交日期'],
                     ['Q_LastTime'          , '最新成交时间'],
-                    # ['Q_LastFlag'          , '最新价变化标志'],
                     # ['Q_LastVol'           , '现手'],
                     ['Q_Low'               , '当日最低价'],
                     ['Q_LowLimit'          , '当日跌停价'],

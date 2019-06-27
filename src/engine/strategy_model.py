@@ -289,13 +289,31 @@ class StrategyModel(object):
         return self._qteModel.getQLast(symbol)
 
     def getQLastDate(self, symbol):
-        return self._qteModel.getQLastDate(symbol)
-
-    def getQLastFlag(self, symbol):
-        return self._qteModel.getQLastFlag(symbol)
+        symbol = self._config.getBenchmark() if not symbol else symbol
+        key = None
+        for keyTuple in self._hisModel._kLineNoticeData.keys():
+            if keyTuple[0] == symbol and keyTuple[1] == 'T':
+                key = keyTuple
+                break
+        if not key:
+            raise Exception(
+                "在使用Q_LastTime方法时，请确保已经在设置界面或者在策略代码中添加了SetBarInterval('%s', 'T', 1)为合约%s订阅了Tick行情！" % (symbol, symbol))
+        tickInfo = self._hisModel.getLastStoredKLine(key)[0]
+        dateTimeStamp = tickInfo['DateTimeStamp']
+        return int(dateTimeStamp) // 1000000000
 
     def getQLastTime(self, symbol):
-        return self._qteModel.getQLastTime(symbol)
+        symbol = self._config.getBenchmark() if not symbol else symbol
+        key = None
+        for keyTuple in self._hisModel._kLineNoticeData.keys():
+            if keyTuple[0] == symbol and keyTuple[1] == 'T':
+                key = keyTuple
+                break
+        if not key:
+            raise Exception("在使用Q_LastTime方法时，请确保已经在设置界面或者在策略代码中添加了SetBarInterval('%s', 'T', 1)为合约%s订阅了Tick行情！"%(symbol, symbol))
+        tickInfo = self._hisModel.getLastStoredKLine(key)[0]
+        dateTimeStamp = tickInfo['DateTimeStamp']
+        return float(int(dateTimeStamp) % 1000000000) / 1000000000
 
     def getQLastVol(self, symbol):
         return self._qteModel.getQLastVol(symbol)
