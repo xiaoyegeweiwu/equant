@@ -901,8 +901,8 @@ class Strategy:
             }
         })
         self.sendEvent2UI(quitEvent)
-        self.logger.info(f"策略已经将停止完成信号发送到UI和engine,策略{self._strategyId}")
         self.sendEvent2EngineForce(quitEvent)
+        self.logger.info(f"策略已经将停止完成信号发送到UI和engine,策略{self._strategyId}")
         # 保证该进程is_alive， 使得队列可用
         while True:
             time.sleep(2)
@@ -943,8 +943,8 @@ class Strategy:
             }
         })
         self.sendEvent2UI(responseEvent)
-        self.logger.info(f"策略已经将删除完成信号发送到UI和engine,策略{self._strategyId}, {EV_EG2UI_STRATEGY_STATUS}")
         self.sendEvent2EngineForce(responseEvent)
+        self.logger.info(f"策略已经将删除完成信号发送到UI和engine,策略{self._strategyId}, {EV_EG2UI_STRATEGY_STATUS}")
 
         # 保证该进程is_alive， 使得队列可用
         while True:

@@ -745,13 +745,13 @@ class StrategyModel(object):
         }
 
         # if entryOrExit in (oCover, oCoverT):
-        if not self._strategy.isRealTimeStatus() and entryOrExit in (oCover, oCoverT):
+        if entryOrExit in (oCover, oCoverT):
             isVaildOrder = self._calcCenter.coverJudge(orderParam)
             if isVaildOrder < 0:
                 return ""
 
         canAdded = self._calcCenter.addOrder(orderParam)
-        if self._strategy.isRealTimeStatus() and canAdded < 1:
+        if canAdded < 1:
             return ""
 
         '''发送历史回测信号'''
