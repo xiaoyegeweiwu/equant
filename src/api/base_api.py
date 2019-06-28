@@ -1110,18 +1110,19 @@ class BaseApi(object):
         return self._dataModel.getQuoteDataExist(contractNo)
 
     #/////////////////////////策略交易/////////////////////////////
-    def Buy(self, contractNo, share=0, price=0, userNo=''):
+    def Buy(self, share, price, contractNo, needCover, userNo):
         '''
         【说明】
               产生一个多头建仓操作
 
         【语法】
-              Bool Buy(int Share=0, float Price=0, string ContractNo=None, string UserNo=')
+              Bool Buy(int Share=0, float Price=0, string ContractNo=None, bool NeedCover = True, string UserNo=')
 
         【参数】
               Share 买入数量，为整型值，默认为0；
               Price 买入价格，为浮点数，默认为0；
               Contract 合约代码，为字符串，默认使用基准合约；
+              NeedCover 是否先清掉方向持仓，默认为True；
               UserNo 用户编号，为字符串，默认使用界面选定用户编号。
 
         【备注】
@@ -1143,7 +1144,7 @@ class BaseApi(object):
               在当前持有空头仓位的情况下：
               Buy(10,Close) 表示平掉所有空仓，并用当前Bar收盘价买入10张合约，马上发送委托。
         '''
-        return self._dataModel.setBuy(userNo, contractNo, share, price)
+        return self._dataModel.setBuy(userNo, contractNo, share, price, needCover)
 
     def BuyToCover(self, contractNo, share=0, price=0, userNo=''):
         '''
@@ -1209,18 +1210,19 @@ class BaseApi(object):
         '''
         return self._dataModel.setSell(userNo, contractNo, share, price)
 
-    def SellShort(self, contractNo, share=0, price=0, userNo=''):
+    def SellShort(self, share, price, contractNo, needCover, userNo):
         '''
         【说明】
               产生一个空头建仓操作
 
         【语法】
-              Bool SellShort(int Share=0, float Price=0, string ContractNo=None, string UserNo='')
+              Bool SellShort(int Share=0, float Price=0, string ContractNo=None, bool NeedCover = True, string UserNo='')
 
         【参数】
               Share 买入数量，为整型值，默认为0；
               Price 买入价格，为浮点数，默认为0；
               Contract 合约代码，为字符串，默认使用基准合约；
+              NeedCover 是否先清掉方向持仓，默认为True；
               UserNo 用户编号，为字符串，默认使用界面选定用户编号。
 
         【备注】
@@ -1242,7 +1244,7 @@ class BaseApi(object):
               SellShort(10,Close) 表示平掉所有多头仓位，并用当前Bar收盘价空头卖出10张合约，马上发送委托。
 
         '''
-        return self._dataModel.setSellShort(userNo, contractNo, share, price)
+        return self._dataModel.setSellShort(userNo, contractNo, share, price, needCover)
 
     def StartTrade(self):
         '''
@@ -6275,8 +6277,8 @@ def DeleteAllOrders(contractNo=''):
     return baseApi.DeleteAllOrders(contractNo)
 
 #策略交易
-def Buy(share=0, price=0, contractNo=None, userNo=''):
-    return baseApi.Buy(contractNo, share, price, userNo)
+def Buy(share=0, price=0, contractNo=None, needCover=True, userNo=''):
+    return baseApi.Buy(share, price, contractNo, needCover, userNo)
 
 def BuyToCover(share=0, price=0, contractNo=None, userNo=''):
     return baseApi.BuyToCover(contractNo, share, price, userNo)
@@ -6284,8 +6286,8 @@ def BuyToCover(share=0, price=0, contractNo=None, userNo=''):
 def Sell(share=0, price=0, contractNo=None, userNo=''):
     return baseApi.Sell(contractNo, share, price, userNo)
 
-def SellShort(share=0, price=0, contractNo=None, userNo=''):
-    return baseApi.SellShort(contractNo, share, price, userNo)
+def SellShort(share=0, price=0, contractNo=None, needCover=True, userNo=''):
+    return baseApi.SellShort(share, price, contractNo, needCover, userNo)
 
 def StartTrade():
     return baseApi.StartTrade()

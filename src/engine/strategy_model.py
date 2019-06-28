@@ -367,7 +367,7 @@ class StrategyModel(object):
         return self._qteModel.getQuoteDataExist(symbol)
 
     # ////////////////////////策略函数////////////////////////////
-    def setBuy(self, userNo, contractNo, share, price):
+    def setBuy(self, userNo, contractNo, share, price, needCover=True):
         contNo = contractNo if contractNo else self._cfgModel.getBenchmark()
         
         # 非K线触发的策略，不使用Bar
@@ -380,7 +380,7 @@ class StrategyModel(object):
 
         # 对于开仓，需要平掉反向持仓
         qty = self._calcCenter.needCover(userNo, contNo, dBuy, share, price)
-        if qty > 0:
+        if qty > 0 and needCover:
             eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtGFD, dBuy, oCover, hSpeculate, price, qty, curBar)
             if eSessionId != "": self._strategy.updateBarInfoInLocalOrder(eSessionId, curBar)
 
@@ -413,7 +413,7 @@ class StrategyModel(object):
         eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtGFD, dSell, oCover, hSpeculate, price, share, curBar)
         if eSessionId != "": self._strategy.updateBarInfoInLocalOrder(eSessionId, curBar)
 
-    def setSellShort(self, userNo, contractNo, share, price):
+    def setSellShort(self, userNo, contractNo, share, price, needCover=True):
         contNo = contractNo if contractNo is not None else self._cfgModel.getBenchmark()
         curBar = None
 
@@ -422,7 +422,7 @@ class StrategyModel(object):
         else:
             userNo = "Default"
         qty = self._calcCenter.needCover(userNo, contNo, dSell, share, price)
-        if qty > 0:
+        if qty > 0 and needCover:
             eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtGFD, dSell, oCover, hSpeculate, price, qty, curBar)
             if eSessionId != "": self._strategy.updateBarInfoInLocalOrder(eSessionId, curBar)
 
