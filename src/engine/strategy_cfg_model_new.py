@@ -289,8 +289,8 @@ class StrategyConfig_new(object):
             if not isinstance(value, list):
                 raise Exception("当触发方式是 4: 指定时刻触发 时，时刻列表必须保存在一个列表中！")
             for timeStr in value:
-                if len(timeStr) != 14 or not self.isVaildDate(timeStr, "%Y%m%d%H%M%S"):
-                    raise Exception("当触发方式是 4: 指定时刻触发 时，指定的时刻格式必须是YYYYmmddHHMMSS！")
+                if len(timeStr) != 6 or not self.isVaildDate(timeStr, "%H%M%S"):
+                    raise Exception("当触发方式是 4: 指定时刻触发 时，指定的时刻格式必须是HHMMSS！")
 
         trigger = self._metaData['Trigger']
 
@@ -477,7 +477,7 @@ class StrategyConfig_new(object):
 
         openFeeType = EEQU_FEE_TYPE_RATIO if isRatio else EEQU_FEE_TYPE_FIXED
         if contNo not in self._metaData['Money'][feeType]:
-            raise Exception("请确保为合约%s设置了%s手续费！"%(contNo, %typeDict[feeType]))
+            raise Exception("请确保为合约%s设置了%s手续费！"%(contNo, typeDict[feeType]))
 
         return self._metaData['Money'][feeType][contNo]['Value'] if self._metaData['Money'][feeType][contNo]['Type'] == openFeeType else 0
 
