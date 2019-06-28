@@ -138,11 +138,6 @@ class StrategyConfig_new(object):
             'Pending': False,
         }
     '''
-    self._metaData['WinPoint'][contractNo] = {
-        "StopPoint": winPoint,
-        "AddPoint": nAddTick,
-        "CoverPosOrderType": nPriceType,
-    }
     def __init__(self, argsDict):
         self._metaData = {
             'SubContract' : [],     # 订阅的合约信息，列表中的第一个合约为基准合约
