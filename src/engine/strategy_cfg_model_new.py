@@ -133,7 +133,7 @@ class StrategyConfig_new(object):
             'Pending': False,
         }
     '''
-    def __init__(self, argsDict):
+    def __init__(self):
         self._metaData = {
             'SubContract' : [],     # 订阅的合约信息，列表中的第一个合约为基准合约
             'Sample'      : {
@@ -279,7 +279,7 @@ class StrategyConfig_new(object):
         return sameDict
 
     # ----------------------- 触发方式 ----------------------
-    def setTrigger(self, type, value):
+    def setTrigger(self, type, value=None):
         '''设置触发方式'''
         if type not in (1, 2, 3, 4, 5):
             raise Exception("触发方式可选的值只能 1: 即时行情触发，2: 交易数据触发，3: 每隔固定时间触发，4: 指定时刻触发 5:K线触发 是中的一个！")
