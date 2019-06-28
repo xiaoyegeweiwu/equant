@@ -522,16 +522,6 @@ class StrategyModel(object):
         feeType = EEQU_FEE_TYPE_RATIO if feeType == 1 else EEQU_FEE_TYPE_FIXED
         return self._cfgModel.setTradeFee(type, feeType, feeValue, contNo)
 
-    def setTriggerCont(self, contNoTuple):
-        if not contNoTuple or len(contNoTuple) == 0:
-            return -1
-        if len(contNoTuple) > 4:
-            contNoTuple = contNoTuple[:4]
-        return self._cfgModel.setTriggerCont(contNoTuple)
-
-    # def setTradeMode(self, inActual, useSample, useReal):
-    #     return self._cfgModel.setTradeMode(inActual, useSample, useReal)
-
     def setActual(self):
         return self._cfgModel.setActual()
 
@@ -555,19 +545,19 @@ class StrategyModel(object):
         self._cfgModel.setMinQty(tradeQty)
         return 0
 
-    def setHedge(self, hedge, contNo):
+    def setHedge(self, hedge):
         if hedge not in ('T', 'B', 'S', 'M'):
             return -1
 
-        self._cfgModel.setHedge(hedge, contNo)
+        self._cfgModel.setHedge(hedge)
         return 0
 
     def setSlippage(self, slippage):
         self._cfgModel.setSlippage(slippage)
         return 0
 
-    def setTriggerMode(self, contNo, type, value):
-        return self._cfgModel.setTrigger(contNo, type, value)
+    def setTriggerMode(self, type, value):
+        return self._cfgModel.setTrigger(type, value)
 
     def setWinPoint(self, winPoint, nPriceType, nAddTick, contNo):
         if not contNo:

@@ -182,11 +182,6 @@ class StrategyHisQuote(object):
         self._contractTuple = self._config.getContract()
         # 基准合约
         self._contractNo = self._config.getBenchmark()
-        # 回测样本配置
-        self._sampleDict = self._config.getSample()
-        self._useSample = self._config.getRunMode()["Simulate"]["UseSample"]
-        # 触发方式配置
-        self._triggerDict = self._config.getTrigger()
         
         # Bar
         for record in self._config.getKLineKindsInfo():
@@ -471,15 +466,9 @@ class StrategyHisQuote(object):
     #////////////////////////参数设置类接口///////////////////////
         
     def _getKLineType(self):
-        # if not self._sampleDict:
-        #     return None
-        # return self._sampleDict['KLineType']
         return self._config.getKLineType()
         
     def _getKLineSlice(self):
-        # if not self._sampleDict:
-        #     return None
-        # return self._sampleDict['KLineSlice']
         return self._config.getKLineSlice()
 
     def _getKLineCount(self, sampleDict):

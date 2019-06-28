@@ -4914,11 +4914,11 @@ class BaseApi(object):
               设置初始资金，不设置默认100万
 
         【语法】
-              int SetInitCapital(float capital, string usrNo)
+              int SetInitCapital(float capital=10000000, string usrNo='')
 
         【参数】
-              capital 初始资金
-              usrNo 账号名称
+              capital 初始资金，默认为10000000
+              usrNo 账号名称，默认为设置界面选中的账号
 
         【备注】
               返回整型，0成功，-1失败
@@ -4953,7 +4953,7 @@ class BaseApi(object):
     def SetTradeFee(self, type, feeType, feeValue, contractNo):
         '''
         【说明】
-              设置手续费收取方式，不设置取交易所公布参数
+              设置手续费收取方式
 
         【语法】
               int SetTradeFee(string type, int feeType, float feeValue, string contractNo)
@@ -4972,50 +4972,6 @@ class BaseApi(object):
               SetTradeFee('T', 2， 5, "ZCE|F|SR|906") 设置合约ZCE|F|SR|906的平今手续费为5元/手
         '''
         return self._dataModel.setTradeFee(type, feeType, feeValue, contractNo)
-
-    def SetTriggerCont(self, contractNo):
-        '''
-        【说明】
-              设置触发合约
-
-        【语法】
-              int SetTriggerCont(contractNo1, contractNo2, contractNo3, ...)
-
-        【参数】
-              contractNo 合约编号，最多设置4个
-
-        【备注】
-              返回整型, 0成功，-1失败
-              不调用此函数，默认以基准合约触发
-
-
-        【示例】
-              SetTriggerCont('ZCE|F|SR|905')
-              SetTriggerCont('ZCE|F|SR|905', 'ZCE|F|SR|912', 'ZCE|F|SR|001')
-        '''
-        return self._dataModel.setTriggerCont(contractNo)
-
-    # def SetTradeMode(self, inActual, useSample, useReal):
-    #     '''
-    #     【说明】
-    #          设置运行方式
-    #
-    #     【语法】
-    #           int SetTradeMode(bool inActual, bool useSample, bool useReal)
-    #
-    #     【参数】
-    #           inActual      True 表示在实盘上运行，False 表示在模拟盘上运行
-    #           useSample     在模拟盘上是否使用历史数据进行回测
-    #           useReal       在模拟盘上是否使用实时数据运行策略
-    #
-    #     【备注】
-    #           返回整型，0成功，-1失败
-    #
-    #     【示例】
-    #           SetTradeMode(False, True, True)    # 在模拟盘上使用历史数据回测，并使用实时数据继续运行策略
-    #           SetTradeMode(True, True, True)     # 在模拟盘上使用历史数据回测，并使用实时数据继续运行策略；在实盘上使用实时数据运行策略
-    #     '''
-    #     return self._dataModel.setTradeMode(inActual, useSample, useReal)
 
     def SetActual(self):
         '''
@@ -5097,13 +5053,13 @@ class BaseApi(object):
         '''
         return self._dataModel.setMinTradeQuantity(tradeQty)
 
-    def SetHedge(self, hedge, contractNo):
+    def SetHedge(self, hedge):
         '''
         【说明】
              设置投保标志
 
         【语法】
-              int SetHedge(char hedge, string contractNo)
+              int SetHedge(char hedge)
 
         【参数】
               hedge 投保标志
@@ -5111,16 +5067,14 @@ class BaseApi(object):
               B : 套保
               S : 套利
               M : 做市
-              contractNo 合约编号，默认为基础合约
 
         【备注】
               返回整型，0成功，-1失败
 
         【示例】
               SetHedge('T') # 设置基础合约的投保标志为投机
-              SetHedge('T', 'ZCE|F|SR|906') # 设置合约ZCE|F|SR|906的投保标志为投机
         '''
-        return self._dataModel.setHedge(hedge, contractNo)
+        return self._dataModel.setHedge(hedge)
 
     def SetSlippage(self, slippage):
         '''
@@ -5140,34 +5094,6 @@ class BaseApi(object):
               无
         '''
         return self._dataModel.setSlippage(slippage)
-
-    # def SetTriggerType(self, contractNo, type, value):
-    #     '''
-    #     【说明】
-    #          设置触发方式
-    #
-    #     【语法】
-    #           int SetTriggerType(string contractNo, int type, int|list value)
-    #
-    #     【参数】
-    #           contractNo 合约编号，不能为空
-    #           type 触发方式，可使用的值为：
-    #             1 : 即时行情触发
-    #             2 : 交易数据触发
-    #             3 : 每隔固定时间触发
-    #             4 : 指定时刻触发
-    #           value 当触发方式是为每隔固定时间触发(type=3)时，value为触发间隔，单位为毫秒，必须为100的整数倍，
-    #           当触发方式为指定时刻触发(type=4)时，value为触发时刻列表，时间的格式为'20190511121314'
-    #           当type为其他值时，该值无效，可以不填
-    #
-    #     【备注】
-    #           返回整型，0成功，-1失败
-    #
-    #     【示例】
-    #           SetTriggerType("ZCE|F|SR|910", 3, 1000) # 每隔1000毫秒触发一次
-    #           SetTriggerType("ZCE|F|SR|910", 4, ['20190511121314', '20190511121315', '20190511121316']) # 指定时刻触发
-    #     '''
-    #     return self._dataModel.setTriggerMode(contractNo, type, value)
 
     def SetTriggerType(self, type, value):
         '''
@@ -5194,7 +5120,7 @@ class BaseApi(object):
               SetTriggerType(3, 1000) # 每隔1000毫秒触发一次
               SetTriggerType(4, ['20190511121314', '20190511121315', '20190511121316']) # 指定时刻触发
         '''
-        return self._dataModel.setTriggerMode('', type, value)
+        return self._dataModel.setTriggerMode(type, value)
 
     def SetWinPoint(self, winPoint, nPriceType, nAddTick, contractNo):
         '''
@@ -6597,7 +6523,7 @@ def SetBarInterval(contractNo, barType, barInterval, barCount=2000):
 # def SetSample(sampleType='C', sampleValue=2000):
 #     return baseApi.SetSample(sampleType, sampleValue)
 
-def SetInitCapital(capital='', userNo=''):
+def SetInitCapital(capital=10000000, userNo=''):
     return baseApi.SetInitCapital(capital, userNo)
 
 def SetMargin(type, value=0, contractNo=''):
@@ -6621,17 +6547,11 @@ def SetTradeDirection(tradeDirection):
 def SetMinTradeQuantity(tradeQty=1):
     return baseApi.SetMinTradeQuantity(tradeQty)
 
-def SetHedge(hedge, contractNo=''):
-    return baseApi.SetHedge(hedge, contractNo)
+def SetHedge(hedge):
+    return baseApi.SetHedge(hedge)
 
 def SetSlippage(slippage):
     return baseApi.SetSlippage(slippage)
-
-def SetTriggerCont(*contractNo):
-    return baseApi.SetTriggerCont(contractNo)
-
-# def SetTriggerType(contNo, type, value=None):
-#     return baseApi.SetTriggerType(contNo, type, value)
 
 def SetTriggerType(type, value=None):
     return baseApi.SetTriggerType(type, value)
