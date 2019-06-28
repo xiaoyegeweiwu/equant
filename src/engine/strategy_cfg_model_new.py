@@ -20,11 +20,6 @@ class StrategyConfig_new(object):
     {
             'SubContract': ['DCE|F|M|1909', 'ZCE|F|TA|909', 'ZCE|F|SR|001'],
             'Sample': {
-                'Display': {
-                    'ContractNo': 'DCE|F|M|1909',
-                    'KLineType': 'M',
-                    'KLineSlice': 1
-                },
                 'DCE|F|M|1909': [{
                     'KLineType': 'M',
                     'KLineSlice': 1,
@@ -142,11 +137,6 @@ class StrategyConfig_new(object):
         self._metaData = {
             'SubContract' : [],     # 订阅的合约信息，列表中的第一个合约为基准合约
             'Sample'      : {
-                'Display': {        # 用于展示的合约（基准合约）信息
-                    'ContractNo': '',
-                    'KLineType': '',
-                    'KLineSlice': 0
-                },
             },
             'Trigger': {    # 触发方式
                 'Timer': [],        # 指定时刻
@@ -195,13 +185,6 @@ class StrategyConfig_new(object):
         if kLineType not in ('t', 'T', 'S', 'M', 'H', 'D', 'W', 'm', 'Y'):
             raise Exception("请确保设置的K线类型为 't':分时，'T':分笔，'S':秒线，'M':分钟，'H':小时，'D':日线，'W':周线，'m':月线，'Y':年线 中的一个！")
 
-        sample = self._metaData['Sample']
-        # 设置用于展示的合约（基准合约）信息
-        if not sample['Display']['ContractNo']:
-            sample['Display']['ContractNo'] = contNo
-            sample['Display']['KLineType'] = kLineType
-            sample['Display']['KLineSlice'] = kLineSlice
-
         # 设置订阅的合约列表
         if contNo not in self._metaData['SubContract']:
             self._metaData['SubContract'].append(contNo)
@@ -209,6 +192,27 @@ class StrategyConfig_new(object):
         # 设置合约的K线类型和周期
         sampleDict = self.getSampleDict(kLineType, kLineSlice, sampleConfig, trigger)
         self.updateSampleDict(contNo, sampleDict)
+
+    def deleteBarInfoInSample(self, contNo, kLineType, kLineSlice, sampleConfig, trigger=True):
+        oldSampleDict = self.getSampleDict(kLineType, kLineSlice, sampleConfig, trigger)
+
+        sample = self._metaData['Sample']
+        if contNo not in sample:
+            raise Exception("修改的合约/K线类型/K线周期/回测起始点信息不存在！")
+
+        sampleDictList = sample[contNo]
+        sameDict = self.getSameDictInList(oldSampleDict, sampleDictList)
+        if sameDict:
+            del sameDict
+
+        if len(sample[contNo]) > 0:
+            return
+
+        # 更新订阅的合约列表
+        del sample[contNo]
+        subContractList = self._metaData['SubContract']
+        if contNo in subContractList:
+            subContractList.remove(contNo)
 
     def getSampleDict(self, kLineType, kLineSlice, sampleConfig, trigger=True):
         # 回测起始点信息
@@ -255,7 +259,12 @@ class StrategyConfig_new(object):
             return
 
         sampleList = sample[contNo]
-        isExist = False
+        isExist = True if self.getSameDictInList(sampleDict, sampleList) else False
+        if not isExist:
+            sampleList.append(sampleDict)
+
+    def getSameDictInList(self, sampleDict, sampleList):
+        sameDict = None
         for sampleInfo in sampleList:
             isEqual = True
             for key in sampleDict.keys():
@@ -264,10 +273,10 @@ class StrategyConfig_new(object):
                     break
             if isEqual:
                 # 存在相同的字典
-                isExist = True
+                sameDict = sampleInfo
                 break
-        if not isExist:
-            sampleList.append(sampleDict)
+
+        return sameDict
 
     # ----------------------- 触发方式 ----------------------
     def setTrigger(self, type, value):
@@ -602,9 +611,6 @@ class StrategyConfig_new(object):
         kLineTypeDictList = []
         subDict = {}
         for contNo, barList in self._metaData['Sample'].items():
-            if contNo in ('Display'):
-                continue
-
             for barInfo in barList:
                 triggerTuple = (contNo, barInfo['KLineType'], barInfo['KLineSlice'])
                 if triggerTuple not in kLineTypetupleList:
@@ -670,9 +676,18 @@ class StrategyConfig_new(object):
 
     def getKLineShowInfo(self):
         # 1、取界面设置的第一个合约 2、取SetBarinterval第一个设置的合约
-        if not self._metaData['Sample']['Display']['ContractNo']:
+        subContract = self._metaData['SubContract']
+        if not subContract or len(subContract) == 0:
             raise Exception("请确保在设置界面或者在策略中调用SetBarInterval方法设置展示的合约、K线类型和周期")
-        return self._metaData['Sample']['Display']
+
+        displayCont = subContract[0]
+        kLineInfo = self._metaData['Sample'][displayCont]
+
+        return {
+            'ContractNo': displayCont,
+            'KLineType': kLineInfo['KLineType'],
+            'KLineSlice': kLineInfo['KLineSlice']
+        }
 
     def getKLineShowInfoSimple(self):
         showInfoSimple = []
