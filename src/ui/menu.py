@@ -325,6 +325,7 @@ class RunMenu(object):
         self.menu.add_command(label="投资报告", command=self.onReport)
         self.menu.add_command(label="图表展示", command=self.onSignal)
         self.menu.add_command(label="属性设置", command=self.onParam)
+        self.menu.add_command(label="全选", command=self.onSelectAll)
 
     def popupmenu(self, event):
         select = self.widget.identify_row(event.y)
@@ -392,3 +393,8 @@ class RunMenu(object):
         # param = self._controller.getUserParam(self._strategyId)
         # path = self._controller.getEditorText()["path"]
         # self._controller.load(path, param)
+
+    def onSelectAll(self):
+        items = self.widget.get_children()
+        self.widget.selection_set(items)
+
