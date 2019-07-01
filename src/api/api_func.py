@@ -229,6 +229,7 @@ _all_func_ = {
                     ['RGB_Red'      , '颜色类型_红色'],
                     ['RGB_Green'    , '颜色类型_绿色'],
                     ['RGB_Blue'     , '颜色类型_蓝色'],
+                    ['RGB_Yellow'   , '颜色类型_黄色'],
                     ['RGB_Purple'   , '颜色类型_紫色'],
                     ['RGB_Gray'     , '颜色类型_灰色'],
                     ['RGB_Brown'    , '颜色类型_褐色'],

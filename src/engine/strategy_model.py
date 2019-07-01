@@ -1064,6 +1064,9 @@ class StrategyModel(object):
     def getBlue(self):
         return 0x0000FF
 
+    def getYellow(self):
+        return 0xFFFF00
+
     def getPurple(self):
         return 0x9900FF
 

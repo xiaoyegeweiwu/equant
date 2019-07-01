@@ -4102,6 +4102,25 @@ class BaseApi(object):
         '''
         return self._dataModel.getBlue()
 
+    def RGB_Yellow(self):
+        '''
+        【说明】
+              返回颜色类型黄色的枚举值
+
+        【语法】
+              int RGB_Yellow()
+
+        【参数】
+              无
+
+        【备注】
+              返回16进制颜色代码
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getYellow()
+
     def RGB_Purple(self):
         '''
         【说明】
