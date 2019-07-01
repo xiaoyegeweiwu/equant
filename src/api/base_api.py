@@ -765,25 +765,6 @@ class BaseApi(object):
         '''
         return self._dataModel.getQLastDate(contractNo)
 
-    def Q_LastFlag(self, contractNo=''):
-        '''
-        【说明】
-              最新价变化标志
-
-        【语法】
-              int Q_LastFlag(string contractNo)
-
-        【参数】
-              contractNo 合约编号
-
-        【备注】
-              返回整型, 1为上涨, -1为下跌, 0为不变
-
-        【实例】
-              无
-        '''
-        return self._dataModel.getQLastFlag(contractNo)
-
     def Q_LastTime(self, contractNo=''):
         '''
         【说明】
@@ -1129,18 +1110,19 @@ class BaseApi(object):
         return self._dataModel.getQuoteDataExist(contractNo)
 
     #/////////////////////////策略交易/////////////////////////////
-    def Buy(self, contractNo, share=0, price=0, userNo=''):
+    def Buy(self, share, price, contractNo, needCover, userNo):
         '''
         【说明】
               产生一个多头建仓操作
 
         【语法】
-              Bool Buy(int Share=0, float Price=0, string ContractNo=None, string UserNo=')
+              Bool Buy(int Share=0, float Price=0, string ContractNo=None, bool NeedCover = True, string UserNo=')
 
         【参数】
               Share 买入数量，为整型值，默认为0；
               Price 买入价格，为浮点数，默认为0；
               Contract 合约代码，为字符串，默认使用基准合约；
+              NeedCover 是否先清掉方向持仓，默认为True；
               UserNo 用户编号，为字符串，默认使用界面选定用户编号。
 
         【备注】
@@ -1162,7 +1144,7 @@ class BaseApi(object):
               在当前持有空头仓位的情况下：
               Buy(10,Close) 表示平掉所有空仓，并用当前Bar收盘价买入10张合约，马上发送委托。
         '''
-        return self._dataModel.setBuy(userNo, contractNo, share, price)
+        return self._dataModel.setBuy(userNo, contractNo, share, price, needCover)
 
     def BuyToCover(self, contractNo, share=0, price=0, userNo=''):
         '''
@@ -1228,18 +1210,19 @@ class BaseApi(object):
         '''
         return self._dataModel.setSell(userNo, contractNo, share, price)
 
-    def SellShort(self, contractNo, share=0, price=0, userNo=''):
+    def SellShort(self, share, price, contractNo, needCover, userNo):
         '''
         【说明】
               产生一个空头建仓操作
 
         【语法】
-              Bool SellShort(int Share=0, float Price=0, string ContractNo=None, string UserNo='')
+              Bool SellShort(int Share=0, float Price=0, string ContractNo=None, bool NeedCover = True, string UserNo='')
 
         【参数】
               Share 买入数量，为整型值，默认为0；
               Price 买入价格，为浮点数，默认为0；
               Contract 合约代码，为字符串，默认使用基准合约；
+              NeedCover 是否先清掉方向持仓，默认为True；
               UserNo 用户编号，为字符串，默认使用界面选定用户编号。
 
         【备注】
@@ -1261,7 +1244,7 @@ class BaseApi(object):
               SellShort(10,Close) 表示平掉所有多头仓位，并用当前Bar收盘价空头卖出10张合约，马上发送委托。
 
         '''
-        return self._dataModel.setSellShort(userNo, contractNo, share, price)
+        return self._dataModel.setSellShort(userNo, contractNo, share, price, needCover)
 
     def StartTrade(self):
         '''
@@ -4119,6 +4102,25 @@ class BaseApi(object):
         '''
         return self._dataModel.getBlue()
 
+    def RGB_Yellow(self):
+        '''
+        【说明】
+              返回颜色类型黄色的枚举值
+
+        【语法】
+              int RGB_Yellow()
+
+        【参数】
+              无
+
+        【备注】
+              返回16进制颜色代码
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getYellow()
+
     def RGB_Purple(self):
         '''
         【说明】
@@ -4933,11 +4935,11 @@ class BaseApi(object):
               设置初始资金，不设置默认100万
 
         【语法】
-              int SetInitCapital(float capital, string usrNo)
+              int SetInitCapital(float capital=10000000, string usrNo='')
 
         【参数】
-              capital 初始资金
-              usrNo 账号名称
+              capital 初始资金，默认为10000000
+              usrNo 账号名称，默认为设置界面选中的账号
 
         【备注】
               返回整型，0成功，-1失败
@@ -4972,7 +4974,7 @@ class BaseApi(object):
     def SetTradeFee(self, type, feeType, feeValue, contractNo):
         '''
         【说明】
-              设置手续费收取方式，不设置取交易所公布参数
+              设置手续费收取方式
 
         【语法】
               int SetTradeFee(string type, int feeType, float feeValue, string contractNo)
@@ -4991,50 +4993,6 @@ class BaseApi(object):
               SetTradeFee('T', 2， 5, "ZCE|F|SR|906") 设置合约ZCE|F|SR|906的平今手续费为5元/手
         '''
         return self._dataModel.setTradeFee(type, feeType, feeValue, contractNo)
-
-    def SetTriggerCont(self, contractNo):
-        '''
-        【说明】
-              设置触发合约
-
-        【语法】
-              int SetTriggerCont(contractNo1, contractNo2, contractNo3, ...)
-
-        【参数】
-              contractNo 合约编号，最多设置4个
-
-        【备注】
-              返回整型, 0成功，-1失败
-              不调用此函数，默认以基准合约触发
-
-
-        【示例】
-              SetTriggerCont('ZCE|F|SR|905')
-              SetTriggerCont('ZCE|F|SR|905', 'ZCE|F|SR|912', 'ZCE|F|SR|001')
-        '''
-        return self._dataModel.setTriggerCont(contractNo)
-
-    # def SetTradeMode(self, inActual, useSample, useReal):
-    #     '''
-    #     【说明】
-    #          设置运行方式
-    #
-    #     【语法】
-    #           int SetTradeMode(bool inActual, bool useSample, bool useReal)
-    #
-    #     【参数】
-    #           inActual      True 表示在实盘上运行，False 表示在模拟盘上运行
-    #           useSample     在模拟盘上是否使用历史数据进行回测
-    #           useReal       在模拟盘上是否使用实时数据运行策略
-    #
-    #     【备注】
-    #           返回整型，0成功，-1失败
-    #
-    #     【示例】
-    #           SetTradeMode(False, True, True)    # 在模拟盘上使用历史数据回测，并使用实时数据继续运行策略
-    #           SetTradeMode(True, True, True)     # 在模拟盘上使用历史数据回测，并使用实时数据继续运行策略；在实盘上使用实时数据运行策略
-    #     '''
-    #     return self._dataModel.setTradeMode(inActual, useSample, useReal)
 
     def SetActual(self):
         '''
@@ -5116,13 +5074,13 @@ class BaseApi(object):
         '''
         return self._dataModel.setMinTradeQuantity(tradeQty)
 
-    def SetHedge(self, hedge, contractNo):
+    def SetHedge(self, hedge):
         '''
         【说明】
              设置投保标志
 
         【语法】
-              int SetHedge(char hedge, string contractNo)
+              int SetHedge(char hedge)
 
         【参数】
               hedge 投保标志
@@ -5130,16 +5088,14 @@ class BaseApi(object):
               B : 套保
               S : 套利
               M : 做市
-              contractNo 合约编号，默认为基础合约
 
         【备注】
               返回整型，0成功，-1失败
 
         【示例】
               SetHedge('T') # 设置基础合约的投保标志为投机
-              SetHedge('T', 'ZCE|F|SR|906') # 设置合约ZCE|F|SR|906的投保标志为投机
         '''
-        return self._dataModel.setHedge(hedge, contractNo)
+        return self._dataModel.setHedge(hedge)
 
     def SetSlippage(self, slippage):
         '''
@@ -5159,34 +5115,6 @@ class BaseApi(object):
               无
         '''
         return self._dataModel.setSlippage(slippage)
-
-    # def SetTriggerType(self, contractNo, type, value):
-    #     '''
-    #     【说明】
-    #          设置触发方式
-    #
-    #     【语法】
-    #           int SetTriggerType(string contractNo, int type, int|list value)
-    #
-    #     【参数】
-    #           contractNo 合约编号，不能为空
-    #           type 触发方式，可使用的值为：
-    #             1 : 即时行情触发
-    #             2 : 交易数据触发
-    #             3 : 每隔固定时间触发
-    #             4 : 指定时刻触发
-    #           value 当触发方式是为每隔固定时间触发(type=3)时，value为触发间隔，单位为毫秒，必须为100的整数倍，
-    #           当触发方式为指定时刻触发(type=4)时，value为触发时刻列表，时间的格式为'20190511121314'
-    #           当type为其他值时，该值无效，可以不填
-    #
-    #     【备注】
-    #           返回整型，0成功，-1失败
-    #
-    #     【示例】
-    #           SetTriggerType("ZCE|F|SR|910", 3, 1000) # 每隔1000毫秒触发一次
-    #           SetTriggerType("ZCE|F|SR|910", 4, ['20190511121314', '20190511121315', '20190511121316']) # 指定时刻触发
-    #     '''
-    #     return self._dataModel.setTriggerMode(contractNo, type, value)
 
     def SetTriggerType(self, type, value):
         '''
@@ -5213,7 +5141,7 @@ class BaseApi(object):
               SetTriggerType(3, 1000) # 每隔1000毫秒触发一次
               SetTriggerType(4, ['20190511121314', '20190511121315', '20190511121316']) # 指定时刻触发
         '''
-        return self._dataModel.setTriggerMode('', type, value)
+        return self._dataModel.setTriggerMode(type, value)
 
     def SetWinPoint(self, winPoint, nPriceType, nAddTick, contractNo):
         '''
@@ -6080,9 +6008,6 @@ def Q_Last(contractNo=''):
 def Q_LastDate(contractNo=''):
     return baseApi.Q_LastDate(contractNo)
 
-def Q_LastFlag(contractNo=''):
-    return baseApi.Q_LastFlag(contractNo)
-
 def Q_LastTime(contractNo=''):
     return baseApi.Q_LastTime(contractNo)
 
@@ -6371,8 +6296,8 @@ def DeleteAllOrders(contractNo=''):
     return baseApi.DeleteAllOrders(contractNo)
 
 #策略交易
-def Buy(share=0, price=0, contractNo=None, userNo=''):
-    return baseApi.Buy(contractNo, share, price, userNo)
+def Buy(share=0, price=0, contractNo=None, needCover=True, userNo=''):
+    return baseApi.Buy(share, price, contractNo, needCover, userNo)
 
 def BuyToCover(share=0, price=0, contractNo=None, userNo=''):
     return baseApi.BuyToCover(contractNo, share, price, userNo)
@@ -6380,8 +6305,8 @@ def BuyToCover(share=0, price=0, contractNo=None, userNo=''):
 def Sell(share=0, price=0, contractNo=None, userNo=''):
     return baseApi.Sell(contractNo, share, price, userNo)
 
-def SellShort(share=0, price=0, contractNo=None, userNo=''):
-    return baseApi.SellShort(contractNo, share, price, userNo)
+def SellShort(share=0, price=0, contractNo=None, needCover=True, userNo=''):
+    return baseApi.SellShort(share, price, contractNo, needCover, userNo)
 
 def StartTrade():
     return baseApi.StartTrade()
@@ -6619,7 +6544,7 @@ def SetBarInterval(contractNo, barType, barInterval, barCount=2000):
 # def SetSample(sampleType='C', sampleValue=2000):
 #     return baseApi.SetSample(sampleType, sampleValue)
 
-def SetInitCapital(capital='', userNo=''):
+def SetInitCapital(capital=10000000, userNo=''):
     return baseApi.SetInitCapital(capital, userNo)
 
 def SetMargin(type, value=0, contractNo=''):
@@ -6643,17 +6568,11 @@ def SetTradeDirection(tradeDirection):
 def SetMinTradeQuantity(tradeQty=1):
     return baseApi.SetMinTradeQuantity(tradeQty)
 
-def SetHedge(hedge, contractNo=''):
-    return baseApi.SetHedge(hedge, contractNo)
+def SetHedge(hedge):
+    return baseApi.SetHedge(hedge)
 
 def SetSlippage(slippage):
     return baseApi.SetSlippage(slippage)
-
-def SetTriggerCont(*contractNo):
-    return baseApi.SetTriggerCont(contractNo)
-
-# def SetTriggerType(contNo, type, value=None):
-#     return baseApi.SetTriggerType(contNo, type, value)
 
 def SetTriggerType(type, value=None):
     return baseApi.SetTriggerType(type, value)

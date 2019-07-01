@@ -95,27 +95,28 @@ class StrategyMenu(object):
         def save(event=None):
             # 新建策略前先保存当前选中的策略
             self._controller.saveStrategy()
-            # TODO：目录树多选时path为list，新建文件的存储位置可能会有问题（总是新建到item最小的文件所在的文件夹）
-            temp_path = self.get_file_path()
-            path = temp_path[0]
-            if os.path.isdir(path):
-                dir_path = path
-            if os.path.isfile(path):
-                dir_path = os.path.dirname(path)
             file_name = newFileWin.nameEntry.get()
             file_type = newFileWin.type_chosen.get()
+            # TODO：目录树多选时path为list，新建文件的存储位置可能会有问题（总是新建到item最小的文件所在的文件夹）
             if file_name == "":
-                messagebox.showinfo(title=self.language.get_text(8), message=self.language.get_text(16), parent=newFileWin)
+                messagebox.showinfo(title=self.language.get_text(8), message=self.language.get_text(16),
+                                    parent=newFileWin)
             else:
+                temp_path = self.get_file_path()
+                path = temp_path[0]
+                if os.path.isdir(path):
+                    dir_path = path
+                if os.path.isfile(path):
+                    dir_path = os.path.dirname(path)
                 file = file_name + file_type
                 if not os.path.exists(os.path.join(dir_path, file)):
-                    # TODO：怎么把文件按文件名插入到合适的位置呢？
                     newFileWin.destroy()
                     filePath = os.path.join(dir_path, file)
                     self._controller.newStrategy(filePath)
                 else:
                     messagebox.showinfo(self.language.get_text(8),
-                                        self.language.get_text(17) + file + self.language.get_text(18), parent=newFileWin)
+                                        self.language.get_text(17) + file + self.language.get_text(18),
+                                        parent=newFileWin)
 
         def cancel():
             newFileWin.destroy()
@@ -324,6 +325,7 @@ class RunMenu(object):
         self.menu.add_command(label="投资报告", command=self.onReport)
         self.menu.add_command(label="图表展示", command=self.onSignal)
         self.menu.add_command(label="属性设置", command=self.onParam)
+        self.menu.add_command(label="全选", command=self.onSelectAll)
 
     def popupmenu(self, event):
         select = self.widget.identify_row(event.y)
@@ -391,3 +393,8 @@ class RunMenu(object):
         # param = self._controller.getUserParam(self._strategyId)
         # path = self._controller.getEditorText()["path"]
         # self._controller.load(path, param)
+
+    def onSelectAll(self):
+        items = self.widget.get_children()
+        self.widget.selection_set(items)
+

@@ -360,7 +360,7 @@ class StrategyConfig(object):
         '''获取触发方式'''
         return self._metaData['Trigger']
 
-    def setTrigger(self, contNo, type, value):
+    def setTrigger(self, type, value):
         '''设置触发方式'''
         if type not in (1, 2, 3, 4):
             return -1
@@ -371,8 +371,6 @@ class StrategyConfig(object):
                 if len(timeStr) != 14 or not self.isVaildDate(timeStr, "%Y%m%d%H%M%S"):
                     return -1
 
-        if len(contNo) > 0:
-            self._metaData['SubContract'].append(contNo)
         trigger = self._metaData['Trigger']
 
         trigger['SnapShot'] = True if type == 1 else False
@@ -432,66 +430,6 @@ class StrategyConfig(object):
 
         return self._metaData['StopPoint'][contNo]
 
-    def setSample(self, sampleType, sampleValue):
-        '''设置样本数据'''
-        pass
-        '''
-        if sampleType not in ('A', 'D', 'C', 'N'):
-            return -1
-
-        sample = self._metaData['Sample']
-
-        # 使用所有K线
-        if sampleType == 'A':
-            self.setAllKTrueInSample(sample)
-            return 0
-
-        # 指定日期开始触发
-        if sampleType == 'D':
-            if not sampleValue or not isinstance(sampleValue, str):
-                return -1
-            if not self.isVaildDate(sampleValue, "%Y%m%d"):
-                return -1
-            self.setBarPeriodInSample(sampleValue, sample)
-            return 0
-
-        # 使用固定根数
-        if sampleType == 'C':
-            if not isinstance(sampleValue, int) or sampleValue <= 0:
-                return -1
-            self.setBarCountInSample(sampleValue, sample)
-            return 0
-
-        # 不执行历史K线
-        if sampleType == 'N':
-            self.setUseSample(False)
-            return 0
-
-        return -1
-        '''
-
-    def getSample(self, contNo=''):
-        '''获取样本数据'''
-        if contNo in self._metaData['Sample']:
-            return self._metaData['Sample'][contNo]
-        return self._metaData['Sample']
-
-    def getStartTime(self, contNo=''):
-        '''获取回测起始时间'''
-        if contNo in self._metaData['Sample']:
-            if "BeginTime" in self._metaData['Sample'][contNo]:
-                return self._metaData['Sample'][contNo]['BeginTime']
-            else:
-                return 0
-        if "BeginTime" in self._metaData['Sample']:
-            return self._metaData['Sample']['BeginTime']
-        return 0
-
-    def getBarIntervalList(self, contNo):
-        if contNo not in self._metaData['BarInterval']:
-            return []
-        return self._metaData['BarInterval'][contNo]
-
     def getKLineType(self):
         '''获取K线类型'''
         kLineInfo = self.getKLineShowInfo()
@@ -503,50 +441,6 @@ class StrategyConfig(object):
         kLineInfo = self.getKLineShowInfo()
         if 'KLineSlice' in kLineInfo:
             return kLineInfo['KLineSlice']
-
-    def setAllKTrueInSample(self, sample, setForSpread=False):
-        if 'BeginTime' in sample:
-            del sample['BeginTime']
-
-        if 'KLineCount' in sample:
-            del sample['KLineCount']
-
-        sample['AllK'] = True
-        if setForSpread:
-            sample['UseSample'] = True
-        else:
-            self._metaData['RunMode']['Simulate']['UseSample'] = True
-
-    def setBarPeriodInSample(self, beginDate, sample, setForSpread=False):
-        '''设置起止时间'''
-        if 'AllK' in sample:
-            del sample['AllK']
-
-        if 'KLineCount' in sample:
-            del sample['KLineCount']
-
-        sample['BeginTime'] = beginDate
-        if setForSpread:
-            sample['UseSample'] = True
-        else:
-            self._metaData['RunMode']['Simulate']['UseSample'] = True
-
-    def setBarCountInSample(self, count, sample, setForSpread=False):
-        '''设置K线数量'''
-        if 'AllK' in sample:
-            del sample['AllK']
-
-        if 'BeginTime' in sample:
-            del sample['BeginTime']
-
-        sample['KLineCount'] = count
-        if setForSpread:
-            sample['UseSample'] = True
-        else:
-            self._metaData['RunMode']['Simulate']['UseSample'] = True
-
-    def setUseSample(self, isUseSample):
-        self._metaData['RunMode']['Simulate']['UseSample'] = isUseSample
 
     def setBarInterval(self, contNo, barType, barInterval, sampleConfig, trigger=True):
         '''设置K线类型和K线周期'''
@@ -723,26 +617,8 @@ class StrategyConfig(object):
             feeDict[k] = deepcopy(initDict)
         return feeDict
 
-    def setTriggerCont(self, contNoTuple):
-        self._metaData['TriggerCont'] = contNoTuple
-
-    def getTriggerCont(self):
-        if 'TriggerCont' in self._metaData:
-            return self._metaData['TriggerCont']
-        return None
-
     def setActual(self):
         self._metaData['RunMode']['Actual']['SendOrder2Actual'] = True
-
-    # def setTradeMode(self, inActual, useSample, useReal):
-    #     runMode = self._metaData['RunMode']
-    #     if inActual:
-    #         # 实盘运行
-    #         runMode['Actual']['SendOrder2Actual'] = True
-    #     else:
-    #         # 模拟盘运行
-    #         runMode['Simulate']['UseSample'] = useSample
-    #         runMode['Simulate']['Continues'] = useReal
 
     def setOrderWay(self, type):
         if type not in (1, 2):

@@ -289,13 +289,31 @@ class StrategyModel(object):
         return self._qteModel.getQLast(symbol)
 
     def getQLastDate(self, symbol):
-        return self._qteModel.getQLastDate(symbol)
-
-    def getQLastFlag(self, symbol):
-        return self._qteModel.getQLastFlag(symbol)
+        symbol = self._config.getBenchmark() if not symbol else symbol
+        key = None
+        for keyTuple in self._hisModel._kLineNoticeData.keys():
+            if keyTuple[0] == symbol and keyTuple[1] == 'T':
+                key = keyTuple
+                break
+        if not key:
+            raise Exception(
+                "在使用Q_LastTime方法时，请确保已经在设置界面或者在策略代码中添加了SetBarInterval('%s', 'T', 1)为合约%s订阅了Tick行情！" % (symbol, symbol))
+        tickInfo = self._hisModel.getLastStoredKLine(key)[0]
+        dateTimeStamp = tickInfo['DateTimeStamp']
+        return int(dateTimeStamp) // 1000000000
 
     def getQLastTime(self, symbol):
-        return self._qteModel.getQLastTime(symbol)
+        symbol = self._config.getBenchmark() if not symbol else symbol
+        key = None
+        for keyTuple in self._hisModel._kLineNoticeData.keys():
+            if keyTuple[0] == symbol and keyTuple[1] == 'T':
+                key = keyTuple
+                break
+        if not key:
+            raise Exception("在使用Q_LastTime方法时，请确保已经在设置界面或者在策略代码中添加了SetBarInterval('%s', 'T', 1)为合约%s订阅了Tick行情！"%(symbol, symbol))
+        tickInfo = self._hisModel.getLastStoredKLine(key)[0]
+        dateTimeStamp = tickInfo['DateTimeStamp']
+        return float(int(dateTimeStamp) % 1000000000) / 1000000000
 
     def getQLastVol(self, symbol):
         return self._qteModel.getQLastVol(symbol)
@@ -349,7 +367,7 @@ class StrategyModel(object):
         return self._qteModel.getQuoteDataExist(symbol)
 
     # ////////////////////////策略函数////////////////////////////
-    def setBuy(self, userNo, contractNo, share, price):
+    def setBuy(self, userNo, contractNo, share, price, needCover=True):
         contNo = contractNo if contractNo else self._cfgModel.getBenchmark()
         
         # 非K线触发的策略，不使用Bar
@@ -362,7 +380,7 @@ class StrategyModel(object):
 
         # 对于开仓，需要平掉反向持仓
         qty = self._calcCenter.needCover(userNo, contNo, dBuy, share, price)
-        if qty > 0:
+        if qty > 0 and needCover:
             eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtGFD, dBuy, oCover, hSpeculate, price, qty, curBar)
             if eSessionId != "": self._strategy.updateBarInfoInLocalOrder(eSessionId, curBar)
 
@@ -395,7 +413,7 @@ class StrategyModel(object):
         eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtGFD, dSell, oCover, hSpeculate, price, share, curBar)
         if eSessionId != "": self._strategy.updateBarInfoInLocalOrder(eSessionId, curBar)
 
-    def setSellShort(self, userNo, contractNo, share, price):
+    def setSellShort(self, userNo, contractNo, share, price, needCover=True):
         contNo = contractNo if contractNo is not None else self._cfgModel.getBenchmark()
         curBar = None
 
@@ -404,7 +422,7 @@ class StrategyModel(object):
         else:
             userNo = "Default"
         qty = self._calcCenter.needCover(userNo, contNo, dSell, share, price)
-        if qty > 0:
+        if qty > 0 and needCover:
             eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtGFD, dSell, oCover, hSpeculate, price, qty, curBar)
             if eSessionId != "": self._strategy.updateBarInfoInLocalOrder(eSessionId, curBar)
 
@@ -504,16 +522,6 @@ class StrategyModel(object):
         feeType = EEQU_FEE_TYPE_RATIO if feeType == 1 else EEQU_FEE_TYPE_FIXED
         return self._cfgModel.setTradeFee(type, feeType, feeValue, contNo)
 
-    def setTriggerCont(self, contNoTuple):
-        if not contNoTuple or len(contNoTuple) == 0:
-            return -1
-        if len(contNoTuple) > 4:
-            contNoTuple = contNoTuple[:4]
-        return self._cfgModel.setTriggerCont(contNoTuple)
-
-    # def setTradeMode(self, inActual, useSample, useReal):
-    #     return self._cfgModel.setTradeMode(inActual, useSample, useReal)
-
     def setActual(self):
         return self._cfgModel.setActual()
 
@@ -537,19 +545,19 @@ class StrategyModel(object):
         self._cfgModel.setMinQty(tradeQty)
         return 0
 
-    def setHedge(self, hedge, contNo):
+    def setHedge(self, hedge):
         if hedge not in ('T', 'B', 'S', 'M'):
             return -1
 
-        self._cfgModel.setHedge(hedge, contNo)
+        self._cfgModel.setHedge(hedge)
         return 0
 
     def setSlippage(self, slippage):
         self._cfgModel.setSlippage(slippage)
         return 0
 
-    def setTriggerMode(self, contNo, type, value):
-        return self._cfgModel.setTrigger(contNo, type, value)
+    def setTriggerMode(self, type, value):
+        return self._cfgModel.setTrigger(type, value)
 
     def setWinPoint(self, winPoint, nPriceType, nAddTick, contNo):
         if not contNo:
@@ -727,13 +735,13 @@ class StrategyModel(object):
         }
 
         # if entryOrExit in (oCover, oCoverT):
-        if not self._strategy.isRealTimeStatus() and entryOrExit in (oCover, oCoverT):
+        if entryOrExit in (oCover, oCoverT):
             isVaildOrder = self._calcCenter.coverJudge(orderParam)
             if isVaildOrder < 0:
                 return ""
 
         canAdded = self._calcCenter.addOrder(orderParam)
-        if self._strategy.isRealTimeStatus() and canAdded < 1:
+        if canAdded < 1:
             return ""
 
         '''发送历史回测信号'''
@@ -856,6 +864,7 @@ class StrategyModel(object):
         '''发送实盘信号'''
         curBar = self.getHisQuoteModel().getCurBar(self._config.getKLineShowInfoSimple())
         if self._config.hasKLineTrigger() and curBar:
+            self.logger.debug(f"实盘信号已经发送，k线时间戳：{curBar['DateTimeStamp']}")
             self.sendSignalEvent(self._signalName, aOrder["Cont"], aOrder["Direct"], aOrder["Offset"], aOrder["OrderPrice"], aOrder["OrderQty"], curBar)
         self.logger.trade_info(f"发送实盘订单，策略Id:{strategyId}, 本地订单号：{eId}, 订单数据：{repr(aOrder)}")
 
@@ -1055,6 +1064,9 @@ class StrategyModel(object):
 
     def getBlue(self):
         return 0x0000FF
+
+    def getYellow(self):
+        return 0xFFFF00
 
     def getPurple(self):
         return 0x9900FF

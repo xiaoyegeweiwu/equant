@@ -458,6 +458,9 @@ class QuantEditor(StrategyTree):
     def setLoadBtnState(self, state):
         self.loadingBtn.config(state=state)
 
+    def setModifyTime(self, time):
+        self._modifyTime = time
+
     def tab_key(self, event):
         self.editor_text.insert(INSERT, " " * 4)
         return 'break'
@@ -482,8 +485,11 @@ class QuantEditor(StrategyTree):
 
     def onFocusIn(self, event):
         """获取焦点事件"""
-        path = self.control.getEditorText()["path"]
         # 过滤双击事件
+
+        if event.widget != self.control.top:
+            return
+
         if self._dModifyFlag:
             return
 
@@ -492,11 +498,16 @@ class QuantEditor(StrategyTree):
 
         self._outFlag = False
 
+        path = self.control.getEditorText()["path"]
+
         if path:
+            if not os.path.exists(path):    # 本地文件已删除
+                return
             modifyTime = os.path.getmtime(path)
+
             # 初始化self._modifyTime
             if self._modifyTime == 0:
-                self._modifyTime = os.path.getmtime(path)
+                self.setModifyTime(os.path.getmtime(path))
             if modifyTime == self._modifyTime:
                 return
 
@@ -508,10 +519,14 @@ class QuantEditor(StrategyTree):
                 # self.editor_text.edit_reset()
 
     def onFocusOut(self, event):
+        if event.widget != self.control.top:
+            return
+
         self._outFlag = True
         path = self.control.getEditorText()["path"]
         if path:
-            self._modifyTime = os.path.getmtime(path)
+            if os.path.exists(path):    # 本地文件已删除
+                self.setModifyTime(os.path.getmtime(path))
 
     def buttonDown(self, event):
         """鼠标按下记录按下位置"""
@@ -539,10 +554,12 @@ class QuantEditor(StrategyTree):
         # self.editor_text.bind("<Return>", self.return_key)
 
         # FocusIn
-        self.editor_text.bind("<FocusIn>", self.onFocusIn)
+        # self.editor_text.bind("<FocusIn>", self.onFocusIn)
+        # self.control.top.bind("<Enter>", self.onFocusIn)
 
         # FocusOut
-        self.editor_text.bind("<FocusOut>", self.onFocusOut)
+        # self.editor_text.bind("<FocusOut>", self.onFocusOut)
+        # self.control.top.bind("<Leave>", self.onFocusOut)
 
         # TODO：事件绑定有问题---回车键有bug
         # self.editor_text.bind("<Button-1>", self.buttonDown)

@@ -276,26 +276,6 @@ class StrategyQuote(QuoteModel):
         quoteDataModel = self._contractData[contNo]
         return quoteDataModel.getLv1Data(4, 0.0)
 
-    # 最新成交日期
-    @paramValidatorFactory(None)
-    def getQLastDate(self, contNo):
-        quoteDataModel = self._contractData[contNo]
-        updateTime = quoteDataModel._metaData['UpdateTime']
-        return int(updateTime) // 1000000000
-
-    # 最新价变化标志
-    @paramValidatorFactory(0)
-    def getQLastFlag(self, contNo):
-        # TODO: 增加最新价和次最新价比较逻辑
-        return 1
-
-    # 最新成交时间
-    @paramValidatorFactory(0)
-    def getQLastTime(self, contNo):
-        quoteDataModel = self._contractData[contNo]
-        updateTime = quoteDataModel._metaData['UpdateTime']
-        return float(int(updateTime) % 1000000000) / 1000000000
-
     # 现手
     @paramValidatorFactory(0)
     def getQLastVol(self, contNo):

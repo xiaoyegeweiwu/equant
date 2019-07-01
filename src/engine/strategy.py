@@ -394,6 +394,7 @@ class Strategy:
             # 1. 内部初始化
             self._initialize()
             # 2. 请求交易所、品种等
+            self._reqExchange()
             self._reqCommodity()
             # 2. 订阅即时行情
             self._subQuote()
@@ -579,6 +580,7 @@ class Strategy:
     
     def _regEgCallback(self):
         self._egCallbackDict = {
+            EV_EG2ST_EXCHANGE_RSP           : self._onExchange         ,
             EV_EG2ST_COMMODITY_RSP          : self._onCommodity        ,
             EV_EG2ST_SUBQUOTE_RSP           : self._onQuoteRsp         ,
             EV_EG2ST_SNAPSHOT_NOTICE        : self._onQuoteNotice      ,
@@ -609,6 +611,9 @@ class Strategy:
         }
     
     # ////////////////////////////内部数据请求接口////////////////////
+    def _reqExchange(self):
+        self._dataModel.reqExchange()
+
     def _reqCommodity(self):
         self._dataModel.reqCommodity()
 
@@ -625,6 +630,10 @@ class Strategy:
         self._dataModel.reqTradeData()
         
     # ////////////////////////////内部数据应答接口////////////////////
+    def _onExchange(self, event):
+        '''交易所信息应答'''
+        self._dataModel.onExchange(event)
+
     def _onCommodity(self, event):
         '''品种查询应答'''
         self._dataModel.onCommodity(event)
@@ -901,8 +910,8 @@ class Strategy:
             }
         })
         self.sendEvent2UI(quitEvent)
-        self.logger.info(f"策略已经将停止完成信号发送到UI和engine,策略{self._strategyId}")
         self.sendEvent2EngineForce(quitEvent)
+        self.logger.info(f"策略已经将停止完成信号发送到UI和engine,策略{self._strategyId}")
         # 保证该进程is_alive， 使得队列可用
         while True:
             time.sleep(2)
@@ -943,8 +952,8 @@ class Strategy:
             }
         })
         self.sendEvent2UI(responseEvent)
-        self.logger.info(f"策略已经将删除完成信号发送到UI和engine,策略{self._strategyId}, {EV_EG2UI_STRATEGY_STATUS}")
         self.sendEvent2EngineForce(responseEvent)
+        self.logger.info(f"策略已经将删除完成信号发送到UI和engine,策略{self._strategyId}, {EV_EG2UI_STRATEGY_STATUS}")
 
         # 保证该进程is_alive， 使得队列可用
         while True:

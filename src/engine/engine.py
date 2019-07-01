@@ -67,7 +67,10 @@ class StrategyEngine(object):
 
         # 恢复上次推出时保存的结构
         self._strategyOrder = {}
-        self._resumeStrategy()
+        try:
+            self._resumeStrategy()
+        except Exception as e:
+            self.logger.error(f"恢复策略失败")
         self._engineOrderModel = EngineOrderModel(self._strategyOrder)
         self._enginePosModel = EnginePosModel()
 
@@ -79,11 +82,7 @@ class StrategyEngine(object):
         if not os.path.exists('config/StrategyContext.json'):
             return
         with open("config/StrategyContext.json", 'r', encoding="utf-8") as resumeFile:
-            try:
-                strategyContext = json.load(resumeFile)
-            except Exception as e:
-                self.logger.error("无法恢复配置")
-                return
+            strategyContext = json.load(resumeFile)
             for k,v in strategyContext.items():
                 if k == "MaxStrategyId":
                     self._maxStrategyId = int(v)

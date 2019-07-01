@@ -85,6 +85,7 @@ class CalcCenter(object):
         self._initLimitCtl()
 
     def _initLimitCtl(self):
+        print()
         self._limitCtl = LimitCtl(self._limit["ContinueOpenTimes"], self._limit["OpenTimes"],
                                   self._limit["OpenAllowClose"], self._limit["CloseAllowOpen"])
 
@@ -364,6 +365,7 @@ class CalcCenter(object):
         "OrderQty" :      # 委托数量 或 期权应价数量
         "DateTimeStamp":  # 时间戳（基准合约）
         "TradeDate":       # 交易日（基准合约）
+        "CurBarIndex":    # K线索引
         }
         :return:
         """
@@ -402,8 +404,9 @@ class CalcCenter(object):
                                                         ftOrder["OrderQty"],
                                                         ftOrder["OrderType"],
                                                         ftOrder["Hedge"]))
-        self._logger.trade_info(f"发送虚拟订单，策略Id:{ftOrder['StrategyId']}, 运行阶段：{ftOrder['StrategyStage']}，"
-                                f"本地订单号：{ftOrder['OrderId']},订单数据：{repr(order)}")
+        # self._logger.info(order["CurBarIndex"])
+        # self._logger.trade_info(f"发送虚拟订单，策略Id:{ftOrder['StrategyId']}, 运行阶段：{ftOrder['StrategyStage']}，"
+        #                         f"本地订单号：{ftOrder['OrderId']},订单数据：{repr(order)}")
 
         # self._logger.sig_info(self._formatOrder(order))
 
