@@ -864,6 +864,7 @@ class StrategyModel(object):
         '''发送实盘信号'''
         curBar = self.getHisQuoteModel().getCurBar(self._config.getKLineShowInfoSimple())
         if self._config.hasKLineTrigger() and curBar:
+            self.logger.debug(f"实盘信号已经发送，k线为{curBar['KLineIndex']}")
             self.sendSignalEvent(self._signalName, aOrder["Cont"], aOrder["Direct"], aOrder["Offset"], aOrder["OrderPrice"], aOrder["OrderQty"], curBar)
         self.logger.trade_info(f"发送实盘订单，策略Id:{strategyId}, 本地订单号：{eId}, 订单数据：{repr(aOrder)}")
 
