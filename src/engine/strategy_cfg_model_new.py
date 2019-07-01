@@ -425,7 +425,7 @@ class StrategyConfig_new(object):
     def setMargin(self, type, value, contNo=''):
         '''设置保证金的类型及比例/额度'''
         if value < 0 or type not in (EEQU_FEE_TYPE_RATIO, EEQU_FEE_TYPE_FIXED):
-            raise Exception("保证金类型只能是 0: 按比例收取，1: 按定额收取 中的一个，并且保证金比例/额度不能小于0！")
+            raise Exception("保证金类型只能是 'R': 按比例收取，'F': 按定额收取 中的一个，并且保证金比例/额度不能小于0！")
 
         if contNo not in self._metaData['Money']:
             self._metaData['Money']['Margin'][contNo] = {'Type':'', 'Value':''}

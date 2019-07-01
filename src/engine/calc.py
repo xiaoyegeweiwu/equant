@@ -404,7 +404,7 @@ class CalcCenter(object):
                                                         ftOrder["OrderQty"],
                                                         ftOrder["OrderType"],
                                                         ftOrder["Hedge"]))
-        self._logger.info(order["CurBarIndex"])
+        # self._logger.info(order["CurBarIndex"])
         # self._logger.trade_info(f"发送虚拟订单，策略Id:{ftOrder['StrategyId']}, 运行阶段：{ftOrder['StrategyStage']}，"
         #                         f"本地订单号：{ftOrder['OrderId']},订单数据：{repr(order)}")
 
