@@ -378,6 +378,7 @@ class QuantEditor(StrategyTree):
                 # self.updateEditorHead(header)
                 self.control.setEditorTextCode(path)  # 根据点击事件给editor的文本和路径赋值
                 with open(path, "r", encoding="utf-8") as f:
+                # with open(path, "rb") as f:
                     data = f.read()
                 self.updateEditorText(data)
                 self.updateEditorHead(header)
@@ -401,7 +402,7 @@ class QuantEditor(StrategyTree):
         self.editor_text.delete(END + "-1c")
         self.editor_text.update()
         self.editor_text.focus_set()
-        self.editor_text.see("end")
+        # self.editor_text.see("end")
         self.editor_text.tag_add("TODO", "0.0", "end")
         self.editor_text.recolorize_main()
 
