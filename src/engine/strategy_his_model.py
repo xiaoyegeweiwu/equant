@@ -351,6 +351,11 @@ class StrategyHisQuote(object):
             return np.array([])
         return self._curBarDict[multiContKey].getBarLow()
 
+    def getBarTimeList(self, multiContKey):
+        if multiContKey not in self._curBarDict:
+            return np.array([])
+        return self._curBarDict[multiContKey].getBarTime()
+
     def getHisData(self, dataType, multiContKey, maxLength):
         if dataType not in (BarDataClose, BarDataOpen, BarDataHigh,
                             BarDataLow, BarDataMedian, BarDataTypical,
@@ -368,7 +373,7 @@ class StrategyHisQuote(object):
             BarDataWeighted : self.getBarWeighted,
             BarDataVol      : self.getBarVol,
             BarDataOpi      : self.getBarOpenInt,
-            BarDataTime     : self.getBarTime,
+            BarDataTime     : self.getBarTimeList,
         }
 
         numArray = methodMap[dataType](multiContKey)
