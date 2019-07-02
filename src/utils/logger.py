@@ -17,6 +17,18 @@ class MyHandlerText(logging.StreamHandler):
         self.textctrl.insert("end", msg + "\n")
         self.flush()
         self.textctrl.config(state="disabled")
+        
+class MyFileHandler(logging.FileHandler):
+    def __init__(self, file, mode):
+        self.fileFd = open(file, mode=mode)
+        logging.FileHandler.__init__(self, file, mode=mode)
+        
+        
+    def emit(self, record):
+        record.msg = record.msg[0]
+        msg = self.format(record)
+        self.fileFd.write(msg+'\n')
+        self.fileFd.flush()
 
 
 class MyHandlerQueue(logging.StreamHandler):
@@ -95,7 +107,7 @@ class Logger(object):
             if data_list is None: break
             #数据格式不对
             if len(data_list) !=3: continue
-            self.level_func[data_list[0]](data_list[1])
+            self.level_func[data_list[0]](data_list[1:])
 
     def _log(self, level, target, s):
         """s为区分打印信息来源的标志"""
@@ -119,7 +131,8 @@ class Logger(object):
 
     def add_handler(self):
         #设置文件句柄
-        file_handler = logging.FileHandler(self.logpath + "equant.log", mode='a')
+        #file_handler = logging.FileHandler(self.logpath + "equant.log", mode='a')
+        file_handler = MyFileHandler(self.logpath + "equant.log", mode='w')
         file_handler.setLevel(logging.DEBUG)
         file_handler.setFormatter(self.formatter)
         self.logger.addHandler(file_handler)
