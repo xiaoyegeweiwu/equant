@@ -95,7 +95,7 @@ class Logger(object):
             if data_list is None: break
             #数据格式不对
             if len(data_list) !=3: continue
-            self.level_func[data_list[0]](data_list[1])
+            self.level_func[data_list[0]](data_list[1:])
 
     def _log(self, level, target, s):
         """s为区分打印信息来源的标志"""
