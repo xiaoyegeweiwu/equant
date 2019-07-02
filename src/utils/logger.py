@@ -88,7 +88,7 @@ class Logger(object):
             os.makedirs( self.logpath) 
             
         #交易日志
-        self.time_now = datetime.datetime.now().strftime("%F %H.%M.%S.%f")[:-3]
+        self.time_now = datetime.datetime.now().strftime("%Y%m%d%H%M%S%f")[:-3]
         trade_path = self.logpath + "trade" + self.time_now + ".dat"
         self.trade_log = open(trade_path, mode='a', encoding='utf-8')
         #self.trade_log.write('我在这儿')
@@ -138,6 +138,7 @@ class Logger(object):
         #设置文件句柄
         logpath = self.logpath + "equant" + self.time_now + ".log"
         #file_handler = logging.FileHandler(self.logpath + "equant.log", mode='a')
+
         file_handler = MyFileHandler(logpath, mode='w')
         file_handler.setLevel(logging.DEBUG)
         file_handler.setFormatter(self.formatter)
