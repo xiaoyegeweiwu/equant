@@ -43,8 +43,9 @@ class MyHandlerQueue(logging.StreamHandler):
         #最多等待1秒
         # TODO: 先判断msg的消息体（json?)
         target = record.msg[1]
-        record.msg = record.msg[0]
+        #record.msg = record.msg[0]
         msg = self.format(record)
+        
         if target == 'S':
             try:
                 self.sig_queue.put_nowait(msg)
@@ -106,7 +107,6 @@ class Logger(object):
             data_list = self.log_queue.get()
             if data_list is None: break
             #数据格式不对
-            if len(data_list) !=3: continue
             self.level_func[data_list[0]](data_list[1:])
 
     def _log(self, level, target, s):
