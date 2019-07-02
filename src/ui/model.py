@@ -41,11 +41,23 @@ class QuantModel(object):
 
     def setEditorTextCode(self, path):
         """设置加载合约的路径信息"""
-        self._editor["path"] = path
-        if os.path.isfile(path):
-            self._editor["code"] = load_file(path)
+        try:
+            if os.path.isfile(path):
+                code = load_file(path)
+            else:
+                code = ""
+        except Exception as e:
+            self._logger.error("打开策略失败！！")
+            traceback.print_exc(e)
         else:
-            self._editor["code"] = ""
+            self._editor["path"] = path
+            self._editor["code"] = code
+
+        # self._editor["path"] = path
+        # if os.path.isfile(path):
+        #     self._editor["code"] = load_file(path)
+        # else:
+        #     self._editor["code"] = ""
 
     def getExchange(self):
         return self._receive.getExchange()
