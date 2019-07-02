@@ -47,6 +47,7 @@ class QuantModel(object):
             else:
                 code = ""
         except Exception as e:
+            self._logger.error("打开策略失败！！")
             traceback.print_exc(e)
         else:
             self._editor["path"] = path

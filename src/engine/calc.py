@@ -210,6 +210,10 @@ class CalcCenter(object):
         
         ret = -1
 
+        if orderQty <= 0:
+            self._logger.error(f"[{userNo}] [{contNo}] 订单手数不大于0")
+            return ret
+
         if direct == dBuy: # 买开
             if pInfo["TotalSell"] > 0:
                 if cost["CloseRatio"]:
@@ -217,6 +221,7 @@ class CalcCenter(object):
                 else:
                     coverCharge = pInfo["TotalSell"] * cost["CloseFixed"]
                 if availableFund < coverCharge:
+                    self._logger.error(f"自动平仓：[{userNo}] [{contNo}] 平卖开仓失败")
                     return -1   # 平卖开仓失败
                 else:
                     #TODO: 需要计算资金变化
@@ -226,6 +231,7 @@ class CalcCenter(object):
                         openCharge = orderQty * cost["OpenFixed"]
 
                     if availableFund - coverCharge < openCharge:
+                        self._logger.error(f"自动平仓：[{userNo}] [{contNo}] 开买开仓失败")
                         ret = -2  # 开买开仓失败
                     else:
                         ret = pInfo["TotalSell"]
@@ -237,6 +243,7 @@ class CalcCenter(object):
                 else:
                     coverCharge = pInfo["TotalBuy"] * cost["CloseFixed"]
                 if availableFund < coverCharge:
+                    self._logger.error(f"自动平仓：[{userNo}] [{contNo}] 平买开仓失败")
                     ret = -1  # 平买开仓失败
                 else:
                     if cost["OpenRatio"]:
@@ -245,6 +252,7 @@ class CalcCenter(object):
                         openCharge = orderQty * cost["OpenFixed"]
 
                     if availableFund - coverCharge < openCharge:
+                        self._logger.error(f"自动平仓：[{userNo}] [{contNo}] 开卖开仓失败")
                         ret = -2  # 开卖开仓失败
                     else:
                         ret = pInfo["TotalBuy"]
@@ -271,10 +279,18 @@ class CalcCenter(object):
 
         ret = -1
 
+        if order["OrderQty"] <= 0:
+            self._logger.error(f"订单手数不大于0，策略Id:{order['StrategyId']}, 运行阶段：{order['StrategyStage']}，"
+                                f"本地订单号：{order['OrderId']},订单数据：{repr(order)}")
+            return ret
+
         if order["Direct"] == dBuy and order["Offset"] == oCover: # 买平
             if pInfo["TotalSell"] > 0:
                 # 判断持仓
                 if pInfo["TotalSell"] < order["OrderQty"]:
+                    self._logger.error(f"平卖仓失败，仓位不足，策略Id:{order['StrategyId']}, "
+                                       f"运行阶段：{order['StrategyStage']}，"
+                                       f"本地订单号：{order['OrderId']},订单数据：{repr(order)}")
                     return -1  # 平卖仓失败， 仓位不足
 
                 # 计算平仓手续费
@@ -285,6 +301,9 @@ class CalcCenter(object):
 
                 # 判断资金
                 if availableFund < coverCharge:
+                    self._logger.error(f"平卖仓失败，资金不足，策略Id:{order['StrategyId']},"
+                                       f" 运行阶段：{order['StrategyStage']}，"
+                                       f"本地订单号：{order['OrderId']},订单数据：{repr(order)}")
                     ret = -2   # 平卖仓失败，资金不足
                 else:
                     ret = 1
@@ -293,6 +312,9 @@ class CalcCenter(object):
             if pInfo["TotalBuy"] > 0:
                 # 判断持仓
                 if pInfo["TotalBuy"] < order["OrderQty"]:
+                    self._logger.error(f"平买仓失败，仓位不足，策略Id:{order['StrategyId']},"
+                                       f" 运行阶段：{order['StrategyStage']}，"
+                                       f"本地订单号：{order['OrderId']},订单数据：{repr(order)}")
                     return -1  # 平买仓失败， 仓位不足
 
                 # 计算平仓手续费
@@ -303,6 +325,9 @@ class CalcCenter(object):
 
                 # 判断资金
                 if availableFund < coverCharge:
+                    self._logger.error(f"平买仓失败，资金不足，策略Id:{order['StrategyId']},"
+                                       f" 运行阶段：{order['StrategyStage']}，"
+                                       f"本地订单号：{order['OrderId']},订单数据：{repr(order)}")
                     ret = -2   # 平买仓失败，资金不足
                 else:
                     ret = 1
@@ -311,6 +336,9 @@ class CalcCenter(object):
             if pInfo["TodaySell"] > 0:
                 # 判断持仓
                 if pInfo["TodaySell"] < order["OrderQty"]:
+                    self._logger.error(f"买平今仓失败，仓位不足，策略Id:{order['StrategyId']},"
+                                       f" 运行阶段：{order['StrategyStage']}，"
+                                       f"本地订单号：{order['OrderId']},订单数据：{repr(order)}")
                     return -1  # 平买仓失败， 仓位不足
 
                 # 计算平仓手续费
@@ -322,6 +350,9 @@ class CalcCenter(object):
 
                 # 判断资金
                 if availableFund < coverCharge:
+                    self._logger.error(f"买平今仓失败，资金不足，策略Id:{order['StrategyId']},"
+                                       f" 运行阶段：{order['StrategyStage']}，"
+                                       f"本地订单号：{order['OrderId']},订单数据：{repr(order)}")
                     ret = -2   # 平买仓失败，资金不足
                 else:
                     ret = 1
@@ -374,6 +405,11 @@ class CalcCenter(object):
             self._beginDate = order["TradeDate"]
         self._endDate = order["TradeDate"]
         self._updateTradeDate(order["TradeDate"])
+
+        if order["OrderQty"] <= 0:
+            self._logger.error(f"订单手数不大于0，策略Id:{order['StrategyId']}, 运行阶段：{order['StrategyStage']}，"
+                                f"本地订单号：{order['OrderId']},订单数据：{repr(order)}")
+            return 0
 
         # TODO:限制信息写在这里
         if len(self._orders) < 1:
