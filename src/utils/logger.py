@@ -4,6 +4,7 @@ from multiprocessing import Queue, Process
 import queue
 import time
 import datetime
+from copy import deepcopy
 
 
 class MyHandlerText(logging.StreamHandler):
@@ -26,8 +27,9 @@ class MyFileHandler(logging.FileHandler):
         
         
     def emit(self, record):
-        record.msg = record.msg[0]
-        msg = self.format(record)
+        tmpRecord = deepcopy(record)
+        tmpRecord.msg = record.msg[0]
+        msg = self.format(tmpRecord)
         self.fileFd.write(msg+'\n')
         self.fileFd.flush()
 
@@ -44,7 +46,7 @@ class MyHandlerQueue(logging.StreamHandler):
         #最多等待1秒
         # TODO: 先判断msg的消息体（json?)
         target = record.msg[1]
-        #record.msg = record.msg[0]
+        record.msg = record.msg[0]
         msg = self.format(record)
         
         if target == 'S':
