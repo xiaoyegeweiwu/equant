@@ -956,7 +956,6 @@ class StrategyHisQuote(object):
         for index, row in allHisData.items():
             key = (row["ContractNo"], row["KLineType"], row["KLineSlice"])
             isShow = key == self._config.getKLineShowInfoSimple()
-
             # print(key, self._config.getKLineShowInfoSimple(),
             lastBar = self.getCurBar(key)
             self._updateCurBar(key, row)
@@ -997,9 +996,10 @@ class StrategyHisQuote(object):
             # 收到策略停止或退出信号， 退出历史回测
             if self._strategy._isExit():
                 break
-
+        #
+        showKey = self._config.getKLineShowInfoSimple()
         if endPos != beginPos:
-            batchKLine = self._curBarDict[key].getBarList()[beginPos:]
+            batchKLine = self._curBarDict[showKey].getBarList()[beginPos:]
             self._addBatchKLine(batchKLine)
         self._sendFlushEvent()
         endTime = datetime.now();endTimeStr = datetime.now().strftime('%H:%M:%S.%f')
