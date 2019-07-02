@@ -3,6 +3,7 @@ import sys,os
 from multiprocessing import Queue, Process
 import queue
 import time
+import datetime
 
 
 class MyHandlerText(logging.StreamHandler):
@@ -85,7 +86,9 @@ class Logger(object):
             os.makedirs( self.logpath) 
             
         #交易日志
-        self.trade_log = open(self.logpath + "trade.dat", mode='a', encoding='utf-8')
+        self.time_now = datetime.datetime.now().strftime("%F %H.%M.%S.%f")[:-3]
+        trade_path = self.logpath + "trade" + self.time_now + ".dat"
+        self.trade_log = open(trade_path, mode='a', encoding='utf-8')
         #self.trade_log.write('我在这儿')
         #self.trade_log.flush()
 
@@ -131,8 +134,11 @@ class Logger(object):
 
     def add_handler(self):
         #设置文件句柄
+        logpath = self.logpath + "equant" + self.time_now + ".log"
         #file_handler = logging.FileHandler(self.logpath + "equant.log", mode='a')
-        file_handler = MyFileHandler(self.logpath + "equant.log", mode='w')
+        file_handler = MyFileHandler(logpath, mode='w')
+
+        file_handler = logging.FileHandler(logpath, mode='a')
         file_handler.setLevel(logging.DEBUG)
         file_handler.setFormatter(self.formatter)
         self.logger.addHandler(file_handler)
