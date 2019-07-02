@@ -84,12 +84,15 @@ class Logger(object):
     def _initialize(self):
 
         self.logpath = r"./log/"
-        if not os.path.exists( self.logpath):
-            os.makedirs( self.logpath) 
-            
+        if not os.path.exists(self.logpath):
+            os.makedirs(self.logpath)
+
+        # 重命名历史日志
+        self.renameHisLog()
+
+        trade_path = self.logpath + "trade.dat"
+
         #交易日志
-        self.time_now = datetime.datetime.now().strftime("%Y%m%d%H%M%S%f")[:-3]
-        trade_path = self.logpath + "trade" + self.time_now + ".dat"
         self.trade_log = open(trade_path, mode='a', encoding='utf-8')
         #self.trade_log.write('我在这儿')
         #self.trade_log.flush()
@@ -114,6 +117,17 @@ class Logger(object):
             #数据格式不对
             self.level_func[data_list[0]](data_list[1:])
 
+    def renameHisLog(self):
+        """重命名历史日志文件"""
+        # 重命名历史日志文件
+        lognames = ["trade.dat", "equant.log"]
+        time_now = datetime.datetime.now().strftime("%Y%m%d%H%M%S%f")[:-3]
+        for name in lognames:
+            path = self.logpath + name
+            his_path = self.logpath + name[:-4] + time_now + name[-4:]
+            if os.path.exists(path):
+                os.rename(path, his_path)
+
     def _log(self, level, target, s):
         """s为区分打印信息来源的标志"""
         data = []
@@ -136,10 +150,10 @@ class Logger(object):
 
     def add_handler(self):
         #设置文件句柄
-        logpath = self.logpath + "equant" + self.time_now + ".log"
+        log_path = self.logpath + "equant.log"
         #file_handler = logging.FileHandler(self.logpath + "equant.log", mode='a')
 
-        file_handler = MyFileHandler(logpath, mode='w')
+        file_handler = MyFileHandler(log_path, mode='w')
         file_handler.setLevel(logging.DEBUG)
         file_handler.setFormatter(self.formatter)
         self.logger.addHandler(file_handler)
