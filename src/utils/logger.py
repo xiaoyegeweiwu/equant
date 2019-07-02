@@ -137,8 +137,6 @@ class Logger(object):
         logpath = self.logpath + "equant" + self.time_now + ".log"
         #file_handler = logging.FileHandler(self.logpath + "equant.log", mode='a')
         file_handler = MyFileHandler(logpath, mode='w')
-
-        file_handler = logging.FileHandler(logpath, mode='a')
         file_handler.setLevel(logging.DEBUG)
         file_handler.setFormatter(self.formatter)
         self.logger.addHandler(file_handler)
