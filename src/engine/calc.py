@@ -76,7 +76,6 @@ class CalcCenter(object):
 
     def initArgs(self, args):
         """初始化参数"""
-        print("1111111111: ", args)
         self._strategy = args
         self._setProfitInitialFundInfo(int(self._strategy["InitialFunds"]) - self._runSet["StartFund"])
         self._setExpertSetting()
@@ -335,7 +334,7 @@ class CalcCenter(object):
                 else:
                     ret = 1
 
-        elif  order["Direct"] == dBuy and order["Offset"] == oCoverT:   # 买平今
+        elif order["Direct"] == dBuy and order["Offset"] == oCoverT:   # 买平今
             if pInfo["TodaySell"] > 0:
                 # 判断持仓
                 if pInfo["TodaySell"] < order["OrderQty"]:
@@ -379,6 +378,22 @@ class CalcCenter(object):
                     ret = 1
 
         return ret
+
+    def calcOrderPrice(self, order):
+        """
+        计算订单的成交价(考虑滑点损耗)
+        :param order: 订单信息
+        :return: 加入滑点之后的订单成交价
+        """
+        cost = self.getCostRate(order["Cont"])
+        slippage = cost["Slippage"]
+        priceTick = cost["PriceTick"]
+        if order["Direct"] == dBuy:
+            price = order["OrderPrice"] + slippage * priceTick
+        else:
+            price = order["OrderPrice"] - slippage * priceTick
+
+        return price
 
     def addOrder(self, order):
         """
@@ -496,15 +511,14 @@ class CalcCenter(object):
            "StrategyId"      : order["StrategyId"],
            "StrategyStage"   : StrategyStatus[order["StrategyStage"]],
            "OrderId"         : order["OrderId"],
-            "TradeDate"      : order["TradeDate"],
-            "DateTimeStamp"  : order["DateTimeStamp"],
-            "UserNo"         : order["UserNo"],
+           "TradeDate"       : order["TradeDate"],
+           "DateTimeStamp"   : order["DateTimeStamp"],
+           "UserNo"          : order["UserNo"],
            "Cont"            : order["Cont"],
            "Direct"          : DirectDict[order["Direct"]],
            "Offset"          : OffsetDict[order["Offset"]],
            "OrderPrice"      : '{:.2f}'.format(order["OrderPrice"]),
            "OrderQty"        : order["OrderQty"],
-            "DateTimeStamp"  : order["DateTimeStamp"],
            "OrderType"       : OrderTypeDict[order["OrderType"]],
            "Hedge"           : HedgeDict[order["Hedge"]],
         }

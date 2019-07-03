@@ -306,7 +306,7 @@ class RunWin(QuantToplevel, QuantFrame):
             # 平仓手续费（率）
             self.closeFee.set("1")
             # 滑点损耗
-            self.slippage.set("1")
+            self.slippage.set("0")
 
             # 样本设置
             self.sampleVar.set(2)
@@ -1510,7 +1510,7 @@ class RunWin(QuantToplevel, QuantFrame):
         self.config["Limit"]["CloseAllowOpen"] = canOpen
 
         # other
-        self.config["Other"]["Slippage"] = float(slippage)
+        self.config["Other"]["Slippage"] = int(slippage)
         if tradeDirection == "双向交易":
             self.config["Other"]["TradeDirection"] = 0
         elif tradeDirection == "仅多头":
