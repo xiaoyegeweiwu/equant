@@ -1,11 +1,11 @@
-from collections import defaultdict
 from capi.com_types import *
 
 
 class LimitCtl(object):
 
-    def __init__(self, maxConOpenTimes, maxCurBarOpenTime, openNotReverse, coverNotOpen):
+    def __init__(self, logger, maxConOpenTimes, maxCurBarOpenTime, openNotReverse, coverNotOpen):
 
+        self._logger = logger
         # 限制
         self._maxConOpenTime   = maxConOpenTimes      # 最大连续同向开仓次数
         self._maxCurBarOpenTime = maxCurBarOpenTime   # 最大每根K线同向开仓次数
@@ -245,6 +245,41 @@ class LimitCtl(object):
             else:
                 self._hasCover = False
 
+
+class DirectionCtl(object):
+    """根据用户选择的交易方向判断订单是否满足下单要求"""
+    def __init__(self, logger, direction):
+        self._logger = logger
+        self._direction = direction
+
+        self._dirCtlCallback()
+
+    def _dirCtlCallback(self):
+        self._dirCtlDict = {
+            1      : self._longTrade,
+            2      : self._shortTrade,
+        }
+
+    def handleDirCtl(self, order):
+        if self._direction not in self._dirCtlDict and self._direction != 0:
+            self._logger.error("Unknown trade direction (%d)" % self._direction)
+            return 0
+        elif self._direction == 0:
+            return 1
+        else:
+            return self._dirCtlDict[self._direction](order)
+
+    def _longTrade(self, order):
+        """交易方向仅多头"""
+        if order["Direct"] == dSell and order["Offset"] == oOpen:   # 空头不下单
+            return 0
+        return 1
+
+    def _shortTrade(self, order):
+        """交易方向仅空头"""
+        if order["Direct"] == dBuy and order["Offset"] == oOpen:  # 多头不下单
+            return 0
+        return 1
 
 
 
