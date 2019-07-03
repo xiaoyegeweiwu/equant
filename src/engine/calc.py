@@ -76,6 +76,7 @@ class CalcCenter(object):
 
     def initArgs(self, args):
         """初始化参数"""
+        print("1111111111: ", args)
         self._strategy = args
         self._setProfitInitialFundInfo(int(self._strategy["InitialFunds"]) - self._runSet["StartFund"])
         self._setExpertSetting()
@@ -85,7 +86,6 @@ class CalcCenter(object):
         self._initLimitCtl()
 
     def _initLimitCtl(self):
-        print()
         self._limitCtl = LimitCtl(self._limit["ContinueOpenTimes"], self._limit["OpenTimes"],
                                   self._limit["OpenAllowClose"], self._limit["CloseAllowOpen"])
 
@@ -143,6 +143,9 @@ class CalcCenter(object):
             self._costs[contract]["OpenFixed"] = self._strategy["OpenFixed"]
             self._costs[contract]["CloseFixed"] = self._strategy["CloseFixed"]
             self._costs[contract]["CloseTodayFixed"] = self._strategy["CloseTodayFixed"]
+            # 新增
+            self._costs[contract]["Slippage"] = self._strategy["Slippage"]     # 滑点
+            self._costs[contract]["PriceTick"] = self._strategy["PriceTick"]   # 最小变动价位
 
             return self._costs[contract]
 
@@ -427,11 +430,12 @@ class CalcCenter(object):
 
         ftOrder = self._formatOrder(order)
 
-        self._logger.sig_info("[%3s] [%4s] [%5s], %s, %s, %s, %s, %s, %s, %s, %s, %s"%(
+        self._logger.sig_info("[%3s] [%4s] [%5s], %s, %s, %s, %s, %s, %s, %s, %s, %s, %s"%(
                                                         ftOrder["StrategyId"],
                                                         ftOrder["StrategyStage"],
                                                         ftOrder["OrderId"],
                                                         ftOrder["TradeDate"],
+                                                        ftOrder["DateTimeStamp"],
                                                         ftOrder["UserNo"],
                                                         ftOrder["Cont"],
                                                         ftOrder["Direct"],
@@ -493,6 +497,7 @@ class CalcCenter(object):
            "StrategyStage"   : StrategyStatus[order["StrategyStage"]],
            "OrderId"         : order["OrderId"],
             "TradeDate"      : order["TradeDate"],
+            "DateTimeStamp"  : order["DateTimeStamp"],
             "UserNo"         : order["UserNo"],
            "Cont"            : order["Cont"],
            "Direct"          : DirectDict[order["Direct"]],

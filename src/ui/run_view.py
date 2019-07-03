@@ -1368,7 +1368,7 @@ class RunWin(QuantToplevel, QuantFrame):
         # -------------转换定时触发的时间形式--------------------------
         time = timer.split("\n")
         timerFormatter = []
-        print("-------: ", time)
+
         for t in time:
             if t:
                 tempT = parseTime(t)

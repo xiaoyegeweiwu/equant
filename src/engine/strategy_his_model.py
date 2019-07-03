@@ -354,7 +354,9 @@ class StrategyHisQuote(object):
     def getBarTimeList(self, multiContKey):
         if multiContKey not in self._curBarDict:
             return np.array([])
-        return self._curBarDict[multiContKey].getBarTime()
+
+        barTimeList = self._curBarDict[multiContKey].getBarTime()
+        return np.array([float(barTime)/1000000000 for barTime in list(barTimeList)])
 
     def getHisData(self, dataType, multiContKey, maxLength):
         if dataType not in (BarDataClose, BarDataOpen, BarDataHigh,

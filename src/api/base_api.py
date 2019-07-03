@@ -415,14 +415,8 @@ class BaseApi(object):
 				
               kLineType 指定周期类型，可选的枚举函数和相应含义为：
                 Enum_Period_Tick        : 周期类型_分笔
-                Enum_Period_Dyna        : 周期类型_分时
-                Enum_Period_Second      : 周期类型_秒线
                 Enum_Period_Min         : 周期类型_分钟
-                Enum_Period_Hour        : 周期类型_小时
                 Enum_Period_Day         : 周期类型_日线
-                Enum_Period_Week        : 周期类型_周线
-                Enum_Period_Month       : 周期类型_月线
-                Enum_Period_Year        : 周期类型_年线
 				
               kLineValue 周期数， 如：5分钟线，周期数就是5；50秒线，周期数为50
               contractNo 合约编号, 为空时取当前合约
@@ -1343,21 +1337,14 @@ class BaseApi(object):
         【备注】
               返回值为字符，通常和BarInterval一起使用进行数据周期的判别
               返回值如下定义：
-              t 分时
               T 分笔
-              S 秒线
               M 分钟
-              H 小时
               D 日线
-              W 周线
-              m 月线
-              Y 年线
 
         【示例】
               当前数据周期为22日线，BarType等于D；
               当前数据周期为60分钟线，BarType等于M；
-              当前数据周期为1TICK线，BarType等于T；
-              当前数据周期为3秒线，BarType等于S。
+              当前数据周期为1TICK线，BarType等于T。
         '''
         return self._dataModel.getBarType()
         
@@ -4877,7 +4864,7 @@ class BaseApi(object):
 
         【参数】
               contractNo 合约编号
-              barType K线类型 t分时，T分笔，S秒线，M分钟，H小时，D日线，W周线，m月线，Y年线
+              barType K线类型 T分笔，M分钟，D日线
               barInterval K线周期
               sampleConfig 策略历史回测的起始点信息，可选的值为：
                 字符A : 使用所有K线
@@ -5795,7 +5782,7 @@ class BaseApi(object):
               无
 
         【备注】
-              返回字符, 't' 分时; 'T' 分笔; 'S' 秒线; 'M' 分钟; 'H' 小时; 'D' 日线; 'W' 周线; 'm' 月线; 'Y'年线
+              返回字符, 'T' 分笔; 'M' 分钟; 'D' 日线;
 
         【示例】
               无
@@ -6381,32 +6368,32 @@ def Enum_Apply():
 def Enum_Period_Tick():
     return baseApi.Enum_Period_Tick()
     
-def Enum_Period_Dyna(): 
-    return baseApi.Enum_Period_Dyna()
-    
-def Enum_Period_Second():
-    return baseApi.Enum_Period_Second()
+# def Enum_Period_Dyna():
+#     return baseApi.Enum_Period_Dyna()
+#
+# def Enum_Period_Second():
+#     return baseApi.Enum_Period_Second()
     
 def Enum_Period_Min():
     return baseApi.Enum_Period_Min()
     
-def Enum_Period_Hour():
-    return baseApi.Enum_Period_Hour()
+# def Enum_Period_Hour():
+#     return baseApi.Enum_Period_Hour()
     
 def Enum_Period_Day():
     return baseApi.Enum_Period_Day()
     
-def Enum_Period_Week():
-    return baseApi.Enum_Period_Week()
-    
-def Enum_Period_Month():
-    return baseApi.Enum_Period_Month()
-    
-def Enum_Period_Year():
-    return baseApi.Enum_Period_Year()
-    
-def Enum_Period_DayX():
-    return baseApi.Enum_Period_DayX()
+# def Enum_Period_Week():
+#     return baseApi.Enum_Period_Week()
+#
+# def Enum_Period_Month():
+#     return baseApi.Enum_Period_Month()
+#
+# def Enum_Period_Year():
+#     return baseApi.Enum_Period_Year()
+#
+# def Enum_Period_DayX():
+#     return baseApi.Enum_Period_DayX()
 
 def RGB_Red():
     return baseApi.RGB_Red()
