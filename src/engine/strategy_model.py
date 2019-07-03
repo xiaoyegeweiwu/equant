@@ -372,11 +372,6 @@ class StrategyModel(object):
         
         # 非K线触发的策略，不使用Bar
         curBar = None
-        # 账户
-        if self._cfgModel.isActualRun():
-            userNo = self._cfgModel.getUserNo() if not userNo else userNo
-        else:
-            userNo = "Default"
 
         # 对于开仓，需要平掉反向持仓
         qty = self._calcCenter.needCover(userNo, contNo, dBuy, share, price)
@@ -392,11 +387,6 @@ class StrategyModel(object):
         curBar = None
 
         # 交易计算、生成回测报告
-        # 产生信号
-        if self._cfgModel.isActualRun():
-            userNo = self._cfgModel.getUserNo() if not userNo else userNo
-        else:
-            userNo = "Default"
         eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtGFD, dBuy, oCover, hSpeculate, price, share, curBar)
         if eSessionId != "": self._strategy.updateBarInfoInLocalOrder(eSessionId, curBar)
 
@@ -405,11 +395,6 @@ class StrategyModel(object):
         curBar = None
 
         # 交易计算、生成回测报告
-        # 产生信号
-        if self._cfgModel.isActualRun():
-            userNo = self._cfgModel.getUserNo() if not userNo else userNo
-        else:
-            userNo = "Default"
         eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtGFD, dSell, oCover, hSpeculate, price, share, curBar)
         if eSessionId != "": self._strategy.updateBarInfoInLocalOrder(eSessionId, curBar)
 
@@ -417,18 +402,12 @@ class StrategyModel(object):
         contNo = contractNo if contractNo is not None else self._cfgModel.getBenchmark()
         curBar = None
 
-        if self._cfgModel.isActualRun():
-            userNo = self._cfgModel.getUserNo() if not userNo else userNo
-        else:
-            userNo = "Default"
         qty = self._calcCenter.needCover(userNo, contNo, dSell, share, price)
         if qty > 0 and needCover:
             eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtGFD, dSell, oCover, hSpeculate, price, qty, curBar)
             if eSessionId != "": self._strategy.updateBarInfoInLocalOrder(eSessionId, curBar)
 
         # 交易计算、生成回测报告
-        # 产生信号
-        userNo = self._cfgModel.getUserNo() if self._cfgModel.isActualRun() else "Default"
         eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtGFD, dSell, oOpen, hSpeculate, price, share, curBar)
         if eSessionId != "": self._strategy.updateBarInfoInLocalOrder(eSessionId, curBar)
 
@@ -713,6 +692,10 @@ class StrategyModel(object):
             curBar = copy.deepcopy(curShowBar)
             curBarIndex = curBar["KLineIndex"]
 
+        userNo = self._cfgModel.getUserNo() if not userNo else userNo
+        if not userNo:
+            userNo = "Default"
+
         orderParam = {
             "UserNo"         : userNo,                   # 账户编号
             "OrderType"      : orderType,                # 定单类型
@@ -763,22 +746,27 @@ class StrategyModel(object):
 
         # 是否暂停实盘下单
         if self._cfgModel.getPending():
+            self.logger.error(f"请调用StartTrade方法开启实盘下单功能")
             return -5, "请调用StartTrade方法开启实盘下单功能"
 
         # 发送下单信号,K线触发、即时行情触发
         # 未选择实盘运行
         if not self._cfgModel.isActualRun():
+            self.logger.error(f"未选择实盘运行，请在设置界面勾选'实盘运行'，或者在策略代码中调用SetActual()")
             return -1, '未选择实盘运行，请在设置界面勾选"实盘运行"，或者在策略代码中调用SetActual()方法选择实盘运行'
 
         if not self._strategy.isRealTimeStatus():
+            self.logger.error(f"策略当前状态不是实盘运行状态， 不会产生实盘订单")
             return -2, "策略当前状态不是实盘运行状态， 不会产生实盘订单"
 
         # 账户错误
         if not userNo or userNo == 'Default':
+            self.logger.error(f"未指定下单账户信息")
             return -3, "未指定下单账户信息"
 
         # 指定的用户未登录
         if not self._trdModel.getSign(userNo):
+            self.logger.error(f"输入的账户没有在极星客户端登录")
             return -4, "输入的账户没有在极星客户端登录"
 
         eId = str(self._strategy.getStrategyId()) + '-' + str(self._strategy.getESessionId())
@@ -854,6 +842,7 @@ class StrategyModel(object):
     def sendActualOrder2Engine(self, aOrder, eId, strategyId):
         if int(aOrder["OrderQty"]+0.5) <= 0:
             return
+        aOrder["OrderQty"] = int(aOrder["OrderQty"]+0.5)
         aOrderEvent = Event({
             "EventCode": EV_ST2EG_ACTUAL_ORDER,
             "StrategyId": strategyId,

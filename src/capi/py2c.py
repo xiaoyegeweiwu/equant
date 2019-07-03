@@ -3,6 +3,7 @@ from threading import Thread
 from .com_types import *
 from .event import *
 from datetime import datetime
+import numpy as np
 
 class PyAPI(object):
     '''与9.5交互api类，单例模式'''
@@ -30,7 +31,9 @@ class PyAPI(object):
         
         # 初始化C Dll
         errorCode = self._cDll.E_Init()
-        assert errorCode == 0, " C API init failed"
+        if errorCode != 0:
+            self.logger.error("与极星9.5连接失败，请重启极星9.5以及量化")
+            return
 
         # 策略编号<-->会话号
         self._SessionStrategyPair = {} #{session_id, strategy_id}
@@ -236,7 +239,6 @@ class PyAPI(object):
         req = EEquKLineReq()
         data = event.getData()
         req.ReqCount = data['ReqCount']
-
         innerContractNo = self.getInnerContractNo(data["ContractNo"])
         req.ContractNo = innerContractNo.encode()
         req.KLineType = data['KLineType'].encode()
@@ -312,6 +314,7 @@ class PyAPI(object):
             }]
         '''
         for i, d in enumerate(dataList):
+            d = {k:0 if np.isnan(v) else v for k, v in d.items()}
             data = EEquKLineData()
             data.KLineIndex                                 = d['KLineIndex']
             data.TradeDate                                  = d['TradeDate']
@@ -764,7 +767,7 @@ class PyAPI(object):
             eEquSignalItem.Direct = d['Direct'].encode()
             eEquSignalItem.Offset = d['Offset'].encode()
             eEquSignalItem.Price = d['Price']
-            eEquSignalItem.Qty = d['Qty']
+            eEquSignalItem.Qty = int(d['Qty']+0.5)
             curBuf = cbuf + sizeof(EEquSignalItem) * i
             cData = string_at(addressof(eEquSignalItem), sizeof(EEquSignalItem))
             memmove(curBuf, cData, sizeof(EEquSignalItem))
@@ -812,7 +815,6 @@ class PyAPI(object):
         self._cDll.E_KLineStrategyStateNotice(byref(sessionId), byref(req))
         self._setSessionId(sessionId.value, event.getStrategyId())
     
-        
     #////////////////////////////交易数据请求///////////////////////
     def reqQryLoginInfo(self, event):
         '''
@@ -1011,7 +1013,7 @@ class PyAPI(object):
         modifyReq.TriggerPrice = data['TriggerPrice']
         modifyReq.TriggerMode = data['TriggerMode'].encode()
         modifyReq.TriggerCondition = data['TriggerCondition'].encode()
-        modifyReq.OrderQty = data['OrderQty']
+        modifyReq.OrderQty = int(data['OrderQty']+0.5)
         modifyReq.StrategyType = data['StrategyType'].encode()
         modifyReq.Remark = data['Remark'].encode()
         modifyReq.AddOneIsValid = data['AddOneIsValid'].encode()
@@ -1653,4 +1655,4 @@ class PyAPI(object):
         pass
 
     def _onExchangeStateNotice(self, apiEvent):
-        pass
+       pass
