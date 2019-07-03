@@ -747,16 +747,21 @@ class StrategyModel(object):
         if canAdded < 1:
             return ""
 
-        '''发送历史回测信号'''
+        '''buy/sell 信号，
+        历史阶段：一定没有委托
+        实时数据：不一定有委托发
+        '''
         curBar = self.getHisQuoteModel().getCurBar(self._config.getKLineShowInfoSimple())
-        if not self._strategy.isRealTimeStatus() and self._config.hasKLineTrigger() and curBar:
+        if self._config.hasKLineTrigger() and curBar:
             self.sendSignalEvent(self._signalName, contNo, orderDirct, entryOrExit, orderPrice, orderQty, curBar)
 
         retCode, eSessionId = self.sendOrder(userNo, contNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty)
         return eSessionId if retCode == 0 else ""
         
     def sendOrder(self, userNo, contNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty, \
-                           triggerType=stNone, triggerMode=tmNone, triggerCondition=tcNone, triggerPrice=0):
+                           triggerType=stNone, triggerMode=tmNone, triggerCondition=tcNone, triggerPrice=0, aFunc = False):
+
+
         '''A账户下单函数，不经过calc模块，直接发单'''
         if not userNo:
             userNo = self._cfgModel.getUserNo()
@@ -820,7 +825,7 @@ class StrategyModel(object):
                 'Remark': '',
                 'AddOneIsValid': tsDay,
             }
-            self.sendActualOrder2Engine(aOrder, eId, self._strategy.getStrategyId())
+            self.sendActualOrder2Engine(aOrder, eId, self._strategy.getStrategyId(),aFunc)
             if orderQty > positionInfo["TodayPos"]:
                 orderQty = orderQty - positionInfo["TodayPos"]
                 entryOrExit = oCover
@@ -852,14 +857,15 @@ class StrategyModel(object):
             'AddOneIsValid': tsDay,
         }
 
-        self.sendActualOrder2Engine(aOrder, eId, self._strategy.getStrategyId())
+        self.sendActualOrder2Engine(aOrder, eId, self._strategy.getStrategyId(),aFunc)
         # self.logger.trade_info(self._strategy.getStrategyId(), aOrder)
         # 更新策略的订单信息
         self._strategy.setESessionId(self._strategy.getESessionId() + 1)
         self._strategy.updateLocalOrder(eId, aOrder)
         return 0, eId
 
-    def sendActualOrder2Engine(self, aOrder, eId, strategyId):
+    # afunc表明是由A函数调用的，还是buy/sell调用的
+    def sendActualOrder2Engine(self, aOrder, eId, strategyId, aFunc):
         if int(aOrder["OrderQty"]+0.5) <= 0:
             return
         aOrder["OrderQty"] = int(aOrder["OrderQty"]+0.5)
@@ -870,9 +876,9 @@ class StrategyModel(object):
             "ESessionId": eId,
         })
         self._strategy.sendEvent2Engine(aOrderEvent)
-        '''发送实盘信号'''
+        '''A函数 发送实盘信号'''
         curBar = self.getHisQuoteModel().getCurBar(self._config.getKLineShowInfoSimple())
-        if self._config.hasKLineTrigger() and curBar:
+        if aFunc and self._config.hasKLineTrigger() and curBar:
             self.logger.debug(f"实盘信号已经发送，k线时间戳：{curBar['DateTimeStamp']}")
             self.sendSignalEvent(self._signalName, aOrder["Cont"], aOrder["Direct"], aOrder["Offset"], aOrder["OrderPrice"], aOrder["OrderQty"], curBar)
         self.logger.trade_info(f"发送实盘订单，策略Id:{strategyId}, 本地订单号：{eId}, 订单数据：{repr(aOrder)}")
