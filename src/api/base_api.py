@@ -350,6 +350,9 @@ class BaseApi(object):
         '''
         return self._dataModel.getCurrentBar(contractNo, kLineType, kLineValue)
 
+    def CurrentBarEntity(self, contractNo, kLineType, kLineValue):
+        return self._dataModel.getCurrentBarEntity(contractNo, kLineType, kLineValue)
+
     def BarStatus(self, contractNo, kLineType, kLineValue):
         '''
         【说明】
@@ -5936,6 +5939,9 @@ def BarCount(contractNo='', kLineType='', kLineValue=0):
 
 def CurrentBar(contractNo='', kLineType='', kLineValue=0):
     return baseApi.CurrentBar(contractNo, kLineType, kLineValue)
+
+def CurrentBarEntity(contractNo='', kLineType='', kLineValue=0):
+    return baseApi.CurrentBarEntity(contractNo, kLineType, kLineValue)
 
 def BarStatus(contractNo='', kLineType='', kLineValue=0):
     return baseApi.BarStatus(contractNo, kLineType, kLineValue)
