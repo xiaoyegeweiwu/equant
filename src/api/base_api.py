@@ -418,6 +418,7 @@ class BaseApi(object):
 				
               kLineType 指定周期类型，可选的枚举函数和相应含义为：
                 Enum_Period_Tick        : 周期类型_分笔
+                Enum_Period_Second      : 周期类型_秒线
                 Enum_Period_Min         : 周期类型_分钟
                 Enum_Period_Day         : 周期类型_日线
 				
@@ -1341,6 +1342,7 @@ class BaseApi(object):
               返回值为字符，通常和BarInterval一起使用进行数据周期的判别
               返回值如下定义：
               T 分笔
+              S 秒线
               M 分钟
               D 日线
 
@@ -4867,7 +4869,7 @@ class BaseApi(object):
 
         【参数】
               contractNo 合约编号
-              barType K线类型 T分笔，M分钟，D日线
+              barType K线类型 T分笔，S秒线，M分钟，D日线
               barInterval K线周期
               sampleConfig 策略历史回测的起始点信息，可选的值为：
                 字符A : 使用所有K线
@@ -5785,7 +5787,7 @@ class BaseApi(object):
               无
 
         【备注】
-              返回字符, 'T' 分笔; 'M' 分钟; 'D' 日线;
+              返回字符, 'T' 分笔; 'S' 秒线; 'M' 分钟; 'D' 日线;
 
         【示例】
               无
@@ -6377,8 +6379,8 @@ def Enum_Period_Tick():
 # def Enum_Period_Dyna():
 #     return baseApi.Enum_Period_Dyna()
 #
-# def Enum_Period_Second():
-#     return baseApi.Enum_Period_Second()
+def Enum_Period_Second():
+    return baseApi.Enum_Period_Second()
     
 def Enum_Period_Min():
     return baseApi.Enum_Period_Min()
