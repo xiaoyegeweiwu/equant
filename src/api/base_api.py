@@ -3397,7 +3397,7 @@ class BaseApi(object):
               当retCode为0时表明发送订单信息成功，retMsg为返回的下单编号localOrderId。
          '''
         return self._dataModel.sendOrder(userNo, contractNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty, \
-                                                      triggerType, triggerMode, triggerCondition, triggerPrice)
+                                                      triggerType, triggerMode, triggerCondition, triggerPrice, aFunc=True)
 
     def A_DeleteOrder(self, localOrderId):
         '''
