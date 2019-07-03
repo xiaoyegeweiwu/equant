@@ -1543,7 +1543,9 @@ class RunWin(QuantToplevel, QuantFrame):
             elif contValues[1] == "分钟":
                 value["KLineType"] = "M"
             elif contValues[1] == "秒":
-                value["KLineType"] = "S"
+                value["KLineType"] = "T"
+            elif contValues[1] == "分笔":
+                value["KLineType"] = "T"
             else:
                 raise Exception("K线类型未知异常")
 
@@ -1967,7 +1969,7 @@ class AddContWin(QuantToplevel, QuantFrame):
         kLineTypeLabel.pack(side=tk.LEFT)
 
         self.kLineTypeChosen = ttk.Combobox(kLineTypeFrame, state="readonly", textvariable=self.kLineType, width=17)
-        self.kLineTypeChosen['values'] = ['日', '分钟', '秒']
+        self.kLineTypeChosen['values'] = ['日', '分钟', '秒', '分笔']
         self.kLineTypeChosen.pack(side=tk.LEFT, fill=tk.X, padx=5)
 
     def setKLineSlice(self, frame):
