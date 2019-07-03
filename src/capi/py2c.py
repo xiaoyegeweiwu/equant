@@ -290,10 +290,11 @@ class PyAPI(object):
         req.ContractNo = innerContractNo.encode()
         req.KLineType = data['KLineType'].encode()
         req.KLineSlice = data['KLineSlice']
+
         self._cDll.E_KLineStrategySwitch(byref(sessionId), byref(req))
         self._setSessionId(sessionId.value, event.getStrategyId())
         
-    def _getTickKLineData(self, dataList, cbuf):
+    def _getTickKLineData(self, dataList, cbuf, tickSlice):
         '''
         功能：创建C语言类型成交明细K线
         参数：
@@ -313,25 +314,43 @@ class PyAPI(object):
                 'SellQty'       : value,
             }]
         '''
+        assert tickSlice is not None, "error"
         for i, d in enumerate(dataList):
-            d = {k:0 if np.isnan(v) else v for k, v in d.items()}
             data = EEquKLineData()
-            data.KLineIndex                                 = d['KLineIndex']
-            data.TradeDate                                  = d['TradeDate']
-            data.DateTimeStamp                              = d['DateTimeStamp']
-            data.TotalQty                                   = int(d['TotalQty']+0.5)
-            data.PositionQty                                = int(d['PositionQty']+0.5)
-            data.LastPrice                                  = d['LastPrice']
-            data.KLineData.KLineData1.LastQty               = int(d['LastQty']+0.5)
-            data.KLineData.KLineData1.PositionChg           = int(d['PositionChg']+0.5)
-            data.KLineData.KLineData1.BuyPrice              = d['BuyPrice']
-            data.KLineData.KLineData1.SellPrice             = d['SellPrice']
-            data.KLineData.KLineData1.BuyQty                = int(d['BuyQty']+0.5)
-            data.KLineData.KLineData1.SellQty               = int(d['SellQty']+0.5)
-            curBuf = cbuf + sizeof(EEquKLineData) * i
-            cData = string_at(addressof(data), sizeof(EEquKLineData))
-            memmove(curBuf, cData, sizeof(EEquKLineData))
-        
+            if tickSlice == 0:
+                data.KLineIndex                                 = d['KLineIndex']
+                data.TradeDate                                  = d['TradeDate']
+                data.DateTimeStamp                              = d['DateTimeStamp']
+                data.TotalQty                                   = int(d['TotalQty']+0.5)
+                data.PositionQty                                = int(d['PositionQty']+0.5)
+                data.LastPrice                                  = d['LastPrice']
+                data.KLineData.KLineData1.LastQty               = int(d['LastQty']+0.5)
+                data.KLineData.KLineData1.PositionChg           = int(d['PositionChg']+0.5)
+                data.KLineData.KLineData1.BuyPrice              = d['BuyPrice']
+                data.KLineData.KLineData1.SellPrice             = d['SellPrice']
+                data.KLineData.KLineData1.BuyQty                = int(d['BuyQty']+0.5)
+                data.KLineData.KLineData1.SellQty               = int(d['SellQty']+0.5)
+                curBuf = cbuf + sizeof(EEquKLineData) * i
+                cData = string_at(addressof(data), sizeof(EEquKLineData))
+                memmove(curBuf, cData, sizeof(EEquKLineData))
+            elif tickSlice>=1:
+                data.KLineIndex = d['KLineIndex']
+                data.TradeDate = d['TradeDate']
+                data.DateTimeStamp = d['DateTimeStamp']
+                data.TotalQty = int(d['TotalQty'] + 0.5)
+                data.PositionQty = int(d['PositionQty'] + 0.5)
+                data.LastPrice = d['LastPrice']
+                data.KLineData.KLineData0.KLineQty = int(d['KLineQty'] + 0.5)
+                data.KLineData.KLineData0.OpeningPrice = d['OpeningPrice']
+                data.KLineData.KLineData0.HighPrice = d['HighPrice']
+                data.KLineData.KLineData0.LowPrice = d['LowPrice']
+                data.KLineData.KLineData0.SettlePrice = d['SettlePrice']
+                curBuf = cbuf + sizeof(EEquKLineData) * i
+                cData = string_at(addressof(data), sizeof(EEquKLineData))
+                memmove(curBuf, cData, sizeof(EEquKLineData))
+            else:
+                self.logger.error(f"error tick slice")
+
     def _getMinuteKLineData(self, dataList, cbuf):
         '''
         功能：创建C语言类型日线和分钟线
@@ -392,7 +411,7 @@ class PyAPI(object):
         cbuf = addressof(pybuf)
         
         if event.getKLineType() == EEQU_KLINE_TICK:
-            self._getTickKLineData(data['Data'], cbuf)
+            self._getTickKLineData(data['Data'], cbuf, event.getKLineSlice())
         else:
             self._getMinuteKLineData(data['Data'], cbuf)
             
@@ -1300,7 +1319,7 @@ class PyAPI(object):
                 'LastPrice'     : data.LastPrice
             }
             
-            if klineType == EEQU_KLINE_TICK:
+            if klineType == EEQU_KLINE_TICK and apiEvent.getKLineSlice() == 0:
                 idict['LastQty']      = data.KLineData.KLineData1.LastQty
                 idict['PositionChg']  = data.KLineData.KLineData1.PositionChg
                 idict['BuyPrice']     = data.KLineData.KLineData1.BuyPrice
@@ -1314,13 +1333,11 @@ class PyAPI(object):
                 idict['HighPrice']    = data.KLineData.KLineData0.HighPrice
                 idict['LowPrice']     = data.KLineData.KLineData0.LowPrice
                 idict['SettlePrice']  = data.KLineData.KLineData0.SettlePrice
-            
+
             dataList.append(idict)
         
         # 发送到引擎
         # print("[in py2c] ", len(dataList), apiEvent.getContractNo(), apiEvent.getKLineType(), apiEvent.getKLineSlice(), apiEvent.isChainEnd())
-
-
         apiEvent.setData(dataList)
         sid = apiEvent.getSessionId()
         apiEvent.setStrategyId(self._getStrategyId(sid))

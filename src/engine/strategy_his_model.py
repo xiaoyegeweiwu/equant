@@ -849,6 +849,7 @@ class StrategyHisQuote(object):
             "EventCode"  : EV_ST2EG_UPDATE_KLINEDATA,
             "StrategyId" : self._strategy.getStrategyId(),
             "KLineType"  : self._getKLineType(),
+            "KLineSlice" : self._getKLineSlice(),
             "Data": {
                 'Count'  : 1,
                 "Data"   : [data,],
@@ -1019,6 +1020,7 @@ class StrategyHisQuote(object):
             "EventCode": EV_ST2EG_NOTICE_KLINEDATA,
             "StrategyId": self._strategy.getStrategyId(),
             "KLineType": self._getKLineType(),
+            "KLineSlice": self._getKLineSlice(),
             "Data": {
                 'Count': len(data),
                 "Data": copy.deepcopy(data),

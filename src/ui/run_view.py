@@ -306,7 +306,7 @@ class RunWin(QuantToplevel, QuantFrame):
             # 平仓手续费（率）
             self.closeFee.set("1")
             # 滑点损耗
-            self.slippage.set("1")
+            self.slippage.set("0")
 
             # 样本设置
             self.sampleVar.set(2)
@@ -1448,6 +1448,7 @@ class RunWin(QuantToplevel, QuantFrame):
                 self.config["RunMode"]["Simulate"]["UseSample"] = True
         elif sampleVar == 3:
             self.config["RunMode"]["Simulate"]["UseSample"] = False
+            self.config["Sample"]["KLineCount"] = 1  # 不执行历史K线时默认订阅一根K线
         else:
             raise Exception("运算起始点异常")
 
@@ -1510,7 +1511,7 @@ class RunWin(QuantToplevel, QuantFrame):
         self.config["Limit"]["CloseAllowOpen"] = canOpen
 
         # other
-        self.config["Other"]["Slippage"] = float(slippage)
+        self.config["Other"]["Slippage"] = int(slippage)
         if tradeDirection == "双向交易":
             self.config["Other"]["TradeDirection"] = 0
         elif tradeDirection == "仅多头":
@@ -1542,7 +1543,9 @@ class RunWin(QuantToplevel, QuantFrame):
             elif contValues[1] == "分钟":
                 value["KLineType"] = "M"
             elif contValues[1] == "秒":
-                value["KLineType"] = "S"
+                value["KLineType"] = "T"
+            elif contValues[1] == "分笔":
+                value["KLineType"] = "T"
             else:
                 raise Exception("K线类型未知异常")
 
@@ -1966,7 +1969,7 @@ class AddContWin(QuantToplevel, QuantFrame):
         kLineTypeLabel.pack(side=tk.LEFT)
 
         self.kLineTypeChosen = ttk.Combobox(kLineTypeFrame, state="readonly", textvariable=self.kLineType, width=17)
-        self.kLineTypeChosen['values'] = ['日', '分钟', '秒']
+        self.kLineTypeChosen['values'] = ['日', '分钟', '秒', '分笔']
         self.kLineTypeChosen.pack(side=tk.LEFT, fill=tk.X, padx=5)
 
     def setKLineSlice(self, frame):

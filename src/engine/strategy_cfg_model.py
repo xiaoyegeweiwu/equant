@@ -445,8 +445,10 @@ class StrategyConfig(object):
     def setBarInterval(self, contNo, barType, barInterval, sampleConfig, trigger=True):
         '''设置K线类型和K线周期'''
         # if barType not in ('t', 'T', 'S', 'M', 'H', 'D', 'W', 'm', 'Y'):
-        if barType not in ('T', 'M', 'D'):
-            raise Exception("请确保设置的K线类型为 'T':分笔，'M':分钟，'D':日线 中的一个！")
+        if barType not in ('T', 'S', 'M', 'D'):
+            raise Exception("请确保设置的K线类型为 'T':分笔，'S':秒线，'M':分钟，'D':日线 中的一个！")
+        if barType == 'S':
+            barType = 'T'
 
         # 清空界面设置的合约K线信息
         contract = self._metaData['Contract']
