@@ -1448,6 +1448,7 @@ class RunWin(QuantToplevel, QuantFrame):
                 self.config["RunMode"]["Simulate"]["UseSample"] = True
         elif sampleVar == 3:
             self.config["RunMode"]["Simulate"]["UseSample"] = False
+            self.config["Sample"]["KLineCount"] = 1  # 不执行历史K线时默认订阅一根K线
         else:
             raise Exception("运算起始点异常")
 
