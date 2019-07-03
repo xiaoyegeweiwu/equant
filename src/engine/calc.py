@@ -144,7 +144,6 @@ class CalcCenter(object):
             self._costs[contract]["CloseTodayFixed"] = self._strategy["CloseTodayFixed"]
             # 新增
             self._costs[contract]["Slippage"] = self._strategy["Slippage"]     # 滑点
-            self._costs[contract]["PriceTick"] = self._strategy["PriceTick"]   # 最小变动价位
 
             return self._costs[contract]
 
@@ -379,19 +378,21 @@ class CalcCenter(object):
 
         return ret
 
-    def calcOrderPrice(self, order):
+    def calcOrderPrice(self, contract, direct, orderprice):
         """
         计算订单的成交价(考虑滑点损耗)
-        :param order: 订单信息
-        :return: 加入滑点之后的订单成交价
+        :param contract: 合约
+        :param direct: 买卖方向
+        :param orderprice: 订单委托价格
+        :return: 计算滑点之后的订单成交价
         """
-        cost = self.getCostRate(order["Cont"])
+        cost = self.getCostRate(contract)
         slippage = cost["Slippage"]
         priceTick = cost["PriceTick"]
-        if order["Direct"] == dBuy:
-            price = order["OrderPrice"] + slippage * priceTick
+        if direct == dBuy:
+            price = orderprice + slippage * priceTick
         else:
-            price = order["OrderPrice"] - slippage * priceTick
+            price = orderprice - slippage * priceTick
 
         return price
 
@@ -528,28 +529,29 @@ class CalcCenter(object):
         计算订单的扩展持仓信息
         :return:
         """
-        charge = 0  # 手续费
-        charge1 = 0  # 手续费1
-        margin = 0  # 保证金
-        turnover = 0
-        profit = 0  # 净利润
+        charge          = 0  # 手续费
+        charge1         = 0  # 手续费1
+        margin          = 0  # 保证金
+        turnover        = 0
+        profit          = 0  # 净利润
         liquidateProfit = 0  # 平仓盈亏
-        linkList = []  # value = {id, vol}
+        slipLoss    = 0  # 滑点损耗
+        linkList        = []  # value = {id, vol}
+
         pInfo = self.getPositionInfo(order["Cont"])
         eo = defaultdict(int)
 
         if order["Direct"] == dBuy and order["Offset"] == oOpen:  # 买开
             qty = order["OrderQty"]
-            charge, turnover, margin, profit = self._buyOpen(order, qty)
+            charge, turnover, margin, profit, slipLoss = self._buyOpen(order, qty)
 
         elif order["Direct"] == dBuy and order["Offset"] == oCover:  # 买平
             qty = order["OrderQty"] if pInfo["TotalSell"] > order["OrderQty"] else pInfo["TotalSell"]
-            charge, charge1, turnover, liquidateProfit, profit, linkList = self._buyClose(order, pInfo, qty)
+            charge, charge1, turnover, liquidateProfit, profit, linkList, slipLoss = self._buyClose(order, pInfo, qty)
 
-        ############################################新增加##########################################################
         elif order["Direct"] == dBuy and order["Offset"] == oCoverT:  # 买平今
             qty = order["OrderQty"] if pInfo["TodaySell"] > order["OrderQty"] else pInfo["TodaySell"]
-            charge, charge1, turnover, liquidateProfit, profit, linkList = self._buyCloseToday(order, pInfo, qty)
+            charge, charge1, turnover, liquidateProfit, profit, linkList, slipLoss = self._buyCloseToday(order, pInfo, qty)
 
         elif order["Direct"] == dBuy and order["Offset"] == oNone:
             self._calcOrderOuter(order)
@@ -557,17 +559,17 @@ class CalcCenter(object):
 
         elif order["Direct"] == dSell and order["Offset"] == oOpen:  # 卖开
             qty = order["OrderQty"]
-            charge, turnover, margin, profit = self._sellOpen(order, qty)
+            charge, turnover, margin, profit, slipLoss = self._sellOpen(order, qty)
 
         elif order["Direct"] == dSell and order["Offset"] == oCover:   # 卖平
             qty = order["OrderQty"] if pInfo["TotalBuy"] > order["OrderQty"] else pInfo["TotalBuy"]
-            charge, charge1, turnover, liquidateProfit, profit, linkList = self._sellClose(order, pInfo, qty)
+            charge, charge1, turnover, liquidateProfit, profit, linkList, slipLoss = self._sellClose(order, pInfo, qty)
 
-        ##########################################新增加############################################################
         elif order["Direct"] == dSell and order["Offset"] == oCoverT:  # 卖平今
             qty = order["OrderQty"] if pInfo["TodayBuy"] > order["OrderQty"] else pInfo["TodayBuy"]
-            charge, charge1, turnover, liquidateProfit, profit, linkList = self._sellCloseToday(order, pInfo, qty)
+            charge, charge1, turnover, liquidateProfit, profit, linkList, slipLoss = self._sellCloseToday(order, pInfo, qty)
 
+        # TODO：因区分不出外盘订单，所以外判订单的滑点损耗未计算
         elif order["Direct"] == dSell and order["Offset"] == oNone:
             self._calcOrderOuter(order)
             return
@@ -578,7 +580,8 @@ class CalcCenter(object):
             "Margin": margin,
             "Turnover": turnover,
             "LiquidateProfit": liquidateProfit,
-            "Profit": profit
+            "Profit": profit,
+            "SlippageLoss": slipLoss
         })
         if (eo["Order"]["Direct"] == dBuy and eo["Order"]["Offset"] == oCover) \
                 or (eo["Order"]["Direct"] == dSell and eo["Order"]["Offset"] == oCover)\
@@ -1013,6 +1016,8 @@ class CalcCenter(object):
         self._profit["LiquidateProfit"] += extendOrder["LiquidateProfit"]
         self._profit["Turnover"] += extendOrder["Turnover"]
         self._profit["Cost"] += extendOrder["Cost"]
+        # 总滑点损耗
+        self._profit["SlippageLoss"] += extendOrder["SlippageLoss"]
 
     def _updateOtherProfit(self, time):
         """
@@ -1319,12 +1324,14 @@ class CalcCenter(object):
         else:
             charge = qty * cost["OpenFixed"]
 
-        # 成交额、保证金、净利润
+        # 成交额、保证金、净利润、滑点损耗
         turnover = order["OrderPrice"] * qty * cost["TradeDot"]
         margin = turnover * cost["Margin"]
         profit = -charge  # 净利润需要扣除手续费
+        # 滑点损耗 = 手数 * 滑点 * 每手乘数 * 最小变动价位 * 每手乘数
+        slipLoss = qty * cost["Slippage"] * cost["PriceTick"] * cost["TradeDot"]
 
-        return charge, turnover, margin, profit
+        return charge, turnover, margin, profit, slipLoss
 
     def _buyClose(self, order, pInfo, qty):
         """
@@ -1354,7 +1361,9 @@ class CalcCenter(object):
         profit = liquidateprofit
         profit -= charge
 
-        return charge, charge1, turnover, liquidateprofit, profit, linkList
+        slipLoss = qty * cost["Slippage"] * cost["PriceTick"] * cost["TradeDot"]
+
+        return charge, charge1, turnover, liquidateprofit, profit, linkList, slipLoss
 
     def _sellOpen(self, order, qty):
         """
@@ -1370,7 +1379,9 @@ class CalcCenter(object):
         margin = order["OrderPrice"] * qty * cost["TradeDot"] * cost["Margin"]
         profit = -charge
 
-        return charge, turnover, margin, profit
+        slipLoss = qty * cost["Slippage"] * cost["PriceTick"] * cost["TradeDot"]
+
+        return charge, turnover, margin, profit, slipLoss
 
     def _sellClose(self, order, pInfo, qty):
         """
@@ -1396,7 +1407,9 @@ class CalcCenter(object):
         profit = liquidateProfit
         profit -= charge
 
-        return charge, charge1, turnover, liquidateProfit, profit, linkList
+        slipLoss = qty * cost["Slippage"] * cost["PriceTick"] * cost["TradeDot"]
+
+        return charge, charge1, turnover, liquidateProfit, profit, linkList, slipLoss
 
     def _buyCloseToday(self, order, pInfo, qty):
         """计算买平今相关信息"""
@@ -1424,7 +1437,9 @@ class CalcCenter(object):
         profit = liquidateProfit
         profit -= charge
 
-        return charge, charge1, turnover, liquidateProfit, profit, linkList
+        slipLoss = qty * cost["Slippage"] * cost["PriceTick"] * cost["TradeDot"]
+
+        return charge, charge1, turnover, liquidateProfit, profit, linkList, slipLoss
 
     def _sellCloseToday(self, order, pInfo, qty):
         """计算卖平今相关信息"""
@@ -1451,7 +1466,9 @@ class CalcCenter(object):
         profit = liquidateProfit
         profit -= charge
 
-        return charge, charge1, turnover, liquidateProfit, profit, linkList
+        slipLoss = qty * cost["Slippage"] * cost["PriceTick"] * cost["TradeDot"]
+
+        return charge, charge1, turnover, liquidateProfit, profit, linkList, slipLoss
 
     def _calcOrderOuter(self, order):
         """
