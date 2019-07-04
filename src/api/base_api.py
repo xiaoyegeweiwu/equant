@@ -3405,10 +3405,10 @@ class BaseApi(object):
               针对当前公式应用的帐户、商品发送撤单指令。
 
         【语法】
-              bool A_DeleteOrder(string localOrderId)
+              bool A_DeleteOrder(int|string localOrderId)
 
         【参数】
-              localOrderId 使用A_SendOrder返回的下单编号。
+              localOrderId 定单号，或者使用A_SendOrder返回的下单编号。
 
         【备注】
               针对当前公式应用的帐户、商品发送撤单指令，发送成功返回True, 发送失败返回False。
