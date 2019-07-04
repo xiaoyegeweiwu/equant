@@ -23,7 +23,8 @@ class QuantEditorHead(object):
 
         self.head_frame.pack_propagate(0)
         self.head_frame.pack(fill=X)
-        
+
+
 class StrategyTree(QuantFrame):
     def __init__(self, frame, control, language):
     
@@ -46,12 +47,12 @@ class StrategyTree(QuantFrame):
         self.gfileicon = tk.PhotoImage(file=r'./icon/file_grey.gif')
         self.wdiricon  = tk.PhotoImage(file=r'./icon/dir_white.gif')
         self.gdiricon  = tk.PhotoImage(file=r'./icon/dir_grey.gif')
-        
-        #print("StrategyTree:%d,%d"%(frame['width'], frame['height']))
+
 
         # TODO：-28: 监控窗口和函数说明窗口对不齐，暂时先减去一个固定值吧
         self.parent_pane = PanedWindow(frame, orient=HORIZONTAL, sashrelief=GROOVE, sashwidth=1.5,
-                                       showhandle=False, opaqueresize=True, height=frame['height']-28, width=frame['width'])
+                                       showhandle=False, opaqueresize=True, height=frame['height']-28,
+                                       width=frame['width'])
         self.parent_pane.pack(fill=BOTH, expand=YES)
         
         self.root_path = os.path.abspath("./strategy")
@@ -70,7 +71,7 @@ class StrategyTree(QuantFrame):
         if self.root_tree:
             # 获取目录树的开关状态
             self._getOpenState("")
-            self._selected = self.root_tree.selection()
+            self._selected = list(self.root_tree.selection())
 
             self.root_tree.destroy()
         if self.strategyTreeScl:
@@ -244,93 +245,6 @@ class StrategyTree(QuantFrame):
     def treeDoubleClick(self, event):
         '''子类重写'''
         raise NotImplementedError
-
-
-    # -----------------------设置策略树中的条目颜色-----------------------------
-    def setup_selection(self, sel_bg=rgb_to_hex(135, 103, 165), sel_fg="white"):
-        self._font = tkFont.Font()
-        self._canvas = tk.Canvas(self.root_tree, background=sel_bg,
-                                 borderwidth=0,
-                                 highlightthickness=0)
-        self._canvas.text = self._canvas.create_text(0, 0, fill=sel_fg, anchor='w')
-
-    def select_item(self, event):
-        self._canvas.place_forget()
-
-        x, y, widget = event.x, event.y, event.widget
-        item = widget.item(widget.focus())
-        itemText = item['text']
-        itemValues = item['values']
-        iid = widget.identify_row(y)
-        column = event.widget.identify_column(x)
-
-        # Leave method if mouse pointer clicks on Treeview area without data
-        if not column or not iid:
-            return
-
-        # Leave method if selected item's value is empty
-        if not len(itemValues):
-            return
-
-        # Get value of selected Treeview cell
-        if column == '#0':
-            self.cell_value = itemText
-        else:
-            self.cell_value = itemValues[int(column[1]) - 1]
-        #print('column[1] = ', column[1])
-        #print('self.cell_value = ', self.cell_value)
-
-        # Leave method if selected Treeview cell is empty
-        if not self.cell_value:  # date is empty
-            return
-
-        # Get the bounding box of selected cell, a tuple (x, y, w, h), where
-        # x, y are coordinates of the upper left corner of that cell relative
-        #      to the widget, and
-        # w, h are width and height of the cell in pixels.
-        # If the item is not visible, the method returns an empty string.
-        bbox = widget.bbox(iid, column)
-        #print('bbox = ', bbox)
-        if not bbox:  # item is not visible
-            return
-
-        # Update and show selection in Canvas Overlay
-        self.show_selection(widget, bbox, column)
-
-        #print('Selected Cell Value = ', self.cell_value)
-
-    def show_selection(self, parent, bbox, column):
-        """Configure canvas and canvas-textbox for a new selection."""
-        #print('@@@@ def show_selection(self, parent, bbox, column):')
-        x, y, width, height = bbox
-        fudgeTreeColumnx = 19 #Determined by trial & error
-        fudgeColumnx = 15     #Determined by trial & error
-
-        # Number of pixels of cell value in horizontal direction
-        textw = self._font.measure(self.cell_value)
-        #print('textw = ',textw)
-
-        # Make Canvas size to fit selected cell
-        self._canvas.configure(width=width, height=height)
-
-        # Position canvas-textbox in Canvas
-        #print('self._canvas.coords(self._canvas.text) = ', self._canvas.coords(self._canvas.text))
-        if column == '#0':
-            self._canvas.coords(self._canvas.text,
-                                fudgeTreeColumnx,
-                                height/2)
-        else:
-            self._canvas.coords(self._canvas.text,
-                                (width-(textw-fudgeColumnx))/2.0,
-                                height/2)
-
-        # Update value of canvas-textbox with the value of the selected cell.
-        self._canvas.itemconfigure(self._canvas.text, text=self.cell_value)
-
-        # Overlay Canvas over Treeview cell
-        self._canvas.place(in_=parent, x=x, y=y)
-
-    # ------------------------暂时不用----------------------------------------------
 
 
 class Context(object):
@@ -553,14 +467,6 @@ class QuantEditor(StrategyTree):
         self.editor_text.bind("<Tab>", self.tab_key)
         # 回车键
         # self.editor_text.bind("<Return>", self.return_key)
-
-        # FocusIn
-        # self.editor_text.bind("<FocusIn>", self.onFocusIn)
-        # self.control.top.bind("<Enter>", self.onFocusIn)
-
-        # FocusOut
-        # self.editor_text.bind("<FocusOut>", self.onFocusOut)
-        # self.control.top.bind("<Leave>", self.onFocusOut)
 
         # TODO：事件绑定有问题---回车键有bug
         # self.editor_text.bind("<Button-1>", self.buttonDown)

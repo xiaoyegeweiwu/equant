@@ -7,7 +7,7 @@ from capi.com_types import *
 from report.reportdetail import ReportDetail
 from report.fieldConfigure import *
 
-from engine.limitctl import LimitCtl
+from engine.orderctl import LimitCtl, DirectionCtl
 
 
 class CalcCenter(object):
@@ -76,17 +76,20 @@ class CalcCenter(object):
 
     def initArgs(self, args):
         """初始化参数"""
+        print("1111111: ",args)
         self._strategy = args
         self._setProfitInitialFundInfo(int(self._strategy["InitialFunds"]) - self._runSet["StartFund"])
         self._setExpertSetting()
         self._curTradeDate = self._strategy["StartTime"]
         self._limit = self._strategy["Limit"]
 
-        self._initLimitCtl()
+        self._initOrderCtl()
 
-    def _initLimitCtl(self):
-        self._limitCtl = LimitCtl(self._limit["ContinueOpenTimes"], self._limit["OpenTimes"],
+    def _initOrderCtl(self):
+        self._limitCtl = LimitCtl(self._logger, self._limit["ContinueOpenTimes"], self._limit["OpenTimes"],
                                   self._limit["OpenAllowClose"], self._limit["CloseAllowOpen"])
+
+        self._dirCtl = DirectionCtl(self._logger, 0)
 
     def _updateTradeDate(self, Time):
         """更新当前交易日信息"""
@@ -427,16 +430,18 @@ class CalcCenter(object):
 
         if order["OrderQty"] <= 0:
             self._logger.error(f"订单手数不大于0，策略Id:{order['StrategyId']}, 运行阶段：{order['StrategyStage']}，"
-                                f"本地订单号：{order['OrderId']},订单数据：{repr(order)}")
+                                f"订单数据：{repr(order)}")
             return 0
 
         # TODO:限制信息写在这里
+        # TODO: 应该先判断下面的限制再判断needCover 和 coverJudge
         if len(self._orders) < 1:
-            ret = self._limitCtl.allowOrder(order, [])
+            lmtRet = self._limitCtl.allowOrder(order, [])
         else:
-            ret = self._limitCtl.allowOrder(order, self._orders[-1]["Order"])
+            lmtRet = self._limitCtl.allowOrder(order, self._orders[-1]["Order"])
 
-        if ret == 0:
+        dirRet = self._dirCtl.handleDirCtl(order)
+        if lmtRet == 0 or dirRet == 0:
             return 0
 
         order.update({"OrderId": self._orderId})
