@@ -33,6 +33,30 @@ class StrategyQuote(QuoteModel):
 
         self._strategy.sendEvent2Engine(event)
 
+    def subQuoteList(self, contNoList):
+        if not contNoList:
+            return
+
+        event = Event({
+            'EventCode': EV_ST2EG_SUB_QUOTE,
+            'StrategyId': self._strategy.getStrategyId(),
+            'Data': contNoList,
+        })
+
+        self._strategy.sendEvent2Engine(event)
+
+    def unsubQuoteList(self, contNoList):
+        if not contNoList:
+            return
+
+        event = Event({
+            'EventCode': EV_ST2EG_UNSUB_QUOTE,
+            'StrategyId': self._strategy.getStrategyId(),
+            'Data': contNoList,
+        })
+
+        self._strategy.sendEvent2Engine(event)
+
     def reqExchange(self):
         event = Event({
             'EventCode': EV_ST2EG_EXCHANGE_REQ,

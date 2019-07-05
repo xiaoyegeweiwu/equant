@@ -5243,6 +5243,46 @@ class BaseApi(object):
         '''
         return self._dataModel.setStopPoint(stopPoint, nPriceType, nAddTick, contractNo)
 
+    def SubscribeContract(self, contractNoList):
+        '''
+        【说明】
+             订阅指定合约的即时行情。
+
+        【语法】
+              bool SubscribeContract(list contractNoList=[])
+
+        【参数】
+              contractNoList 订阅的合约列表，默认为空列表。
+
+        【备注】
+              该方法可用策略中的initialize(context)方法中订阅指定合约的即时行情，也可在handle_data(context)方法中动态的订阅指定合约的即使行情。
+
+        【示例】
+              SubscribeContract(['ZCE|F|SR|909', 'ZCE|F|SR|910']) 订阅合约'ZCE|F|SR|909'和'ZCE|F|SR|910'的即时行情；
+              SubscribeContract(['ZCE|F|SR']) 订阅合约商品'ZCE|F|SR'对应的所有合约的即时行情。
+        '''
+        return self._dataModel.subscribeContract(contractNoList)
+
+    def UnsubscribeContract(self, contractNoList):
+        '''
+        【说明】
+             退订指定合约的即时行情。
+
+        【语法】
+              bool UnsubscribeContract(list contractNoList=[])
+
+        【参数】
+              contractNoList 退订的合约列表，默认为空列表。
+
+        【备注】
+              该方法可用策略中的initialize(context)方法中退订指定合约的即时行情，也可在handle_data(context)方法中动态的退订指定合约的即使行情。
+
+        【示例】
+              UnsubscribeContract(['ZCE|F|SR|909', 'ZCE|F|SR|910']) 退订合约'ZCE|F|SR|909'和'ZCE|F|SR|910'的即时行情；
+              UnsubscribeContract(['ZCE|F|SR']) 退订合约商品'ZCE|F|SR'对应的所有合约的即时行情。
+        '''
+        return self._dataModel.unsubscribeContract(contractNoList)
+
     # //////////////////////其他函数////////////////////
 
     def PlotNumeric(self, name, value, color, main, axis, barsback):
@@ -6643,6 +6683,12 @@ def SetWinPoint(winPoint, nPriceType=0, nAddTick=0, contractNo=''):
 
 def SetStopPoint(stopPoint, nPriceType=0, nAddTick=0, contractNo=''):
     return baseApi.SetStopPoint(stopPoint, nPriceType, nAddTick, contractNo)
+
+def SubscribeContract(contNoList=[]):
+    return baseApi.SubscribeContract(contNoList)
+
+def UnsubscribeContract(contNoList=[]):
+    return baseApi.UnsubscribeContract(contNoList)
 
 # 属性函数
 def BarInterval():

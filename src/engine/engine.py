@@ -747,27 +747,11 @@ class StrategyEngine(object):
         if len(subList) > 0:
             event.setData(subList)
             self._pyApi.reqSubQuote(event)
-
-    def getContractList(self, contList):
-        contractList = []
-        for subContNo in contList:
-            if subContNo in self._qteModel._contractData:
-                contractList.append(subContNo)
-                continue
-
-            # 根据品种获取该品种的所有合约
-            for contractNo in list(self._qteModel._contractData.keys()):
-                if subContNo in contractNo:
-                    qteModel = self._qteModel._contractData[contractNo]
-                    if qteModel._metaData['CommodityNo'] == subContNo:
-                        contractList.append(contractNo)
-
-        return contractList
     
     def _reqUnsubQuote(self, event):
         '''退订即时行情'''
         strategyId = event.getStrategyId()
-        contractList = event.getData()
+        contractList = contractList = self.getContractList(event.getData())
         
         unSubList = []
         for contNo in contractList:
@@ -784,6 +768,22 @@ class StrategyEngine(object):
         if len(unSubList) > 0:
             event.setData(unSubList)
             self._pyApi.reqUnsubQuote(event)
+
+    def getContractList(self, contList):
+        contractList = []
+        for subContNo in contList:
+            if subContNo in self._qteModel._contractData:
+                contractList.append(subContNo)
+                continue
+
+            # 根据品种获取该品种的所有合约
+            for contractNo in list(self._qteModel._contractData.keys()):
+                if subContNo in contractNo:
+                    qteModel = self._qteModel._contractData[contractNo]
+                    if qteModel._metaData['CommodityNo'] == subContNo:
+                        contractList.append(contractNo)
+
+        return contractList
         
     # def _reqTimebucket(self, event):
     #     '''查询时间模板'''

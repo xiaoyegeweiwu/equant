@@ -292,6 +292,8 @@ _all_func_ = {
                     ['SetTriggerType'      , '设置触发方式'],
                     ['SetWinPoint'         , '设置策略的止盈点'],
                     ['SetStopPoint'        , '设置策略的止损点'],
+                    ['SubscribeContract'   , '订阅指定合约即时行情'],
+                    ['UnsubscribeContract' , '退订指定合约即时行情'],
                 ],
 
     '绘图函数': [

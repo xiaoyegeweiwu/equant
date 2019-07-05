@@ -127,6 +127,13 @@ class StrategyModel(object):
     def subQuote(self):
         self._qteModel.subQuote()
 
+    def subQuoteList(self, contNoList):
+        self._qteModel.subQuoteList(contNoList)
+
+    def unsubQuoteList(self, contNoList):
+        # TODO: 退订即使行情时，是否需要删除已经得到的即时行情信息
+        self._qteModel.unsubQuoteList(contNoList)
+
     def onExchange(self, event):
         self._qteModel.onExchange(event)
 
@@ -579,6 +586,14 @@ class StrategyModel(object):
         if not contNo:
             contNo = self._cfgModel.getBenchmark()
         return self._cfgModel.setStopPoint(stopPoint, nPriceType, nAddTick, contNo)
+
+    def subscribeContract(self, contList):
+        self._cfgModel.updateSubQuoteContract(contList)
+        return self.subQuoteList(contList)
+
+    def unsubscribeContract(self, contList):
+        self._cfgModel.updateUnsubQuoteContract(contList)
+        return self.unsubQuoteList(contList)
 
     # ///////////////////////账户函数///////////////////////////
     def getAccountId(self):

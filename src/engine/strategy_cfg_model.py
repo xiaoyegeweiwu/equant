@@ -158,6 +158,12 @@ class StrategyConfig(object):
         # 触发方式，给setTriggerType清空界面设置用
         resDict['Trigger']['SetByUI'] = True
 
+        # 订阅即使行情合约列表
+        resDict['SubQuoteContract'] = []
+
+        # 退订即使行情合约列表
+        resDict['UnsubQuoteContract'] = []
+
         return resDict
 
     def updateBarInterval(self, contNo, inDict, fromDict):
@@ -222,7 +228,7 @@ class StrategyConfig(object):
     # *******************************************************
     # gyt test interface
     def getTriggerContract(self):
-        return self._metaData['SubContract']
+        return self.getContract()
 
     def getSampleInfo(self):
         kLineTypetupleList = []
@@ -328,7 +334,12 @@ class StrategyConfig(object):
     # *******************************************************
     def getContract(self):
         '''获取合约列表'''
-        return self._metaData['SubContract']
+        contNoList = set(self._metaData['SubContract'])
+        if len(self._metaData['SubQuoteContract']) > 0:
+            contNoList = contNoList | set(self._metaData['SubQuoteContract'])
+        if len(self._metaData['UnsubQuoteContract']) > 0:
+            contNoList = contNoList - set(self._metaData['UnsubQuoteContract'])
+        return list(contNoList)
 
     def setPending(self, pending):
         '''设置是否暂停向实盘下单标志'''
@@ -717,3 +728,17 @@ class StrategyConfig(object):
         if "Params" not in self._metaData:
             return {}
         return self._metaData["Params"]
+
+    def updateSubQuoteContract(self, contNoList):
+        if not isinstance(contNoList, list) or not contNoList:
+            return
+
+        self._metaData['SubQuoteContract'].extend(contNoList)
+
+    def updateUnsubQuoteContract(self, contNoList):
+        if not isinstance(contNoList, list) or not contNoList:
+            return
+
+        self._metaData['UnsubQuoteContract'].extend(contNoList)
+
+
