@@ -714,7 +714,7 @@ class StrategyEngine(object):
     
     def _reqSubQuote(self, event):
         '''订阅即时行情'''
-        contractList = event.getData()
+        contractList = self.getContractList(event.getData())
         strategyId = event.getStrategyId()
         
         subList = []
@@ -731,6 +731,22 @@ class StrategyEngine(object):
         if len(subList) > 0:
             event.setData(subList)
             self._pyApi.reqSubQuote(event)
+
+    def getContractList(self, contList):
+        contractList = []
+        for subContNo in contList:
+            if subContNo in self._qteModel._contractData:
+                contractList.append(subContNo)
+                continue
+
+            # 根据品种获取该品种的所有合约
+            for contractNo in list(self._qteModel._contractData.keys()):
+                if subContNo in contractNo:
+                    qteModel = self._qteModel._contractData[contractNo]
+                    if qteModel._metaData['CommodityNo'] == subContNo:
+                        contractList.append(contractNo)
+
+        return contractList
     
     def _reqUnsubQuote(self, event):
         '''退订即时行情'''
