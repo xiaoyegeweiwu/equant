@@ -1,11 +1,13 @@
 import talib
+import numpy as np
 
 p1=5
 p2=20
 
+
 def initialize(context): 
-    SetBarInterval("SHFE|F|RB|1910", 'M', 1,  2000)
-    SetActual()
+    #SetActual()
+    pass
 
 def handle_data(context):
     # 使用talib计算均价
