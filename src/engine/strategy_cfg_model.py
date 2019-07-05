@@ -155,7 +155,9 @@ class StrategyConfig(object):
             kLineInfo = defaultSample[benchmark][0]
             resDict['Sample']['Display'] = {"ContractNo": benchmark, "KLineType": kLineInfo['KLineType'], "KLineSlice": kLineInfo['KLineSlice']}
 
-        # print("sun ======== ", resDict)
+        # 触发方式，给setTriggerType清空界面设置用
+        resDict['Trigger']['SetByUI'] = True
+
         return resDict
 
     def updateBarInterval(self, contNo, inDict, fromDict):
@@ -362,7 +364,7 @@ class StrategyConfig(object):
 
     def setTrigger(self, type, value):
         '''设置触发方式'''
-        if type not in (1, 2, 3, 4):
+        if type not in (1, 2, 3, 4, 5):
             return -1
         if type == 3 and value%100 != 0:
             return -1
@@ -372,11 +374,25 @@ class StrategyConfig(object):
                     return -1
 
         trigger = self._metaData['Trigger']
+        # 清空界面设置的触发方式信息
+        if 'SetByUI' in trigger and trigger['SetByUI']:
+            trigger['SnapShot'] = False
+            trigger['Trade'] = False
+            trigger['Cycle'] = None
+            trigger['Timer'] = []
+            trigger['KLine'] = False
+            trigger['SetByUI'] = False
 
-        trigger['SnapShot'] = True if type == 1 else False
-        trigger['Trade'] = True if type == 2 else False
-        trigger['Cycle'] = value if type == 3 else None
-        trigger['Timer'] = value if type ==4 else None
+        if type == 1:
+            trigger['SnapShot'] = True
+        elif type == 2:
+            trigger['Trade'] = True
+        elif type == 3:
+            trigger['Cycle'] = value
+        elif type == 4:
+            trigger['Timer'] = value
+        elif type ==5:
+            trigger['KLine'] = True
 
         return 0
 
@@ -661,7 +677,7 @@ class StrategyConfig(object):
         return self._metaData['RunMode']['SendOrder']
 
     def hasKLineTrigger(self):
-        return True
+        return bool(self._metaData['Trigger']['KLine'])
 
     def hasTimerTrigger(self):
         return bool(self._metaData['Trigger']['Timer'])
