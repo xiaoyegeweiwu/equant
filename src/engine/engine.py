@@ -241,31 +241,17 @@ class StrategyEngine(object):
         
     def _dispathQuote2Strategy(self, code, apiEvent):
         '''分发即时行情'''
-        apiData = apiEvent.getData()
         contractNo = apiEvent.getContractNo()
         contStList = self._quoteOberverDict[contractNo]
-        
-        data = apiData[:]
-        
-        msg = {
-            'EventSrc'     :  EEQU_EVSRC_ENGINE,
-            'EventCode'    :  code,
-            'StrategyId'   :  0,
-            'SessionId'    :  0,
-            'UserNo'       :  '',
-            'ContractNo'   :  contractNo,
-            'Data'         :  data
-        }
-        
-        event = Event(msg)
-        
+        apiEvent.setEventCode(code)
+
         for id in contStList:
-            self._sendEvent2Strategy(id, event)
+            self._sendEvent2Strategy(id, apiEvent)
             
     # //////////////////////UI事件处理函数/////////////////////
     def _handleUIData(self):
         event = self._ui2egQueue.get()
-        code  = event.getEventCode()
+        code = event.getEventCode()
 
         if code == EV_UI2EG_LOADSTRATEGY:
             # 加载策略事件
@@ -321,8 +307,12 @@ class StrategyEngine(object):
             self._onStrategyRemoveCom(event)
             self.logger.info(f"策略删除完成，策略id:{event.getStrategyId()}")
         elif event.getData()["Status"] == ST_STATUS_EXCEPTION:
-            self._isEffective[event.getStrategyId()] = False
-            self._strategyMgr.handleStrategyException(event)
+            self._onStrategyExceptionCom(event)
+
+    def _onStrategyExceptionCom(self, event):
+        self.sendEvent2UI(event)
+        self._cleanStrategyInfo(event.getStrategyId())
+        self._strategyMgr.handleStrategyException(event)
 
     # ////////////////api回调及策略请求事件处理//////////////////
     def _handleApiData(self):
@@ -337,6 +327,7 @@ class StrategyEngine(object):
             try:
                 self._apiCallbackDict[code](apiEvent)
             except Exception as e:
+                traceback.print_exc()
                 self.logger.error("处理 c api 发来的数据出现错误, event code = {}".format(code))
                 errorText = traceback.format_exc()
                 errorText = errorText + "When handle C API in engine, EventCode: {}".format(code)
@@ -361,6 +352,7 @@ class StrategyEngine(object):
                     return
                 self._mainWorkFuncDict[code](event)
             except Exception as e:
+                # traceback.print_exc()
                 errorText = traceback.format_exc()
                 errorText = errorText + f"When handle strategy:{strategyId} in engine, EventCode: {code}. stop stratey {strategyId}!"
                 self._handleEngineExceptionCausedByStrategy(strategyId)
@@ -454,6 +446,8 @@ class StrategyEngine(object):
         self._qteModel.updateCommodity(apiEvent)
         self._eg2uiQueue.put(apiEvent)
 
+        self._sendEvent2AllStrategy(apiEvent)
+
         if apiEvent.isChainEnd():
             self._pyApi.reqContract(Event({'StrategyId':0, 'Data':''}))
 
@@ -494,20 +488,10 @@ class StrategyEngine(object):
         self._hisModel.updateKline(apiEvent)
         strategyId = apiEvent.getStrategyId()
         # 策略号为0，认为是推送数据
-        apiData = apiEvent.getData()
-        data = apiData[:]
-        event = Event({
-            'StrategyId' : strategyId,
-            'EventCode'  : code,
-            'ChainEnd'   : apiEvent.getChain(),
-            'ContractNo' : apiEvent.getContractNo(),
-            'KLineType'  : apiEvent.getKLineType(),
-            'KLineSlice' : apiEvent.getKLineSlice(),
-            'Data'       : data
-        })
+        apiEvent.setEventCode(code)
 
         if strategyId > 0:
-            self._sendEvent2Strategy(strategyId, event)
+            self._sendEvent2Strategy(strategyId, apiEvent)
             return
 
         # 推送数据，分发
@@ -516,9 +500,8 @@ class StrategyEngine(object):
             return
 
         stDict = self._hisKLineOberverDict[key]
-        for key in stDict:
-            event.setStrategyId(key)
-            self._sendEvent2Strategy(key, event)
+        for someStrategy in stDict:
+            self._sendEvent2Strategy(someStrategy, apiEvent)
 
     # 用户登录信息
     def _onApiLoginInfo(self, apiEvent):
@@ -961,7 +944,6 @@ class StrategyEngine(object):
         # 还在正常运行
         if strategyId in self._isEffective and self._isEffective[strategyId]:
             self._isEffective[strategyId] = False
-            self._isSt2EngineDataEffective[strategyId] = False
             self._sendEvent2StrategyForce(strategyId, event)
         # 停止
         elif self._strategyMgr.getStrategyState(strategyId) == ST_STATUS_QUIT:
@@ -979,8 +961,6 @@ class StrategyEngine(object):
         self._sendEvent2Strategy(event.getStrategyId(), event)
 
     def _restartStrategyWhenParamsChanged(self, event):
-        # print("=====================")
-        # print(event.getData())
         strategyId = event.getStrategyId()
         if strategyId in self._eg2stQueueDict and strategyId in self._isEffective and self._isEffective[strategyId]:
             self._isEffective[strategyId] = False
@@ -1027,6 +1007,7 @@ class StrategyEngine(object):
                 "ErrorText": errorText,
             }
         })
+
         self._eg2uiQueue.put(event)
 
     def _clearQueue(self, someQueue):
