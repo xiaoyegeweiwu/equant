@@ -5201,13 +5201,13 @@ class BaseApi(object):
 
     # //////////////////////其他函数////////////////////
 
-    def PlotNumeric(self, name, value, color, main, axis, type, barsback):
+    def PlotNumeric(self, name, value, color, main, axis, barsback):
         '''
         【说明】
             在当前Bar输出一个数值
 
         【语法】
-            float PlotNumeric(string name,float value,int color,bool main, char axis, int type, int barsback=0)
+            float PlotNumeric(string name,float value,int color,bool main, char axis, int barsback=0)
 
         【参数】
             name  输出值的名称，不区分大小写；
@@ -5215,7 +5215,6 @@ class BaseApi(object):
             color 输出值的显示颜色，默认表示使用属性设置框中的颜色；
             main  指标是否加载到主图，True-主图，False-幅图，默认主图
             axis  指标是否使用独立坐标，True-独立坐标，False-非独立坐标，默认非独立坐标
-            type  指标线性，0-竖直直线，1-指标线，2-柱子，3-竖线段，4-变色K线，5-线段，6-图标，7-点，8-位置格式
             barsback 从当前Bar向前回溯的Bar数，默认值为当前Bar。
 
         【备注】
@@ -5225,7 +5224,7 @@ class BaseApi(object):
             例1：PlotNumeric ("MA1",Ma1Value);
             输出MA1的值。
         '''
-        return self._dataModel.setPlotNumeric(name, value, color, main, axis, type, barsback)
+        return self._dataModel.setPlotNumeric(name, value, color, main, axis, 1, barsback)
         
     def PlotIcon(self, value, icon, main, barsback):
         '''
@@ -6678,8 +6677,8 @@ def SymbolType(contractNo=''):
     return baseApi.SymbolType(contractNo)
 
 #其他函数
-def PlotNumeric(name, value, color=0xdd0000, main=True, axis=False, type=1, barsback=0):
-    return baseApi.PlotNumeric(name, value, color, main, axis, type, barsback)
+def PlotNumeric(name, value, color=0xdd0000, main=True, axis=False, barsback=0):
+    return baseApi.PlotNumeric(name, value, color, main, axis, barsback)
     
 def PlotIcon(value, icon=0, main=False, barsback=0):
     return baseApi.PlotIcon(value, icon, main, barsback)
