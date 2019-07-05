@@ -475,30 +475,6 @@ class BaseApi(object):
         '''
         return self._dataModel.getHisBarsInfo(contractNo, kLineType, kLineValue, maxLength)
 
-    def BarsLast(self, condition, contractNo, kLineType, kLineValue):
-        '''
-        【说明】
-              获取最后一次满足条件时距离当前的bar数
-
-        【语法】
-               int BarsLast(string condition, string contractNo='', char kLineType='', int kLineValue=0)
-
-        【参数】
-              condition
-              contractNo 合约编号, 为空时取基准合约
-              kLineType K线类型，可选值请参阅周期类型枚举函数
-              kLineValue K线周期
-              若contractNo, kLineType, kLineValue同时不填，则取用于展示的合约及相应的K线类型和周期
-
-        【备注】
-              返回最后一次满足条件时距离当前的bar数。
-
-        【示例】
-              BarsLast(Close > Open); 从当前Bar开始，最近出现Close>Open的Bar到当前Bar的偏移值。如果为0，即当前Bar为最近的满足条件的Bar。
-
-        '''
-        return self._dataModel.getBarsLast(condition, contractNo, kLineType, kLineValue)
-
     #/////////////////////////即时行情/////////////////////////////
     def Q_UpdateTime(self, contractNo):
         '''
