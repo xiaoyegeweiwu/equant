@@ -3216,6 +3216,25 @@ class BaseApi(object):
          '''
         return self._dataModel.getNextOrderNo(localOrderId, contractNo1, contractNo2)
 
+    def A_LastOrderNo(self, contractNo1, contractNo2):
+        '''
+        【说明】
+              返回当前账户最近发送的订单号。
+
+        【语法】
+              int A_LastOrderNo(string contractNo)
+
+        【参数】
+              contractNo 合约代码，默认为遍历所有合约。
+
+        【备注】
+              若返回值为-1，表示没有任何订单，否则，返回最后一个订单的索引值。
+
+        【示例】
+              无
+         '''
+        return self._dataModel.getLastOrderNo(contractNo1, contractNo2)
+
     def A_FirstQueueOrderNo(self, contractNo1, contractNo2):
         '''
         【说明】
@@ -3405,10 +3424,10 @@ class BaseApi(object):
               针对当前公式应用的帐户、商品发送撤单指令。
 
         【语法】
-              bool A_DeleteOrder(string localOrderId)
+              bool A_DeleteOrder(int|string localOrderId)
 
         【参数】
-              localOrderId 使用A_SendOrder返回的下单编号。
+              localOrderId 定单号，或者使用A_SendOrder返回的下单编号。
 
         【备注】
               针对当前公式应用的帐户、商品发送撤单指令，发送成功返回True, 发送失败返回False。
@@ -6262,6 +6281,9 @@ def A_FirstOrderNo(contractNo1='', contractNo2=''):
 
 def A_NextOrderNo(localOrderId=0, contractNo1='', contractNo2=''):
     return baseApi.A_NextOrderNo(localOrderId, contractNo1, contractNo2)
+
+def A_LastOrderNo(contractNo1='', contractNo2=''):
+    return baseApi.A_LastOrderNo(contractNo1, contractNo2)
 
 def A_FirstQueueOrderNo(contractNo1='', contractNo2=''):
     return baseApi.A_FirstQueueOrderNo(contractNo1, contractNo2)

@@ -485,15 +485,17 @@ class TradeModel:
     def updateOrderData(self, apiEvent):
         dataList = apiEvent.getData()
 
+        unLoginAccount = []
         for data in dataList:
             userNo = data['UserNo']
-            if userNo not in self._userInfo:
-                self.logger.error("[updateOrderData]The user account(%s) doesn't login!"%userNo)
-                continue
-                
-            #self.logger.debug('[ORDER]%s'%data)
-        
-            self._userInfo[userNo].updateOrder(data)
+            if userNo in self._userInfo:
+                self._userInfo[userNo].updateOrder(data)
+            elif userNo not in unLoginAccount:
+                unLoginAccount.append(userNo)
+
+        if len(unLoginAccount) > 0:
+            self.logger.error("[updateOrderData]The user account%s doesn't login!"%unLoginAccount)
+
             
     def updateMatchData(self, apiEvent):
         dataList = apiEvent.getData()

@@ -276,6 +276,8 @@ class StrategyHisQuote(object):
         if multiContKey not in self._curBarDict:
             return 0
         curBar = self._curBarDict[multiContKey].getCurBar()
+        if not curBar:
+            return 0
         timeStamp = str(curBar['DateTimeStamp'])
         return float(timeStamp[-9:])/1000000000
 
