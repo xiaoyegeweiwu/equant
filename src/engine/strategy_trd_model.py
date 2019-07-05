@@ -1,7 +1,7 @@
 import numpy as np
 from capi.com_types import *
 from .engine_model import *
-import time, sys
+import time, sys, datetime
 from .trade_model import TradeModel
 
 class StrategyTrade(TradeModel):
@@ -511,6 +511,27 @@ class StrategyTrade(TradeModel):
                     minOrderId = orderModel._metaData['OrderId']
 
         return minOrderId
+
+    def getLastOrderNo(self, contNo1, contNo2):
+        if self._selectedUserNo not in self._userInfo:
+            raise Exception("请先在极星客户端登录您的交易账号")
+
+        tUserInfoModel = self._userInfo[self._selectedUserNo]
+        if len(tUserInfoModel._order) == 0:
+            return -1
+
+        orderId = -1
+        insertSeconds = -1
+        for orderKey in list(tUserInfoModel._order.keys()):
+            orderModel = tUserInfoModel._order[orderKey]
+            if not contNo1 or contNo1 == orderModel._metaData['Cont']:
+                timeDateStr = orderModel._metaData['InsertTime']
+                time1 = datetime.datetime.strptime(timeDateStr, "%Y-%m-%d %H:%M:%S")
+                seconds = float(time.mktime(time1.timetuple()))
+                if seconds >= insertSeconds and orderModel._metaData['OrderId'] > orderId:
+                    orderId = orderModel._metaData['OrderId']
+
+        return orderId
 
     def getFirstQueueOrderNo(self, contNo1, contNo2):
         if self._selectedUserNo not in self._userInfo:
