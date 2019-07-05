@@ -475,6 +475,30 @@ class BaseApi(object):
         '''
         return self._dataModel.getHisBarsInfo(contractNo, kLineType, kLineValue, maxLength)
 
+    def BarsLast(self, condition, contractNo, kLineType, kLineValue):
+        '''
+        【说明】
+              获取最后一次满足条件时距离当前的bar数
+
+        【语法】
+               int BarsLast(string condition, string contractNo='', char kLineType='', int kLineValue=0)
+
+        【参数】
+              condition
+              contractNo 合约编号, 为空时取基准合约
+              kLineType K线类型，可选值请参阅周期类型枚举函数
+              kLineValue K线周期
+              若contractNo, kLineType, kLineValue同时不填，则取用于展示的合约及相应的K线类型和周期
+
+        【备注】
+              返回最后一次满足条件时距离当前的bar数。
+
+        【示例】
+              BarsLast(Close > Open); 从当前Bar开始，最近出现Close>Open的Bar到当前Bar的偏移值。如果为0，即当前Bar为最近的满足条件的Bar。
+
+        '''
+        return self._dataModel.getBarsLast(condition, contractNo, kLineType, kLineValue)
+
     #/////////////////////////即时行情/////////////////////////////
     def Q_UpdateTime(self, contractNo):
         '''
@@ -1656,7 +1680,7 @@ class BaseApi(object):
               合约最小变动价
 
         【语法】
-              int PriceTick(contractNo)
+              int PriceTick(string contractNo)
 
         【参数】
               contractNo 合约编号，为空时，取基准合约。
@@ -1675,7 +1699,7 @@ class BaseApi(object):
               期权类型，欧式还是美式
 
         【语法】
-              int OptionStyle()
+              int OptionStyle(string contractNo)
 
         【参数】
               contractNo 合约编号，为空时，取基准合约。
@@ -1694,10 +1718,10 @@ class BaseApi(object):
               返回期权的类型，是看涨还是看跌期权
 
         【语法】
-              int OptionType()
+              int OptionType(string contractNo)
 
         【参数】
-              无
+              contractNo 合约编号，为空时，取基准合约。
 
         【备注】
               返回整型，0为看涨，1为看跌， -1为异常。
@@ -1713,10 +1737,10 @@ class BaseApi(object):
               合约价格精度
 
         【语法】
-              float PriceScale()
+              float PriceScale(string contractNo)
 
         【参数】
-              无
+              contractNo 合约编号，为空时，取基准合约。
 
         【备注】
               返回浮点数
@@ -1806,10 +1830,10 @@ class BaseApi(object):
               获取合约名称
 
         【语法】
-              string SymbolName()
+              string SymbolName(string contractNo)
 
         【参数】
-              无
+              contractNo 合约编号，为空时，取基准合约。
 
         【备注】
               返回字符串
@@ -1825,10 +1849,10 @@ class BaseApi(object):
               获取合约所属的品种编号
 
         【语法】
-              string SymbolType()
+              string SymbolType(string contractNo)
 
         【参数】
-              无
+              contractNo 合约编号，为空时，取基准合约。
 
         【备注】
               返回字符串
@@ -1837,6 +1861,26 @@ class BaseApi(object):
               "ZCE|F|SR|001"的品种编号为"ZCE|F|SR"
         '''
         return self._dataModel.getSymbolType(contractNo)
+
+    def GetIndexMap(self, contractNo):
+        '''
+        【说明】
+              获取商品主连/近月对应的合约
+
+        【语法】
+              string SymbolType(string contractNo)
+
+        【参数】
+              contractNo 取商品主连/近月编号，不能为空。
+
+        【备注】
+              返回字符串
+
+        【示例】
+              GetIndexMap('DCE|Z|I|MAIN') 的返回为"DCE|F|I|1909"
+              GetIndexMap('DCE|Z|I|NEARBY') 的返回为"DCE|F|I|1907"
+        '''
+        return self._dataModel.getIndexMap(contractNo)
 
     # //////////////////////策略状态////////////////////
     def AvgEntryPrice(self, contractNo):
@@ -6675,6 +6719,9 @@ def SymbolName(contractNo=''):
 
 def SymbolType(contractNo=''):
     return baseApi.SymbolType(contractNo)
+
+def GetIndexMap(contractNo=''):
+    return baseApi.GetIndexMap(contractNo)
 
 #其他函数
 def PlotNumeric(name, value, color=0xdd0000, main=True, axis=False, barsback=0):

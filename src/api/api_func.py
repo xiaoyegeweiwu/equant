@@ -98,6 +98,7 @@ _all_func_ = {
                     ['Symbol'              , '合约编号'],
                     ['SymbolName'          , '合约名称'],
                     ['SymbolType'          , '品种编号'],
+                    ['GetIndexMap'         , '获取主连/近月对应的合约'],
                 ],
                 
     '策略状态': [

@@ -51,6 +51,24 @@ class StrategyQuote(QuoteModel):
         
         self._strategy.sendEvent2Engine(event)
 
+    def reqContract(self):
+        event = Event({
+            'EventCode': EV_ST2EG_CONTRACT_REQ,
+            'StrategyId': self._strategy.getStrategyId(),
+            'Data': '',
+        })
+
+        self._strategy.sendEvent2Engine(event)
+
+    def reqUnderlayMap(self):
+        event = Event({
+            'EventCode': EV_ST2EG_UNDERLAYMAPPING_REQ,
+            'StrategyId': self._strategy.getStrategyId(),
+            'Data': '',
+        })
+
+        self._strategy.sendEvent2Engine(event)
+
     # /////////////////////////////应答消息处理///////////////////
     def onExchange(self, event):
         dataDict = event.getData()
@@ -62,6 +80,14 @@ class StrategyQuote(QuoteModel):
         dataDict = event.getData()
         for k, v in dataDict.items():
             self._commodityData[k] = CommodityModel(self.logger, v)
+
+    def onContract(self, event):
+        dataDict = event.getData()
+        for k, v in dataDict.items():
+            self._contractData[k] = QuoteDataModel(self.logger, v)
+
+    def onUnderlayMap(self, event):
+        self._underlayData = event.getData()
 
     def onQuoteRsp(self, event):
         '''

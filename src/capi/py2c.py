@@ -1660,7 +1660,7 @@ class PyAPI(object):
         apiEvent.setData(dataList)
         sid = apiEvent.getSessionId()
         apiEvent.setStrategyId(self._getStrategyId(sid))
-        # self._api2egQueue.put(apiEvent)
+        self._api2egQueue.put(apiEvent)
 
     def getInnerContractNo(self, userContractNo):
         return self._userContractNo2InnerContractNo.get(userContractNo, userContractNo)

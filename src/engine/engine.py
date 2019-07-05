@@ -135,6 +135,7 @@ class StrategyEngine(object):
             EEQU_SRVEVENT_DISCONNECT        : self._onApiDisconnect            ,
             EEQU_SRVEVENT_EXCHANGE          : self._onApiExchange              ,
             EEQU_SRVEVENT_COMMODITY         : self._onApiCommodity             ,
+            EEQU_SRVEVENT_UNDERLAYMAPPING   : self._onApiUnderlayMapping       ,
             EEQU_SRVEVENT_CONTRACT          : self._onApiContract              ,
             EEQU_SRVEVENT_TIMEBUCKET        : self._onApiTimeBucket            ,
             EEQU_SRVEVENT_QUOTESNAP         : self._onApiSnapshot              ,
@@ -157,6 +158,8 @@ class StrategyEngine(object):
         self._mainWorkFuncDict = {
             EV_ST2EG_EXCHANGE_REQ           : self._onExchange                 ,
             EV_ST2EG_COMMODITY_REQ          : self._reqCommodity               ,
+            EV_ST2EG_CONTRACT_REQ           : self._reqContract                ,
+            EV_ST2EG_UNDERLAYMAPPING_REQ    : self._reqUnderlayMap             ,
             EV_ST2EG_SUB_QUOTE              : self._reqSubQuote                ,
             EV_ST2EG_UNSUB_QUOTE            : self._reqUnsubQuote              ,
             EV_ST2EG_SUB_HISQUOTE           : self._reqSubHisquote             ,
@@ -460,6 +463,9 @@ class StrategyEngine(object):
                 'Data': dataDict['CommodityNo'],
             })
             self._pyApi.reqTimebucket(event)
+
+    def _onApiUnderlayMapping(self, apiEvent):
+        self._qteModel.updateUnderlayMap(apiEvent)
         
     def _onApiContract(self, apiEvent):
         self._qteModel.updateContract(apiEvent)
@@ -710,6 +716,16 @@ class StrategyEngine(object):
     def _reqCommodity(self, event):
         '''查询品种信息'''
         revent = self._qteModel.getCommodity()
+        self._sendEvent2Strategy(event.getStrategyId(), revent)
+
+    def _reqContract(self, event):
+        '''查询合约信息'''
+        revent = self._qteModel.getContract()
+        self._sendEvent2Strategy(event.getStrategyId(), revent)
+
+    def _reqUnderlayMap(self, event):
+        '''查询主力/近月合约映射关系'''
+        revent = self._qteModel.getUnderlayMap()
         self._sendEvent2Strategy(event.getStrategyId(), revent)
     
     def _reqSubQuote(self, event):

@@ -82,6 +82,7 @@ EV_ST2EG_TIMEBUCKET_REQ           = 0x205           #查询品种时间模板
 EV_ST2EG_ACTUAL_ORDER             = 0x206           # 实盘订单
 EV_ST2EG_ACTUAL_CANCEL_ORDER      = 0x207           # 实盘撤单
 EV_ST2EG_ACTUAL_MODIFY_ORDER      = 0x208           # 实盘改单
+EV_ST2EG_UNDERLAYMAPPING_REQ      = 0x209           #查询主力/近月的合约
 
 EV_ST2EG_SUB_QUOTE                = 0x220           #订阅即时行情
 EV_ST2EG_UNSUB_QUOTE              = 0x221           #退订即时行
@@ -111,6 +112,7 @@ EV_EG2ST_CURRENCY_RSP             = 0x302           #查询币种
 EV_EG2ST_COMMODITY_RSP            = 0x303           #查询品种信息
 EV_EG2ST_CONTRACT_RSP             = 0x304           #查询合约信息
 EV_EG2ST_TIMEBUCKET_RSP           = 0x305           #查询品种时间模板
+EV_ST2EG_UNDERLAYMAPPING_RSP      = 0x306           #查询主力/近月对应的合约
 
 EV_EG2ST_SUBQUOTE_RSP             = 0x320            #行情订阅应答
 EV_EG2ST_SNAPSHOT_NOTICE          = 0X321            #普通行情推送

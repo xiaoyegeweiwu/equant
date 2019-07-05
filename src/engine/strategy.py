@@ -393,9 +393,12 @@ class Strategy:
         try:
             # 1. 内部初始化
             self._initialize()
-            # 2. 请求交易所、品种等
+            # 1.1 请求交易所、品种、合约等
             self._reqExchange()
             self._reqCommodity()
+            # self._reqContract()
+            # 1.2 请求主力/近月/指数合约映射合约信息
+            self._reqUnderlayMap()
             # 2. 订阅即时行情
             self._subQuote()
             # 3. 请求历史行情
@@ -582,6 +585,8 @@ class Strategy:
         self._egCallbackDict = {
             EV_EG2ST_EXCHANGE_RSP           : self._onExchange         ,
             EV_EG2ST_COMMODITY_RSP          : self._onCommodity        ,
+            EV_EG2ST_CONTRACT_RSP           : self._onContract         ,
+            EV_ST2EG_UNDERLAYMAPPING_RSP    : self._onUnderlayMap      ,
             EV_EG2ST_SUBQUOTE_RSP           : self._onQuoteRsp         ,
             EV_EG2ST_SNAPSHOT_NOTICE        : self._onQuoteNotice      ,
             EV_EG2ST_DEPTH_NOTICE           : self._onDepthNotice      ,
@@ -617,6 +622,12 @@ class Strategy:
     def _reqCommodity(self):
         self._dataModel.reqCommodity()
 
+    def _reqContract(self):
+        self._dataModel.reqContract()
+
+    def _reqUnderlayMap(self):
+        self._dataModel.reqUnderlayMap()
+
     # 订阅即时tick、 k线
     def _subQuote(self):
         self._dataModel.subQuote()
@@ -638,6 +649,12 @@ class Strategy:
         '''品种查询应答'''
         self._dataModel.onCommodity(event)
         self._dataModel.initializeCalc()
+
+    def _onContract(self, event):
+        self._dataModel.onContract(event)
+
+    def _onUnderlayMap(self, event):
+        self._dataModel.onUnderlayMap(event)
             
     def _onQuoteRsp(self, event):
         '''行情应答，来着策略引擎'''

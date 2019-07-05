@@ -117,6 +117,12 @@ class StrategyModel(object):
 
     def reqCommodity(self):
         self._qteModel.reqCommodity()
+
+    def reqContract(self):
+        self._qteModel.reqContract()
+
+    def reqUnderlayMap(self):
+        self._qteModel.reqUnderlayMap()
         
     def subQuote(self):
         self._qteModel.subQuote()
@@ -126,7 +132,13 @@ class StrategyModel(object):
 
     def onCommodity(self, event):
         self._qteModel.onCommodity(event)
-            
+
+    def onContract(self, event):
+        self._qteModel.onContract(event)
+
+    def onUnderlayMap(self, event):
+        self._qteModel.onUnderlayMap(event)
+
     def onQuoteRsp(self, event):
         self._qteModel.onQuoteRsp(event)
         
@@ -1641,6 +1653,9 @@ class StrategyModel(object):
 
     def getSymbolType(self, contNo):
         return self.getCommodityInfoFromContNo(contNo)['CommodityCode']
+
+    def getIndexMap(self, contNo):
+        return self._qteModel.getUnderlayContractNo(contNo)
 
     # ///////////////////////策略状态///////////////////////////
     def getAvgEntryPrice(self, contNo):

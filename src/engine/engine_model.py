@@ -26,6 +26,7 @@ class QuoteModel:
         self._exchangeData  = {}  #{key=ExchangeNo,value=ExchangeModel}
         self._commodityData = {}  #{key=CommodityNo, value=CommodityModel}
         self._contractData  = {}  #{key=ContractNo, value=QuoteDataModel}
+        self._underlayData  = {}  #{key=ContractNo, value=UnderlayContractNo}
 
         self._baseDataReady = False
         
@@ -47,6 +48,23 @@ class QuoteModel:
             dataDict[k] = v.getCommodity()
         #TODO：先不拷贝
         return Event({'EventCode':EV_EG2ST_COMMODITY_RSP, 'Data':dataDict})
+
+    def getContract(self):
+        dataDict = {}
+        for k, v in self._contractData.items():
+            dataDict[k] = v.getContract()
+            dataDict[k]['ContractNo'] = k
+        return Event({'EventCode': EV_EG2ST_CONTRACT_RSP, 'Data': dataDict})
+
+    def getUnderlayMap(self):
+        dataDict = deepcopy(self._underlayData)
+        return Event({'EventCode': EV_ST2EG_UNDERLAYMAPPING_RSP, 'Data': dataDict})
+
+    def getUnderlayContractNo(self, contNo):
+        if contNo not in self._underlayData:
+            return ""
+
+        return self._underlayData[contNo]
 
     # 交易所
     def updateExchange(self, apiEvent):
@@ -78,6 +96,14 @@ class QuoteModel:
 
         if apiEvent.isChainEnd():
             pass
+
+    # 合约映射
+    def updateUnderlayMap(self, apiEvent):
+        dataList = apiEvent.getData()
+        for data in dataList:
+            contNo = data['ContractNo']
+            underlayContNo = data['UnderlayContractNo']
+            self._underlayData[contNo] = underlayContNo
 
     # 合约
     def updateContract(self, apiEvent):
@@ -231,7 +257,10 @@ class QuoteDataModel:
             'Lv2BidData' : [0 for i in range(10)],    # 买深度
             'Lv2AskData' : [0 for i in range(10)]     # 卖深度
         }
-        
+
+    def getContract(self):
+        return self._metaData
+
     def getEvent(self, strategyId):
         data = deepcopy(self._metaData)
         msg = {
