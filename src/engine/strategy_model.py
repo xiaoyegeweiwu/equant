@@ -809,6 +809,10 @@ class StrategyModel(object):
             self.logger.error(f"输入的账户没有在极星客户端登录")
             return -4, "输入的账户没有在极星客户端登录"
 
+        underlayContNo = self._qteModel.getUnderlayContractNo(contNo)
+        if len(underlayContNo) > 0:
+            contNo = underlayContNo
+
         eId = str(self._strategy.getStrategyId()) + '-' + str(self._strategy.getESessionId())
         # 上期所特殊处理
         if "SHFE|" in contNo and entryOrExit == oCover:
