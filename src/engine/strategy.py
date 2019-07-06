@@ -341,28 +341,43 @@ class Strategy:
         self._localOrder = {} # {本地生成的eSessionId : TradeRecode对象}
         
         self._moneyLastTime = 0
+        self._userModelDict = {}
 
     # ////////////////////////////对外接口////////////////////
+    
     def _initialize(self):
         self._strategyState = StrategyStatusRunning
+        #用户模板函数路径加入系统路径，并扩展baseapi的作用域
+        workPath = os.path.abspath('.')
+        userPath = workPath + "\strategy\FuncTemplate"
+        if userPath not in sys.path:
+            sys.path.insert(0, userPath)
+        
         moduleDir, moduleName = os.path.split(self._filePath)
         moduleName = os.path.splitext(moduleName)[0]
 
         if moduleDir not in sys.path:
             sys.path.insert(0, moduleDir)
-
-        # 1. 加载用户策略
-        userModule = importlib.import_module(moduleName)
-
-        # 2. 创建策略上下文
-        self._context = StrategyContext()
-
+            
         # 3. 创建数据模块
         self._dataModel = StrategyModel(self)
 
         # 4. 初始化系统函数
         self._baseApi = base_api.baseApi.updateData(self, self._dataModel)
+        # 扩展用户模板函数作用域
+        userDir = os.listdir(userPath)
+        for file in userDir:
+            modelFile = os.path.splitext(file)[0]
+            model = importlib.import_module(modelFile)
+            model.__dict__.update(base_api.__dict__)
+            self._userModelDict[modelFile] = model
+
+        # 1. 加载用户策略
+        userModule = importlib.import_module(moduleName)
         userModule.__dict__.update(base_api.__dict__)
+
+        # 2. 创建策略上下文
+        self._context = StrategyContext()
 
         # 5. 初始化用户策略参数
         if not self._noInitialize:
