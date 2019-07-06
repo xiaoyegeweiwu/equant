@@ -145,6 +145,9 @@ class StrategyModel(object):
 
     def onUnderlayMap(self, event):
         self._qteModel.onUnderlayMap(event)
+       
+    def onExchangeStateNotice(self, event):
+        self._qteModel.onExchangeStatus(event)
 
     def onQuoteRsp(self, event):
         self._qteModel.onQuoteRsp(event)
@@ -1502,12 +1505,18 @@ class StrategyModel(object):
 
     def getExchangeName(self, contNo):
         exchangeNo = self.getCommodityInfoFromContNo(contNo)['ExchangeCode']
+        return exchangeNo
+        #if exchangeNo not in self._qteModel._exchangeData:
+        #    return None
 
-        if exchangeNo not in self._qteModel._exchangeData:
-            return None
-
-        exchangeModel = self._qteModel._exchangeData[exchangeNo]
-        return exchangeModel._metaData['ExchangeName']
+        #exchangeModel = self._qteModel._exchangeData[exchangeNo]
+        #return exchangeModel._metaData['ExchangeName']
+        
+    def getExchangeTime(self, exgNo):
+        return self._qteModel.getExchangeTime(exgNo)
+        
+    def getExchangeStatus(self, exgNo):
+        return self._qteModel.getExchangeStatus(exgNo)
 
     def getExpiredDate(self, contNo):
         return 0

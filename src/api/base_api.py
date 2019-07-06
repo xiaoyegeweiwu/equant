@@ -1430,6 +1430,58 @@ class BaseApi(object):
         '''
         return self._dataModel.getExchangeName(contractNo)
         
+    def ExchangeTime(self, exchangeNo):
+        '''
+        【说明】
+              合约对应交易所名称
+
+        【语法】
+              string ExchangeTime(exchangeNo)
+
+        【参数】
+              exchangeNo: 交易所编号，例如"ZCE","DCE","SHFE","CFFEX","INE"
+
+        【备注】
+              返回字符串 "2019-07-05 22:11:00"
+
+        【示例】
+              ExchangeTime('ZCE')
+        '''
+        return self._dataModel.ExchangeTime(exchangeNo)
+        
+    def ExchangeStatus(self, exchangeNo):
+        '''
+        【说明】
+              合约对应交易所名称
+
+        【语法】
+              string ExchangeStatus(exchangeNo)
+
+        【参数】
+              exchangeNo: 交易所编号，例如"ZCE","DCE","SHFE","CFFEX","INE"
+
+        【备注】
+              返回字符
+              'N'   未知状态
+              'I'   正初始化
+              'R'   准备就绪
+              '0'   交易日切换
+              '1'   竞价申报
+              '2'   竞价撮合
+              '3'   连续交易
+              '4'   交易暂停
+              '5'   交易闭市  
+              '6'   竞价暂停
+              '7'   报盘未连
+              '8'   交易未连
+              '9'   闭市处理
+
+        【示例】
+              ExchangeStatus('ZCE')
+        '''
+        return self._dataModel.ExchangeStatus(exchangeNo)
+        
+        
     def ExpiredDate(self, contractNo):
         '''
         【说明】
@@ -1838,13 +1890,13 @@ class BaseApi(object):
         '''
         return self._dataModel.getSymbolType(contractNo)
 
-    def GetIndexMap(self, contractNo):
+    def GetTrendContract(self, contractNo):
         '''
         【说明】
               获取商品主连/近月对应的合约
 
         【语法】
-              string SymbolType(string contractNo)
+              string GetTrendContract(string contractNo)
 
         【参数】
               contractNo 取商品主连/近月编号，不能为空。
@@ -1853,8 +1905,8 @@ class BaseApi(object):
               返回字符串
 
         【示例】
-              GetIndexMap('DCE|Z|I|MAIN') 的返回为"DCE|F|I|1909"
-              GetIndexMap('DCE|Z|I|NEARBY') 的返回为"DCE|F|I|1907"
+              GetTrendContract('DCE|Z|I|MAIN') 的返回为"DCE|F|I|1909"
+              GetTrendContract('DCE|Z|I|NEARBY') 的返回为"DCE|F|I|1907"
         '''
         return self._dataModel.getIndexMap(contractNo)
 
@@ -6684,6 +6736,12 @@ def ContractUnit(contractNo=''):
 
 def ExchangeName(contractNo=''):
     return baseApi.ExchangeName(contractNo)
+    
+def ExchangeTime(exchangeNo):
+    return baseApi.ExchangeTime(exchangeNo)
+  
+def ExchangeStatus(exchangeNo):
+    return baseApi.ExchangeStatus(exchangeNo)
 
 def ExpiredDate(contractNo=''):
     return baseApi.ExpiredDate(contractNo)
@@ -6742,8 +6800,8 @@ def SymbolName(contractNo=''):
 def SymbolType(contractNo=''):
     return baseApi.SymbolType(contractNo)
 
-def GetIndexMap(contractNo=''):
-    return baseApi.GetIndexMap(contractNo)
+def GetTrendContract(contractNo=''):
+    return baseApi.GetTrendContract(contractNo)
 
 #其他函数
 def PlotNumeric(name, value, color=0xdd0000, main=True, axis=False, barsback=0):

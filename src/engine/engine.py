@@ -152,11 +152,13 @@ class StrategyEngine(object):
             EEQU_SRVEVENT_TRADE_POSITQRY    : self._onApiPosDataQry            ,
             EEQU_SRVEVENT_TRADE_POSITION    : self._onApiPosData               ,
             EEQU_SRVEVENT_TRADE_FUNDQRY     : self._onApiMoney                 ,
+            EEQU_SRVEVENT_TRADE_EXCSTATEQRY : self._onApiExchangeStateQry      ,
+            EEQU_SRVEVENT_TRADE_EXCSTATE    : self._onExchangeStateNotice      ,
         }
         
     def _regMainWorkFunc(self):
         self._mainWorkFuncDict = {
-            EV_ST2EG_EXCHANGE_REQ           : self._onExchange                 ,
+            EV_ST2EG_EXCHANGE_REQ           : self._reqExchange                 ,
             EV_ST2EG_COMMODITY_REQ          : self._reqCommodity               ,
             EV_ST2EG_CONTRACT_REQ           : self._reqContract                ,
             EV_ST2EG_UNDERLAYMAPPING_REQ    : self._reqUnderlayMap             ,
@@ -401,7 +403,6 @@ class StrategyEngine(object):
     #////////////////api回调事件//////////////////////////////
     def _onApiConnect(self, apiEvent):
         self._pyApi.reqSpreadContractMapping()
-        self._pyApi.reqTrendContractMapping()
         self._pyApi.reqExchange(Event({'StrategyId':0, 'Data':''}))
         self._eg2uiQueue.put(apiEvent)
         
@@ -443,7 +444,17 @@ class StrategyEngine(object):
 
         self._eg2uiQueue.put(apiEvent)
         if apiEvent.isChainEnd():
+            self._pyApi.reqExchangeStatus(Event({'StrategyId':0, 'Data':''}))
+            
+    def _onApiExchangeStateQry(self, apiEvent):
+        self._onExchangeStateNotice(apiEvent)
+        if apiEvent.isChainEnd():
             self._pyApi.reqCommodity(Event({'StrategyId':0, 'Data':''}))
+        
+    def _onExchangeStateNotice(self, apiEvent):
+        self._qteModel.updateExchangeStatus(apiEvent)
+        self._sendEvent2Strategy(apiEvent.getStrategyId(), apiEvent)
+        self._eg2uiQueue.put(apiEvent)
         
     def _onApiCommodity(self, apiEvent):
         self._qteModel.updateCommodity(apiEvent)
@@ -452,7 +463,8 @@ class StrategyEngine(object):
         self._sendEvent2AllStrategy(apiEvent)
 
         if apiEvent.isChainEnd():
-            self._pyApi.reqContract(Event({'StrategyId':0, 'Data':''}))
+            #self._pyApi.reqContract(Event({'StrategyId':0, 'Data':''}))
+            self._pyApi.reqTrendContractMapping(Event({'StrategyId':0, 'Data':''}))   
 
         # 发送商品交易时间模板请求
         dataList = apiEvent.getData()
@@ -466,6 +478,8 @@ class StrategyEngine(object):
 
     def _onApiUnderlayMapping(self, apiEvent):
         self._qteModel.updateUnderlayMap(apiEvent)
+        if apiEvent.isChainEnd():
+            self._pyApi.reqContract(Event({'StrategyId':0, 'Data':''}))
         
     def _onApiContract(self, apiEvent):
         self._qteModel.updateContract(apiEvent)
@@ -708,7 +722,7 @@ class StrategyEngine(object):
         event = self._qteModel.getQuoteEvent(contractNo, strategyId)
         self._sendEvent2Strategy(strategyId, event)
 
-    def _onExchange(self, event):
+    def _reqExchange(self, event):
         '''查询交易所信息'''
         revent = self._qteModel.getExchange()
         self._sendEvent2Strategy(event.getStrategyId(), revent)

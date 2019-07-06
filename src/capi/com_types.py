@@ -155,10 +155,10 @@ EEQU_SRVEVENT_TRADE_MATCHQRY      = 0x64            #交易成交查询--
 EEQU_SRVEVENT_TRADE_MATCH         = 0x65            #交易成交变化--
 EEQU_SRVEVENT_TRADE_POSITQRY      = 0x66            #交易持仓查询--
 EEQU_SRVEVENT_TRADE_POSITION      = 0x67            #交易持仓变化--
-EEQU_SRVEVENT_TRADE_FUNDQRY       = 0x68            # 交易资金查询
-EEQU_SRVEVENT_TRADE_USERQRY       = 0x6B            # 资金账号查询
-EEQU_SRVEVENT_TRADE_EXCSTATEQRY   = 0x6C            # 交易所状态查询
-EEQU_SRVEVENT_TRADE_EXCSTATE      = 0x6D            #
+EEQU_SRVEVENT_TRADE_FUNDQRY       = 0x68            #交易资金查询
+EEQU_SRVEVENT_TRADE_USERQRY       = 0x6B            #资金账号查询
+EEQU_SRVEVENT_TRADE_EXCSTATEQRY   = 0x6C            #交易所状态查询
+EEQU_SRVEVENT_TRADE_EXCSTATE      = 0x6D            #交易所状态变化通知
 
 #////////////////////内部协议定义/////////////////////////////////
 # 模块定义
@@ -453,6 +453,21 @@ StrategyStatusExit          = "Exit"
 # 发单方式
 SendOrderRealTime           = '1'
 SendOrderStable             = '2'
+
+# 交易所状态
+tsUnknown                       = 'N'   #未知状态
+tsIniting                       = 'I'   #正初始化
+tsReady                         = 'R'   #准备就绪
+tsSwitchDay                     = '0'   #交易日切换
+tsBiding                        = '1'   #竞价申报
+tsMakeMatch                     = '2'   #竞价撮合
+tsTradeing                      = '3'   #连续交易
+tsPause                         = '4'   #交易暂停
+tsClosed                        = '5'   #交易闭市   
+tsBidPause                      = '6'   #竞价暂停
+tsGatewayDisconnect             = '7'   #报盘未连
+tsTradeDisconnect               = '8'   #交易未连
+tsCloseDeal                     = '9'   #闭市处理
 
 # 品种交易状态
 EEQU_TRADESTATE_BID             = '1'   # 集合竞价
@@ -1176,7 +1191,46 @@ class EEquPositionNotice(Structure):
         ('FloatProfit', c_double),			              # 浮盈
         ('FloatProfitTBT', c_double),		              # 逐笔浮赢 trade by trade
     ]
+    
+class EEquExchangeStateReq(Structure):
+    """交易所状态及时间查询请求"""
+    _pack_ = 1
+    _fields_ = [
+    ]
+    
+class EEquExchangeStateRsp(Structure):
+    '''主力合约和月份合约关系应答'''
+    _pack_ = 1
+    _fields_ = [
+        ("Sign", c_char*21),                              #服务器标识
+        ("ExchangeNo", c_char*11),                        #交易所编号
+        ("ExchangeDateTime", c_char*21),                  #交易所系统时间
+        ("LocalDateTime", c_char*21),                     #本地系统时间
+        ("TradeState", c_char)                            #交易所状态
+    ]
 
+class EEquSpreadMappingReq(Structure):
+    """极星套利合约映射关系查询请求"""
+    _pack_ = 1
+    _fields_ = [
+    ]
+
+
+class EEquSpreadMappingDataResponse(Structure):
+    '''极星套利合约映射关系应答'''
+    _pack_ = 1
+    _fields_ = [
+        ("ContractNo", c_char*101),                       #客户端合约编号
+        ("SrcContractNo", c_char*101),                    #原始合约编号
+    ]
+
+class EEquTrendMappingDataResponse(Structure):
+    '''主力合约和月份合约关系应答'''
+    _pack_ = 1
+    _fields_ = [
+        ("ContractNo", c_char * 101),                     #虚拟合约编号,MAIN,NEARBY
+        ("UnderlayContractNo", c_char * 101),             #真实合约编号,月份合约
+    ]
 
     
 class EEquServiceInfo(Structure):

@@ -606,6 +606,9 @@ class Strategy:
             EEQU_SRVEVENT_TRADE_FUNDQRY     : self._onTradeFundRsp,
             EEQU_SRVEVENT_TRADE_ORDERQRY    : self._onTradeOrderQry,
             EEQU_SRVEVENT_TRADE_ORDER       : self._onTradeOrder,
+            EEQU_SRVEVENT_TRADE_EXCSTATEQRY : self._onExchangeStateNotice      ,
+            EEQU_SRVEVENT_TRADE_EXCSTATE    : self._onExchangeStateNotice      ,
+            
 
             EV_UI2EG_STRATEGY_QUIT          : self._onStrategyQuit,
             EV_UI2EG_EQUANT_EXIT            : self._onEquantExit,
@@ -655,6 +658,10 @@ class Strategy:
 
     def _onUnderlayMap(self, event):
         self._dataModel.onUnderlayMap(event)
+       
+    def _onExchangeStateNotice(self, event):
+        '''交易所状态'''
+        self._dataModel.onExchangeStatus(event)
             
     def _onQuoteRsp(self, event):
         '''行情应答，来着策略引擎'''

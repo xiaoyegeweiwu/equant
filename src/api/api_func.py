@@ -79,6 +79,8 @@ _all_func_ = {
                     # ['CanTrade'            , '是否支持交易'],
                     ['ContractUnit'        , '每手乘数'],
                     ['ExchangeName'        , '交易所名称'],
+                    ['ExchangeTime'        , '交易所系统时间'],
+                    ['ExchangeStatus'      , '交易所状态'],
                     # ['ExpiredDate'         , '最后交易日'],
                     ['GetSessionCount'     , '交易时段个数'],
                     ['GetSessionStartTime' , '交易时段起始时间'],
@@ -98,7 +100,7 @@ _all_func_ = {
                     ['Symbol'              , '合约编号'],
                     ['SymbolName'          , '合约名称'],
                     ['SymbolType'          , '品种编号'],
-                    ['GetIndexMap'         , '获取主连/近月对应的合约'],
+                    ['GetTrendContract'    , '获取主连/近月对应的合约'],
                 ],
                 
     '策略状态': [

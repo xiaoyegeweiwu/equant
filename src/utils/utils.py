@@ -3,11 +3,7 @@ import pickle
 import time
 from datetime import datetime
 
-import sys
-sys.path.append(".")
-sys.path.append("..")
 from capi.com_types import *
-from functools import wraps
 
 
 def rgb_to_hex(r, g, b):
@@ -96,20 +92,3 @@ def parseTime(time):
     tempTime = datetime.strftime(now_, '%Y%m%d')
     return tempTime + time
 
-# by gyt 便于调试
-def debug(func):
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        funcResult = func(*args, **kwargs)
-        argsStr = "(" + ", ".join([str(positionArg) for positionArg in args])
-        kwargsStr = ", "+repr(kwargs)+")" if kwargs else ")"
-        print(f"{func.__name__}{argsStr}{kwargsStr} -> {funcResult}")
-        return funcResult
-    return wrapper
-
-
-# @debug
-# def test(a, b =3):
-#     return a+b
-
-# test(19, b =10)

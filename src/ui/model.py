@@ -293,6 +293,8 @@ class GetEgData(object):
             EEQU_SRVEVENT_COMMODITY:        self._onEgCommodityInfo,
             EEQU_SRVEVENT_CONTRACT:         self._onEgContractInfo,
             EEQU_SRVEVENT_TRADE_USERQRY:    self._onEgUserInfo,
+            EEQU_SRVEVENT_TRADE_EXCSTATEQRY:self._onEgExchangeStatus,
+            EEQU_SRVEVENT_TRADE_EXCSTATE:   self._onEgExchangeStatus,
 
             EEQU_SRVEVENT_CONNECT:          self._onEgConnect,
             EEQU_SRVEVENT_DISCONNECT:       self._onEgDisconnect
@@ -342,6 +344,10 @@ class GetEgData(object):
         """获取引擎推送交易所信息"""
         exData = event.getData()
         self._exchangeList.extend(exData)
+        
+    def _onEgExchangeStatus(self, event):
+        '''获取交易所状态及时间'''
+        pass
 
     def _onEgCommodityInfo(self, event):
         """获取引擎推送品种信息"""

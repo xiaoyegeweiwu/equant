@@ -97,9 +97,16 @@ class StrategyQuote(QuoteModel):
     def onExchange(self, event):
         dataDict = event.getData()
         for k, v in dataDict.items():
-            self._exchangeData[k] = ExchangeModel(self.logger, v)
-
-
+            self._exchangeData[k] = ExchangeModel(self.logger, v)   
+       
+    def onExchangeStateNotice(self, event):
+        dataDict = event.getData()
+        for k, v in dataDict.items():
+            if k not in self._exchangeData:
+                continue
+            exchangeModel = self._exchangeData[k]
+            exchangeModel.updateStatus(v) 
+        
     def onCommodity(self, event):
         dataDict = event.getData()
         for k, v in dataDict.items():
@@ -165,6 +172,16 @@ class StrategyQuote(QuoteModel):
 
     def onDepthNotice(self, event):
         QuoteModel.updateLv2(self, event)
+        
+    def getExchangeTime(self, exchangeNo):
+        if exchangeNo not in self._exchangeData:
+            return ""
+        return self._exchangeData[exchangeNo].getExchangeTime()
+        
+    def getExchangeStatus(self, exchangeNo):
+        if exchangeNo not in self._exchangeData:
+            return ""
+        return self._exchangeData[exchangeNo].getExchangeStatus()
 
     def getLv1DataAndUpdateTime(self, contNo):
         if not contNo:
