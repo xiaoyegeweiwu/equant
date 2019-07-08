@@ -265,7 +265,8 @@ class StrategyMenu(object):
         # 当前选中的策略路径
         editorPath = self._controller.getEditorText()["path"]
         def enter(event=None):
-            self._controller.saveStrategy()
+            # 删除操作不保存选中的策略
+            # self._controller.saveStrategy()
             
             # 先关闭窗口
             deleteTop.destroy()

@@ -442,8 +442,9 @@ class QuantEditor(StrategyTree):
 
         self._outFlag = True
         path = self.control.getEditorText()["path"]
+
         if path:
-            if os.path.exists(path):    # 本地文件已删除
+            if os.path.exists(path):    # 本地文件存在
                 self.setModifyTime(os.path.getmtime(path))
 
     def buttonDown(self, event):
