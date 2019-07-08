@@ -221,6 +221,7 @@ def main():
         # os.chdir(dirPath)
         # os.system('rmdir /S /Q "{}"'.format(workDir))
 
+        print("更新完成！")
 
 if __name__ == '__main__':
     main()
