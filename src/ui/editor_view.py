@@ -119,6 +119,9 @@ class StrategyTree(QuantFrame):
         # 恢复策略目录的开关状态
         self._setOpenState("")
         # 恢复选中状态
+        for s in self._selected:
+            if not os.path.exists(s):
+                self._selected.remove(s)
         if self._selected:
             self.root_tree.selection_set(self._selected)
 
@@ -403,11 +406,15 @@ class QuantEditor(StrategyTree):
 
     def onFocusIn(self, event):
         """获取焦点事件"""
-        # 过滤双击事件
-
         if event.widget != self.control.top:
             return
 
+        self._fileMonitor(event)
+        self._treeMonitor(event)
+
+    def _fileMonitor(self, event):
+        """监控策略文件修改"""
+        # 过滤双击事件
         if self._dModifyFlag:
             return
 
@@ -419,7 +426,7 @@ class QuantEditor(StrategyTree):
         path = self.control.getEditorText()["path"]
 
         if path:
-            if not os.path.exists(path):    # 本地文件已删除
+            if not os.path.exists(path):  # 本地文件已删除
                 return
             modifyTime = os.path.getmtime(path)
 
@@ -435,6 +442,24 @@ class QuantEditor(StrategyTree):
                 self.editor_text.delete(0.0, END + "-1c")
                 self.updateEditorText(editorCode)
                 # self.editor_text.edit_reset()
+
+    def _treeMonitor(self, event):
+        editorPath = self.control.getEditorText()["path"]
+        if editorPath == "":
+            return
+
+        self.update_all_tree()
+
+        _, fileName = os.path.split(editorPath)
+        if not os.path.exists(editorPath):
+            # 更新选中策略路径
+            self.control.setEditorTextCode("")
+
+            if messagebox.askokcancel("重新加载", f"策略{fileName}文件被删除\n是否在编辑框中保留？"):
+                return
+
+            # 更新策略编辑界面显示信息
+            self.control.updateEditor("")
 
     def onFocusOut(self, event):
         if event.widget != self.control.top:
