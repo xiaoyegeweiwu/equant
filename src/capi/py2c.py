@@ -120,7 +120,7 @@ class PyAPI(object):
                 'Data' : 交易所编号 str
             }
         '''
-        self.logger.debug('request exchange!')
+        self.logger.info('request exchange!')
         
         sessionId = c_uint()
         req = EEquExchangeReq(event.getData().encode())
@@ -135,7 +135,7 @@ class PyAPI(object):
                 'StrategyId': 策略id, int
             }
         '''
-        self.logger.debug('request exchange status!')
+        self.logger.info('request exchange status!')
         
         sessionId = c_uint()
         req = EEquExchangeStateReq()
@@ -151,12 +151,24 @@ class PyAPI(object):
                 'Data' : 起始品种编号 str
             }
         '''
-        self.logger.debug('request commodity!')
+        self.logger.info('request commodity!')
         
         sessionId = c_uint()
         req = EEquCommodityReq(event.getData().encode())
         self._cDll.E_ReqQryCommodityInfo(byref(sessionId), byref(req))
         self._setSessionId(sessionId.value, event.getStrategyId())
+        
+    def reqTrendContractMapping(self, event):
+        '''
+        功能：虚拟合约映射关系查询请求
+        参数：{
+              }
+        '''
+        self.logger.info('request trend contract map!')
+        sessionId = c_uint()
+        req = EEquSpreadMappingReq()
+        self._cDll.E_ReqQryUnderlayMapping(byref(sessionId), byref(req))
+        self._setSessionId(sessionId.value, 0)
         
     def reqContract(self, event):
         '''
@@ -167,7 +179,7 @@ class PyAPI(object):
                 'Data' : 起始合约编号 str
             }
         '''
-        self.logger.debug('request contract!')
+        self.logger.info('request contract!')
         
         sessionId = c_uint()
         req = EEquContractReq(event.getData().encode())
@@ -181,6 +193,7 @@ class PyAPI(object):
         参数：{
               }
         '''
+        self.logger.info('request spread contract map!')
         sessionId = c_uint()
         req = EEquSpreadMappingReq()
         self._cDll.E_ReqQrySpreadMapping(byref(sessionId), byref(req))
@@ -1660,18 +1673,6 @@ class PyAPI(object):
         for record in apiEvent.getData():
             self._userContractNo2InnerContractNo[record["SrcContractNo"]] = record["ContractNo"]
             self._innerContractNo2UserContractNo[record["ContractNo"]] = record["SrcContractNo"]
-            
-    def reqTrendContractMapping(self, event):
-        '''
-        功能：虚拟合约映射关系查询请求
-        参数：{
-              }
-        '''
-        sessionId = c_uint()
-        req = EEquSpreadMappingReq()
-        self._cDll.E_ReqQryUnderlayMapping(byref(sessionId), byref(req))
-        self._setSessionId(sessionId.value, 0)
-        
             
     def _onTrendContractMapping(self, apiEvent):
         dataAddr = apiEvent.getData()
