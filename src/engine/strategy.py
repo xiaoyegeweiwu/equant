@@ -341,7 +341,7 @@ class Strategy:
         self._localOrder = {} # {本地生成的eSessionId : TradeRecode对象}
         
         self._moneyLastTime = 0
-        self._userModelDict = {}
+        #self._userModelDict = {}
 
     # ////////////////////////////对外接口////////////////////
     
@@ -361,6 +361,8 @@ class Strategy:
             
         # 3. 创建数据模块
         self._dataModel = StrategyModel(self)
+        
+        self._userModelDict = {}
 
         # 4. 初始化系统函数
         self._baseApi = base_api.baseApi.updateData(self, self._dataModel)
