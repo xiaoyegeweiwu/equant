@@ -33,6 +33,30 @@ class StrategyQuote(QuoteModel):
 
         self._strategy.sendEvent2Engine(event)
 
+    def subQuoteList(self, contNoList):
+        if not contNoList:
+            return
+
+        event = Event({
+            'EventCode': EV_ST2EG_SUB_QUOTE,
+            'StrategyId': self._strategy.getStrategyId(),
+            'Data': contNoList,
+        })
+
+        self._strategy.sendEvent2Engine(event)
+
+    def unsubQuoteList(self, contNoList):
+        if not contNoList:
+            return
+
+        event = Event({
+            'EventCode': EV_ST2EG_UNSUB_QUOTE,
+            'StrategyId': self._strategy.getStrategyId(),
+            'Data': contNoList,
+        })
+
+        self._strategy.sendEvent2Engine(event)
+
     def reqExchange(self):
         event = Event({
             'EventCode': EV_ST2EG_EXCHANGE_REQ,
@@ -51,17 +75,50 @@ class StrategyQuote(QuoteModel):
         
         self._strategy.sendEvent2Engine(event)
 
+    def reqContract(self):
+        event = Event({
+            'EventCode': EV_ST2EG_CONTRACT_REQ,
+            'StrategyId': self._strategy.getStrategyId(),
+            'Data': '',
+        })
+
+        self._strategy.sendEvent2Engine(event)
+
+    def reqUnderlayMap(self):
+        event = Event({
+            'EventCode': EV_ST2EG_UNDERLAYMAPPING_REQ,
+            'StrategyId': self._strategy.getStrategyId(),
+            'Data': '',
+        })
+
+        self._strategy.sendEvent2Engine(event)
+
     # /////////////////////////////应答消息处理///////////////////
     def onExchange(self, event):
         dataDict = event.getData()
         for k, v in dataDict.items():
-            self._exchangeData[k] = ExchangeModel(self.logger, v)
-
-
+            self._exchangeData[k] = ExchangeModel(self.logger, v)   
+       
+    def onExchangeStateNotice(self, event):
+        dataDict = event.getData()
+        for k, v in dataDict.items():
+            if k not in self._exchangeData:
+                continue
+            exchangeModel = self._exchangeData[k]
+            exchangeModel.updateStatus(v) 
+        
     def onCommodity(self, event):
         dataDict = event.getData()
         for k, v in dataDict.items():
             self._commodityData[k] = CommodityModel(self.logger, v)
+
+    def onContract(self, event):
+        dataDict = event.getData()
+        for k, v in dataDict.items():
+            self._contractData[k] = QuoteDataModel(self.logger, v)
+
+    def onUnderlayMap(self, event):
+        self._underlayData = event.getData()
 
     def onQuoteRsp(self, event):
         '''
@@ -115,6 +172,16 @@ class StrategyQuote(QuoteModel):
 
     def onDepthNotice(self, event):
         QuoteModel.updateLv2(self, event)
+        
+    def getExchangeTime(self, exchangeNo):
+        if exchangeNo not in self._exchangeData:
+            return ""
+        return self._exchangeData[exchangeNo].getExchangeTime()
+        
+    def getExchangeStatus(self, exchangeNo):
+        if exchangeNo not in self._exchangeData:
+            return ""
+        return self._exchangeData[exchangeNo].getExchangeStatus()
 
     def getLv1DataAndUpdateTime(self, contNo):
         if not contNo:

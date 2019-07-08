@@ -93,7 +93,7 @@ class PyAPI(object):
             EEQU_SRVEVENT_TRADE_FUNDQRY     : self._onMoney          ,
             EEQU_SRVEVENT_SPRAEDMAPPING     : self._onSpreadContractMapping,
             EEQU_SRVEVENT_UNDERLAYMAPPING   : self._onTrendContractMapping,
-            EEQU_SRVEVENT_TRADE_EXCSTATEQRY : self._onExchangeStateRsp,
+            EEQU_SRVEVENT_TRADE_EXCSTATEQRY : self._onExchangeStateNotice,
             EEQU_SRVEVENT_TRADE_EXCSTATE    : self._onExchangeStateNotice,
         }
     #//////////////////////////初始化消息///////////////////////////
@@ -127,6 +127,21 @@ class PyAPI(object):
         self._cDll.E_ReqQryExchangeInfo(byref(sessionId), byref(req))
         self._setSessionId(sessionId.value, event.getStrategyId())
         
+    def reqExchangeStatus(self, event):
+        '''
+        功能：查询交易所状态
+        参数：
+            {
+                'StrategyId': 策略id, int
+            }
+        '''
+        self.logger.debug('request exchange status!')
+        
+        sessionId = c_uint()
+        req = EEquExchangeStateReq()
+        self._cDll.E_ReqExchangeStateQry(byref(sessionId), byref(req))
+        self._setSessionId(sessionId.value, event.getStrategyId())
+        
     def reqCommodity(self, event):
         '''
         功能：查品种
@@ -158,6 +173,18 @@ class PyAPI(object):
         req = EEquContractReq(event.getData().encode())
         self._cDll.E_ReqQryContractInfo(byref(sessionId), byref(req))
         self._setSessionId(sessionId.value, event.getStrategyId())
+        
+
+    def reqSpreadContractMapping(self):
+        '''
+        功能：极星套利合约映射查询请求
+        参数：{
+              }
+        '''
+        sessionId = c_uint()
+        req = EEquSpreadMappingReq()
+        self._cDll.E_ReqQrySpreadMapping(byref(sessionId), byref(req))
+        self._setSessionId(sessionId.value, 0)
         
     def reqTimebucket(self, event):
         '''
@@ -1607,12 +1634,6 @@ class PyAPI(object):
         self._cDll.E_ReqQrySpreadMapping(byref(sessionId), byref(req))
         self._setSessionId(sessionId.value, 0)
 
-    def reqTrendContractMapping(self):
-        sessionId = c_uint()
-        req = EEquSpreadMappingReq()
-        self._cDll.E_ReqQryUnderlayMapping(byref(sessionId), byref(req))
-        self._setSessionId(sessionId.value, 0)
-
     #
     def _onSpreadContractMapping(self, apiEvent):
         dataAddr = apiEvent.getData()
@@ -1639,7 +1660,19 @@ class PyAPI(object):
         for record in apiEvent.getData():
             self._userContractNo2InnerContractNo[record["SrcContractNo"]] = record["ContractNo"]
             self._innerContractNo2UserContractNo[record["ContractNo"]] = record["SrcContractNo"]
-
+            
+    def reqTrendContractMapping(self, event):
+        '''
+        功能：虚拟合约映射关系查询请求
+        参数：{
+              }
+        '''
+        sessionId = c_uint()
+        req = EEquSpreadMappingReq()
+        self._cDll.E_ReqQryUnderlayMapping(byref(sessionId), byref(req))
+        self._setSessionId(sessionId.value, 0)
+        
+            
     def _onTrendContractMapping(self, apiEvent):
         dataAddr = apiEvent.getData()
         fieldSize = apiEvent.getFieldSize()
@@ -1660,7 +1693,7 @@ class PyAPI(object):
         apiEvent.setData(dataList)
         sid = apiEvent.getSessionId()
         apiEvent.setStrategyId(self._getStrategyId(sid))
-        # self._api2egQueue.put(apiEvent)
+        self._api2egQueue.put(apiEvent)
 
     def getInnerContractNo(self, userContractNo):
         return self._userContractNo2InnerContractNo.get(userContractNo, userContractNo)
@@ -1668,8 +1701,30 @@ class PyAPI(object):
     def getUserContractNo(self, innerContractNo):
         return self._innerContractNo2UserContractNo.get(innerContractNo, innerContractNo)
 
-    def _onExchangeStateRsp(self, apiEvent):
-        pass
-
     def _onExchangeStateNotice(self, apiEvent):
-       pass
+        '''交易所状态应答'''
+        dataAddr   = apiEvent.getData()
+        fieldSize  = apiEvent.getFieldSize()
+        fieldCount = apiEvent.getFieldCount()
+        
+        dataList = []
+        
+        for i in range(fieldCount):
+            buf = string_at(dataAddr + fieldSize * i, fieldSize)
+            data = EEquExchangeStateRsp()
+            memmove(addressof(data), buf, sizeof(EEquExchangeStateRsp))
+            
+            idict = {
+                'Sign'              : data.Sign.decode('utf-8'),    
+                'ExchangeNo'        : data.ExchangeNo.decode('utf-8'),
+                'ExchangeDateTime'  : data.ExchangeDateTime.decode('utf-8'),
+                'LocalDateTime'     : data.LocalDateTime.decode('utf-8'),
+                'TradeState'        : data.TradeState.decode('utf-8')
+            }
+            dataList.append(idict)
+        
+        #发送到引擎  
+        apiEvent.setData(dataList)
+        sid = apiEvent.getSessionId()
+        apiEvent.setStrategyId(self._getStrategyId(sid))
+        self._api2egQueue.put(apiEvent)

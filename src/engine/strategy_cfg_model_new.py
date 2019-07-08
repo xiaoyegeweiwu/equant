@@ -294,6 +294,7 @@ class StrategyConfig_new(object):
 
         trigger = self._metaData['Trigger']
 
+        # TODO: 清空界面设置的触发方式
         if type == 1:
             trigger['SnapShot'] = True
         elif type == 2:

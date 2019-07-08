@@ -117,16 +117,38 @@ class StrategyModel(object):
 
     def reqCommodity(self):
         self._qteModel.reqCommodity()
+
+    def reqContract(self):
+        self._qteModel.reqContract()
+
+    def reqUnderlayMap(self):
+        self._qteModel.reqUnderlayMap()
         
     def subQuote(self):
         self._qteModel.subQuote()
+
+    def subQuoteList(self, contNoList):
+        self._qteModel.subQuoteList(contNoList)
+
+    def unsubQuoteList(self, contNoList):
+        # TODO: 退订即使行情时，是否需要删除已经得到的即时行情信息
+        self._qteModel.unsubQuoteList(contNoList)
 
     def onExchange(self, event):
         self._qteModel.onExchange(event)
 
     def onCommodity(self, event):
         self._qteModel.onCommodity(event)
-            
+
+    def onContract(self, event):
+        self._qteModel.onContract(event)
+
+    def onUnderlayMap(self, event):
+        self._qteModel.onUnderlayMap(event)
+       
+    def onExchangeStateNotice(self, event):
+        self._qteModel.onExchangeStatus(event)
+
     def onQuoteRsp(self, event):
         self._qteModel.onQuoteRsp(event)
         
@@ -568,6 +590,14 @@ class StrategyModel(object):
             contNo = self._cfgModel.getBenchmark()
         return self._cfgModel.setStopPoint(stopPoint, nPriceType, nAddTick, contNo)
 
+    def subscribeContract(self, contList):
+        self._cfgModel.updateSubQuoteContract(contList)
+        return self.subQuoteList(contList)
+
+    def unsubscribeContract(self, contList):
+        self._cfgModel.updateUnsubQuoteContract(contList)
+        return self.unsubQuoteList(contList)
+
     # ///////////////////////账户函数///////////////////////////
     def getAccountId(self):
         return self._trdModel.getAccountId()
@@ -796,6 +826,10 @@ class StrategyModel(object):
         if not self._trdModel.getSign(userNo):
             self.logger.error(f"输入的账户没有在极星客户端登录")
             return -4, "输入的账户没有在极星客户端登录"
+
+        underlayContNo = self._qteModel.getUnderlayContractNo(contNo)
+        if len(underlayContNo) > 0:
+            contNo = underlayContNo
 
         eId = str(self._strategy.getStrategyId()) + '-' + str(self._strategy.getESessionId())
         # 上期所特殊处理
@@ -1471,12 +1505,18 @@ class StrategyModel(object):
 
     def getExchangeName(self, contNo):
         exchangeNo = self.getCommodityInfoFromContNo(contNo)['ExchangeCode']
+        return exchangeNo
+        #if exchangeNo not in self._qteModel._exchangeData:
+        #    return None
 
-        if exchangeNo not in self._qteModel._exchangeData:
-            return None
-
-        exchangeModel = self._qteModel._exchangeData[exchangeNo]
-        return exchangeModel._metaData['ExchangeName']
+        #exchangeModel = self._qteModel._exchangeData[exchangeNo]
+        #return exchangeModel._metaData['ExchangeName']
+        
+    def getExchangeTime(self, exgNo):
+        return self._qteModel.getExchangeTime(exgNo)
+        
+    def getExchangeStatus(self, exgNo):
+        return self._qteModel.getExchangeStatus(exgNo)
 
     def getExpiredDate(self, contNo):
         return 0
@@ -1641,6 +1681,9 @@ class StrategyModel(object):
 
     def getSymbolType(self, contNo):
         return self.getCommodityInfoFromContNo(contNo)['CommodityCode']
+
+    def getIndexMap(self, contNo):
+        return self._qteModel.getUnderlayContractNo(contNo)
 
     # ///////////////////////策略状态///////////////////////////
     def getAvgEntryPrice(self, contNo):

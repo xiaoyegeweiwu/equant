@@ -40,7 +40,7 @@ class BaseApi(object):
         【备注】
               简写D,返回格式为YYYYMMDD的整数
 
-        【实例】
+        【示例】
               当前Bar对应的日期为2019-03-25，则Date返回值为20190325
         '''
         return self._dataModel.getBarDate(contractNo, kLineType, kLineValue)
@@ -61,7 +61,7 @@ class BaseApi(object):
         【备注】
               简写T, 返回格式为0.HHMMSS的浮点数
 
-        【实例】
+        【示例】
               当前Bar对应的时间为11:34:21，Time返回值为0.113421
               当前Bar对应的时间为09:34:00，Time返回值为0.0934
               当前Bar对应的时间为11:34:00，Time返回值为0.1134
@@ -85,7 +85,7 @@ class BaseApi(object):
               简写O, 返回值numpy数组包含截止当前Bar的所有开盘价
               Open()[-1] 表示当前Bar开盘价，Open()[-2]表示上一个Bar开盘价，以此类推
 
-        【实例】
+        【示例】
               Open() 获取基准合约的所有开盘价列表
               Open('ZCE|F|SR|905', 'M', 1) 获取白糖905合约1分钟K线的所有开盘价列表
         '''
@@ -109,7 +109,7 @@ class BaseApi(object):
               返回numpy数组，包括截止当前Bar的所有最高价
               High('ZCE|F|SR|905', 'M', 1)[-1] 表示当前Bar最高价，High('ZCE|F|SR|905', 'M', 1)[-2]表示上一个Bar最高价，以此类推
 
-        【实例】
+        【示例】
               无
         '''
         return self._dataModel.getBarHigh(contractNo, kLineType, kLineValue)
@@ -132,7 +132,7 @@ class BaseApi(object):
               返回numpy数组，包括截止当前Bar的所有最低价
               Low()[-1] 表示当前Bar最低价，Low()[-2]表示上一个Bar最低价，以此类推
 
-        【实例】
+        【示例】
               无
         '''
         return self._dataModel.getBarLow(contractNo, kLineType, kLineValue)
@@ -154,7 +154,7 @@ class BaseApi(object):
               简写C, 返回numpy数组，包括截止当前Bar的所有收盘价
               Close()[-1] 表示当前Bar收盘价，Close()[-2]表示上一个Bar收盘价，以此类推
 
-        【实例】
+        【示例】
               无
         '''
         return self._dataModel.getBarClose(contractNo, kLineType, kLineValue)
@@ -175,7 +175,7 @@ class BaseApi(object):
               使用该函数前请确保在策略的initial方法中使用SetBarInterval(contractNo, 'D', 1)方法订阅contractNo合约的日线信息；
               若daysAgo超过了订阅合约contractNo日线数据的样本数量，则返回为-1。
 
-        【实例】
+        【示例】
               OpenD(3，'ZCE|F|SR|905') 获取白糖905合约3天前的开盘价
         '''
         return self._dataModel.getOpenD(daysAgo, contractNo)
@@ -196,7 +196,7 @@ class BaseApi(object):
               使用该函数前请确保在策略的initial方法中使用SetBarInterval(contractNo, 'D', 1)方法订阅contractNo合约的日线信息；
               若daysAgo超过了订阅合约contractNo日线数据的样本数量，则返回为-1。
 
-        【实例】
+        【示例】
               CloseD(3，'ZCE|F|SR|905') 获取白糖905合约3天前的收盘价
         '''
         return self._dataModel.getCloseD(daysAgo, contractNo)
@@ -217,7 +217,7 @@ class BaseApi(object):
               使用该函数前请确保在策略的initial方法中使用SetBarInterval(contractNo, 'D', 1)方法订阅contractNo合约的日线信息；
               若daysAgo超过了订阅合约contractNo日线数据的样本数量，则返回为-1。
 
-        【实例】
+        【示例】
               HighD(3，'ZCE|F|SR|905') 获取白糖905合约3天前的最高价
         '''
         return self._dataModel.getHighD(daysAgo, contractNo)
@@ -238,7 +238,7 @@ class BaseApi(object):
               使用该函数前请确保在策略的initial方法中使用SetBarInterval(contractNo, 'D', 1)方法订阅contractNo合约的日线信息；
               若daysAgo超过了订阅合约contractNo日线数据的样本数量，则返回为-1。
 
-        【实例】
+        【示例】
               LowD(3，'ZCE|F|SR|905') 获取白糖905合约3天前的最低价
         '''
         return self._dataModel.getLowD(daysAgo, contractNo)
@@ -260,7 +260,7 @@ class BaseApi(object):
               简写V, 返回numpy数组，包括截止当前Bar的所有成交量
               Vol()[-1] 表示当前Bar成交量，Vol()[-2]表示上一个Bar成交量，以此类推
 
-        【实例】
+        【示例】
               无
         '''
         return self._dataModel.getBarVol(contractNo, kLineType, kLineValue)
@@ -282,7 +282,7 @@ class BaseApi(object):
               返回numpy数组，包括截止当前Bar的所有持仓量
               OpenInt()[-1] 表示当前Bar持仓量，OpenInt()[-2]表示上一个Bar持仓量，以此类推
 
-        【实例】
+        【示例】
               无
         '''
         return self._dataModel.getBarOpenInt(contractNo, kLineType, kLineValue)
@@ -303,7 +303,7 @@ class BaseApi(object):
         【备注】
               返回格式为YYYYMMDD的整数
 
-        【实例】
+        【示例】
               当前Bar对用的日期为2019-03-25，则Date返回值为20190325
         '''
         return self._dataModel.getBarTradeDate(contractNo, kLineType, kLineValue)
@@ -324,7 +324,7 @@ class BaseApi(object):
         【备注】
               返回值为整型
 
-        【实例】
+        【示例】
               无
         '''
         return self._dataModel.getBarCount(contractNo, kLineType, kLineValue)
@@ -345,7 +345,7 @@ class BaseApi(object):
         【备注】
               第一个Bar返回值为0，其他Bar递增
 
-        【实例】
+        【示例】
               无
         '''
         return self._dataModel.getCurrentBar(contractNo, kLineType, kLineValue)
@@ -369,7 +369,7 @@ class BaseApi(object):
         【备注】
               返回值整型, 0表示第一个Bar,1表示中间普通Bar,2表示最后一个Bar
 
-        【实例】
+        【示例】
               无
         '''
         return self._dataModel.getBarStatus(contractNo, kLineType, kLineValue)
@@ -390,7 +390,7 @@ class BaseApi(object):
         【备注】
               返回Bool值，有效返回True，否则返回False
 
-        【实例】
+        【示例】
               无
         '''
         return self._dataModel.isHistoryDataExist(contractNo, kLineType, kLineValue)
@@ -429,7 +429,7 @@ class BaseApi(object):
         【备注】
               返回numpy数组，包括截止当前Bar的最多maxLength个指定的种类的历史数据
 
-        【实例】
+        【示例】
               closeList = HisData(Enum_Data_Close(), Enum_Period_Min(), 5, "ZCE|F|SR|906", 1000) # 获取合约ZCE|F|SR|906包含当前Bar在内的之前1000个5分钟线的收盘价
               closeList[-1] # 当前Bar的收盘价
               closeList[-2] # 上一个Bar的收盘价
@@ -469,7 +469,7 @@ class BaseApi(object):
 	            PositionQty 总持仓，如460816
 	            TradeDate' 交易日期，如20190521
 
-        【实例】
+        【示例】
               barList = HisBarsInfo("ZCE|F|SR|906", Enum_Period_Min(), 5, 1000) # 获取合约ZCE|F|SR|906包含当前Bar在内的之前1000个历史5分钟K线的数据
               barInfo = barList[-1] # 当前Bar的详细信息
         '''
@@ -491,7 +491,7 @@ class BaseApi(object):
               返回格式为"YYYYMMDDHHMMSSmmm"的字符串，
               若指定合约即时行情的更新时间为2019-05-21 10:07:46.000，则该函数放回为20190521100746000
 
-        【实例】
+        【示例】
               无
         '''
         return self._dataModel.getQUpdateTime(contractNo)
@@ -510,7 +510,7 @@ class BaseApi(object):
         【备注】
               返回浮点数, 可获取指定合约,指定深度的最优卖价
 
-        【实例】
+        【示例】
               无
         '''
         return self._dataModel.getQAskPrice(contractNo, level)
@@ -529,7 +529,7 @@ class BaseApi(object):
         【备注】
               返回整型，1为上涨，-1为下跌，0为不变
 
-        【实例】
+        【示例】
               无
         '''
         return self._dataModel.getQAskPriceFlag(contractNo)
@@ -548,7 +548,7 @@ class BaseApi(object):
         【备注】
               返回浮点数, 可获取指定合约,指定深度的最优卖量
 
-        【实例】
+        【示例】
               无
         '''
         return self._dataModel.getQAskVol(contractNo, level)
@@ -567,7 +567,7 @@ class BaseApi(object):
         【备注】
               返回浮点数，返回实时均价即结算价
 
-        【实例】
+        【示例】
               无
         '''
         return self._dataModel.getQAvgPrice(contractNo)
@@ -586,7 +586,7 @@ class BaseApi(object):
         【备注】
               返回浮点数, 可获取指定合约,指定深度的最优买价
 
-        【实例】
+        【示例】
               无
         '''
         return self._dataModel.getQBidPrice(contractNo, level)
@@ -605,7 +605,7 @@ class BaseApi(object):
         【备注】
               返回整型，1为上涨，-1为下跌，0为不变
 
-        【实例】
+        【示例】
               无
         '''
         return self._dataModel.getQBidPriceFlag(contractNo)
@@ -625,7 +625,7 @@ class BaseApi(object):
         【备注】
               返回浮点数, 可获取指定合约,指定深度的最优买量
 
-        【实例】
+        【示例】
               无
         '''
         return self._dataModel.getQBidVol(contractNo, level)
@@ -644,7 +644,7 @@ class BaseApi(object):
         【备注】
               返回浮点数
 
-        【实例】
+        【示例】
               无
         '''
         return self._dataModel.getQClose(contractNo)
@@ -663,7 +663,7 @@ class BaseApi(object):
         【备注】
               返回浮点数
 
-        【实例】
+        【示例】
               无
         '''
         return self._dataModel.getQHigh(contractNo)
@@ -682,7 +682,7 @@ class BaseApi(object):
         【备注】
               返回浮点数
 
-        【实例】
+        【示例】
               无
         '''
         return self._dataModel.getQHisHigh(contractNo)
@@ -701,7 +701,7 @@ class BaseApi(object):
         【备注】
               返回浮点数
 
-        【实例】
+        【示例】
               无
         '''
         return self._dataModel.getQHisLow(contractNo)
@@ -720,7 +720,7 @@ class BaseApi(object):
         【备注】
               返回浮点数, 买入价成交为内盘
 
-        【实例】
+        【示例】
               无
         '''
         return self._dataModel.getQInsideVol(contractNo)
@@ -739,7 +739,7 @@ class BaseApi(object):
         【备注】
               返回浮点数
 
-        【实例】
+        【示例】
               无
         '''
         return self._dataModel.getQLast(contractNo)
@@ -758,7 +758,7 @@ class BaseApi(object):
         【备注】
               返回当前公式应用商品的最新成交日期，格式为YYYYMMDD整数表示的日期。
 
-        【实例】
+        【示例】
               无
         '''
         return self._dataModel.getQLastDate(contractNo)
@@ -778,7 +778,7 @@ class BaseApi(object):
               返回当前公式应用商品的最新成交时间，以格式为0.HHMMSSmmm浮点数表示的时间。
 
 
-        【实例】
+        【示例】
               无
         '''
         return self._dataModel.getQLastTime(contractNo)
@@ -797,7 +797,7 @@ class BaseApi(object):
         【备注】
               返回浮点数，单位为手
 
-        【实例】
+        【示例】
               无
         '''
         return self._dataModel.getQLastVol(contractNo)
@@ -816,7 +816,7 @@ class BaseApi(object):
         【备注】
               返回浮点数
 
-        【实例】
+        【示例】
               无
         '''
         return self._dataModel.getQLow(contractNo)
@@ -835,7 +835,7 @@ class BaseApi(object):
         【备注】
               返回浮点数
 
-        【实例】
+        【示例】
               无
         '''
         return self._dataModel.getQLowLimit(contractNo)
@@ -854,7 +854,7 @@ class BaseApi(object):
         【备注】
               返回浮点数
 
-        【实例】
+        【示例】
               无
         '''
         return self._dataModel.getQOpen(contractNo)
@@ -873,7 +873,7 @@ class BaseApi(object):
         【备注】
               返回浮点数, 单位为手
 
-        【实例】
+        【示例】
               无
         '''
         return self._dataModel.getQOpenInt(contractNo)
@@ -892,7 +892,7 @@ class BaseApi(object):
         【备注】
               返回整型, 1为增加，-1为下降，0为不变
 
-        【实例】
+        【示例】
               无
         '''
         return self._dataModel.getQOpenIntFlag(contractNo)
@@ -911,7 +911,7 @@ class BaseApi(object):
         【备注】
               返回浮点数，卖出价成交为外盘
 
-        【实例】
+        【示例】
               无
         '''
         return self._dataModel.getQOutsideVol(contractNo)
@@ -930,7 +930,7 @@ class BaseApi(object):
         【备注】
               返回浮点数
 
-        【实例】
+        【示例】
               无
         '''
         return self._dataModel.getQPreOpenInt(contractNo)
@@ -949,7 +949,7 @@ class BaseApi(object):
         【备注】
               返回浮点数
 
-        【实例】
+        【示例】
               无
         '''
         return self._dataModel.getQPreSettlePrice(contractNo)
@@ -968,7 +968,7 @@ class BaseApi(object):
         【备注】
               返回浮点数
 
-        【实例】
+        【示例】
               无
         '''
         return self._dataModel.getQPriceChg(contractNo)
@@ -988,7 +988,7 @@ class BaseApi(object):
         【备注】
               返回浮点数
 
-        【实例】
+        【示例】
               无
         '''
         return self._dataModel.getQPriceChgRadio(contractNo)
@@ -1007,7 +1007,7 @@ class BaseApi(object):
         【备注】
               返回浮点数
 
-        【实例】
+        【示例】
               无
         '''
         return self._dataModel.getQTodayEntryVol(contractNo)
@@ -1026,7 +1026,7 @@ class BaseApi(object):
         【备注】
               返回浮点数
 
-        【实例】
+        【示例】
               无
         '''
         return self._dataModel.getQTodayExitVol(contractNo)
@@ -1045,7 +1045,7 @@ class BaseApi(object):
         【备注】
               返回浮点数
 
-        【实例】
+        【示例】
               无
         '''
         return self._dataModel.getQTotalVol(contractNo)
@@ -1064,7 +1064,7 @@ class BaseApi(object):
         【备注】
               返回浮点数
 
-        【实例】
+        【示例】
               无
         '''
         return self._dataModel.getQTurnOver(contractNo)
@@ -1083,7 +1083,7 @@ class BaseApi(object):
         【备注】
               返回浮点数
 
-        【实例】
+        【示例】
               无
         '''
         return self._dataModel.getQUpperLimit(contractNo)
@@ -1430,6 +1430,58 @@ class BaseApi(object):
         '''
         return self._dataModel.getExchangeName(contractNo)
         
+    def ExchangeTime(self, exchangeNo):
+        '''
+        【说明】
+              合约对应交易所名称
+
+        【语法】
+              string ExchangeTime(exchangeNo)
+
+        【参数】
+              exchangeNo: 交易所编号，例如"ZCE","DCE","SHFE","CFFEX","INE"
+
+        【备注】
+              返回字符串 "2019-07-05 22:11:00"
+
+        【示例】
+              ExchangeTime('ZCE')
+        '''
+        return self._dataModel.ExchangeTime(exchangeNo)
+        
+    def ExchangeStatus(self, exchangeNo):
+        '''
+        【说明】
+              合约对应交易所名称
+
+        【语法】
+              string ExchangeStatus(exchangeNo)
+
+        【参数】
+              exchangeNo: 交易所编号，例如"ZCE","DCE","SHFE","CFFEX","INE"
+
+        【备注】
+              返回字符
+              'N'   未知状态
+              'I'   正初始化
+              'R'   准备就绪
+              '0'   交易日切换
+              '1'   竞价申报
+              '2'   竞价撮合
+              '3'   连续交易
+              '4'   交易暂停
+              '5'   交易闭市  
+              '6'   竞价暂停
+              '7'   报盘未连
+              '8'   交易未连
+              '9'   闭市处理
+
+        【示例】
+              ExchangeStatus('ZCE')
+        '''
+        return self._dataModel.ExchangeStatus(exchangeNo)
+        
+        
     def ExpiredDate(self, contractNo):
         '''
         【说明】
@@ -1656,7 +1708,7 @@ class BaseApi(object):
               合约最小变动价
 
         【语法】
-              int PriceTick(contractNo)
+              int PriceTick(string contractNo)
 
         【参数】
               contractNo 合约编号，为空时，取基准合约。
@@ -1675,7 +1727,7 @@ class BaseApi(object):
               期权类型，欧式还是美式
 
         【语法】
-              int OptionStyle()
+              int OptionStyle(string contractNo)
 
         【参数】
               contractNo 合约编号，为空时，取基准合约。
@@ -1694,10 +1746,10 @@ class BaseApi(object):
               返回期权的类型，是看涨还是看跌期权
 
         【语法】
-              int OptionType()
+              int OptionType(string contractNo)
 
         【参数】
-              无
+              contractNo 合约编号，为空时，取基准合约。
 
         【备注】
               返回整型，0为看涨，1为看跌， -1为异常。
@@ -1713,10 +1765,10 @@ class BaseApi(object):
               合约价格精度
 
         【语法】
-              float PriceScale()
+              float PriceScale(string contractNo)
 
         【参数】
-              无
+              contractNo 合约编号，为空时，取基准合约。
 
         【备注】
               返回浮点数
@@ -1806,10 +1858,10 @@ class BaseApi(object):
               获取合约名称
 
         【语法】
-              string SymbolName()
+              string SymbolName(string contractNo)
 
         【参数】
-              无
+              contractNo 合约编号，为空时，取基准合约。
 
         【备注】
               返回字符串
@@ -1825,10 +1877,10 @@ class BaseApi(object):
               获取合约所属的品种编号
 
         【语法】
-              string SymbolType()
+              string SymbolType(string contractNo)
 
         【参数】
-              无
+              contractNo 合约编号，为空时，取基准合约。
 
         【备注】
               返回字符串
@@ -1837,6 +1889,26 @@ class BaseApi(object):
               "ZCE|F|SR|001"的品种编号为"ZCE|F|SR"
         '''
         return self._dataModel.getSymbolType(contractNo)
+
+    def GetTrendContract(self, contractNo):
+        '''
+        【说明】
+              获取商品主连/近月对应的合约
+
+        【语法】
+              string GetTrendContract(string contractNo)
+
+        【参数】
+              contractNo 取商品主连/近月编号，不能为空。
+
+        【备注】
+              返回字符串
+
+        【示例】
+              GetTrendContract('DCE|Z|I|MAIN') 的返回为"DCE|F|I|1909"
+              GetTrendContract('DCE|Z|I|NEARBY') 的返回为"DCE|F|I|1907"
+        '''
+        return self._dataModel.getIndexMap(contractNo)
 
     # //////////////////////策略状态////////////////////
     def AvgEntryPrice(self, contractNo):
@@ -5141,6 +5213,7 @@ class BaseApi(object):
                 2 : 交易数据触发
                 3 : 每隔固定时间触发
                 4 : 指定时刻触发
+                5 : K线触发
               value 当触发方式是为每隔固定时间触发(type=3)时，value为触发间隔，单位为毫秒，必须为100的整数倍，
               当触发方式为指定时刻触发(type=4)时，value为触发时刻列表，时间的格式为'20190511121314'
               当type为其他值时，该值无效，可以不填
@@ -5198,15 +5271,55 @@ class BaseApi(object):
         '''
         return self._dataModel.setStopPoint(stopPoint, nPriceType, nAddTick, contractNo)
 
+    def SubQuote(self, contractNoList):
+        '''
+        【说明】
+             订阅指定合约的即时行情。
+
+        【语法】
+              bool SubQuote(list contractNoList=[])
+
+        【参数】
+              contractNoList 订阅的合约列表，默认为空列表。
+
+        【备注】
+              该方法可用策略中的initialize(context)方法中订阅指定合约的即时行情，也可在handle_data(context)方法中动态的订阅指定合约的即使行情。
+
+        【示例】
+              SubQuote(['ZCE|F|SR|909', 'ZCE|F|SR|910']) 订阅合约'ZCE|F|SR|909'和'ZCE|F|SR|910'的即时行情；
+              SubQuote(['ZCE|F|SR']) 订阅合约商品'ZCE|F|SR'对应的所有合约的即时行情。
+        '''
+        return self._dataModel.subscribeContract(contractNoList)
+
+    def UnsubQuote(self, contractNoList):
+        '''
+        【说明】
+             退订指定合约的即时行情。
+
+        【语法】
+              bool UnsubQuote(list contractNoList=[])
+
+        【参数】
+              contractNoList 退订的合约列表，默认为空列表。
+
+        【备注】
+              该方法可用策略中的initialize(context)方法中退订指定合约的即时行情，也可在handle_data(context)方法中动态的退订指定合约的即使行情。
+
+        【示例】
+              UnsubQuote(['ZCE|F|SR|909', 'ZCE|F|SR|910']) 退订合约'ZCE|F|SR|909'和'ZCE|F|SR|910'的即时行情；
+              UnsubQuote(['ZCE|F|SR']) 退订合约商品'ZCE|F|SR'对应的所有合约的即时行情。
+        '''
+        return self._dataModel.unsubscribeContract(contractNoList)
+
     # //////////////////////其他函数////////////////////
 
-    def PlotNumeric(self, name, value, color, main, axis, type, barsback):
+    def PlotNumeric(self, name, value, color, main, axis, barsback):
         '''
         【说明】
             在当前Bar输出一个数值
 
         【语法】
-            float PlotNumeric(string name,float value,int color,bool main, char axis, int type, int barsback=0)
+            float PlotNumeric(string name,float value,int color,bool main, char axis, int barsback=0)
 
         【参数】
             name  输出值的名称，不区分大小写；
@@ -5214,7 +5327,6 @@ class BaseApi(object):
             color 输出值的显示颜色，默认表示使用属性设置框中的颜色；
             main  指标是否加载到主图，True-主图，False-幅图，默认主图
             axis  指标是否使用独立坐标，True-独立坐标，False-非独立坐标，默认非独立坐标
-            type  指标线性，0-竖直直线，1-指标线，2-柱子，3-竖线段，4-变色K线，5-线段，6-图标，7-点，8-位置格式
             barsback 从当前Bar向前回溯的Bar数，默认值为当前Bar。
 
         【备注】
@@ -5224,7 +5336,7 @@ class BaseApi(object):
             例1：PlotNumeric ("MA1",Ma1Value);
             输出MA1的值。
         '''
-        return self._dataModel.setPlotNumeric(name, value, color, main, axis, type, barsback)
+        return self._dataModel.setPlotNumeric(name, value, color, main, axis, 1, barsback)
         
     def PlotIcon(self, value, icon, main, barsback):
         '''
@@ -6600,6 +6712,12 @@ def SetWinPoint(winPoint, nPriceType=0, nAddTick=0, contractNo=''):
 def SetStopPoint(stopPoint, nPriceType=0, nAddTick=0, contractNo=''):
     return baseApi.SetStopPoint(stopPoint, nPriceType, nAddTick, contractNo)
 
+def SubQuote(contNoList=[]):
+    return baseApi.SubQuote(contNoList)
+
+def UnsubQuote(contNoList=[]):
+    return baseApi.UnsubQuote(contNoList)
+
 # 属性函数
 def BarInterval():
     return baseApi.BarInterval()
@@ -6618,6 +6736,12 @@ def ContractUnit(contractNo=''):
 
 def ExchangeName(contractNo=''):
     return baseApi.ExchangeName(contractNo)
+    
+def ExchangeTime(exchangeNo):
+    return baseApi.ExchangeTime(exchangeNo)
+  
+def ExchangeStatus(exchangeNo):
+    return baseApi.ExchangeStatus(exchangeNo)
 
 def ExpiredDate(contractNo=''):
     return baseApi.ExpiredDate(contractNo)
@@ -6676,9 +6800,12 @@ def SymbolName(contractNo=''):
 def SymbolType(contractNo=''):
     return baseApi.SymbolType(contractNo)
 
+def GetTrendContract(contractNo=''):
+    return baseApi.GetTrendContract(contractNo)
+
 #其他函数
-def PlotNumeric(name, value, color=0xdd0000, main=True, axis=False, type=1, barsback=0):
-    return baseApi.PlotNumeric(name, value, color, main, axis, type, barsback)
+def PlotNumeric(name, value, color=0xdd0000, main=True, axis=False, barsback=0):
+    return baseApi.PlotNumeric(name, value, color, main, axis, barsback)
     
 def PlotIcon(value, icon=0, main=False, barsback=0):
     return baseApi.PlotIcon(value, icon, main, barsback)
