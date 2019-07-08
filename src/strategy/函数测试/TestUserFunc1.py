@@ -17,3 +17,4 @@ def handle_data(context):
     last1 = UserFunc1.getQLast(code1)
     last2 = UserFunc1.getQLast(code2)
     LogInfo(last1, last2,g_UserFunc2.getCurTime(code1))
+    pass
