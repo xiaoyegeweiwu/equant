@@ -97,7 +97,8 @@ class StrategyQuote(QuoteModel):
     def onExchange(self, event):
         dataDict = event.getData()
         for k, v in dataDict.items():
-            self._exchangeData[k] = ExchangeModel(self.logger, v)   
+            self._exchangeData[k] = ExchangeModel(self.logger, v) 
+            self._exchangeData[k].updateStatus(v)
        
     def onExchangeStateNotice(self, event):
         dataDict = event.getData()

@@ -228,9 +228,10 @@ class ExchangeModel:
 
     def getExchangeTime(self):
         '''获取交易所时间'''
-        now = datetime.datetime.now()
-        sys = now + self._delta
-        return sys.strptime('%Y-%m-%d %H:%M:%S')
+        now = datetime.now()
+        delta = timedelta(seconds=self._timeDiff)
+        sys = now + delta
+        return sys.strftime('%Y-%m-%d %H:%M:%S')
         
     def getExchangeStatus(self):
         return self._metaData['TradeState']

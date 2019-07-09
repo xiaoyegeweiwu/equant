@@ -1447,7 +1447,7 @@ class BaseApi(object):
         【示例】
               ExchangeTime('ZCE')
         '''
-        return self._dataModel.ExchangeTime(exchangeNo)
+        return self._dataModel.getExchangeTime(exchangeNo)
         
     def ExchangeStatus(self, exchangeNo):
         '''
@@ -1479,7 +1479,7 @@ class BaseApi(object):
         【示例】
               ExchangeStatus('ZCE')
         '''
-        return self._dataModel.ExchangeStatus(exchangeNo)
+        return self._dataModel.getExchangeStatus(exchangeNo)
         
         
     def ExpiredDate(self, contractNo):
