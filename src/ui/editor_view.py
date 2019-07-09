@@ -66,12 +66,47 @@ class StrategyTree(QuantFrame):
         #显示策略树
         self.parent_pane.add(self.tree_frame, minsize=218, stretch='always')
 
+    def insert_tree(self):
+        # 作为类成员，用于树更新
+        style = ttk.Style()
+        style.configure('Filter.Treeview', foreground=rgb_to_hex(51, 51, 51))
+        style.layout('Filter.Treeview', [
+            ('Treeview.entry', {
+                'border': '1', 'children':
+                    [('Treeview.padding', {
+                        'children':
+                            [('Treeview.treearea', {'sticky': 'nswe'})], 'sticky': 'nswe'
+                    })],
+                'sticky': 'nswe'
+            })
+        ])
+
+        self.root_tree = ttk.Treeview(self.tree_frame, show="tree", style='Filter.Treeview')
+
+        # 增加滚动条
+        self.strategyTreeScl = self.addScroll(self.tree_frame, self.root_tree, xscroll=False)
+
+        # 生成文件
+        self.loadTree("", self.root_path)
+        # 绑定处理事件
+        self.root_tree.bind("<Double-1>", self.treeDoubleClick)
+        self.root_tree.bind("<Button-3>", self.strategyMenu)
+        self.root_tree.bind("<<TreeviewSelect>>", self.selectCallback)
+        self.root_tree.pack(fill=BOTH, expand=YES)
+
+        # 策略标签颜色
+        # self.root_tree.bind('<Button-1>', self.select_item)
+        # self.setup_selection()
+
     def update_all_tree(self):
         """销毁策略目录"""
         if self.root_tree:
             # 获取目录树的开关状态
             self._getOpenState("")
-            self._selected = list(self.root_tree.selection())
+
+            self._selected = []
+            for item in self.root_tree.selection():
+                self._selected.append(self.root_tree.item(item)["values"][0])
 
             self.root_tree.destroy()
         if self.strategyTreeScl:
@@ -84,13 +119,17 @@ class StrategyTree(QuantFrame):
         # 恢复策略目录的开关状态
         self._setOpenState("")
         # 恢复选中状态
+        for s in self._selected:
+            if not os.path.exists(s):
+                self._selected.remove(s)
         if self._selected:
             self.root_tree.selection_set(self._selected)
 
     def _getOpenState(self, item):
         """遍历树目录的开关状态， 需要循环遍历所有item"""
         for itemId in self.root_tree.get_children(item):
-            self._openState[itemId] = self.root_tree.item(itemId)["open"]
+            key = self.root_tree.item(itemId)["values"][0]
+            self._openState[key] = self.root_tree.item(itemId)["open"]
             self._getOpenState(itemId)
 
     def _setOpenState(self, item):
@@ -144,38 +183,6 @@ class StrategyTree(QuantFrame):
             # 新建之后排序
             self.update_all_tree()
 
-    def insert_tree(self):
-        #作为类成员，用于树更新
-        style = ttk.Style()
-        style.configure('Filter.Treeview', foreground=rgb_to_hex(51, 51, 51))
-        style.layout('Filter.Treeview', [
-            ('Treeview.entry', {
-                'border': '1', 'children':
-                    [('Treeview.padding', {
-                        'children':
-                            [('Treeview.treearea', {'sticky': 'nswe'})], 'sticky': 'nswe'
-                    })],
-                'sticky': 'nswe'
-            })
-        ])
-
-        self.root_tree = ttk.Treeview(self.tree_frame, show="tree", style='Filter.Treeview')
-        
-        #增加滚动条
-        self.strategyTreeScl = self.addScroll(self.tree_frame, self.root_tree, xscroll=False)
-
-        #生成文件
-        self.loadTree("", self.root_path)
-        #绑定处理事件
-        self.root_tree.bind("<Double-1>", self.treeDoubleClick)
-        self.root_tree.bind("<Button-3>", self.strategyMenu)
-        self.root_tree.bind("<<TreeviewSelect>>", self.selectCallback)
-        self.root_tree.pack(fill=BOTH, expand=YES)
-
-        # 策略标签颜色
-        # self.root_tree.bind('<Button-1>', self.select_item)
-        # self.setup_selection()
-
     def strategyMenu(self, event):
         """右键弹出菜单"""
         StrategyMenu(self.control, self).popupmenu(event)
@@ -212,7 +219,7 @@ class StrategyTree(QuantFrame):
         for path in os.listdir(rootpath):  # 遍历当前目录
             if path == "__pycache__":
                 continue
-            abspath = os.path.join(os.path.abspath(rootpath), path)  # 连接成绝对路径
+            abspath = os.path.join(os.path.abspath(rootpath), path)
 
             # windows下，此处TreeView有一个bug, len(valaues)==1时， 空格会被拆分成两个值，\\会消失
             if os.path.isdir(abspath):
@@ -292,7 +299,6 @@ class QuantEditor(StrategyTree):
                 # self.updateEditorHead(header)
                 self.control.setEditorTextCode(path)  # 根据点击事件给editor的文本和路径赋值
                 with open(path, "r", encoding="utf-8") as f:
-                # with open(path, "rb") as f:
                     data = f.read()
                 self.updateEditorText(data)
                 self.updateEditorHead(header)
@@ -309,7 +315,7 @@ class QuantEditor(StrategyTree):
         self.titleLabel.config(text=text)
 
     def updateEditorText(self, text):
-
+        """更新策略编辑界面内容"""
         editor_text_code = text
         self.editor_text.delete(0.0, END+"-1c")
         self.editor_text.insert(END, editor_text_code)
@@ -353,8 +359,8 @@ class QuantEditor(StrategyTree):
         if os.path.exists(path):
             with open(path, "w", encoding="utf-8") as f:
                 f.write(code)
-        if not os.path.exists(path):
-            messagebox.showinfo(self.language.get_text(8), self.language.get_text(9))
+        # if not os.path.exists(path):
+        #     messagebox.showinfo(self.language.get_text(8), self.language.get_text(9))
         
     def insertEditorHead(self, frame):
         # self.titleLabel = Label(frame, text=os.path.basename(self.root_path), bg=rgb_to_hex(255, 255, 255))
@@ -400,11 +406,15 @@ class QuantEditor(StrategyTree):
 
     def onFocusIn(self, event):
         """获取焦点事件"""
-        # 过滤双击事件
-
         if event.widget != self.control.top:
             return
 
+        self._fileMonitor(event)
+        self._treeMonitor(event)
+
+    def _fileMonitor(self, event):
+        """监控策略文件修改"""
+        # 过滤双击事件
         if self._dModifyFlag:
             return
 
@@ -416,7 +426,7 @@ class QuantEditor(StrategyTree):
         path = self.control.getEditorText()["path"]
 
         if path:
-            if not os.path.exists(path):    # 本地文件已删除
+            if not os.path.exists(path):  # 本地文件已删除
                 return
             modifyTime = os.path.getmtime(path)
 
@@ -433,14 +443,33 @@ class QuantEditor(StrategyTree):
                 self.updateEditorText(editorCode)
                 # self.editor_text.edit_reset()
 
+    def _treeMonitor(self, event):
+        editorPath = self.control.getEditorText()["path"]
+        if editorPath == "":
+            return
+
+        self.update_all_tree()
+
+        _, fileName = os.path.split(editorPath)
+        if not os.path.exists(editorPath):
+            # 更新选中策略路径
+            self.control.setEditorTextCode("")
+
+            if messagebox.askokcancel("重新加载", f"策略{fileName}文件被删除\n是否在编辑框中保留？"):
+                return
+
+            # 更新策略编辑界面显示信息
+            self.control.updateEditor("")
+
     def onFocusOut(self, event):
         if event.widget != self.control.top:
             return
 
         self._outFlag = True
         path = self.control.getEditorText()["path"]
+
         if path:
-            if os.path.exists(path):    # 本地文件已删除
+            if os.path.exists(path):    # 本地文件存在
                 self.setModifyTime(os.path.getmtime(path))
 
     def buttonDown(self, event):

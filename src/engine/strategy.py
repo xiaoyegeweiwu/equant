@@ -341,7 +341,7 @@ class Strategy:
         self._localOrder = {} # {本地生成的eSessionId : TradeRecode对象}
         
         self._moneyLastTime = 0
-        self._userModelDict = {}
+        #self._userModelDict = {}
 
     # ////////////////////////////对外接口////////////////////
     
@@ -361,16 +361,19 @@ class Strategy:
             
         # 3. 创建数据模块
         self._dataModel = StrategyModel(self)
+        
+        self._userModelDict = {}
 
         # 4. 初始化系统函数
         self._baseApi = base_api.baseApi.updateData(self, self._dataModel)
         # 扩展用户模板函数作用域
-        userDir = os.listdir(userPath)
-        for file in userDir:
-            modelFile = os.path.splitext(file)[0]
-            model = importlib.import_module(modelFile)
-            model.__dict__.update(base_api.__dict__)
-            self._userModelDict[modelFile] = model
+        if os.path.exists(userPath):
+            userDir = os.listdir(userPath)
+            for file in userDir:
+                modelFile = os.path.splitext(file)[0]
+                model = importlib.import_module(modelFile)
+                model.__dict__.update(base_api.__dict__)
+                self._userModelDict[modelFile] = model
 
         # 1. 加载用户策略
         userModule = importlib.import_module(moduleName)

@@ -116,6 +116,7 @@ class RunWin(QuantToplevel, QuantFrame):
             'Params': {
 
             }
+
         }
 
         self.fColor = self.bgColor
@@ -1001,7 +1002,7 @@ class RunWin(QuantToplevel, QuantFrame):
         self.kLineCheck = tk.Checkbutton(kLineFrame, text="K线触发", bg=rgb_to_hex(255, 255, 255),
                                          anchor=tk.W, variable=self.isKLine)
         self.kLineCheck.pack(side=tk.LEFT, padx=5)
-        self.kLineCheck.config(state="disabled")
+        # self.kLineCheck.config(state="disabled")
 
         # 即时行情触发
         self.marketCheck = tk.Checkbutton(marketFrame, text="即时行情触发", bg=rgb_to_hex(255, 255, 255),
@@ -1654,7 +1655,7 @@ class SelectContractWin(QuantToplevel, QuantFrame):
     # exchangeList = ["CFFEX", "CME", "DCE", "SGE", "SHFE", "ZCE", "SPD", "INE", "NYMEX", "SSE", "SZSE"]
     exchangeList = ["SPD", "ZCE", "DCE", "SHFE", "INE", "CFFEX", "SSE", "SZSE", "SGE", "CBOT", "CME", "NYMEX"]
     commodityType = {"P": "现货", "Y": "现货", "F": "期货", "O": "期权",
-                     "S": "跨期套利", "M": "跨品种套利", "s": "", "m": "",
+                     "S": "跨期套利", "M": "品种套利", "s": "", "m": "",
                      "y": "", "Z": "指数", "T": "股票", "X": "外汇",
                      "I": "外汇", "C": "外汇"}
 

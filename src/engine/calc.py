@@ -76,7 +76,6 @@ class CalcCenter(object):
 
     def initArgs(self, args):
         """初始化参数"""
-        print("1111111: ",args)
         self._strategy = args
         self._setProfitInitialFundInfo(int(self._strategy["InitialFunds"]) - self._runSet["StartFund"])
         self._setExpertSetting()
@@ -1994,10 +1993,8 @@ class CalcCenter(object):
     #         return self._fundRecords[-1]['Available']
     #     return self._runSet["StartFund"]
 
-    # TODO：写成私有的
     def getAvailableFund(self):
         """
-
         :return: 返回最新的资金记录信息，若资金记录为空，则返回初始资金
         """
         if self._fundRecords:

@@ -19,7 +19,8 @@ class StrategyMenu(object):
         self.language = Language("EquantMainFrame")
 
         self._lClickSelectedItem = None   # 左键选择标签
-        self._rightClickPath = ""    # 记录右键弹出菜单时选中的策略路径
+        self._rightClickPath = ""         # 记录右键弹出菜单时选中的策略路径
+        self._rightClickItem = None       # 记录右键弹出菜单时选中的策略树的item id
 
         self.menu = Menu(self.widget, tearoff=0)
 
@@ -58,6 +59,7 @@ class StrategyMenu(object):
         # 记录右键所选择的策略路径
         if rSelectItem:  # 存在选择的策略
             self._rightClickPath = self.widget.item(rSelectItem)["values"][0]
+            self._rightClickItem = rSelectItem
 
         if self._lClickSelectedItem:
             if rSelectItem:
@@ -198,7 +200,6 @@ class StrategyMenu(object):
                 return
             else:
                 if os.path.isfile(path):
-                    # print(os.path.splitext(renameTop.newEntry.get()))
                     if os.path.splitext(renameTop.newEntry.get())[0] == "" \
                             or os.path.splitext(renameTop.newEntry.get())[0] == ".py":
                         messagebox.showinfo("提示", "策略文件后缀名不能为空", parent=renameTop)
@@ -214,13 +215,13 @@ class StrategyMenu(object):
                         return
 
                 if not os.path.exists(newPath):
-                    self.widget.item(self._lClickSelectedItem, values=[newPath, "!@#$%^&*"])
+                    self.widget.item(self._rightClickItem, values=[newPath, "!@#$%^&*"])
                     os.rename(path, newPath)
 
                     if os.path.isfile(newPath):
 
                         text = renameTop.newEntry.get()
-                        self.widget.item(self._lClickSelectedItem, text=text)
+                        self.widget.item(self._rightClickItem, text=text)
                         # TODO:更新标签和model中的editor
                         if path in editorPath:
                             self._controller.setEditorTextCode(newPath)
@@ -228,8 +229,16 @@ class StrategyMenu(object):
 
                     if os.path.isdir(newPath):
                         text = renameTop.newEntry.get()
-                        self.widget.tag_configure(self._lClickSelectedItem, text=text)
-                    self.widget.update()
+                        self.widget.item(self._rightClickItem, text=text)
+
+                        # 如果修改选中策略的上层目录，则要更新选中策略的路径
+                        if path in editorPath:
+                            (_, tempFileName) = os.path.split(editorPath)
+                            self._controller.setEditorTextCode(os.path.join(newPath, tempFileName))
+                            print(os.path.join(newPath, tempFileName))
+
+                    # self.widget.update()
+                    self.parent.update_all_tree()
                 else:
                     messagebox.showinfo("提示", self.language.get_text(32), parent=renameTop)
             renameTop.destroy()
@@ -256,7 +265,8 @@ class StrategyMenu(object):
         # 当前选中的策略路径
         editorPath = self._controller.getEditorText()["path"]
         def enter(event=None):
-            self._controller.saveStrategy()
+            # 删除操作不保存选中的策略
+            # self._controller.saveStrategy()
             
             # 先关闭窗口
             deleteTop.destroy()

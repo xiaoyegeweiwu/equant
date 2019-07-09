@@ -396,7 +396,11 @@ class StrategyModel(object):
     # ////////////////////////策略函数////////////////////////////
     def setBuy(self, userNo, contractNo, share, price, needCover=True):
         contNo = contractNo if contractNo else self._cfgModel.getBenchmark()
-        
+
+        underlayContNo = self._qteModel.getUnderlayContractNo(contNo)
+        if len(underlayContNo) > 0:
+            contNo = underlayContNo
+
         # 非K线触发的策略，不使用Bar
         curBar = None
         # 计算考虑滑点损耗后的价格
@@ -414,6 +418,11 @@ class StrategyModel(object):
 
     def setBuyToCover(self, userNo, contractNo, share, price):
         contNo = contractNo if contractNo is not None else self._cfgModel.getBenchmark()
+
+        underlayContNo = self._qteModel.getUnderlayContractNo(contNo)
+        if len(underlayContNo) > 0:
+            contNo = underlayContNo
+
         curBar = None
 
         # 计算考虑滑点损耗后的价格
@@ -426,6 +435,11 @@ class StrategyModel(object):
 
     def setSell(self, userNo, contractNo, share, price):
         contNo = contractNo if contractNo is not None else self._cfgModel.getBenchmark()
+
+        underlayContNo = self._qteModel.getUnderlayContractNo(contNo)
+        if len(underlayContNo) > 0:
+            contNo = underlayContNo
+
         curBar = None
 
         # 计算考虑滑点损耗后的价格
@@ -438,6 +452,11 @@ class StrategyModel(object):
 
     def setSellShort(self, userNo, contractNo, share, price, needCover=True):
         contNo = contractNo if contractNo is not None else self._cfgModel.getBenchmark()
+
+        underlayContNo = self._qteModel.getUnderlayContractNo(contNo)
+        if len(underlayContNo) > 0:
+            contNo = underlayContNo
+
         curBar = None
 
         # 计算考虑滑点损耗后的价格
@@ -793,8 +812,6 @@ class StrategyModel(object):
         
     def sendOrder(self, userNo, contNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty, \
                            triggerType=stNone, triggerMode=tmNone, triggerCondition=tcNone, triggerPrice=0, aFunc = False):
-
-
         '''A账户下单函数，不经过calc模块，直接发单'''
         if not userNo:
             userNo = self._cfgModel.getUserNo()
