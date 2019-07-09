@@ -821,27 +821,27 @@ class StrategyModel(object):
 
         # 是否暂停实盘下单
         if self._cfgModel.getPending():
-            self.logger.error(f"请调用StartTrade方法开启实盘下单功能")
+            self.logger.warn(f"请调用StartTrade方法开启实盘下单功能")
             return -5, "请调用StartTrade方法开启实盘下单功能"
 
         # 发送下单信号,K线触发、即时行情触发
         # 未选择实盘运行
         if not self._cfgModel.isActualRun():
-            self.logger.error(f"未选择实盘运行，请在设置界面勾选'实盘运行'，或者在策略代码中调用SetActual()")
+            self.logger.warn(f"未选择实盘运行，请在设置界面勾选'实盘运行'，或者在策略代码中调用SetActual()")
             return -1, '未选择实盘运行，请在设置界面勾选"实盘运行"，或者在策略代码中调用SetActual()方法选择实盘运行'
 
         if not self._strategy.isRealTimeStatus():
-            self.logger.error(f"策略当前状态不是实盘运行状态， 不会产生实盘订单")
+            self.logger.warn(f"策略当前状态不是实盘运行状态， 不会产生实盘订单")
             return -2, "策略当前状态不是实盘运行状态， 不会产生实盘订单"
 
         # 账户错误
         if not userNo or userNo == 'Default':
-            self.logger.error(f"未指定下单账户信息")
+            self.logger.warn(f"未指定下单账户信息")
             return -3, "未指定下单账户信息"
 
         # 指定的用户未登录
         if not self._trdModel.getSign(userNo):
-            self.logger.error(f"输入的账户没有在极星客户端登录")
+            self.logger.warn(f"输入的账户没有在极星客户端登录")
             return -4, "输入的账户没有在极星客户端登录"
 
         underlayContNo = self._qteModel.getUnderlayContractNo(contNo)
@@ -857,6 +857,7 @@ class StrategyModel(object):
                 positionInfo = self._trdModel.getUserModel(userNo).getPositionInfo(contNo, dBuy)
 
             if positionInfo is None:
+                self.logger.warn(f"持仓查询没有查询到对应方向的持仓, 无法平仓")
                 return -6, "持仓查询没有查询到对应方向的持仓, 无法平仓"
             entryOrExitToday = oCoverT
             orderQtyToday = positionInfo["TodayPos"]

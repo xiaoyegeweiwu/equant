@@ -227,7 +227,7 @@ class StrategyEngine(object):
                 break
             except queue.Full:
                 time.sleep(0.1)
-                self.logger.error(f"engine向策略发事件时卡住，策略id:{strategyId}, 事件号: {event.getEventCode()}")
+                self.logger.warn(f"engine向策略发事件时阻塞，策略id:{strategyId}, 事件号: {event.getEventCode()}")
 
     def _sendEvent2StrategyForce(self, strategyId, event):
         eg2stQueue = self._eg2stQueueDict[strategyId]
@@ -237,7 +237,7 @@ class StrategyEngine(object):
                 break
             except queue.Full:
                 time.sleep(0.1)
-                self.logger.error(f"engine强制向策略发事件时卡住，策略id:{strategyId}, 事件号: {event.getEventCode()}")
+                self.logger.warn(f"engine向策略发事件时阻塞，策略id:{strategyId}, 事件号: {event.getEventCode()}")
 
     def _sendEvent2AllStrategy(self, event):
         for id in self._eg2stQueueDict:
@@ -288,7 +288,7 @@ class StrategyEngine(object):
 
     def _loadStrategy(self, event, strategyId = None):
         id = self._getStrategyId() if strategyId is None else strategyId
-        eg2stQueue = Queue(2000)
+        eg2stQueue = Queue(20000)
         self._eg2stQueueDict[id] = eg2stQueue
         self._strategyMgr.create(id, eg2stQueue, self._eg2uiQueue, self._st2egQueue, event)
         # broken pip error 修复
