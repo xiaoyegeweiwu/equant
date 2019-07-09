@@ -304,15 +304,11 @@ class StrategyQuote(QuoteModel):
     @paramValidatorFactory(0)
     def getQClose(self, contNo):
         quoteDataModel = self._contractData[contNo]
-
-        if 14 in quoteDataModel._metaData["Lv1Data"] and quoteDataModel._metaData["Lv1Data"][14] >= 0:
-            if quoteDataModel._metaData["Lv1Data"][14] > 0:
-                return quoteDataModel._metaData["Lv1Data"][14]
-            elif 0 in quoteDataModel._metaData["Lv1Data"]:
-                return quoteDataModel._metaData["Lv1Data"][0]
-            return 0.0
-
-        return 0.0
+        
+        if 14 in quoteDataModel._metaData["Lv1Data"] and quoteDataModel._metaData["Lv1Data"][14] > 0:
+            return quoteDataModel._metaData["Lv1Data"][14]
+        else:
+            return quoteDataModel._metaData["Lv1Data"][0]
 
     # 当日最高价
     @paramValidatorFactory(0)
