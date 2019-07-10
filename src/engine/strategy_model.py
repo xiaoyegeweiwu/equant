@@ -611,11 +611,13 @@ class StrategyModel(object):
             contNo = self._cfgModel.getBenchmark()
         return self._cfgModel.setStopPoint(stopPoint, nPriceType, nAddTick, contNo)
 
-    def subscribeContract(self, contList):
+    def subscribeContract(self, contNo):
+        contList = [contNo]
         self._cfgModel.updateSubQuoteContract(contList)
         return self.subQuoteList(contList)
 
-    def unsubscribeContract(self, contList):
+    def unsubscribeContract(self, contNo):
+        contList = [contNo]
         self._cfgModel.updateUnsubQuoteContract(contList)
         return self.unsubQuoteList(contList)
 

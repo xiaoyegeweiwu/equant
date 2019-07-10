@@ -26,7 +26,7 @@ def main():
     # 创建策略引擎到界面的队列，发送资金数据
     eg2ui_q = Queue(10000)
     # 创建界面到策略引擎的队列，发送策略全路径
-    ui2eg_q = Queue(100)
+    ui2eg_q = Queue(10000)
     
     # 创建策略引擎
     engine = StrategyEngine(logger, eg2ui_q, ui2eg_q)

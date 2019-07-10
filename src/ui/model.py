@@ -388,11 +388,13 @@ class GetEgData(object):
             # 如果不给出超时则会导致线程退出时阻塞
             event = self._eg2uiQueue.get(timeout=0.1)
             eventCode = event.getEventCode()
+            #self._logger.debug("[UI]handlerEgEvent code:%d,strategyid:%d"%(eventCode, event.getStrategyId()))
             if eventCode not in self._egAskCallbackDict:
                 self._logger.error(f"[UI]: Unknown engine event{eventCode}")
             else:
                 self._egAskCallbackDict[eventCode](event)
         except queue.Empty:
+            #self._logger.debug("[UI]handlerEgEvent _eg2uiQueue empty!")
             pass
 
     def getReportData(self):

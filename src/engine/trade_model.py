@@ -60,6 +60,17 @@ class TUserInfoModel:
         
     def getSign(self):
         return self._metaData['Sign']
+        
+    def getContPos(self):
+        '''获取该账户各合约持仓情况'''
+        contPosDict = {}  #cont, bs, h, data
+        
+        for v in self._position.values():
+            data = v._metaData
+            key = data['cont'] + data['Direct'] + data['Hedge'] 
+            contPosDict[key] = data
+            
+        return contPosDict
 
     def updateMoney(self, data):
         currencyNo = data['CurrencyNo']
@@ -339,6 +350,11 @@ class TradeModel:
 
     def getUserInfo(self):
         return self._userInfo
+        
+    def isUserLogin(self):
+        if len(self._userInfo) > 0:
+            return True
+        return False
         
     def getUserModel(self, userNo):
         if userNo not in self._userInfo:

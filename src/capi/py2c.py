@@ -1433,6 +1433,9 @@ class PyAPI(object):
         
         # 发送到引擎
         apiEvent.setData(dataList)
+        sid = apiEvent.getSessionId()
+        apiEvent.setStrategyId(self._getStrategyId(sid))
+        #self.logger.info("[PY2C]_onUserInfo, id:%d,data:%s"%(apiEvent.getStrategyId(), apiEvent.getData()))
         self._api2egQueue.put(apiEvent)
 
     def _onOrderData(self, apiEvent):
