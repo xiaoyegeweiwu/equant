@@ -131,7 +131,9 @@ class StrategyTrade(TradeModel):
         :return:
         '''
         if len(self._userInfo) == 0 or self._selectedUserNo not in self._userInfo:
-            raise Exception("请确保您的账号已经在客户端登录")
+            #raise Exception("请确保您的账号已经在客户端登录")
+            self.logger.error("User not login")
+            return 0
 
         tUserInfoModel = self._userInfo[self._selectedUserNo]
         if len(tUserInfoModel._position) == 0:

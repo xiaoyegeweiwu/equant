@@ -832,21 +832,21 @@ class StrategyModel(object):
         # 发送下单信号,K线触发、即时行情触发
         # 未选择实盘运行
         if not self._cfgModel.isActualRun():
-            self.logger.warn(f"未选择实盘运行，请在设置界面勾选'实盘运行'，或者在策略代码中调用SetActual()")
+            #self.logger.warn(f"未选择实盘运行，请在设置界面勾选'实盘运行'，或者在策略代码中调用SetActual()")
             return -1, '未选择实盘运行，请在设置界面勾选"实盘运行"，或者在策略代码中调用SetActual()方法选择实盘运行'
 
         if not self._strategy.isRealTimeStatus():
-            self.logger.warn(f"策略当前状态不是实盘运行状态， 不会产生实盘订单")
+            #self.logger.warn(f"策略当前状态不是实盘运行状态， 不会产生实盘订单")
             return -2, "策略当前状态不是实盘运行状态， 不会产生实盘订单"
 
         # 账户错误
         if not userNo or userNo == 'Default':
-            self.logger.warn(f"未指定下单账户信息")
+            #self.logger.warn(f"未指定下单账户信息")
             return -3, "未指定下单账户信息"
 
         # 指定的用户未登录
         if not self._trdModel.getSign(userNo):
-            self.logger.warn(f"输入的账户没有在极星客户端登录")
+            #self.logger.warn(f"输入的账户没有在极星客户端登录")
             return -4, "输入的账户没有在极星客户端登录"
 
         underlayContNo = self._qteModel.getUnderlayContractNo(contNo)

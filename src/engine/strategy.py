@@ -479,6 +479,9 @@ class Strategy:
             # self._runStatus = ST_STATUS_HISTORY
             # self._send2UIStatus(self._runStatus)
             #
+            
+            if not self._dataModel.getConfigModel().isActualRun():
+                self.logger.warn(f"未选择实盘运行，如果需要请在设置界面勾选'实盘运行'，或者在策略代码中调用SetActual()")
 
             while not self._isExit():
                 try:
