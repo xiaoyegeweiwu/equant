@@ -340,11 +340,6 @@ class StrategyTree(QuantFrame):
             self.control.setEditorTextCode(os.path.join(move_item, tempFileName))
 
 
-
-
-
-
-
 class Context(object):
     pass
 

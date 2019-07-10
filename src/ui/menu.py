@@ -237,7 +237,6 @@ class StrategyMenu(object):
                         if path in editorPath:
                             (_, tempFileName) = os.path.split(editorPath)
                             self._controller.setEditorTextCode(os.path.join(newPath, tempFileName))
-                            print(os.path.join(newPath, tempFileName))
 
                     # self.widget.update()
                     self.parent.update_all_tree()

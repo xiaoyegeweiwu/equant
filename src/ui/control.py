@@ -71,6 +71,7 @@ class TkinterController(object):
     def updateMonitor(self):
         # 更新监控界面策略信息
         strategyDict = self.strategyManager.getStrategyDict()
+        #TODO: strategyDict的异常策略应该怎么处理?
         for stId in strategyDict:
             self.app.updateStatus(stId, strategyDict[stId])
 

@@ -342,6 +342,7 @@ class GetEgData(object):
 
         self._logger.info(f"[UI][{id}]: Receiving strategy status %s successfully!"%(sStatus))
 
+        #TODO: if需要改下
         if id not in self._stManager.getStrategyDict():
             dataDict = {
                 "StrategyId":   id,
