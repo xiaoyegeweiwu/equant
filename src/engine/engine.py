@@ -104,16 +104,24 @@ class StrategyEngine(object):
                     pass
 
     def resumeAllStrategyConfig(self, strategyConfig):
-        for strategyId, strategyIni in strategyConfig.items():
+        #self.logger.info(strategyConfig)
+        copyConfig = {}
+        for k, v in strategyConfig.items():
+            copyConfig[int(k)] = None
+            
+        sortedList = sorted(copyConfig)
+        #self.logger.info(sortedList)
+        for strategyId in sortedList:
+            strategyIni = strategyConfig[str(strategyId)]
             config = StrategyConfig(strategyIni["Config"])
             key = config.getKLineShowInfoSimple()
             fakeEvent = Event({
                 "EventCode": EV_EG2UI_LOADSTRATEGY_RESPONSE,
-                "StrategyId": int(strategyId),
+                "StrategyId": strategyId,
                 "ErrorCode": 0,
                 "ErrorText": "",
                 "Data": {
-                    "StrategyId": int(strategyId),
+                    "StrategyId": strategyId,
                     "StrategyName": strategyIni["StrategyName"],
                     "StrategyState": ST_STATUS_QUIT,
                     "Path": strategyIni["Path"],
@@ -129,7 +137,7 @@ class StrategyEngine(object):
                 }
             })
             self._eg2uiQueue.put(fakeEvent)
-            self._strategyMgr.insertResumedStrategy(int(strategyId), fakeEvent.getData())
+            self._strategyMgr.insertResumedStrategy(strategyId, fakeEvent.getData())
 
     def _resumeStrategyOrder(self, strategyOrder):
         if not strategyOrder:

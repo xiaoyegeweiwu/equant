@@ -7,6 +7,7 @@ p2=20
 
 def initialize(context): 
     #SetActual()
+    SetBarInterval("DCE|F|I|1909", 'M', 1, 2000)
     pass
 
 def handle_data(context):
