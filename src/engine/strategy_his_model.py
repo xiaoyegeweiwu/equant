@@ -974,7 +974,8 @@ class StrategyHisQuote(object):
         for index, row in allHisData.items():
             key = (row["ContractNo"], row["KLineType"], row["KLineSlice"])
             isShow = key == self._config.getKLineShowInfoSimple()
-            # print(key, self._config.getKLineShowInfoSimple(),
+            # if index == 0:
+            #     print("row = ", row)
             lastBar = self.getCurBar(key)
             self._updateCurBar(key, row)
             curBar = self.getCurBar(key)
@@ -1074,11 +1075,9 @@ class StrategyHisQuote(object):
         priceInfos = {}
         curTriggerInfo = self._strategy.getCurTriggerSourceInfo()
 
-        if curTriggerInfo is None:
+        if curTriggerInfo is None or curTriggerInfo["KLineType"] is None or curTriggerInfo["KLineSlice"] is None:
             return
-
         key = (curTriggerInfo["ContractNo"], curTriggerInfo["KLineType"], curTriggerInfo["KLineSlice"])
-        assert key[1] is not None, "error"
 
         curBar = self._curBarDict[key].getCurBar()
         priceInfos[key[0]] = {

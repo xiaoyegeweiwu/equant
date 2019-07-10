@@ -14,14 +14,9 @@ class TriggerMgr(object):
             self._isReady.setdefault(record["ContractNo"], {})
             # k线订阅
             self._isReady.get(record["ContractNo"]).setdefault(kLineKey, False)
-            # 即时行情订阅
-            snapShotKey = (record["ContractNo"], 0, 0)
-            self._isReady.get(record["ContractNo"]).setdefault(snapShotKey, False)
 
     def updateData(self, apiEvent):
-        if apiEvent.getEventCode() == EV_EG2ST_SNAPSHOT_NOTICE:
-            key = (apiEvent.getContractNo(), 0, 0)
-        elif apiEvent.getEventCode() == EV_EG2ST_HISQUOTE_NOTICE:
+        if apiEvent.getEventCode() == EV_EG2ST_HISQUOTE_NOTICE:
             key = (apiEvent.getContractNo(), apiEvent.getKLineType(), apiEvent.getKLineSlice())
         else:
             return

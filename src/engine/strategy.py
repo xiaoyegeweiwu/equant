@@ -1081,13 +1081,13 @@ class Strategy:
             return
 
         # 如果有成交量变化，将等待该合约所有k线到达后再触发。
-        if 11 in data[0]["FieldData"].keys():
-            self._triggerMgr.updateData(event)
-            # ************************************
-            if self._triggerMgr.isAllDataReady(event.getContractNo()):
-                self._sendSyncTriggerEvent(event.getContractNo())
-                self._triggerMgr.restAllData(event.getContractNo())
-            return
+        # if 11 in data[0]["FieldData"].keys():
+        #     self._triggerMgr.updateData(event)
+        #     # ************************************
+        #     if self._triggerMgr.isAllDataReady(event.getContractNo()):
+        #         self._sendSyncTriggerEvent(event.getContractNo())
+        #         self._triggerMgr.restAllData(event.getContractNo())
+        #     return
             # ************************************
 
         dateTimeStamp, tradeDate, lv1Data = self.getTriggerTimeAndData(event.getContractNo())
