@@ -450,7 +450,7 @@ class StrategyEngine(object):
         for k,v in userInfo.items():
             accPos[k] = v.getContPos()
             
-        self.logger.info("Position Sync:", accPos)
+        #self.logger.info("Position Sync:", accPos)
         
     def _send2uiQueue(self, event):
         #self.logger.info("[ENGINE] Send event(%d,%d) to UI!"%(event.getEventCode(), event.getStrategyId()))
