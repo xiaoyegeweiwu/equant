@@ -93,7 +93,11 @@ class BarInfo(object):
         return self._getBarValue('LastPrice')
 
     def getBarVol(self):
-        return self._getBarValue('TotalQty')
+        if 'KLineQty' in self._curBar:
+            return self._getBarValue('KLineQty')
+        else:
+            return self._getBarValue('LastQty')
+        #return self._getBarValue('TotalQty')
 
     def getBarOpenInt(self):
         return self._getBarValue('PositionQty')
