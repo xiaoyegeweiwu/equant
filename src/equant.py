@@ -21,7 +21,7 @@ def main():
     log_process = Process(target=run_log_process, args=(logger,))
     log_process.start()
     
-    logger.info("Start Epolestar Equant v9.5.4!")
+    logger.info("Start epolestar equant version:%s!"%("EquantV1.0.5.20190710"))
 
     # 创建策略引擎到界面的队列，发送资金数据
     eg2ui_q = Queue(10000)
