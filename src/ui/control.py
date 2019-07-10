@@ -74,7 +74,7 @@ class TkinterController(object):
         #TODO: strategyDict的异常策略应该怎么处理?
         for stId in strategyDict:
             if len(strategyDict[stId]) < 4:
-                return
+                return 
             self.app.updateStatus(stId, strategyDict[stId])
 
     def quitThread(self):
