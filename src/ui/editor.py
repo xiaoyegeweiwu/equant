@@ -148,10 +148,6 @@ class ParentText(Text):
         self.config(state="disabled")
         self.update()
 
-    def onRoll(self, event=None):
-        """自动滚屏"""
-        self.rollFlag = not(self.rollFlag)
-
     def undo(self, event=None):
         self.edit_undo()
 
@@ -436,7 +432,7 @@ class SignalText(ParentText):
         menu.add_command(label="复制", command=self.copy)
         menu.add_command(label="全选", command=self.select_all)
         menu.add_command(label="清除", command=self.clear_all)
-        menu.add_checkbutton(label="自动滚屏", command=self.onRoll, variable=self.rollFlag)
+        menu.add_checkbutton(label="自动滚屏", onvalue=True, offvalue=0, variable=self.rollFlag)
         menu.post(event.x_root, event.y_root)
 
     # TODO:setText重写
@@ -492,13 +488,11 @@ class MonitorText(ParentText):
         # self.see("end")
 
     def create_menu(self, event):
-        rollFlag = BooleanVar()
-        rollFlag.set(True)
         menu = Menu(self, tearoff=0)
         menu.add_command(label="复制", command=self.copy)
         menu.add_command(label="全选", command=self.select_all)
         menu.add_command(label="清除", command=self.clear_all)
-        menu.add_checkbutton(label="自动滚屏", command=self.onRoll, variable=rollFlag)
+        menu.add_checkbutton(label="自动滚屏", onvalue=True, offvalue=0, variable=self.rollFlag)
         menu.post(event.x_root, event.y_root)
 
 
@@ -584,7 +578,7 @@ class ErrorText(ParentText):
         menu.add_command(label="复制", command=self.copy)
         menu.add_command(label="全选", command=self.select_all)
         menu.add_command(label="清除", command=self.clear_all)
-        menu.add_checkbutton(label="自动滚屏", command=self.onRoll, variable=self.rollFlag)
+        menu.add_checkbutton(label="自动滚屏", onvalue=True, offvalue=0, variable=self.rollFlag)
         menu.post(event.x_root, event.y_root)
 
     # TODO:setText重写
