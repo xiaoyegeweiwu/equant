@@ -1,6 +1,5 @@
 import os
 import shutil
-# import time, datetime
 import requests
 import zipfile
 
@@ -23,9 +22,9 @@ os.chdir(os.path.abspath(os.path.join(dirPath, "..\\equant_backups")))
 
 workDir = os.getcwd()
 
-styPath = os.path.join(workDir, "equant_back\\src\\strategy")
-cfgPath = os.path.join(workDir, "equant_back\\src\\config")
-logPath = os.path.join(workDir, "equant_back\\src\\log")
+styPath = os.path.join(workDir, "equant-master\\src\\strategy")
+cfgPath = os.path.join(workDir, "equant-master\\src\\config")
+logPath = os.path.join(workDir, "equant-master\\src\\log")
 
 tempPath1 = os.path.join(dirPath, "src\\strategy")
 tempPath2 = os.path.join(dirPath, "src\\config")
@@ -39,7 +38,7 @@ def backup(directory, des):
 
 
     if os.path.exists(directory):
-        os.system(f"xcopy {directory} {des} /e /i /h")
+        os.system(f"xcopy {directory} {des} /y /e /i /h")
         print("%s 备份成功！" % directory)
         return 1
     else:
@@ -139,14 +138,17 @@ def mergeFile(src, dst):
                 mergeFile(sfPath, dfPath)
             else:
                 print("Copy %s ===> %s"%(sfPath, dfPath))
-                shutil.copyfile(sfPath, dfPath)
+                #shutil.copyfile(sfPath, dfPath)
+                os.system(f"xcopy {sfPath} {dfPath} /y /e /i /h ")
         elif os.path.isfile(sfPath):
             if os.path.exists(dfPath):
-                shutil.copyfile(sfPath, dfPath)
+                # shutil.copyfile(sfPath, dfPath)
+                os.system(f"xcopy {sfPath} {dfPath} /y /e /i /h")
                 print("Cover %s ===> %s" % (sfPath, dfPath))
             else:
                 # shutil.copy2(sfPath, dfPath)
                 shutil.copy(sfPath, dfPath)
+                #os.system(f"xcopy {sfPath} {dfPath} /y /e /i /h")
                 print("copy %s ===> %s" % (sfPath, dfPath))
 
 def readonly_handler(func, path, ececinfo):
@@ -160,14 +162,6 @@ def main():
     if inp == 'y' or inp == 'Y':  # 确认升级
         # killProcess()
 
-        # 备份文件
-        for directory, dest in zip([dirPath, os.path.abspath(os.path.join(dirPath, "..\\epolestar"))],
-                                   [os.path.join(workDir, "equant_back"), os.path.join(workDir, "epolestar_back")]):
-            bacRlt = backup(directory, dest)
-            if bacRlt == 0:    # 路径不存在
-                print("备份数据过程出错！")
-                return
-
         # 下载
         for url, tag in zip(urls, tags):
             print("开始下载%s" % tag)
@@ -175,11 +169,20 @@ def main():
             if reqRlt == 0:   # 下载失败
                  print("下载过程出错，请重新尝试！")
                  return
-
+				 
+		
         # 解压并删除压缩包
         for name in zipname:
             zipFile(name)
             delzip(name)
+
+        # 备份文件
+        for directory, dest in zip([dirPath, os.path.abspath(os.path.join(dirPath, "..\\epolestar"))],
+                                   [os.path.join(workDir, "equant_back"), os.path.join(workDir, "epolestar_back")]):
+            bacRlt = backup(directory, dest)
+            if bacRlt == 0:    # 路径不存在
+                print("备份数据过程出错！")
+                return
 
         # 删除旧版本中的代码部分，保留config, strategy, log文件夹
         for file in os.listdir(os.path.join(dirPath, "src")):
@@ -198,7 +201,7 @@ def main():
 
         src = os.path.join(workDir, "epolestar")
         des = os.path.abspath(os.path.join(dirPath, "..\\epolestar"))
-        os.system(f"xcopy {src} {des} /e /i /h")
+        os.system(f"xcopy {src} {des} /y /e /i /h")
 
         # 合并config, strategy, log去重
         # TODO：会不会存在合并出错情况
@@ -215,7 +218,7 @@ def main():
                     mergeFile(spath, dpath)
                 if os.path.isfile(spath):
                     shutil.copy(spath, dpath)
-
+                    # os.system(f"xcopy {spath} {dpath} /y /e /i /h")
 
         # 删除现场
         # os.chdir(dirPath)

@@ -15,6 +15,7 @@ from collections import OrderedDict
 import traceback
 from .engine_order_model import EngineOrderModel, EnginePosModel
 from .strategy_cfg_model import StrategyConfig
+from datetime import datetime
 
 
 class StrategyEngine(object):
@@ -64,6 +65,9 @@ class StrategyEngine(object):
         self._quoteOberverDict = {} #{'contractNo' : [strategyId1, strategyId2...]}
         # 历史K线订阅列表
         self._hisKLineOberverDict = {} #{'contractNo' : [strategyId1, strategyId2...]}
+        
+        self._lastMoneyTime = datetime.now()  #资金查询时间
+        self._lastPosTime   = datetime.now()  #持仓同步时间
 
         # 恢复上次推出时保存的结构
         self._strategyOrder = {}
@@ -76,6 +80,9 @@ class StrategyEngine(object):
 
         # 创建主处理线程, 从api和策略进程收数据处理
         self._startMainThread()
+        
+        # 启动1秒定时器
+        self._start1secondsTimer()
         self.logger.debug('Initialize strategy engine ok!')
 
     def _resumeStrategy(self):
@@ -97,16 +104,24 @@ class StrategyEngine(object):
                     pass
 
     def resumeAllStrategyConfig(self, strategyConfig):
-        for strategyId, strategyIni in strategyConfig.items():
+        #self.logger.info(strategyConfig)
+        copyConfig = {}
+        for k, v in strategyConfig.items():
+            copyConfig[int(k)] = None
+            
+        sortedList = sorted(copyConfig)
+        #self.logger.info(sortedList)
+        for strategyId in sortedList:
+            strategyIni = strategyConfig[str(strategyId)]
             config = StrategyConfig(strategyIni["Config"])
             key = config.getKLineShowInfoSimple()
             fakeEvent = Event({
                 "EventCode": EV_EG2UI_LOADSTRATEGY_RESPONSE,
-                "StrategyId": int(strategyId),
+                "StrategyId": strategyId,
                 "ErrorCode": 0,
                 "ErrorText": "",
                 "Data": {
-                    "StrategyId": int(strategyId),
+                    "StrategyId": strategyId,
                     "StrategyName": strategyIni["StrategyName"],
                     "StrategyState": ST_STATUS_QUIT,
                     "Path": strategyIni["Path"],
@@ -122,7 +137,7 @@ class StrategyEngine(object):
                 }
             })
             self._eg2uiQueue.put(fakeEvent)
-            self._strategyMgr.insertResumedStrategy(int(strategyId), fakeEvent.getData())
+            self._strategyMgr.insertResumedStrategy(strategyId, fakeEvent.getData())
 
     def _resumeStrategyOrder(self, strategyOrder):
         if not strategyOrder:
@@ -227,7 +242,7 @@ class StrategyEngine(object):
                 break
             except queue.Full:
                 time.sleep(0.1)
-                self.logger.error(f"engine向策略发事件时卡住，策略id:{strategyId}, 事件号: {event.getEventCode()}")
+                self.logger.warn(f"engine向策略发事件时阻塞，策略id:{strategyId}, 事件号: {event.getEventCode()}")
 
     def _sendEvent2StrategyForce(self, strategyId, event):
         eg2stQueue = self._eg2stQueueDict[strategyId]
@@ -237,7 +252,7 @@ class StrategyEngine(object):
                 break
             except queue.Full:
                 time.sleep(0.1)
-                self.logger.error(f"engine强制向策略发事件时卡住，策略id:{strategyId}, 事件号: {event.getEventCode()}")
+                self.logger.warn(f"engine向策略发事件时阻塞，策略id:{strategyId}, 事件号: {event.getEventCode()}")
 
     def _sendEvent2AllStrategy(self, event):
         for id in self._eg2stQueueDict:
@@ -288,7 +303,7 @@ class StrategyEngine(object):
 
     def _loadStrategy(self, event, strategyId = None):
         id = self._getStrategyId() if strategyId is None else strategyId
-        eg2stQueue = Queue(2000)
+        eg2stQueue = Queue(20000)
         self._eg2stQueueDict[id] = eg2stQueue
         self._strategyMgr.create(id, eg2stQueue, self._eg2uiQueue, self._st2egQueue, event)
         # broken pip error 修复
@@ -382,32 +397,74 @@ class StrategyEngine(object):
         self._apiThreadH = Thread(target=self._mainThreadFunc)
         self._apiThreadH.start()
         
-    def _moneyThreadFunc(self):
+    def _1SecondsThreadFunc(self):
+        '''1秒定时器'''
         while True:
-            eventList = self._trdModel.getMoneyEvent()
-            # 查询所有账户下的资金
-            allMoneyReqEvent = Event({
-                "StrategyId": 0,
-                "Data": {
-                }
-            })
-            self._reqMoney(allMoneyReqEvent)
+            #60秒查一次资金
+            self._queryMoney()
+            
+            #10秒同步一次持仓
+            self._syncPosition()
                 
-            time.sleep(60)
+            time.sleep(1)
                 
-    def _createMoneyTimer(self):
+    def _start1secondsTimer(self):
         '''资金查询线程'''
-        self._moneyThreadH = Thread(target=self._moneyThreadFunc)
-        self._moneyThreadH.start()
+        self._1SecondsThreadH = Thread(target=self._1SecondsThreadFunc)
+        self._1SecondsThreadH.start()
         
+    def _queryMoney(self):
+        nowTime = datetime.now()
+        # 未登录，不查询资金
+        if not self._trdModel.isUserLogin():
+            self._lastMoneyTime = nowTime
+            return
+            
+        if (nowTime - self._lastMoneyTime).total_seconds() < 60:
+            return
+        eventList = self._trdModel.getMoneyEvent()
+        # 查询所有账户下的资金
+        allMoneyReqEvent = Event({
+            "StrategyId": 0,
+            "Data": {
+            }
+        })
+        self._reqMoney(allMoneyReqEvent)
+        self._lastMoneyTime = nowTime
+        
+    def _syncPosition(self):
+        nowTime = datetime.now()
+        # 未登录，不同步持仓
+        if not self._trdModel.isUserLogin():
+            self._lastPosTime = nowTime
+            return
+            
+        if (nowTime - self._lastPosTime).total_seconds() < 10:
+            return
+            
+        self._lastPosTime = nowTime
+        
+        accPos = {}
+        #查询所有账户持仓情况
+        userInfo = self._trdModel.getUserInfo()
+        for k,v in userInfo.items():
+            accPos[k] = v.getContPos()
+            
+        #self.logger.info("Position Sync:", accPos)
+        
+    def _send2uiQueue(self, event):
+        #self.logger.info("[ENGINE] Send event(%d,%d) to UI!"%(event.getEventCode(), event.getStrategyId()))
+        self._eg2uiQueue.put(event)
     #////////////////api回调事件//////////////////////////////
     def _onApiConnect(self, apiEvent):
         self._pyApi.reqSpreadContractMapping()
         self._pyApi.reqExchange(Event({'StrategyId':0, 'Data':''}))
-        self._eg2uiQueue.put(apiEvent)
+        self._send2uiQueue(apiEvent)
+        #self._eg2uiQueue.put(apiEvent)
         
     def _onApiDisconnect(self, apiEvent):
-        self._eg2uiQueue.put(apiEvent)
+        #self._eg2uiQueue.put(apiEvent)
+        self._send2uiQueue(apiEvent)
         '''
         断连事件：区分与9.5/交易/即时行情/历史行情
             1. 与9.5断连：
@@ -442,7 +499,8 @@ class StrategyEngine(object):
         self._qteModel.updateExchange(apiEvent)
         self._sendEvent2Strategy(apiEvent.getStrategyId(), apiEvent)
 
-        self._eg2uiQueue.put(apiEvent)
+        #self._eg2uiQueue.put(apiEvent)
+        self._send2uiQueue(apiEvent)
         if apiEvent.isChainEnd():
             self._pyApi.reqExchangeStatus(Event({'StrategyId':0, 'Data':''}))
             
@@ -454,11 +512,13 @@ class StrategyEngine(object):
     def _onExchangeStateNotice(self, apiEvent):
         self._qteModel.updateExchangeStatus(apiEvent)
         self._sendEvent2Strategy(apiEvent.getStrategyId(), apiEvent)
-        self._eg2uiQueue.put(apiEvent)
+        #self._eg2uiQueue.put(apiEvent)
+        self._send2uiQueue(apiEvent)
         
     def _onApiCommodity(self, apiEvent):
         self._qteModel.updateCommodity(apiEvent)
-        self._eg2uiQueue.put(apiEvent)
+        #self._eg2uiQueue.put(apiEvent)
+        self._send2uiQueue(apiEvent)
 
         self._sendEvent2AllStrategy(apiEvent)
 
@@ -483,7 +543,8 @@ class StrategyEngine(object):
         
     def _onApiContract(self, apiEvent):
         self._qteModel.updateContract(apiEvent)
-        self._eg2uiQueue.put(apiEvent)
+        #self._eg2uiQueue.put(apiEvent)
+        self._send2uiQueue(apiEvent)
         if apiEvent.isChainEnd():
             self._pyApi.reqQryLoginInfo(Event({'StrategyId':0, 'Data':''}))
         
@@ -539,7 +600,8 @@ class StrategyEngine(object):
     # 账户信息
     def _onApiUserInfo(self, apiEvent):
         self._trdModel.updateUserInfo(apiEvent)
-        self._eg2uiQueue.put(apiEvent)
+        #self._eg2uiQueue.put(apiEvent)
+        self._send2uiQueue(apiEvent)
         # print("++++++ 账户信息 引擎 ++++++", apiEvent.getData())
         self._sendEvent2AllStrategy(apiEvent)
 
@@ -635,8 +697,6 @@ class StrategyEngine(object):
             return
 
         self._trdModel.setStatus(TM_STATUS_POSITION)
-        # 交易基础数据查询完成，定时查询资金
-        self._createMoneyTimer()
             
     def _onApiPosData(self, apiEvent):
         self._enginePosModel.updatePosNotice(apiEvent)

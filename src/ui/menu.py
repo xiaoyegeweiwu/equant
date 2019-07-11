@@ -134,7 +134,7 @@ class StrategyMenu(object):
 
         def save(event=None):
             # 新建前先保存当前选中的策略
-            self._controller.saveStrategy()
+            # self._controller.saveStrategy()
 
             file_name = newTop.nameEntry.get()
             if file_name == "":
@@ -179,6 +179,8 @@ class StrategyMenu(object):
         """移动文件"""
         # TODO: 可以用treeview的move方法实现吧
         # TODO：进行操作前需要对当前选中的策略进行保存
+        moveWin = MoveToplevel(self._controller.top)
+        moveWin.display()
         pass
 
     def rename(self):
@@ -235,7 +237,6 @@ class StrategyMenu(object):
                         if path in editorPath:
                             (_, tempFileName) = os.path.split(editorPath)
                             self._controller.setEditorTextCode(os.path.join(newPath, tempFileName))
-                            print(os.path.join(newPath, tempFileName))
 
                     # self.widget.update()
                     self.parent.update_all_tree()

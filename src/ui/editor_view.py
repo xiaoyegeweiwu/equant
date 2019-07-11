@@ -1,4 +1,5 @@
 import os
+import shutil
 
 from tkinter import *
 from tkinter import Frame
@@ -40,6 +41,8 @@ class StrategyTree(QuantFrame):
         self._openState = {}
         # 记录被选中的节点
         self._selected = None
+
+        self.moveFlag = False
 
         # 策略树图标
         # TODO:不加self就不显示image
@@ -93,6 +96,13 @@ class StrategyTree(QuantFrame):
         self.root_tree.bind("<Button-3>", self.strategyMenu)
         self.root_tree.bind("<<TreeviewSelect>>", self.selectCallback)
         self.root_tree.pack(fill=BOTH, expand=YES)
+
+        # 策略移动事件
+        self.root_tree.bind("<ButtonPress-1>", self.bDown)
+        self.root_tree.bind("<ButtonRelease-1>", self.bUp, add='+')
+        self.root_tree.bind("<B1-Motion>", self.bMove, add='+')
+        self.root_tree.bind("<Shift-ButtonPress-1>", self.bDown_Shift, add='+')
+        self.root_tree.bind("<Shift-ButtonRelease-1>", self.bUp_Shift, add='+')
 
         # 策略标签颜色
         # self.root_tree.bind('<Button-1>', self.select_item)
@@ -252,6 +262,82 @@ class StrategyTree(QuantFrame):
     def treeDoubleClick(self, event):
         '''子类重写'''
         raise NotImplementedError
+
+    def bDown_Shift(self, event):
+        tv = event.widget
+        select = [tv.index(s) for s in tv.selection()]
+        select.append(tv.index(tv.identify_row(event.y)))
+        select.sort()
+        print(range(select[0], select[-1] + 1))
+        for i in range(select[0], select[-1] + 1, 1):
+            tv.selection_add(tv.get_children()[i])
+
+    def bDown(self, event):
+        tv = event.widget
+        if tv.identify_row(event.y) not in tv.selection():
+            tv.selection_set(tv.identify_row(event.y))
+
+    def bUp(self, event):
+        tv = event.widget
+        if tv.identify_row(event.y) in tv.selection():
+            tv.selection_set(tv.identify_row(event.y))
+
+        if self.moveFlag == True:
+            self.update_all_tree()
+            self.moveFlag = False
+
+    def bUp_Shift(self, event):
+        pass
+
+    def bMove(self, event):
+        self.moveFlag = True
+
+        tv = event.widget
+        moveto = tv.index(tv.identify_row(event.y))
+        move_item = tv.identify_row(event.y)
+        if move_item in tv.selection():
+            tv.config(cursor="hand2")
+            return
+
+        if not os.path.isdir(move_item):
+            return
+
+        # 顶层文件夹不支持拖动
+        for se in tv.selection():
+            if tv.parent(se) == "":
+                return
+
+        # if not tv.get_children(move_item):        # 要判断是不是文件夹，不是的话就不移动
+        #     return
+
+        # bbox = tv.bbox(move_item)
+        # if not bbox:
+        #     return
+
+        # print("2222: ", bbox)
+        # x, y, width, height = bbox
+        # canvas = Canvas(self.tree_frame, width=width, height=height, bg="green")
+        # canvas.pack(expand=YES, fill=BOTH)
+        # canvas.create_rectangle(x, x, y, y)
+
+        tv.item(move_item, open=True)
+
+        for s in tv.selection():
+            if tv.parent(s) == move_item:
+                continue
+
+            try:
+                shutil.move(s, move_item)
+            except Exception as e:
+                self.logger.info("移动文件失败！")
+                raise Exception("移动文件失败")
+
+            tv.move(s, tv.identify_row(event.y), moveto)
+
+        editorPath = self.control.getEditorText()["path"]
+        if editorPath in tv.selection():
+            (_, tempFileName) = os.path.split(editorPath)
+            self.control.setEditorTextCode(os.path.join(move_item, tempFileName))
 
 
 class Context(object):
