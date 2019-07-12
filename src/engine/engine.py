@@ -473,7 +473,7 @@ class StrategyEngine(object):
                 }
             })
             
-            self.logger.info("Sync position to ui:%s"%event.getData())
+            #self.logger.info("Sync position to ui:%s"%event.getData())
             self._send2uiQueue(event)
             
         
