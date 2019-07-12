@@ -5,7 +5,7 @@ import talib
 import time, sys
 import math
 import pandas as pd
-from .strategy_cfg_model import StrategyConfig
+from .strategy_cfg_model_new import StrategyConfig_new
 from .strategy_his_model import StrategyHisQuote
 from .strategy_qte_model import StrategyQuote
 from .strategy_trd_model import StrategyTrade
@@ -28,7 +28,7 @@ class StrategyModel(object):
         self._plotedDict = {}
 
         # Notice：会抛异常
-        self._cfgModel = StrategyConfig(self._argsDict)
+        self._cfgModel = StrategyConfig_new(self._argsDict)
         self._config = self._cfgModel
         # 回测计算
         self._calcCenter = CalcCenter(self.logger)
@@ -75,7 +75,7 @@ class StrategyModel(object):
         self._trdModel.initialize()
 
     def initializeCalc(self):
-        contNo = self._cfgModel.getContract()[0]
+        contNo = self._cfgModel.getBenchmark()
         strategyParam = {
             "InitialFunds": float(self._cfgModel.getInitCapital()),  # 初始资金
             "StrategyName": self._strategy.getStrategyName(),  # 策略名称
