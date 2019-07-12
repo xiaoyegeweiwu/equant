@@ -443,7 +443,6 @@ class SignalText(ParentText):
         self.insert("end", text)
         self.config(state="disabled")
         self.update()
-        print("--------------: ", self.rollFlag)
         if self.rollFlag.get():
             self.see("end")
         else:
