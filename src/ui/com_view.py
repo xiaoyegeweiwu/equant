@@ -34,6 +34,26 @@ class QuantFrame(object):
 
         return xsb, ysb
 
+    def testDigit(self, content):
+        """判断Entry中内容"""
+        if content.isdigit() or content == "":
+            return True
+        return False
+
+    def testFloat(self, content):
+        """判断Entry中是否为浮点数"""
+        try:
+            if content == "" or isinstance(float(content), float):
+                return True
+        except:
+            return False
+
+    def handlerAdaptor(self, fun, **kwargs):
+        """回调适配器"""
+        return lambda event, fun=fun, kwargs=kwargs: fun(event, **kwargs)
+
+
+
 
 class QuantToplevel(tk.Toplevel):
     def __init__(self, master=None):
@@ -224,6 +244,48 @@ class DeleteToplevel(QuantToplevel):
         label.pack(side=tk.LEFT, fill=tk.X, expand=tk.NO, padx=15, pady=15)
         self.cancelBtn.pack(side=tk.RIGHT, expand=tk.NO, ipadx=5, padx=15, pady=10)
         self.saveBtn.pack(side=tk.RIGHT, expand=tk.NO, ipadx=5, padx=15, pady=10)
+
+
+"""
+class MoveToplevel(QuantToplevel):
+
+    def __init__(self, master=None):
+        super().__init__(master)
+        self.attributes("-toolwindow", 1)
+        self.title("移动")
+        self.createWidget()
+
+    def createWidget(self):
+        group_label = tk.Label(self, text=self.language.get_text(25))
+        group_entry = tk.Label(self)
+        group_entry["text"] = "自编"
+        name_label = tk.Label(self, text=self.language.get_text(26))
+        name_entry = tk.Label(self)
+        name_entry["text"] = "基于平移布林通道的系统.py"
+
+        move_label = tk.Label(self, text=self.language.get_text(27))
+        move_chosen = ttk.Combobox(self)
+
+        save_button = tk.Button(self, text=self.language.get_text(19))
+        cancal_button = tk.Button(self, text=self.language.get_text(20))
+
+        group_label.grid(row=0, column=0, sticky=tk.W)
+        group_entry.grid(row=0, column=1, sticky=tk.W)
+        name_label.grid(row=1, column=0, sticky=tk.W)
+        name_entry.grid(row=1, column=1, sticky=tk.W)
+        move_label.grid(row=2, column=0, sticky=tk.W)
+        move_chosen.grid(row=2, column=1, sticky=tk.W)
+        save_button.grid(row=3, column=0, sticky=tk.E)
+        cancal_button.grid(row=3, column=1, sticky=tk.E)
+
+    def display(self):
+        self.update()
+        self.deiconify()
+        self.grab_set()
+        self.focus_set()
+        # self.newEntry.focus_set()
+        self.wait_window()
+"""
 
 
 def Singleton(cls):
