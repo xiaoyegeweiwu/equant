@@ -599,7 +599,7 @@ class StrategyModel(object):
         return 0
 
     def setTriggerMode(self, type, value):
-        return self._cfgModel.setTrigger(type, value)
+        return self._cfgModel.setTrigger(type, value, False)
 
     def setWinPoint(self, winPoint, nPriceType, nAddTick, contNo):
         if not contNo:

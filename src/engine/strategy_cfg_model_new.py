@@ -57,6 +57,7 @@ class StrategyConfig_new(object):
                 }]
             },
             'Trigger': {
+                'SetByUI': True,
                 'Timer': ['20190625121212', '20190625111111'],
                 'Cycle': 200,
                 'KLine': True,
@@ -134,7 +135,7 @@ class StrategyConfig_new(object):
         }
     '''
     def __init__(self, argDict=None):
-        if argDict:
+        if argDict and isinstance(argDict, dict) and len(dict) > 0:
             self._metaData = deepcopy(argDict)
             return
 
@@ -143,6 +144,7 @@ class StrategyConfig_new(object):
             'Sample'      : {
             },
             'Trigger': {    # 触发方式
+                'SetByUI': True,    # 由界面设置
                 'Timer': [],        # 指定时刻
                 'Cycle': 0,         # 每隔固定毫秒数触发
                 'KLine': False,     # K线触发
@@ -286,7 +288,7 @@ class StrategyConfig_new(object):
         return sameDict
 
     # ----------------------- 触发方式 ----------------------
-    def setTrigger(self, type, value=None):
+    def setTrigger(self, type, value=None, setByUI=True):
         '''设置触发方式'''
         if type not in (1, 2, 3, 4, 5):
             raise Exception("触发方式可选的值只能 1: 即时行情触发，2: 交易数据触发，3: 每隔固定时间触发，4: 指定时刻触发 5:K线触发 是中的一个！")
@@ -301,7 +303,14 @@ class StrategyConfig_new(object):
 
         trigger = self._metaData['Trigger']
 
-        # TODO: 清空界面设置的触发方式
+        if (setByUI and not trigger['SetByUI']) or (not setByUI and trigger['SetByUI']):
+            # 清空原有Trigger设置信息
+            trigger['SetByUI'] = setByUI
+            trigger['SnapShot'] = False
+            trigger['Trade'] = False
+            trigger['Cycle'] = None
+            trigger['Timer'] = []
+
         if type == 1:
             trigger['SnapShot'] = True
         elif type == 2:
@@ -608,8 +617,12 @@ class StrategyConfig_new(object):
 
     def getBenchmark(self):
         '''获取基准合约'''
-        showInfo = self.getKLineShowInfo()
-        return showInfo['ContractNo']
+        # 1、取界面设置的第一个合约 2、取SetBarinterval第一个设置的合约
+        subContract = self._metaData['SubContract']
+        if not subContract or len(subContract) == 0:
+            raise Exception("请确保在设置界面或者在策略中调用SetBarInterval方法设置展示的合约、K线类型和周期")
+
+        return subContract[0]
 
     def getTriggerContract(self):
         return self._metaData['SubContract']
@@ -683,12 +696,7 @@ class StrategyConfig_new(object):
         return kLineTypetupleList
 
     def getKLineShowInfo(self):
-        # 1、取界面设置的第一个合约 2、取SetBarinterval第一个设置的合约
-        subContract = self._metaData['SubContract']
-        if not subContract or len(subContract) == 0:
-            raise Exception("请确保在设置界面或者在策略中调用SetBarInterval方法设置展示的合约、K线类型和周期")
-
-        displayCont = subContract[0]
+        displayCont = self.getBenchmark()
         kLineInfo = self._metaData['Sample'][displayCont][0]
 
         return {
