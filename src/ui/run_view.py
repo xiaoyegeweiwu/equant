@@ -1277,34 +1277,39 @@ class RunWin(QuantToplevel, QuantFrame):
             samValue = ''
             if contValues[3] == "所有K线":
                 samValue = 'A'
-            elif contValues[3] == "不使用历史K线":
+            elif contValues[3] == "不执行历史K线":
                 samValue = 'N'
-            else:
+            elif isinstance(contValues[3], str):
+                if not contValues[3].find("-") == -1:  # 日期
+                    temp = "".join(contValues[3].split("-"))
+                    samValue = temp
+            elif isinstance(contValues[3], int):
                 samValue = contValues[3]
+
 
             self._strConfig.setBarInfoInSample(contCode, kTypeValue, kSliceValue, samValue)
 
             # 保证金，手续费设置
 
-            # TODO: margin类型没有设置！！！！！
-            # 比例
-            self._strConfig.setMargin('R', float(margin) / 100, contCode)
-
-            # 开仓按比例收费
-            if openType == "比例":
-                self._strConfig.setTradeFee('O', 'R', float(openFee) / 100, contCode)
-            else:
-                self._strConfig.setTradeFee('O', 'F', float(openFee), contCode)
-            # 平仓按比例收费
-            if closeType == "比例":
-                self._strConfig.setTradeFee('C', 'R', float(closeFee) / 100, contCode)
-            else:
-                self._strConfig.setTradeFee('C', 'F', float(closeFee), contCode)
-            # 平今手续费
-            # TODO：平今手续费没有设置
-            # self.config["Money"]["CloseTodayFee"]["Type"] = "F"
-            # self.config["Money"]["CloseTodayFee"]["Type"] = 0
-            self._strConfig.setTradeFee('T', "F", 0, contCode)
+            # # TODO: margin类型没有设置！！！！！
+            # # 比例
+            # self._strConfig.setMargin('R', float(margin) / 100, contCode)
+            #
+            # # 开仓按比例收费
+            # if openType == "比例":
+            #     self._strConfig.setTradeFee('O', 'R', float(openFee) / 100, contCode)
+            # else:
+            #     self._strConfig.setTradeFee('O', 'F', float(openFee), contCode)
+            # # 平仓按比例收费
+            # if closeType == "比例":
+            #     self._strConfig.setTradeFee('C', 'R', float(closeFee) / 100, contCode)
+            # else:
+            #     self._strConfig.setTradeFee('C', 'F', float(closeFee), contCode)
+            # # 平今手续费
+            # # TODO：平今手续费没有设置
+            # # self.config["Money"]["CloseTodayFee"]["Type"] = "F"
+            # # self.config["Money"]["CloseTodayFee"]["Type"] = 0
+            # self._strConfig.setTradeFee('T', "F", 0, contCode)
 
 
         # K线触发
@@ -1372,25 +1377,25 @@ class RunWin(QuantToplevel, QuantFrame):
             raise Exception("投保标志异常")
 
         # # 保证金率
-        # # TODO: margin类型没有设置！！！！！
-        # # 比例
-        # self._strConfig.setMargin('R', float(margin)/100)
-        #
-        # # 开仓按比例收费
-        # if openType == "比例":
-        #     self._strConfig.setTradeFee('O', 'R', float(openFee) / 100)
-        # else:
-        #     self._strConfig.setTradeFee('O', 'F', float(openFee))
-        # # 平仓按比例收费
-        # if closeType == "比例":
-        #     self._strConfig.setTradeFee('C', 'R', float(closeFee)/100)
-        # else:
-        #     self._strConfig.setTradeFee('C', 'F', float(closeFee))
-        # # 平今手续费
-        # # TODO：平今手续费没有设置
-        # # self.config["Money"]["CloseTodayFee"]["Type"] = "F"
-        # # self.config["Money"]["CloseTodayFee"]["Type"] = 0
-        # self._strConfig.setTradeFee('T', "F", 0)
+        # TODO: margin类型没有设置！！！！！
+        # 比例
+        self._strConfig.setMargin('R', float(margin)/100)
+
+        # 开仓按比例收费
+        if openType == "比例":
+            self._strConfig.setTradeFee('O', 'R', float(openFee) / 100)
+        else:
+            self._strConfig.setTradeFee('O', 'F', float(openFee))
+        # 平仓按比例收费
+        if closeType == "比例":
+            self._strConfig.setTradeFee('C', 'R', float(closeFee)/100)
+        else:
+            self._strConfig.setTradeFee('C', 'F', float(closeFee))
+        # 平今手续费
+        # TODO：平今手续费没有设置
+        # self.config["Money"]["CloseTodayFee"]["Type"] = "F"
+        # self.config["Money"]["CloseTodayFee"]["Type"] = 0
+        self._strConfig.setTradeFee('T', "F", 0)
 
         # 滑点损耗
         self._strConfig.setSlippage(float(slippage))
