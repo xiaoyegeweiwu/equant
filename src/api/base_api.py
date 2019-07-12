@@ -6554,6 +6554,9 @@ def RGB_Gray():
 
 def RGB_Brown():
     return baseApi.RGB_Brown()
+    
+def RGB_Yellow():
+    return baseApi.RGB_Yellow()
 
 def Enum_Order_Market():
     return baseApi.Enum_Order_Market()
