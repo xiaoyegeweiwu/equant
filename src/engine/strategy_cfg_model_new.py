@@ -135,7 +135,7 @@ class StrategyConfig_new(object):
         }
     '''
     def __init__(self, argDict=None):
-        if argDict and isinstance(argDict, dict) and len(dict) > 0:
+        if argDict and isinstance(argDict, dict):
             self._metaData = deepcopy(argDict)
             return
 
