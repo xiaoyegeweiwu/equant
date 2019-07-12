@@ -883,9 +883,7 @@ class StrategyEngine(object):
             # 根据品种获取该品种的所有合约
             for contractNo in list(self._qteModel._contractData.keys()):
                 if subContNo in contractNo:
-                    qteModel = self._qteModel._contractData[contractNo]
-                    if qteModel._metaData['CommodityNo'] == subContNo:
-                        contractList.append(contractNo)
+                    contractList.append(contractNo)
 
         return contractList
         
