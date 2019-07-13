@@ -1595,10 +1595,61 @@ class StrategyModel(object):
                 return {'Time': float(timeTuple[0]) / 1000000000, 'TradeState': timeTuple[1]}
 
         return {'Time': float(timeList[0][0]) / 1000000000, 'TradeState': timeList[0][1]}
+        
+    def getCurrentDate(self):
+        if not self._strategy.isRealTimeStatus():
+            return self.getBarDate('', '', 0)
+            
+        date = datetime.now().strftime('%Y%m%d')
+        return int(date)
 
     def getCurrentTime(self):
+        if not self._strategy.isRealTimeStatus():
+            return self.getBarTime('', '', 0)
+            
         currentTime = datetime.now().strftime('0.%H%M%S')
         return float(currentTime)
+        
+    def _gethms(self, time):
+        itime = int((time + 1e-9) * 1000000)
+        hh,mm,ss = 0, 0, 0
+        if itime > 0:
+            hh = int(itime / 10000)
+            mm = int((itime % (10000)) / 100)
+            ss = itime % 100
+            
+        return hh, mm, ss
+        
+    def getTimeDiff(self, time1, time2):
+        if not isinstance(time1, float):
+            return 0
+            
+        if not isinstance(time2, float):
+            return 0    
+         
+        ftime1 = math.modf(time1)[0]
+        ftime2 = math.modf(time2)[0]
+        
+        hh1,mm1,ss1 = self._gethms(ftime1)
+        hh2,mm2,ss2 = self._gethms(ftime2)
+
+        now = datetime.now()
+        
+        mtime1 = datetime(now.year, now.month, now.day, hh1, mm1, ss1)
+        mtime2 = datetime(now.year, now.month, now.day, hh2, mm2, ss2)
+        if time2 + 1.0 < 1e-9:
+            mtime2 = now
+        
+        if mtime2 > mtime1:
+            delta = (mtime2 - mtime1).seconds
+        else:
+            delta = -(mtime1 - mtime2).seconds
+
+        return delta
+        
+    def getRef(self, price, n):
+        return self.getRef(price,n-1) if len(price) < n else price[-n]
+        
 
     def isInSession(self, contNo):
         if not contNo:

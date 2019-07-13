@@ -30,8 +30,10 @@ class MyFileHandler(logging.FileHandler):
         tmpRecord = deepcopy(record)
         tmpRecord.msg = record.msg[0]
         msg = self.format(tmpRecord)
-        self.fileFd.write(msg+'\n')
-        self.fileFd.flush()
+        target = record.msg[1]
+        if target != 'T' and target != 'S':
+            self.fileFd.write(msg+'\n')
+            self.fileFd.flush()
 
 
 class MyHandlerQueue(logging.StreamHandler):

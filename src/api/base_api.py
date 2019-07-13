@@ -1607,10 +1607,29 @@ class BaseApi(object):
         '''
         return self._dataModel.getNextTimeInfo(contractNo, timeStamp)
 
+    def CurrentDate(self):
+        '''
+        【说明】
+              公式处于历史阶段时，返回历史K线当时的日期。处于实时阶段时，返回客户端所在操作系统的日期
+
+        【语法】
+              int CurrentDate()
+
+        【参数】
+              无
+
+        【备注】
+              格式为YYMMDD的整数。
+
+        【示例】
+              如果当前日期为2019-7-13，CurrentDate返回值为20190713
+        '''
+        return self._dataModel.getCurrentDate()
+        
     def CurrentTime(self):
         '''
         【说明】
-              获取操作系统的当前时间。
+              公式处于历史阶段时，返回历史K线当时的时间。处于实时阶段时，返回客户端所在操作系统的时间
 
         【语法】
               float CurrentTime()
@@ -1619,12 +1638,33 @@ class BaseApi(object):
               无
 
         【备注】
-              获取操作系统的当前时间，格式为0.HHMMSS的浮点数。
+              格式为0.HHMMSS的浮点数。
 
         【示例】
               如果当前时间为11:34:21，CurrentTime返回值为0.113421。
         '''
         return self._dataModel.getCurrentTime()
+        
+    def TimeDiff(self, datetime1, datetime2):
+        '''
+        【说明】
+              返回两个时间之间的间隔秒数，忽略日期差异
+
+        【语法】
+              int TimeDiff(self, datetime1, datetime2)
+
+        【参数】
+              datetime1 输入较早时间
+              datetime2 输入较晚个时间
+
+        【备注】
+              该函数只计算两个时间之间的差值，不考虑两个参数的日期
+
+        【示例】
+              TimeDiff(20190404.104110,20110404.104120);返回两时间相差10秒；
+              TimeDiff(20190404.1041,20110404.1043);返回两时间相差2分钟，即120秒
+        '''
+        return self._dataModel.getTimeDiff(datetime1, datetime2)
 
     def IsInSession(self, contractNo):
         '''
@@ -5798,6 +5838,26 @@ class BaseApi(object):
             SMA(Close(), 12, 2)
         '''
         return self._dataModel.SMA(price, period, weight)
+        
+    def REF(self, price, length):
+        '''
+        【说明】
+            求N周期前数据的值
+        【语法】
+            float REF(float Price,int Length)
+            
+        【参数】
+            Price   价格
+            Length  需要计算的周期数。
+
+        【备注】
+            Length不能小于0
+
+        【示例】
+            REF(Close, 1); 获得上一周期的收盘价，等价于Close[-2]
+            REF((Close + High + Low)/ 3, 10); 返回10周期前的高低收价格的平均值。
+        '''
+        return self._dataModel.getRef(price, length)
 
     def ParabolicSAR(self, high, low, afstep, aflimit):
         '''
@@ -6786,6 +6846,12 @@ def GetNextTimeInfo(contractNo, timeStr):
 
 def CurrentTime():
     return baseApi.CurrentTime()
+    
+def CurrentDate():
+    return baseApi.CurrentDate()
+
+def TimeDiff(datetime1, datetime2=-1.0):
+    return baseApi.TimeDiff(datetime1, datetime2)
 
 def IsInSession(contractNo=''):
     return baseApi.IsInSession(contractNo)
@@ -6892,6 +6958,9 @@ def LogError(*args):
 
 def SMA(price, period, weight):
     return baseApi.SMA(price, period, weight)
+    
+def REF(price, length):
+    return baseApi.REF(price, length)
 
 def ParabolicSAR(high, low, afstep, aflimit):
     return baseApi.ParabolicSAR(high, low, afstep, aflimit)
