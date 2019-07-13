@@ -2120,6 +2120,12 @@ class StrategyModel(object):
     def ParabolicSAR(self, high, low, afstep, aflimit):
         '''计算抛物线转向'''
         return self._staModel.ParabolicSAR(high, low, afstep, aflimit)
+        
+    def getHighest2(self, price, length):
+        pass
+        
+    def getLowest2(self, price, length):
+        pass
 
     def getHighest(self, price, length):
         if (not isinstance(price, np.ndarray) and not isinstance(price, list)) or len(price) == 0:
@@ -2140,3 +2146,12 @@ class StrategyModel(object):
             return arr
 
         return talib.MIN(arr, length)
+        
+    def getCountIf(self, cond, peroid):
+        sum = 0
+        for i in range(len(cond)-1, len(cond)-peroid-1, -1):
+            if cond[i]: sum += 1
+            if i == 0: break
+            
+        return sum
+            

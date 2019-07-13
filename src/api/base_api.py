@@ -5973,6 +5973,26 @@ class BaseApi(object):
             Lowest (HisData(Enum_Data_Typical()), 10); 计算10周期以来高低收价格的平均值的最低值。
         '''
         return self._dataModel.getLowest(price, length)
+        
+    def CountIf(self, cond, period):
+        '''
+        【说明】
+            获取最近N周期条件满足的计数
+
+        【语法】
+            int CountIf(condition, period):
+
+        【参数】
+            condition 传入的条件表达式；
+            period 计算条件的周期数
+
+        【备注】
+            获取最近N周期条件满足的计数
+
+        【示例】
+            CountIf(Close > Open , 10); 最近10周期出现Close>Open的周期总数
+        '''
+        return self._dataModel.getCountIf(cond, period)
 
     def strategyStatus(self):
         '''
@@ -7022,3 +7042,7 @@ def Highest(price, length):
 
 def Lowest(price, length):
     return baseApi.Lowest(price, length)
+    
+def CountIf(cond, peroid):
+    return baseApi.CountIf(cond, peroid)    
+    
