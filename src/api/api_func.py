@@ -24,6 +24,7 @@ _all_func_ = {
                     ['HistoryDataExist'    , '历史数据是否存在'],
                     ['HisData'             , '获取各种历史数据数组'],
                     ['HisBarsInfo'         , '获取历史K线详细数据'],
+                    ['BarsLast'            , '获取最后一次满足条件时距离当前的bar数'],
                 ],
                 
     '即时行情': [

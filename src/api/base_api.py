@@ -475,6 +475,26 @@ class BaseApi(object):
         '''
         return self._dataModel.getHisBarsInfo(contractNo, kLineType, kLineValue, maxLength)
 
+    def BarsLast(self, condition):
+        '''
+        【说明】
+              返回最后一次满足条件时距离当前的bar数
+
+        【语法】
+               int BarsLast(bool condition)
+
+        【参数】
+              condition  传入的条件表达式
+
+        【备注】
+              返回最后一次满足条件时距离当前的bar数。
+
+        【示例】
+              BarsLast(Close > Open); 从当前Bar开始，最近出现Close>Open的Bar到当前Bar的偏移值。如果为0，即当前Bar为最近的满足条件的Bar。
+
+        '''
+        return self._dataModel.getBarsLast(condition)
+
     #/////////////////////////即时行情/////////////////////////////
     def Q_UpdateTime(self, contractNo):
         '''
@@ -6192,6 +6212,9 @@ def HisData(type, period='', interval=0, contractNo='', maxLength=100):
 
 def HisBarsInfo(contractNo='', kLineType='', kLineValue=0, maxLength=None):
     return baseApi.HisBarsInfo(contractNo, kLineType, kLineValue, maxLength)
+
+def BarsLast(condition):
+    return baseApi.BarsLast(condition)
 
 #即时行情
 def Q_UpdateTime(contractNo=''):

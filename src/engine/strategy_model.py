@@ -272,6 +272,19 @@ class StrategyModel(object):
         multiContKey = self.getKey(contNo, kLineType, kLineValue)
         return self._hisModel.getHisBarsInfo(multiContKey, maxLength)
 
+    def getBarsLast(self, condition):
+        conLen = len(condition)
+        if conLen == 0:
+            return 0
+
+        count = 0
+        for i in range(conLen-1, -1, -1):
+            if condition[i]:
+                break
+            else:
+                count += 1
+        return count
+
     # ////////////////////////即时行情////////////////////////////
     def getQUpdateTime(self, symbol):
         return self._qteModel.getQUpdateTime(symbol)
