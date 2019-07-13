@@ -673,8 +673,8 @@ class RunWin(QuantToplevel, QuantFrame):
         self.userChosen = ttk.Combobox(self.userFrame, state="readonly", textvariable=self.user)
         # TODO：账户信息重复
         userList = []   # 从交易引擎获取
-        for user in self._userNo:
-            userList.append(user["UserNo"])
+        [userList.append(user["UserNo"]) for user in self._userNo if not user["UserNo"] in userList]
+
         self.userChosen["values"] = userList
         if userList:
             self.userChosen.current(0)
