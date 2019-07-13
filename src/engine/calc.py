@@ -474,7 +474,6 @@ class CalcCenter(object):
         self._logger.trade_info(f"发送虚拟订单，策略Id:{ftOrder['StrategyId']}, 运行阶段：{ftOrder['StrategyStage']}，"
                                 f"本地订单号：{ftOrder['OrderId']},订单数据：{repr(order)}")
 
-        # self._logger.sig_info(self._formatOrder(order))
 
         contPrice = {
             "Cont": order["Cont"],

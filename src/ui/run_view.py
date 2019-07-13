@@ -1213,7 +1213,7 @@ class RunWin(QuantToplevel, QuantFrame):
             self.toFundFrame()
             return
 
-        if cycle =="":
+        if cycle == "":
             messagebox.showinfo("极星量化", "定时触发周期不能为空", parent=self)
             self.cycleEntry.focus_set()
             self.toRunFrame()
@@ -1286,31 +1286,7 @@ class RunWin(QuantToplevel, QuantFrame):
             elif isinstance(contValues[3], int):
                 samValue = contValues[3]
 
-
             self._strConfig.setBarInfoInSample(contCode, kTypeValue, kSliceValue, samValue)
-
-            # 保证金，手续费设置
-
-            # # TODO: margin类型没有设置！！！！！
-            # # 比例
-            # self._strConfig.setMargin('R', float(margin) / 100, contCode)
-            #
-            # # 开仓按比例收费
-            # if openType == "比例":
-            #     self._strConfig.setTradeFee('O', 'R', float(openFee) / 100, contCode)
-            # else:
-            #     self._strConfig.setTradeFee('O', 'F', float(openFee), contCode)
-            # # 平仓按比例收费
-            # if closeType == "比例":
-            #     self._strConfig.setTradeFee('C', 'R', float(closeFee) / 100, contCode)
-            # else:
-            #     self._strConfig.setTradeFee('C', 'F', float(closeFee), contCode)
-            # # 平今手续费
-            # # TODO：平今手续费没有设置
-            # # self.config["Money"]["CloseTodayFee"]["Type"] = "F"
-            # # self.config["Money"]["CloseTodayFee"]["Type"] = 0
-            # self._strConfig.setTradeFee('T', "F", 0, contCode)
-
 
         # K线触发
         if isKLine:
@@ -1343,7 +1319,7 @@ class RunWin(QuantToplevel, QuantFrame):
         #TODO: user类型对不对呢？
         self._strConfig.setUserNo(user)
         # 初始资金
-        self._strConfig.setInitCapital(initFund, user)
+        self._strConfig.setInitCapital(int(initFund))
         # 交易方向
         if tradeDirection == "双向交易":
             self._strConfig.setTradeDirection(0)
@@ -1415,7 +1391,7 @@ class RunWin(QuantToplevel, QuantFrame):
         self._strConfig.setParams(params)
 
         self.config = self._strConfig.getConfig()
-        print("1111111111: ", self.config)
+        # print("1111111111: ", self.config)
 
 
         # -------------保存用户配置--------------------------
