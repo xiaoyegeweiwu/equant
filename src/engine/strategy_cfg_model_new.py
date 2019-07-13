@@ -374,19 +374,12 @@ class StrategyConfig_new(object):
         return self._metaData['Money']['UserNo']
 
     # ----------------------- 初始资金 ----------------------
-    def setInitCapital(self, capital, userNo='Default'):
+    def setInitCapital(self, capital):
         '''设置初始资金'''
-        if not userNo:
-            self._metaData['Money']['InitFunds'] = capital
-        if userNo not in self._metaData['Money']:
-            self._metaData['Money'][userNo] = {'InitFunds': capital}
-        else:
-            self._metaData['Money'][userNo]['InitFunds'] = capital
+        self._metaData['Money']['InitFunds'] = capital
 
     def getInitCapital(self, userNo='Default'):
         '''获取初始资金'''
-        if userNo in self._metaData:
-            return self._metaData['Money'][userNo]['InitFunds']
         return self._metaData['Money']['InitFunds']
 
     # ----------------------- 交易方向 ----------------------
