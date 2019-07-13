@@ -611,15 +611,25 @@ class StrategyModel(object):
             contNo = self._cfgModel.getBenchmark()
         return self._cfgModel.setStopPoint(stopPoint, nPriceType, nAddTick, contNo)
 
-    def subscribeContract(self, contNo):
-        contList = [contNo]
-        self._cfgModel.updateSubQuoteContract(contList)
-        return self.subQuoteList(contList)
+    def setFloatStopPoint(self, startPoint, stopPoint, nPriceType, nAddTick, contNo):
+        if not contNo:
+            contNo = self._cfgModel.getBenchmark()
+        return self._cfgModel.setFloatStopPoint(startPoint, stopPoint, nPriceType, nAddTick, contNo)
 
-    def unsubscribeContract(self, contNo):
-        contList = [contNo]
-        self._cfgModel.updateUnsubQuoteContract(contList)
-        return self.unsubQuoteList(contList)
+    def subscribeQuote(self, contNoTuple):
+        if len(contNoTuple) <= 0:
+            return
+
+        contNoList = list(contNoTuple)
+        self._cfgModel.updateSubQuoteContract(contNoList)
+        return self.subQuoteList(contNoList)
+
+    def unsubscribeQuote(self, contNoTuple):
+        if len(contNoTuple) <= 0:
+            return
+        contNoList = list(contNoTuple)
+        self._cfgModel.updateUnsubQuoteContract(contNoList)
+        return self.unsubQuoteList(contNoList)
 
     # ///////////////////////账户函数///////////////////////////
     def getAccountId(self):

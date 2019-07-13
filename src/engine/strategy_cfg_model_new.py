@@ -130,6 +130,16 @@ class StrategyConfig_new(object):
                 },
                 ...
             },
+            'FloatStopPoint' : {
+                'DCE|F|M|1909' : {
+                    'StartPoint': 20,
+                    'StopPoint': 10,
+                    'AddPoint': nAddTick,
+                    'CoverPosOrderType': nPriceType,
+                },
+                ...
+            },
+            'SubQuoteContract' : ['ZCE|F|SR|001']
             'Params': {},
             'Pending': False,
         }
@@ -177,8 +187,10 @@ class StrategyConfig_new(object):
                 'OpenAllowClose': 0, # 开仓的K线不允许反向下单
                 'CloseAllowOpen': 0 # 平仓的K线不允许开仓
             },
-            'WinPoint' : {},    # 止盈信息
-            'StopPoint' : {},   # 止损信息
+            'WinPoint' : {},         # 止盈信息
+            'StopPoint' : {},        # 止损信息
+            'FloatStopPoint' : {},   # 浮动止损信息
+            'SubQuoteContract' : [], # 即时行情订阅合约列表
             'Params': {}, # 用户设置参数
             'Pending': False,
         }
@@ -584,6 +596,32 @@ class StrategyConfig_new(object):
 
         return self._metaData['StopPoint'][contNo]
 
+    # ----------------------- 浮动止损信息 ----------------------
+    def setFloatStopPoint(self, startPoint, stopPoint, nPriceType, nAddTick, contractNo):
+        '''设置止损信息'''
+        if nPriceType not in (0, 1, 2, 3, 4):
+            raise Exception("设置止损点平仓下单价格类型必须为 0: 最新价，1：对盘价，2：挂单价，3：市价，4：停板价 中的一个！")
+
+        if nAddTick not in (0, 1, 2):
+            raise Exception("止损点的超价点数仅能为0，1，2中的一个！")
+
+        self._metaData['FloatStopPoint'][contractNo] = {
+            "StartPoint" : startPoint,
+            "StopPoint": stopPoint,
+            "AddPoint": nAddTick,
+            "CoverPosOrderType": nPriceType,
+        }
+
+    def getFloatStopPoint(self, contractNo=None):
+        if not contractNo:
+            contNo = self.getBenchmark() if not contractNo else contractNo
+
+        if contNo not in self._metaData['FloatStopPoint']:
+            return None
+
+        return self._metaData['FloatStopPoint'][contNo]
+
+
     # ----------------------- 用户设置参数 ----------------------
     def setParams(self, params):
         '''设置用户设置参数'''
@@ -603,6 +641,13 @@ class StrategyConfig_new(object):
     def getPending(self):
         '''获取是否暂停向实盘下单标志'''
         return self._metaData['Pending']
+
+    # --------------------- 订阅/退订即时行情 --------------------
+    def updateSubQuoteContract(self, contNoList):
+        pass
+
+    def updateUnsubQuoteContract(self, contNoList):
+        pass
 
     # -----------------------------------------------------------
     def getConfig(self):

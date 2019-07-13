@@ -5292,12 +5292,12 @@ class BaseApi(object):
              设置触发方式
 
         【语法】
-              int SetWinPoint(int winPoint, int nPriceType, int nAddTick, string contractNo)
+              void SetWinPoint(int winPoint, int nPriceType = 0, int nAddTick = 0, string contractNo = "")
 
         【参数】
               winPoint 赢利点数值，若当前价格相对于最近一次开仓价格的盈利点数达到或超过该值，就进行止盈；
-              nPriceType 平仓下单价格类型 0:最新价 1：对盘价 2：挂单价 3：市价 4：停板价；
-              nAddTick 超价点数 仅当nPrice为0，1，2时有效；
+              nPriceType 平仓下单价格类型 0:最新价 1：对盘价 2：挂单价 3：市价 4：停板价，默认值为0；
+              nAddTick 超价点数 仅当nPrice为0，1，2时有效，默认为0；
               contractNo 合约代码，默认为基准合约。
 
         【备注】
@@ -5314,12 +5314,12 @@ class BaseApi(object):
              设置触发方式
 
         【语法】
-              int SetWinPoint(int stopPoint, int nPriceType, int nAddTick, string contractNo)
+              void SetWinPoint(int stopPoint, int nPriceType = 0, int nAddTick = 0, string contractNo = "")
 
         【参数】
               stopPoint 止损点数，若当前价格相对于最近一次开仓价格亏损点数达到或跌破该值，就进行止损；
-              nPriceType 平仓下单价格类型 0:最新价 1：对盘价 2：挂单价 3：市价 4：停板价；
-              nAddTick 超价点数 仅当nPrice为0，1，2时有效；
+              nPriceType 平仓下单价格类型 0:最新价 1：对盘价 2：挂单价 3：市价 4：停板价，默认值为0；
+              nAddTick 超价点数 仅当nPrice为0，1，2时有效，默认为0；
               contractNo 合约代码，默认为基准合约。
 
         【备注】
@@ -5330,13 +5330,37 @@ class BaseApi(object):
         '''
         return self._dataModel.setStopPoint(stopPoint, nPriceType, nAddTick, contractNo)
 
-    def SubQuote(self, contractNo):
+    def SetFloatStopPoint(self, startPoint, stopPoint, nPriceType, nAddTick, contractNo):
+        '''
+        【说明】
+             设置触发方式
+
+        【语法】
+              int SetFloatStopPoint(int startPoint, int stopPoint, int nPriceType = 0, int nAddTick = 0, string contractNo = "")
+
+        【参数】
+              startPoint 启动点数，当前价格相对于最后一次开仓价格盈利点数超过该值后启动浮动止损监控；
+              stopPoint 止损点数，若当前价格相对于最近一次开仓价格亏损点数达到或跌破该值，就进行止损；
+              nPriceType 平仓下单价格类型 0:最新价 1：对盘价 2：挂单价 3：市价 4：停板价，默认为0；
+              nAddTick 超价点数 仅当nPrice为0，1，2时有效，默认为0；
+              contractNo 合约代码，默认为基准合约。
+
+        【备注】
+              无
+
+        【示例】
+              SetFloatStopPoint(20,10)
+              举例：郑棉合约，多头方向。开仓价格为15000，当前价格突破15100后开启浮动止损，若此，止损点会随着价格上升而不断上升。假如价格上涨到15300，则此时的止损价格为(15300-50),即15250，若价格从15300回落到15250，则进行自动平仓。
+        '''
+        return self._dataModel.setFloatStopPoint(startPoint, stopPoint, nPriceType, nAddTick, contractNo)
+
+    def SubQuote(self, contNoTuple):
         '''
         【说明】
              订阅指定合约的即时行情。
 
         【语法】
-              bool SubQuote(string contractNo)
+              bool SubQuote(string contractNo1, string contractNo2, string contractNo3, ...)
 
         【参数】
               contractNo 合约编号，为空不做任何操作
@@ -5346,17 +5370,18 @@ class BaseApi(object):
 
         【示例】
               SubQuote("ZCE|F|TA|909") 订阅合约TA909的即时行情；
+              SubQuote("ZCE|F|TA|909", "ZCE|F|TA|910") 订阅合约TA909和TA910的即时行情；
               SubQuote("ZCE|F|TA") 订阅TA品种下所有合约的即时行情
         '''
-        return self._dataModel.subscribeContract(contractNo)
+        return self._dataModel.subscribeQuote(contNoTuple)
 
-    def UnsubQuote(self, contractNo):
+    def UnsubQuote(self, contNoTuple):
         '''
         【说明】
              退订指定合约的即时行情。
 
         【语法】
-              bool UnsubQuote(string contractNo)
+              bool UnsubQuote(string contractNo1, string contractNo2, string contractNo3, ...)
 
         【参数】
               contractNo 合约编号
@@ -5365,10 +5390,11 @@ class BaseApi(object):
               该方法可用策略中的initialize(context)方法中退订指定合约的即时行情，也可在handle_data(context)方法中动态的退订指定合约的即使行情。
 
         【示例】
-              UnsubQuote(['ZCE|F|SR|909', 'ZCE|F|SR|910']) 退订合约'ZCE|F|SR|909'和'ZCE|F|SR|910'的即时行情；
-              UnsubQuote(['ZCE|F|SR']) 退订合约商品'ZCE|F|SR'对应的所有合约的即时行情。
+              UnsubQuote('ZCE|F|SR|909') 退订合约'ZCE|F|SR|909'的即时行情；
+              UnsubQuote('ZCE|F|SR|909', 'ZCE|F|SR|910') 退订合约'ZCE|F|SR|909'和'ZCE|F|SR|910'的即时行情；
+              UnsubQuote('ZCE|F|SR') 退订合约商品'ZCE|F|SR'对应的所有合约的即时行情。
         '''
-        return self._dataModel.unsubscribeContract(contractNo)
+        return self._dataModel.unsubscribeQuote(contNoTuple)
 
     # //////////////////////其他函数////////////////////
 
@@ -6798,11 +6824,14 @@ def SetWinPoint(winPoint, nPriceType=0, nAddTick=0, contractNo=''):
 def SetStopPoint(stopPoint, nPriceType=0, nAddTick=0, contractNo=''):
     return baseApi.SetStopPoint(stopPoint, nPriceType, nAddTick, contractNo)
 
-def SubQuote(contNo):
-    return baseApi.SubQuote(contNo)
+def SetFloatStopPoint(startPoint, stopPoint, nPriceType=0, nAddTick=0, contractNo=''):
+    return baseApi.SetFloatStopPoint(startPoint, stopPoint, nPriceType, nAddTick, contractNo)
 
-def UnsubQuote(contNo):
-    return baseApi.UnsubQuote(contNo)
+def SubQuote(*args):
+    return baseApi.SubQuote(args)
+
+def UnsubQuote(*args):
+    return baseApi.UnsubQuote(args)
 
 # 属性函数
 def BarInterval():
