@@ -2288,6 +2288,25 @@ class BaseApi(object):
         '''
         return self._dataModel.getMarketPosition(contractNo)
 
+    def PositionProfit(self, contractNo):
+        '''
+        【说明】
+               获得当前持仓的浮动盈亏 。
+
+        【语法】
+              float PositionProfit(string contractNo)
+
+        【参数】
+              contractNo 合约编号，默认为基准合约。
+
+        【备注】
+              若策略当前持仓为0，则返回0
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getPositionProfit(contractNo)
+
     #////////////////////////////策略性能/////////////////
     def Available(self):
         '''
@@ -6245,6 +6264,10 @@ def LastEntryTime(contractNo=''):
 
 def MarketPosition(contractNo=''):
     return baseApi.MarketPosition(contractNo)
+
+def PositionProfit(contractNo=''):
+    return baseApi.PositionProfit(contractNo)
+
 # 策略性能
 def Available():
     return baseApi.Available()

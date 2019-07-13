@@ -124,6 +124,7 @@ _all_func_ = {
                     ['LastEntryPrice'      , '当前持仓的最后一个建仓价格'],
                     ['LastEntryTime'       , '当前持仓的最后一个建仓位置的时间'],
                     ['MarketPosition'      , '当前持仓状态'],
+                    ['PositionProfit'      , '当前持仓的浮动盈亏'],
     #                 ['MaxContracts'        , '当前持仓的最大持仓合约数'],
     #                 ['MaxEntries'          , '最大的建仓次数'],
     #                 ['MaxPositionLoss'     , '当前持仓的最大浮动亏损数'],

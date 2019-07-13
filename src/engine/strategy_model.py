@@ -1951,6 +1951,16 @@ class StrategyModel(object):
             return 0
         return 1 if buy > sell else -1
 
+    def getPositionProfit(self, contNo):
+        if not contNo:
+            contNo = self._config.getBenchmark()
+
+        if contNo not in list(self._calcCenter.getPositionInfo()):
+            return 0.0
+
+        positionInfo = self._calcCenter.getPositionInfo(contNo)
+        return positionInfo['HoldProfit']
+
     # ///////////////////////策略性能///////////////////////////
     def getAvailable(self):
         return self._calcCenter.getProfit()['Available']
