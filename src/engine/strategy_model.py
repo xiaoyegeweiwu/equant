@@ -1751,7 +1751,7 @@ class StrategyModel(object):
         return 0
 
     def getSymbol(self):
-        return self._cfgModel.getContract()
+        return self._cfgModel.getBenchmark()
 
     def getSymbolName(self, contNo):
         commodityInfo = self.getCommodityInfoFromContNo(contNo)

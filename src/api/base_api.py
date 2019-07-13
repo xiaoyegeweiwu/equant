@@ -1864,7 +1864,7 @@ class BaseApi(object):
     def Symbol(self):
         '''
         【说明】
-              获取合约编号
+              获取展示合约，即基准合约的编号
 
         【语法】
               string Symbol()
