@@ -1258,16 +1258,22 @@ class RunWin(QuantToplevel, QuantFrame):
             contValues = self.contTree.item(item)['values']
             contsInfo.append(contValues)
 
+            # kLineTypeDict = {
+            #     "分时": 't',
+            #     "分笔": 'T',
+            #     "秒线": 'S',
+            #     "分钟": 'M',
+            #     "小时": 'H',
+            #     "日线": 'D',
+            #     "周线": 'W',
+            #     "月线": 'm',
+            #     "年线": 'Y'
+            # }
+
             kLineTypeDict = {
-                "分时": 't',
                 "分笔": 'T',
-                "秒线": 'S',
                 "分钟": 'M',
-                "小时": 'H',
                 "日线": 'D',
-                "周线": 'W',
-                "月线": 'm',
-                "年线": 'Y'
             }
 
             contCode     = contValues[0]
@@ -1820,8 +1826,7 @@ class AddContWin(QuantToplevel, QuantFrame):
         kLineTypeLabel.pack(side=tk.LEFT)
 
         self.kLineTypeChosen = ttk.Combobox(kLineTypeFrame, state="readonly", textvariable=self.kLineType, width=17)
-        self.kLineTypeChosen['values'] = ['分时', '分笔', '秒线', '分钟', '小时', '日线', '周线', '月线', '年线']
-        # self.kLineTypeChosen['values'] = ['日', '分钟', '秒']
+        self.kLineTypeChosen['values'] = ['分笔', '分钟', '日线']
         self.kLineTypeChosen.pack(side=tk.LEFT, fill=tk.X, padx=5)
         self.kLineTypeChosen.bind("<<ComboboxSelected>>", self.kLineChosenCallback)
 
