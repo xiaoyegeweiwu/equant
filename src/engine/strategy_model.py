@@ -2122,10 +2122,22 @@ class StrategyModel(object):
         return self._staModel.ParabolicSAR(high, low, afstep, aflimit)
         
     def getHighest2(self, price, length):
-        pass
+        high = price[-1]
+        for i in range(len(price)-1, len(price)-length-1, -1):
+            if price[i] > high:
+                high = price[i]
+            if i == 0: break
+            
+        return high
         
     def getLowest2(self, price, length):
-        pass
+        low = price[-1]
+        for i in range(len(price)-1, len(price)-length-1, -1):
+            if price[i] < low:
+                low = price[i]
+            if i == 0: break
+            
+        return low
 
     def getHighest(self, price, length):
         if (not isinstance(price, np.ndarray) and not isinstance(price, list)) or len(price) == 0:
