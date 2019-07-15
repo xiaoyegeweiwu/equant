@@ -204,7 +204,7 @@ class StrategyConfig_new(object):
         if not contNo:
             raise Exception("请确保在设置界面或者SetBarInterval方法中设置的合约编号不为空！")
             # if barType not in ('t', 'T', 'S', 'M', 'H', 'D', 'W', 'm', 'Y'):
-        if kLineType not in ('S', 'M', 'D'):
+        if kLineType not in ('T', 'M', 'D'):
             raise Exception("请确保设置的K线类型为 'T':分笔，'M':分钟，'D':日线 中的一个！")
 
         # 设置订阅的合约列表
