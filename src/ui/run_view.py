@@ -1279,7 +1279,6 @@ class RunWin(QuantToplevel, QuantFrame):
             contCode     = contValues[0]
             kTypeValue   = kLineTypeDict[contValues[1]]
             kSliceValue  = int(contValues[2])
-            kSliceValue = 0
 
             samValue = ''
             if contValues[3] == "所有K线":
