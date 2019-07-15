@@ -343,6 +343,7 @@ class Strategy:
         self._localOrder = {} # {本地生成的eSessionId : TradeRecode对象}
         
         self._moneyLastTime = 0
+        self._virtualPosTime = 0
         #self._userModelDict = {}
 
     # ////////////////////////////对外接口////////////////////
@@ -572,6 +573,23 @@ class Strategy:
             })
 
             self.sendEvent2UI(event)
+            
+    def _noticeVirtualPos(self):
+        nowTime = datetime.now()
+        if self._virtualPosTime == 0 or (nowTime - self._virtualPosTime).total_seconds() >= 1:
+            self._virtualPosTime = nowTime
+            calc = self._dataModel.getCalcCenter()
+            #获取该策略所有合约的虚拟持仓
+            posDict = calc.getPositionInfo()
+            if len(posDict) == 0:
+                return
+            event = Event({
+                "StrategyId" : self._strategyId,
+                "EventCode"   : EV_ST2EG_POSITION_NOTICE,
+                "Data"        : posDict
+            })
+            
+            self.sendEvent2Engine(event)
 
         
     def _runTimer(self):
@@ -588,6 +606,8 @@ class Strategy:
             self._triggerCycle()
             # 通知资金变化
             self._triggerMoney()
+            # 发送持仓变化
+            self._noticeVirtualPos()
             # 休眠100ms
             time.sleep(0.1)
 

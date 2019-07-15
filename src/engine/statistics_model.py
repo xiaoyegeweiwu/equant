@@ -8,6 +8,7 @@ class StatisticsModel(object):
         self._strategy = strategy
         self.logger = strategy.logger
         self._config = config
+            
 
     def SMA(self, price:np.array, period, weight):
         sma = 0.0
@@ -20,6 +21,8 @@ class StatisticsModel(object):
             return -2, np.array(smas)
 
         for i, p in enumerate(price):
+            if np.isnan(p):
+                p = 0.0
             if i == 0:
                 sma = p
             else:

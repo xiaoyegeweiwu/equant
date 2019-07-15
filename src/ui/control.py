@@ -307,10 +307,30 @@ class ChildThread(threading.Thread):
         self.isStopped = False
 
     def run(self):
-        while not self.isStopped:
+        # while not self.isStopped:
+        while True:
+            if self.isStopped:
+                break
             self.target()
             time.sleep(self.sleepTime)
 
     def stop(self):
         # 设置停止标志位
         self.isStopped = True
+
+    # def _async_raise(self, tid, exctype):
+    #     """raises the exception, performs cleanup if needed"""
+    #     import ctypes
+    #     import inspect
+    #     tid = ctypes.c_long(tid)
+    #     if not inspect.isclass(exctype):
+    #         exctype = type(exctype)
+    #     res = ctypes.pythonapi.PyThreadState_SetAsyncExc(tid, ctypes.py_object(exctype))
+    #     if res == 0:
+    #         raise ValueError("invalid thread id")
+    #     elif res != 1:
+    #         ctypes.pythonapi.PyThreadState_SetAsyncExc(tid, None)
+    #         raise SystemError("PyThreadState_SetAsyncExc failed")
+    #
+    # def raiseExc(self, exctype):
+    #     self._async_raise( self.ident, exctype)

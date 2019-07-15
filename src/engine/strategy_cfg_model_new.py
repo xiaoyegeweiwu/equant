@@ -57,6 +57,7 @@ class StrategyConfig_new(object):
                 }]
             },
             'Trigger': {
+                'SetByUI': True,
                 'Timer': ['20190625121212', '20190625111111'],
                 'Cycle': 200,
                 'KLine': True,
@@ -129,16 +130,31 @@ class StrategyConfig_new(object):
                 },
                 ...
             },
+            'FloatStopPoint' : {
+                'DCE|F|M|1909' : {
+                    'StartPoint': 20,
+                    'StopPoint': 10,
+                    'AddPoint': nAddTick,
+                    'CoverPosOrderType': nPriceType,
+                },
+                ...
+            },
+            'SubQuoteContract' : ['ZCE|F|SR|001']
             'Params': {},
             'Pending': False,
         }
     '''
-    def __init__(self):
+    def __init__(self, argDict=None):
+        if argDict and isinstance(argDict, dict):
+            self._metaData = deepcopy(argDict)
+            return
+
         self._metaData = {
             'SubContract' : [],     # 订阅的合约信息，列表中的第一个合约为基准合约
             'Sample'      : {
             },
             'Trigger': {    # 触发方式
+                'SetByUI': True,    # 由界面设置
                 'Timer': [],        # 指定时刻
                 'Cycle': 0,         # 每隔固定毫秒数触发
                 'KLine': False,     # K线触发
@@ -171,13 +187,18 @@ class StrategyConfig_new(object):
                 'OpenAllowClose': 0, # 开仓的K线不允许反向下单
                 'CloseAllowOpen': 0 # 平仓的K线不允许开仓
             },
-            'WinPoint' : {},    # 止盈信息
-            'StopPoint' : {},   # 止损信息
+            'WinPoint' : {},         # 止盈信息
+            'StopPoint' : {},        # 止损信息
+            'FloatStopPoint' : {},   # 浮动止损信息
+            'SubQuoteContract' : [], # 即时行情订阅合约列表
             'Params': {}, # 用户设置参数
             'Pending': False,
         }
 
     # ----------------------- 合约/K线类型/K线周期 ----------------------
+    def setBarInterval(self, contNo, barType, barInterval, sampleConfig, trigger=True):
+        self.setBarInfoInSample(contNo, barType, barInterval, sampleConfig, trigger)
+
     def setBarInfoInSample(self, contNo, kLineType, kLineSlice, sampleConfig, trigger=True):
         '''设置订阅的合约、K线类型和周期'''
         if not contNo:
@@ -255,7 +276,7 @@ class StrategyConfig_new(object):
     def updateSampleDict(self, contNo, sampleDict):
         sample = self._metaData['Sample']
         if contNo not in sample:
-            sample[contNo] = sampleDict
+            sample[contNo] = [sampleDict,]
             return
 
         sampleList = sample[contNo]
@@ -279,7 +300,7 @@ class StrategyConfig_new(object):
         return sameDict
 
     # ----------------------- 触发方式 ----------------------
-    def setTrigger(self, type, value=None):
+    def setTrigger(self, type, value=None, setByUI=True):
         '''设置触发方式'''
         if type not in (1, 2, 3, 4, 5):
             raise Exception("触发方式可选的值只能 1: 即时行情触发，2: 交易数据触发，3: 每隔固定时间触发，4: 指定时刻触发 5:K线触发 是中的一个！")
@@ -294,7 +315,14 @@ class StrategyConfig_new(object):
 
         trigger = self._metaData['Trigger']
 
-        # TODO: 清空界面设置的触发方式
+        if (setByUI and not trigger['SetByUI']) or (not setByUI and trigger['SetByUI']):
+            # 清空原有Trigger设置信息
+            trigger['SetByUI'] = setByUI
+            trigger['SnapShot'] = False
+            trigger['Trade'] = False
+            trigger['Cycle'] = None
+            trigger['Timer'] = []
+
         if type == 1:
             trigger['SnapShot'] = True
         elif type == 2:
@@ -358,19 +386,12 @@ class StrategyConfig_new(object):
         return self._metaData['Money']['UserNo']
 
     # ----------------------- 初始资金 ----------------------
-    def setInitCapital(self, capital, userNo=''):
+    def setInitCapital(self, capital):
         '''设置初始资金'''
-        if not userNo:
-            self._metaData['Money']['InitFunds'] = capital
-        if userNo not in self._metaData['Money']:
-            self._metaData['Money'][userNo] = {'InitFunds': capital}
-        else:
-            self._metaData['Money'][userNo]['InitFunds'] = capital
+        self._metaData['Money']['InitFunds'] = capital
 
-    def getInitCapital(self, userNo=''):
+    def getInitCapital(self, userNo='Default'):
         '''获取初始资金'''
-        if userNo in self._metaData:
-            return self._metaData['Money'][userNo]['InitFunds']
         return self._metaData['Money']['InitFunds']
 
     # ----------------------- 交易方向 ----------------------
@@ -423,7 +444,7 @@ class StrategyConfig_new(object):
         return self._metaData['Money']['Hedge']
 
     # ----------------------- 保证金 ----------------------
-    def setMargin(self, type, value, contNo=''):
+    def setMargin(self, type, value, contNo='Default'):
         '''设置保证金的类型及比例/额度'''
         if value < 0 or type not in (EEQU_FEE_TYPE_RATIO, EEQU_FEE_TYPE_FIXED):
             raise Exception("保证金类型只能是 'R': 按比例收取，'F': 按定额收取 中的一个，并且保证金比例/额度不能小于0！")
@@ -434,21 +455,21 @@ class StrategyConfig_new(object):
         self._metaData['Money']['Margin'][contNo]['Value'] = value
         return 0
 
-    def getMarginType(self, contNo=''):
+    def getMarginType(self, contNo='Default'):
         '''获取保证金类型'''
         if contNo not in self._metaData['Money']['Margin']:
             raise Exception("请确保为合约%s设置了保证金类型！"%contNo)
 
         return self._metaData['Money']['Margin'][contNo]['Type']
 
-    def getMarginValue(self, contNo=''):
+    def getMarginValue(self, contNo='Default'):
         '''获取保证金比例值'''
-        if contNo in self._metaData['Money']['Margin']:
+        if contNo not in self._metaData['Money']['Margin']:
             raise Exception("请确保为合约%s设置了保证金比例/额度！"%contNo)
         return self._metaData['Money']['Margin'][contNo]['Value']
 
     # ----------------------- 交易手续费 ----------------------
-    def setTradeFee(self, type, feeType, feeValue, contNo=''):
+    def setTradeFee(self, type, feeType, feeValue, contNo='Default'):
         '''设置交易手续费'''
         typeMap = {
             'A': ('OpenFee', 'CloseFee', 'CloseTodayFee'),
@@ -470,7 +491,7 @@ class StrategyConfig_new(object):
                 'Value': feeValue
             }
 
-    def getRatioOrFixedFee(self, feeType, isRatio, contNo=''):
+    def getRatioOrFixedFee(self, feeType, isRatio, contNo='Default'):
         '''获取 开仓/平仓/今平 手续费率或固定手续费'''
         typeDict = {'OpenFee':'开仓', 'CloseFee':'平仓', 'CloseTodayFee':'平今'}
         if feeType not in typeDict:
@@ -482,27 +503,27 @@ class StrategyConfig_new(object):
 
         return self._metaData['Money'][feeType][contNo]['Value'] if self._metaData['Money'][feeType][contNo]['Type'] == openFeeType else 0
 
-    def getOpenRatio(self, contNo=''):
+    def getOpenRatio(self, contNo='Default'):
         '''获取开仓手续费率'''
         return self.getRatioOrFixedFee('OpenFee', True, contNo)
 
-    def getOpenFixed(self, contNo=''):
+    def getOpenFixed(self, contNo='Default'):
         '''获取开仓固定手续费'''
         return self.getRatioOrFixedFee('OpenFee', False, contNo)
 
-    def getCloseRatio(self, contNo=''):
+    def getCloseRatio(self, contNo='Default'):
         '''获取平仓手续费率'''
         return self.getRatioOrFixedFee('CloseFee', True, contNo)
 
-    def getCloseFixed(self, contNo=''):
+    def getCloseFixed(self, contNo='Default'):
         '''获取平仓固定手续费'''
         return self.getRatioOrFixedFee('CloseFee', False, contNo)
 
-    def getCloseTodayRatio(self, contNo=''):
+    def getCloseTodayRatio(self, contNo='Default'):
         '''获取今平手续费率'''
         return self.getRatioOrFixedFee('CloseTodayFee', True, contNo)
 
-    def getCloseTodayFixed(self, contNo=''):
+    def getCloseTodayFixed(self, contNo='Default'):
         '''获取今平固定手续费'''
         return self.getRatioOrFixedFee('CloseTodayFee', False, contNo)
 
@@ -575,6 +596,32 @@ class StrategyConfig_new(object):
 
         return self._metaData['StopPoint'][contNo]
 
+    # ----------------------- 浮动止损信息 ----------------------
+    def setFloatStopPoint(self, startPoint, stopPoint, nPriceType, nAddTick, contractNo):
+        '''设置止损信息'''
+        if nPriceType not in (0, 1, 2, 3, 4):
+            raise Exception("设置止损点平仓下单价格类型必须为 0: 最新价，1：对盘价，2：挂单价，3：市价，4：停板价 中的一个！")
+
+        if nAddTick not in (0, 1, 2):
+            raise Exception("止损点的超价点数仅能为0，1，2中的一个！")
+
+        self._metaData['FloatStopPoint'][contractNo] = {
+            "StartPoint" : startPoint,
+            "StopPoint": stopPoint,
+            "AddPoint": nAddTick,
+            "CoverPosOrderType": nPriceType,
+        }
+
+    def getFloatStopPoint(self, contractNo=None):
+        if not contractNo:
+            contNo = self.getBenchmark() if not contractNo else contractNo
+
+        if contNo not in self._metaData['FloatStopPoint']:
+            return None
+
+        return self._metaData['FloatStopPoint'][contNo]
+
+
     # ----------------------- 用户设置参数 ----------------------
     def setParams(self, params):
         '''设置用户设置参数'''
@@ -595,14 +642,25 @@ class StrategyConfig_new(object):
         '''获取是否暂停向实盘下单标志'''
         return self._metaData['Pending']
 
+    # --------------------- 订阅/退订即时行情 --------------------
+    def updateSubQuoteContract(self, contNoList):
+        pass
+
+    def updateUnsubQuoteContract(self, contNoList):
+        pass
+
     # -----------------------------------------------------------
     def getConfig(self):
         return self._metaData
 
     def getBenchmark(self):
         '''获取基准合约'''
-        showInfo = self.getKLineShowInfo()
-        return showInfo['ContractNo']
+        # 1、取界面设置的第一个合约 2、取SetBarinterval第一个设置的合约
+        subContract = self._metaData['SubContract']
+        if not subContract or len(subContract) == 0:
+            raise Exception("请确保在设置界面或者在策略中调用SetBarInterval方法设置展示的合约、K线类型和周期")
+
+        return subContract[0]
 
     def getTriggerContract(self):
         return self._metaData['SubContract']
@@ -676,13 +734,8 @@ class StrategyConfig_new(object):
         return kLineTypetupleList
 
     def getKLineShowInfo(self):
-        # 1、取界面设置的第一个合约 2、取SetBarinterval第一个设置的合约
-        subContract = self._metaData['SubContract']
-        if not subContract or len(subContract) == 0:
-            raise Exception("请确保在设置界面或者在策略中调用SetBarInterval方法设置展示的合约、K线类型和周期")
-
-        displayCont = subContract[0]
-        kLineInfo = self._metaData['Sample'][displayCont]
+        displayCont = self.getBenchmark()
+        kLineInfo = self._metaData['Sample'][displayCont][0]
 
         return {
             'ContractNo': displayCont,

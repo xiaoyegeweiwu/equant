@@ -61,13 +61,16 @@ class StrategyEngine(object):
         self._isEffective = {}
         self._isSt2EngineDataEffective= {}
         
+        # 策略虚拟持仓
+        self._strategyPosDict = {}
+        
         # 即时行情订阅列表
         self._quoteOberverDict = {} #{'contractNo' : [strategyId1, strategyId2...]}
         # 历史K线订阅列表
         self._hisKLineOberverDict = {} #{'contractNo' : [strategyId1, strategyId2...]}
         
-        self._lastMoneyTime = datetime.now()  #资金查询时间
-        self._lastPosTime   = datetime.now()  #持仓同步时间
+        self._lastMoneyTime = 0  #资金查询时间
+        self._lastPosTime   = 0  #持仓同步时间
 
         # 恢复上次推出时保存的结构
         self._strategyOrder = {}
@@ -195,6 +198,17 @@ class StrategyEngine(object):
             EV_ST2EG_ADD_KLINESIGNAL        : self._addSignal,
             EV_ST2EG_NOTICE_KLINESIGNAL     : self._sendKLineSignal,
             EV_ST2EG_UPDATE_KLINESIGNAL     : self._sendKLineSignal,
+            
+            ST_ST2EG_SYNC_CONFIG            : self._syncStrategyConfig,
+
+            EV_ST2EG_STRATEGYTRADEINFO      : self._reqTradeInfo,
+            EV_ST2EG_ACTUAL_ORDER           : self._sendOrder,
+            EV_ST2EG_ACTUAL_CANCEL_ORDER    : self._deleteOrder,
+            EV_ST2EG_ACTUAL_MODIFY_ORDER    : self._modifyOrder,
+            
+            EV_ST2EG_UPDATE_STRATEGYDATA    : self._reqStrategyDataUpdateNotice,
+            
+            EV_ST2EG_POSITION_NOTICE        : self._noticeVirtualPos,
 
             # 暂停、恢复、与退出
             EV_UI2EG_STRATEGY_QUIT          : self._onStrategyQuit,
@@ -203,7 +217,6 @@ class StrategyEngine(object):
             EV_UI2EG_STRATEGY_FIGURE        : self._switchStrategy,
             EV_UI2EG_STRATEGY_RESTART       : self._restartStrategyWhenParamsChanged,
 
-            EV_ST2EG_UPDATE_STRATEGYDATA    : self._reqStrategyDataUpdateNotice,
             EV_EG2UI_REPORT_RESPONSE        : self._reportResponse,
             EV_EG2UI_CHECK_RESULT           : self._checkResponse,
             EV_EG2ST_MONITOR_INFO           : self._monitorResponse,
@@ -211,12 +224,6 @@ class StrategyEngine(object):
             # load strategy
             EV_EG2UI_LOADSTRATEGY_RESPONSE  : self._loadStrategyResponse,
             EV_EG2UI_STRATEGY_STATUS        : self._onStrategyStatus,
-            ST_ST2EG_SYNC_CONFIG            : self._syncStrategyConfig,
-
-            EV_ST2EG_STRATEGYTRADEINFO      : self._reqTradeInfo,
-            EV_ST2EG_ACTUAL_ORDER           : self._sendOrder,
-            EV_ST2EG_ACTUAL_CANCEL_ORDER    : self._deleteOrder,
-            EV_ST2EG_ACTUAL_MODIFY_ORDER    : self._modifyOrder,
         }
             
     def run(self):
@@ -420,17 +427,16 @@ class StrategyEngine(object):
             self._lastMoneyTime = nowTime
             return
             
-        if (nowTime - self._lastMoneyTime).total_seconds() < 60:
-            return
-        eventList = self._trdModel.getMoneyEvent()
-        # 查询所有账户下的资金
-        allMoneyReqEvent = Event({
-            "StrategyId": 0,
-            "Data": {
-            }
-        })
-        self._reqMoney(allMoneyReqEvent)
-        self._lastMoneyTime = nowTime
+        if self._lastMoneyTime == 0 or (nowTime - self._lastMoneyTime).total_seconds() >= 60:
+            eventList = self._trdModel.getMoneyEvent()
+            # 查询所有账户下的资金
+            allMoneyReqEvent = Event({
+                "StrategyId": 0,
+                "Data": {
+                }
+            })
+            self._reqMoney(allMoneyReqEvent)
+            self._lastMoneyTime = nowTime
         
     def _syncPosition(self):
         nowTime = datetime.now()
@@ -439,18 +445,37 @@ class StrategyEngine(object):
             self._lastPosTime = nowTime
             return
             
-        if (nowTime - self._lastPosTime).total_seconds() < 10:
-            return
+        if self._lastPosTime == 0 or (nowTime - self._lastPosTime).total_seconds() >= 5:
+            self._lastPosTime = nowTime
             
-        self._lastPosTime = nowTime
-        
-        accPos = {}
-        #查询所有账户持仓情况
-        userInfo = self._trdModel.getUserInfo()
-        for k,v in userInfo.items():
-            accPos[k] = v.getContPos()
+            accPos = {}
+            #查询所有账户持仓情况
+            userInfo = self._trdModel.getUserInfo()
+            for k,v in userInfo.items():
+                accPos[k] = v.getContPos()
             
-        #self.logger.info("Position Sync:", accPos)
+            #获取所有策略的虚拟持仓
+            strategyPos = {}
+            for id in self._strategyPosDict:
+                if not self._isEffective[id]:
+                    continue
+                    
+                if not self._isSt2EngineDataEffective[id]:
+                    continue
+
+                strategyPos[id] = self._strategyPosDict[id]
+                
+            event = Event({
+                "EventCode" : EV_EG2UI_POSITION_NOTICE,
+                "Data"      :{
+                    "Account"  : accPos,
+                    "Strategy" : strategyPos
+                }
+            })
+            
+            #self.logger.info("Sync position to ui:%s"%event.getData())
+            self._send2uiQueue(event)
+            
         
     def _send2uiQueue(self, event):
         #self.logger.info("[ENGINE] Send event(%d,%d) to UI!"%(event.getEventCode(), event.getStrategyId()))
@@ -769,6 +794,11 @@ class StrategyEngine(object):
             }
         })
         self._sendEvent2Strategy(stragetyId, event)
+        
+    def _noticeVirtualPos(self, event):
+        # 策略虚拟持仓变化通知
+        stragetyId = event.getStrategyId()
+        self._strategyPosDict[stragetyId] = event.getData()
 
     # ///////////////策略进程事件//////////////////////////////
     def _addSubscribe(self, contractNo, strategyId):
@@ -853,9 +883,7 @@ class StrategyEngine(object):
             # 根据品种获取该品种的所有合约
             for contractNo in list(self._qteModel._contractData.keys()):
                 if subContNo in contractNo:
-                    qteModel = self._qteModel._contractData[contractNo]
-                    if qteModel._metaData['CommodityNo'] == subContNo:
-                        contractList.append(contractNo)
+                    contractList.append(contractNo)
 
         return contractList
         

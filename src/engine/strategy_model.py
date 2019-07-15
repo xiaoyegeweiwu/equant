@@ -5,7 +5,7 @@ import talib
 import time, sys
 import math
 import pandas as pd
-from .strategy_cfg_model import StrategyConfig
+from .strategy_cfg_model_new import StrategyConfig_new
 from .strategy_his_model import StrategyHisQuote
 from .strategy_qte_model import StrategyQuote
 from .strategy_trd_model import StrategyTrade
@@ -28,7 +28,7 @@ class StrategyModel(object):
         self._plotedDict = {}
 
         # Notice：会抛异常
-        self._cfgModel = StrategyConfig(self._argsDict)
+        self._cfgModel = StrategyConfig_new(self._argsDict)
         self._config = self._cfgModel
         # 回测计算
         self._calcCenter = CalcCenter(self.logger)
@@ -75,7 +75,7 @@ class StrategyModel(object):
         self._trdModel.initialize()
 
     def initializeCalc(self):
-        contNo = self._cfgModel.getContract()[0]
+        contNo = self._cfgModel.getBenchmark()
         strategyParam = {
             "InitialFunds": float(self._cfgModel.getInitCapital()),  # 初始资金
             "StrategyName": self._strategy.getStrategyName(),  # 策略名称
@@ -271,6 +271,19 @@ class StrategyModel(object):
     def getHisBarsInfo(self, contNo, kLineType, kLineValue, maxLength):
         multiContKey = self.getKey(contNo, kLineType, kLineValue)
         return self._hisModel.getHisBarsInfo(multiContKey, maxLength)
+
+    def getBarsLast(self, condition):
+        conLen = len(condition)
+        if conLen == 0:
+            return 0
+
+        count = 0
+        for i in range(conLen-1, -1, -1):
+            if condition[i]:
+                break
+            else:
+                count += 1
+        return count
 
     # ////////////////////////即时行情////////////////////////////
     def getQUpdateTime(self, symbol):
@@ -599,7 +612,7 @@ class StrategyModel(object):
         return 0
 
     def setTriggerMode(self, type, value):
-        return self._cfgModel.setTrigger(type, value)
+        return self._cfgModel.setTrigger(type, value, False)
 
     def setWinPoint(self, winPoint, nPriceType, nAddTick, contNo):
         if not contNo:
@@ -611,15 +624,25 @@ class StrategyModel(object):
             contNo = self._cfgModel.getBenchmark()
         return self._cfgModel.setStopPoint(stopPoint, nPriceType, nAddTick, contNo)
 
-    def subscribeContract(self, contNo):
-        contList = [contNo]
-        self._cfgModel.updateSubQuoteContract(contList)
-        return self.subQuoteList(contList)
+    def setFloatStopPoint(self, startPoint, stopPoint, nPriceType, nAddTick, contNo):
+        if not contNo:
+            contNo = self._cfgModel.getBenchmark()
+        return self._cfgModel.setFloatStopPoint(startPoint, stopPoint, nPriceType, nAddTick, contNo)
 
-    def unsubscribeContract(self, contNo):
-        contList = [contNo]
-        self._cfgModel.updateUnsubQuoteContract(contList)
-        return self.unsubQuoteList(contList)
+    def subscribeQuote(self, contNoTuple):
+        if len(contNoTuple) <= 0:
+            return
+
+        contNoList = list(contNoTuple)
+        self._cfgModel.updateSubQuoteContract(contNoList)
+        return self.subQuoteList(contNoList)
+
+    def unsubscribeQuote(self, contNoTuple):
+        if len(contNoTuple) <= 0:
+            return
+        contNoList = list(contNoTuple)
+        self._cfgModel.updateUnsubQuoteContract(contNoList)
+        return self.unsubQuoteList(contNoList)
 
     # ///////////////////////账户函数///////////////////////////
     def getAccountId(self):
@@ -1595,10 +1618,61 @@ class StrategyModel(object):
                 return {'Time': float(timeTuple[0]) / 1000000000, 'TradeState': timeTuple[1]}
 
         return {'Time': float(timeList[0][0]) / 1000000000, 'TradeState': timeList[0][1]}
+        
+    def getCurrentDate(self):
+        if not self._strategy.isRealTimeStatus():
+            return self.getBarDate('', '', 0)
+            
+        date = datetime.now().strftime('%Y%m%d')
+        return int(date)
 
     def getCurrentTime(self):
+        if not self._strategy.isRealTimeStatus():
+            return self.getBarTime('', '', 0)
+            
         currentTime = datetime.now().strftime('0.%H%M%S')
         return float(currentTime)
+        
+    def _gethms(self, time):
+        itime = int((time + 1e-9) * 1000000)
+        hh,mm,ss = 0, 0, 0
+        if itime > 0:
+            hh = int(itime / 10000)
+            mm = int((itime % (10000)) / 100)
+            ss = itime % 100
+            
+        return hh, mm, ss
+        
+    def getTimeDiff(self, time1, time2):
+        if not isinstance(time1, float):
+            return 0
+            
+        if not isinstance(time2, float):
+            return 0    
+         
+        ftime1 = math.modf(time1)[0]
+        ftime2 = math.modf(time2)[0]
+        
+        hh1,mm1,ss1 = self._gethms(ftime1)
+        hh2,mm2,ss2 = self._gethms(ftime2)
+
+        now = datetime.now()
+        
+        mtime1 = datetime(now.year, now.month, now.day, hh1, mm1, ss1)
+        mtime2 = datetime(now.year, now.month, now.day, hh2, mm2, ss2)
+        if time2 + 1.0 < 1e-9:
+            mtime2 = now
+        
+        if mtime2 > mtime1:
+            delta = (mtime2 - mtime1).seconds
+        else:
+            delta = -(mtime1 - mtime2).seconds
+
+        return delta
+        
+    def getRef(self, price, n):
+        return self.getRef(price,n-1) if len(price) < n else price[-n]
+        
 
     def isInSession(self, contNo):
         if not contNo:
@@ -1690,7 +1764,7 @@ class StrategyModel(object):
         return 0
 
     def getSymbol(self):
-        return self._cfgModel.getContract()
+        return self._cfgModel.getBenchmark()
 
     def getSymbolName(self, contNo):
         commodityInfo = self.getCommodityInfoFromContNo(contNo)
@@ -1951,6 +2025,16 @@ class StrategyModel(object):
             return 0
         return 1 if buy > sell else -1
 
+    def getPositionProfit(self, contNo):
+        if not contNo:
+            contNo = self._config.getBenchmark()
+
+        if contNo not in list(self._calcCenter.getPositionInfo()):
+            return 0.0
+
+        positionInfo = self._calcCenter.getPositionInfo(contNo)
+        return positionInfo['HoldProfit']
+
     # ///////////////////////策略性能///////////////////////////
     def getAvailable(self):
         return self._calcCenter.getProfit()['Available']
@@ -2036,6 +2120,12 @@ class StrategyModel(object):
     def ParabolicSAR(self, high, low, afstep, aflimit):
         '''计算抛物线转向'''
         return self._staModel.ParabolicSAR(high, low, afstep, aflimit)
+        
+    def getHighest2(self, price, length):
+        pass
+        
+    def getLowest2(self, price, length):
+        pass
 
     def getHighest(self, price, length):
         if (not isinstance(price, np.ndarray) and not isinstance(price, list)) or len(price) == 0:
@@ -2056,3 +2146,12 @@ class StrategyModel(object):
             return arr
 
         return talib.MIN(arr, length)
+        
+    def getCountIf(self, cond, peroid):
+        sum = 0
+        for i in range(len(cond)-1, len(cond)-peroid-1, -1):
+            if cond[i]: sum += 1
+            if i == 0: break
+            
+        return sum
+            
