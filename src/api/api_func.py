@@ -225,7 +225,7 @@ _all_func_ = {
 
                     ['Enum_Period_Tick'    , '周期类型_分笔'],
                     # ['Enum_Period_Dyna'    , '周期类型_分时'],
-                    ['Enum_Period_Second'  , '周期类型_秒线'],
+                    # ['Enum_Period_Second'  , '周期类型_秒线'],
                     ['Enum_Period_Min'     , '周期类型_分钟'],
                     # ['Enum_Period_Hour'    , '周期类型_小时'],
                     ['Enum_Period_Day'     , '周期类型_日线'],
