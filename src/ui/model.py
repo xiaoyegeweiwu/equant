@@ -254,6 +254,7 @@ class GetEgData(object):
             EV_EG2UI_CHECK_RESULT:          self._onEgDebugInfo,
             EV_EG2ST_MONITOR_INFO:          self._onEgMonitorInfo,
             EV_EG2UI_STRATEGY_STATUS:       self._onEgStrategyStatus,
+            EV_EG2UI_POSITION_NOTICE:       self._onEgPositionNotice,
             EEQU_SRVEVENT_EXCHANGE:         self._onEgExchangeInfo,
             EEQU_SRVEVENT_COMMODITY:        self._onEgCommodityInfo,
             EEQU_SRVEVENT_CONTRACT:         self._onEgContractInfo,
@@ -368,6 +369,12 @@ class GetEgData(object):
                 self._app.delUIStrategy(id)
                 self._logger.info(f"[UI][{id}]: Receiving strategy removing answer info successfully!")
 
+    def _onEgPositionNotice(self, event):
+        return
+        syncPosition = event.getData()
+        print("aaaaaaaaaa: ", syncPosition)
+        self._logger.info("[UI]: Receiving sync position info successfully!")
+
     def _onEgConnect(self, event):
         src = event.getEventSrc()
         self._app.setConnect(src)
@@ -387,7 +394,9 @@ class GetEgData(object):
         try:
             # 如果不给出超时则会导致线程退出时阻塞
             event = self._eg2uiQueue.get(timeout=0.1)
+            # event = self._eg2uiQueue.get_nowait()
             eventCode = event.getEventCode()
+
             if eventCode not in self._egAskCallbackDict:
                 self._logger.error(f"[UI]: Unknown engine event{eventCode}")
             else:
