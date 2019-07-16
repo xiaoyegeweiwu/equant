@@ -410,6 +410,8 @@ class StrategyModel(object):
     # ////////////////////////策略函数////////////////////////////
     def setBuy(self, userNo, contractNo, share, price, needCover=True):
         contNo = contractNo if contractNo else self._cfgModel.getBenchmark()
+        
+        self.logger.info("3333:%s,%s,%f,%d"%(userNo, contractNo, price, share))
 
         underlayContNo = self._qteModel.getUnderlayContractNo(contNo)
         if len(underlayContNo) > 0:
@@ -432,6 +434,7 @@ class StrategyModel(object):
 
     def setBuyToCover(self, userNo, contractNo, share, price):
         contNo = contractNo if contractNo is not None else self._cfgModel.getBenchmark()
+        self.logger.info("2222:%s,%s,%f,%d"%(userNo, contractNo, price, share))
 
         underlayContNo = self._qteModel.getUnderlayContractNo(contNo)
         if len(underlayContNo) > 0:
@@ -449,6 +452,8 @@ class StrategyModel(object):
 
     def setSell(self, userNo, contractNo, share, price):
         contNo = contractNo if contractNo is not None else self._cfgModel.getBenchmark()
+        
+        self.logger.info("0000:%s,%s,%f,%d"%(userNo, contractNo, price, share))
 
         underlayContNo = self._qteModel.getUnderlayContractNo(contNo)
         if len(underlayContNo) > 0:
@@ -466,6 +471,8 @@ class StrategyModel(object):
 
     def setSellShort(self, userNo, contractNo, share, price, needCover=True):
         contNo = contractNo if contractNo is not None else self._cfgModel.getBenchmark()
+        
+        self.logger.info("1111:%s,%s,%f,%d"%(userNo, contractNo, price, share))
 
         underlayContNo = self._qteModel.getUnderlayContractNo(contNo)
         if len(underlayContNo) > 0:
@@ -777,6 +784,7 @@ class StrategyModel(object):
             2. 如果支持K线触发，会产生下单信号
             3. 对于即时行情和委托触发，在日志中分析下单信号
         '''
+        self.logger.info("AAAAAAA:%s,%s,%f,%d"%(userNo, contNo, orderPrice, orderQty))
         triggerInfo = self._strategy.getCurTriggerSourceInfo()
         dateTime = triggerInfo["DateTimeStamp"]
         tradeDate = triggerInfo["TradeDate"]
