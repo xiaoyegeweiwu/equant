@@ -1482,7 +1482,7 @@ class PyAPI(object):
                 'StrategyOrderId'  : None,
             }
             dataList.append(idict)
-        
+            print("sun +++++++ py2c OrderId ", idict['OrderId'], " OrderState : ", idict['OrderState'])
         #
         def getStrategyIdAndOrderId(apiSessionId, args):
             strategyId, eSessionId = 0, 0

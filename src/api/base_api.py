@@ -475,26 +475,6 @@ class BaseApi(object):
         '''
         return self._dataModel.getHisBarsInfo(contractNo, kLineType, kLineValue, maxLength)
 
-    def BarsLast(self, condition):
-        '''
-        【说明】
-              返回最后一次满足条件时距离当前的bar数
-
-        【语法】
-               int BarsLast(bool condition)
-
-        【参数】
-              condition  传入的条件表达式
-
-        【备注】
-              返回最后一次满足条件时距离当前的bar数。
-
-        【示例】
-              BarsLast(Close > Open); 从当前Bar开始，最近出现Close>Open的Bar到当前Bar的偏移值。如果为0，即当前Bar为最近的满足条件的Bar。
-
-        '''
-        return self._dataModel.getBarsLast(condition)
-
     #/////////////////////////即时行情/////////////////////////////
     def Q_UpdateTime(self, contractNo):
         '''
@@ -2366,6 +2346,26 @@ class BaseApi(object):
               无
         '''
         return self._dataModel.getPositionProfit(contractNo)
+
+    def BarsLast(self, condition):
+        '''
+        【说明】
+              返回最后一次满足条件时距离当前的bar数
+
+        【语法】
+               int BarsLast(bool condition)
+
+        【参数】
+              condition  传入的条件表达式
+
+        【备注】
+              返回最后一次满足条件时距离当前的bar数。
+
+        【示例】
+              BarsLast(Close > Open); 从当前Bar开始，最近出现Close>Open的Bar到当前Bar的偏移值。如果为0，即当前Bar为最近的满足条件的Bar。
+
+        '''
+        return self._dataModel.getBarsLast(condition)
 
     #////////////////////////////策略性能/////////////////
     def Available(self):
@@ -5039,7 +5039,7 @@ class BaseApi(object):
 
         【参数】
               contractNo 合约编号
-              barType K线类型 T分笔，S秒线，M分钟，D日线
+              barType K线类型 T分笔，M分钟，D日线
               barInterval K线周期
               sampleConfig 策略历史回测的起始点信息，可选的值为：
                 字符A : 使用所有K线
@@ -6063,7 +6063,7 @@ class BaseApi(object):
               无
 
         【备注】
-              返回字符, 'T' 分笔; 'S' 秒线; 'M' 分钟; 'D' 日线;
+              返回字符, 'T' 分笔; 'M' 分钟; 'D' 日线;
 
         【示例】
               无
@@ -6233,9 +6233,6 @@ def HisData(type, period='', interval=0, contractNo='', maxLength=100):
 def HisBarsInfo(contractNo='', kLineType='', kLineValue=0, maxLength=None):
     return baseApi.HisBarsInfo(contractNo, kLineType, kLineValue, maxLength)
 
-def BarsLast(condition):
-    return baseApi.BarsLast(condition)
-
 #即时行情
 def Q_UpdateTime(contractNo=''):
     return baseApi.Q_UpdateTime(contractNo)
@@ -6396,6 +6393,9 @@ def MarketPosition(contractNo=''):
 
 def PositionProfit(contractNo=''):
     return baseApi.PositionProfit(contractNo)
+
+def BarsLast(condition):
+    return baseApi.BarsLast(condition)
 
 # 策略性能
 def Available():
@@ -6665,8 +6665,8 @@ def Enum_Period_Tick():
 # def Enum_Period_Dyna():
 #     return baseApi.Enum_Period_Dyna()
 #
-def Enum_Period_Second():
-    return baseApi.Enum_Period_Second()
+# def Enum_Period_Second():
+#     return baseApi.Enum_Period_Second()
     
 def Enum_Period_Min():
     return baseApi.Enum_Period_Min()

@@ -24,7 +24,6 @@ _all_func_ = {
                     ['HistoryDataExist'    , '历史数据是否存在'],
                     ['HisData'             , '获取各种历史数据数组'],
                     ['HisBarsInfo'         , '获取历史K线详细数据'],
-                    ['BarsLast'            , '获取最后一次满足条件时距离当前的bar数'],
                 ],
                 
     '即时行情': [
@@ -128,6 +127,7 @@ _all_func_ = {
                     ['LastEntryTime'       , '当前持仓的最后一个建仓位置的时间'],
                     ['MarketPosition'      , '当前持仓状态'],
                     ['PositionProfit'      , '当前持仓的浮动盈亏'],
+                    ['BarsLast'            , '获取最后一次满足条件时距离当前的bar数'],
     #                 ['MaxContracts'        , '当前持仓的最大持仓合约数'],
     #                 ['MaxEntries'          , '最大的建仓次数'],
     #                 ['MaxPositionLoss'     , '当前持仓的最大浮动亏损数'],
@@ -225,7 +225,7 @@ _all_func_ = {
 
                     ['Enum_Period_Tick'    , '周期类型_分笔'],
                     # ['Enum_Period_Dyna'    , '周期类型_分时'],
-                    ['Enum_Period_Second'  , '周期类型_秒线'],
+                    # ['Enum_Period_Second'  , '周期类型_秒线'],
                     ['Enum_Period_Min'     , '周期类型_分钟'],
                     # ['Enum_Period_Hour'    , '周期类型_小时'],
                     ['Enum_Period_Day'     , '周期类型_日线'],

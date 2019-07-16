@@ -254,6 +254,7 @@ class GetEgData(object):
             EV_EG2UI_CHECK_RESULT:          self._onEgDebugInfo,
             EV_EG2ST_MONITOR_INFO:          self._onEgMonitorInfo,
             EV_EG2UI_STRATEGY_STATUS:       self._onEgStrategyStatus,
+            EV_EG2UI_POSITION_NOTICE:       self._onEgPositionNotice,
             EEQU_SRVEVENT_EXCHANGE:         self._onEgExchangeInfo,
             EEQU_SRVEVENT_COMMODITY:        self._onEgCommodityInfo,
             EEQU_SRVEVENT_CONTRACT:         self._onEgContractInfo,
@@ -343,7 +344,7 @@ class GetEgData(object):
         self._logger.info(f"[UI][{id}]: Receiving strategy status %s successfully!"%(sStatus))
 
         #TODO: if需要改下
-        if id not in self._stManager.getStrategyDict():
+        if id not in self._stManager.getStrategyDict() and sStatus != ST_STATUS_REMOVE:
             dataDict = {
                 "StrategyId":   id,
                 "Status":       sStatus
@@ -352,21 +353,25 @@ class GetEgData(object):
         else:
             # 策略状态改变后要通知监控界面
             self._stManager.updateStrategyStatus(id, sStatus)
-            # TODO：直接将dataDict传进去？
-            dataDict = self._stManager.getSingleStrategy(id)
-
-            self._app.updateStatus(id, dataDict)
+            # 更新策略Id的运行状态
+            self._app.updateStatus(id, sStatus)
             if sStatus == ST_STATUS_QUIT:
                 # 策略停止时接收策略数据
                 self._stManager.addResultData(id, event.getData()["Result"])
                 self._logger.info(f"[UI][{id}]: Receiving strategy data successfully when strategy quit!")
+            # TODO：引擎发了两遍remove事件
             if sStatus == ST_STATUS_REMOVE:
                 # 删除策略需要接到通知之后再进行删除
-                # 将策略管理器中的该策略也删除掉
                 self._stManager.removeStrategy(id)
                 # 更新界面
                 self._app.delUIStrategy(id)
                 self._logger.info(f"[UI][{id}]: Receiving strategy removing answer info successfully!")
+
+    def _onEgPositionNotice(self, event):
+        return
+        syncPosition = event.getData()
+        print("aaaaaaaaaa: ", syncPosition)
+        self._logger.info("[UI]: Receiving sync position info successfully!")
 
     def _onEgConnect(self, event):
         src = event.getEventSrc()
@@ -387,7 +392,9 @@ class GetEgData(object):
         try:
             # 如果不给出超时则会导致线程退出时阻塞
             event = self._eg2uiQueue.get(timeout=0.1)
+            # event = self._eg2uiQueue.get_nowait()
             eventCode = event.getEventCode()
+
             if eventCode not in self._egAskCallbackDict:
                 self._logger.error(f"[UI]: Unknown engine event{eventCode}")
             else:
@@ -448,7 +455,7 @@ class StrategyManager(object):
     def addStrategy(self, dataDict):
         id = dataDict['StrategyId']
         self._strategyDict[id] = dataDict
-        self._app.updateSingleExecute(dataDict)
+        self._app.addExecute(dataDict)
 
     def add_(self, dataDict):
         #TODO: 策略状态传过来事件问题
@@ -473,7 +480,8 @@ class StrategyManager(object):
         return self._strategyDict[id]["StrategyName"]
 
     def updateStrategyStatus(self, id, status):
-        self._strategyDict[id]["StrategyState"] = status
+        if id in self._strategyDict:
+            self._strategyDict[id]["StrategyState"] = status
 
     def getStrategyConfigData(self, id):
         """获取运行设置信息"""

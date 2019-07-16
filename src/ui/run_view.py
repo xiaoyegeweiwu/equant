@@ -1258,16 +1258,22 @@ class RunWin(QuantToplevel, QuantFrame):
             contValues = self.contTree.item(item)['values']
             contsInfo.append(contValues)
 
+            # kLineTypeDict = {
+            #     "分时": 't',
+            #     "分笔": 'T',
+            #     "秒线": 'S',
+            #     "分钟": 'M',
+            #     "小时": 'H',
+            #     "日线": 'D',
+            #     "周线": 'W',
+            #     "月线": 'm',
+            #     "年线": 'Y'
+            # }
+
             kLineTypeDict = {
-                "分时": 't',
                 "分笔": 'T',
-                "秒线": 'S',
                 "分钟": 'M',
-                "小时": 'H',
                 "日线": 'D',
-                "周线": 'W',
-                "月线": 'm',
-                "年线": 'Y'
             }
 
             contCode     = contValues[0]
@@ -1391,7 +1397,7 @@ class RunWin(QuantToplevel, QuantFrame):
         self._strConfig.setParams(params)
 
         self.config = self._strConfig.getConfig()
-        # print("1111111111: ", self.config)
+        # print("-----------: ", self.config)
 
 
         # -------------保存用户配置--------------------------
@@ -1762,7 +1768,8 @@ class AddContWin(QuantToplevel, QuantFrame):
         self.selectedItem = item
         self.contCode.set(value[0])
         self.kLineType.set(value[1])
-        self.kLineSlice.set(value[2])
+        # 防止用户设置中分笔的周期设置为不为零的值
+        self.kLineSlice.set("0") if value[1] == "分笔" else self.kLineSlice.set(value[2])
         # 设置运算起始点状态（转换）
         samV = {
             "所有K线"       : 0,
@@ -1818,9 +1825,9 @@ class AddContWin(QuantToplevel, QuantFrame):
         kLineTypeLabel.pack(side=tk.LEFT)
 
         self.kLineTypeChosen = ttk.Combobox(kLineTypeFrame, state="readonly", textvariable=self.kLineType, width=17)
-        self.kLineTypeChosen['values'] = ['分时', '分笔', '秒线', '分钟', '小时', '日线', '周线', '月线', '年线']
-        # self.kLineTypeChosen['values'] = ['日', '分钟', '秒']
+        self.kLineTypeChosen['values'] = ['分笔', '分钟', '日线']
         self.kLineTypeChosen.pack(side=tk.LEFT, fill=tk.X, padx=5)
+        self.kLineTypeChosen.bind("<<ComboboxSelected>>", self.kLineChosenCallback)
 
     def setKLineSlice(self, frame):
         self.klineSliceFrame = tk.Frame(frame, relief=tk.RAISED, bg=rgb_to_hex(245, 245, 245))
@@ -1833,6 +1840,20 @@ class AddContWin(QuantToplevel, QuantFrame):
                                              textvariable=self.kLineSlice, width=17)
         self.klineSliceChosen["values"] = ['1', '2', '3', '5', '10', '15', '30', '60', '120']
         self.klineSliceChosen.pack(side=tk.LEFT, fill=tk.X, padx=5)
+        self.klineSliceChosen.bind("<<ComboboxSelected>>", self.kLineChosenCallback)
+
+    def kLineChosenCallback(self, event):
+        """k线周期和k线类型选择回调函数"""
+        type = self.kLineType.get()
+        slice = self.kLineSlice.get()
+        if slice == "0":
+            slice = "1"
+        if type == "分笔":
+            self.kLineSlice.set("0")
+            self.klineSliceChosen.config(state="disabled")
+            return
+        self.kLineSlice.set(slice)
+        self.klineSliceChosen.config(state="normal")
 
     def setSample(self, frame):
         """设置样本"""
