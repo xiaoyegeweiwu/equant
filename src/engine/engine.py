@@ -14,7 +14,7 @@ import os, json
 from collections import OrderedDict
 import traceback
 from .engine_order_model import EngineOrderModel, EnginePosModel
-from .strategy_cfg_model import StrategyConfig
+from .strategy_cfg_model_new import StrategyConfig_new as StrategyConfig
 from datetime import datetime
 
 
@@ -77,6 +77,7 @@ class StrategyEngine(object):
         try:
             self._resumeStrategy()
         except Exception as e:
+            traceback.print_exc()
             self.logger.error(f"恢复策略失败")
         self._engineOrderModel = EngineOrderModel(self._strategyOrder)
         self._enginePosModel = EnginePosModel()
