@@ -1,6 +1,6 @@
 class NumericSeries(list):
-    def __init__(self, isOpenLog=True):
-        super().__init__()
+    def __init__(self, rawList=[], isOpenLog=True):
+        super().__init__(rawList)
         self._curBarIndex = -1
         self._isOpenLog = isOpenLog
 
@@ -49,15 +49,12 @@ class NumericSeries(list):
     def __len__(self):
         return super().__len__()
 
-# i = 1
-#
-# def CurrentBar():
-#     global i
-#     result = i
-#     # i += 1
-#     return result
-#
-# test = NumericArray(False)
-# test.append(1)
-# test.append(2)
-# print(test)
+    def __add__(self, other):
+        if len(self) != len(other):
+            if self._isOpenLog:
+                LogInfo(f"长度不一样,{len(self)}, {len(other)}")
+            return
+        result = [a+b for a,b in zip(super().__iter__(), other)]
+        resultObj = self.__class__(result, self._isOpenLog)
+        return resultObj
+

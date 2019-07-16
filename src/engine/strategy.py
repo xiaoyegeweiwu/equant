@@ -256,8 +256,6 @@ class StrategyContext:
         self._parameter = parameter
 
 
-
-
 class TradeRecord(object):
     def __init__(self, eSessionId, orderData={}):
         self._eSessionId = eSessionId   # eSessionId
@@ -393,6 +391,7 @@ class Strategy:
         else:
             self._context.params = self._argsDict["Params"]
 
+        print(self._argsDict)
         self._userModule = userModule
         # 5.1 同步配置
         self._sendConfig2Engine()

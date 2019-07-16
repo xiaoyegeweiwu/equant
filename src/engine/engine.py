@@ -263,10 +263,11 @@ class StrategyEngine(object):
                 self.logger.warn(f"engine向策略发事件时阻塞，策略id:{strategyId}, 事件号: {event.getEventCode()}")
 
     def _sendEvent2AllStrategy(self, event):
-        for id in self._eg2stQueueDict:
-            self._sendEvent2Strategy(id, event)
-            # self._eg2stQueueDict[id].put(event)
-        
+        for strategyId in self._eg2stQueueDict:
+            eventCopy = copy.deepcopy(event)
+            eventCopy.setStrategyId(strategyId)
+            self._sendEvent2Strategy(strategyId, eventCopy)
+
     def _dispathQuote2Strategy(self, code, apiEvent):
         '''分发即时行情'''
         contractNo = apiEvent.getContractNo()
