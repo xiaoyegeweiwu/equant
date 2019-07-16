@@ -180,56 +180,46 @@ class QuantMonitor(object):
         :param dataDict: 策略的所有信息
         :return: 需要展示的信息
         """
+
         try:
-            Id = dataDict['StrategyId']
-            UserNo = dataDict["Config"]["Money"]["UserNo"]
-            StName = dataDict['StrategyName']
-            BenchCon = dataDict['ContractNo']
-            kLineType = dataDict['KLineType']
-            kLineSlice = dataDict['KLinceSlice']
+            Id          = dataDict['StrategyId']
+            UserNo      = dataDict["Config"]["Money"]["UserNo"]
+            StName      = dataDict['StrategyName']
+            BenchCon    = dataDict['ContractNo']
+            kLineType   = dataDict['KLineType']
+            kLineSlice  = dataDict['KLinceSlice']
 
-            Frequency = str(kLineSlice) + kLineType
+            Frequency   = str(kLineSlice) + kLineType
 
-            RunType = "是" if dataDict['IsActualRun'] else "否"
-            Status = StrategyStatus[dataDict["StrategyState"]]
-            InitFund = dataDict['InitialFund']
+            RunType     = "是" if dataDict['IsActualRun'] else "否"
+            Status      = StrategyStatus[dataDict["StrategyState"]]
+            InitFund    = dataDict['InitialFund']
 
-            if 'RunningData' in dataDict:
-                # Available =  "{:.2f}".format(dataDict['RunningData']['Fund'][-1]['Available'])
-                Available = "{:.2f}".format(dataDict['RunningData']['Available'])
-                # 年化单利收益率
-                # AnnualizedReturns = "{:.2f}".format(dataDict['RunningData']['Detail']['AnnualizedSimple'])
-                MaxRetrace = "{:.2f}".format((dataDict['RunningData']['MaxRetrace']))
-                TotalProfit = "{:.2f}".format(dataDict['RunningData']['NetProfit'])
-                WinRate = "{:.2f}".format(dataDict['RunningData']['WinRate'])
-            else:
-                Available = InitFund
-                MaxRetrace = 0
-                TotalProfit = 0
-                WinRate = 0
+            Available   = "{:.2f}".format(InitFund)
+            MaxRetrace  = 0.0
+            TotalProfit = 0.0
+            WinRate     = 0.0
+
+            return [
+                Id,
+                UserNo,
+                StName,
+                BenchCon,
+                Frequency,
+                Status,
+                RunType,
+                InitFund,
+                Available,
+                MaxRetrace,
+                TotalProfit,
+                WinRate
+            ]
 
         except KeyError:
             traceback.print_exc()
-            return {}
+            return []
 
-        values = [
-            Id,
-            UserNo,
-            StName,
-            BenchCon,
-            Frequency,
-            Status,
-            RunType,
-            InitFund,
-            Available,
-            MaxRetrace,
-            TotalProfit,
-            WinRate
-        ]
-
-        return values
-
-    def updateSingleExecute(self, dataDict):
+    def addExecute(self, dataDict):
         values = self._formatMonitorInfo(dataDict)
 
         if not values:
@@ -238,11 +228,12 @@ class QuantMonitor(object):
         strategyId = dataDict["StrategyId"]
         try:
             if self.executeListTree.exists(strategyId):
-                self.updateStatus(strategyId, dataDict)
+                self.updateStatus(strategyId, dataDict[5])
                 return
         except Exception as e:
-            self._logger.warn("updateSingleExecute exception")
-        self.executeListTree.insert("", END, iid=strategyId, values=tuple(values), tag=0)
+            self._logger.warn("addExecute exception")
+        else:
+            self.executeListTree.insert("", END, iid=strategyId, values=tuple(values), tag=0)
 
     def createErr(self):
         # 错误信息展示
@@ -452,14 +443,27 @@ class QuantMonitor(object):
 
     def deleteStrategy(self, strategyId):
         """删除策略"""
-        self.executeListTree.delete(strategyId)
+        if str(strategyId) in self.executeListTree.get_children():
+            self.executeListTree.delete(strategyId)
 
-    def updateStatus(self, strategyId, dataDict):
-        """更新策略ID对应的策略状态"""
-        if len(dataDict) < 4:
-            return
+    def updateValue(self, strategyId, dataDict):
+        """更新策略ID对应的运行数据"""
 
-        values = self._formatMonitorInfo(dataDict)
-        if not values:
-            return
-        self.executeListTree.item(strategyId, values=values)
+        colValues = {
+                       "#9": "{:.2f}".format(dataDict["Available"]),
+                       "#10": "{:.2f}".format(dataDict["MaxRetrace"]),
+                       "#11": "{:.2f}".format(dataDict["NetProfit"]),
+                       "#12": "{:.2f}".format(dataDict["WinRate"])
+                   }
+
+        if str(strategyId) in self.executeListTree.get_children():
+            for k, v in colValues.items():
+                self.executeListTree.set(strategyId, column=k, value=v)
+
+    def updateStatus(self, strategyId, status):
+        """更新策略状态"""
+        if str(strategyId) in self.executeListTree.get_children():
+            self.executeListTree.set(strategyId, column="#6", value=StrategyStatus[status])
+
+
+

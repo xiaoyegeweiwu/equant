@@ -11,6 +11,8 @@ from .run_view import RunWin
 from report.reportview import ReportView
 from .com_view import HistoryToplevel
 
+from datetime import datetime
+
 
 class QuantApplication(object):
     '''主界面'''
@@ -116,6 +118,7 @@ class QuantApplication(object):
         # self.create_monitor()
         self.quant_monitor.createSignal()
         self.quant_monitor.createErr()
+        # self.quant_monitor.createPos()
 
     def updateLogText(self):
         self.quant_monitor.updateLogText()
@@ -145,8 +148,11 @@ class QuantApplication(object):
     # def updateExecuteList(self, executeList):
     #     self.quant_monitor.updateExecuteList(executeList)
         
-    def updateSingleExecute(self, dataDict):
-        self.quant_monitor.updateSingleExecute(dataDict)
+    def addExecute(self, dataDict):
+        self.quant_monitor.addExecute(dataDict)
+
+    def sortStrategyExecute(self):
+        self.quant_monitor.sortStrategyExecute()
 
     def createRunWin(self, param):
         """弹出量化设置界面"""
@@ -182,7 +188,8 @@ class QuantApplication(object):
         stName = os.path.basename(strategyPath)
 
         stData = stManager.getSingleStrategy(id)
-        runMode = stData["Config"]["RunMode"]["Actual"]["SendOrder2Actual"]
+        # runMode = stData["Config"]["RunMode"]["Actual"]["SendOrder2Actual"]
+        runMode = stData["Config"]["RunMode"]["SendOrder2Actual"]
         # 保存报告数据
         save(data, runMode, stName)
 
@@ -190,14 +197,23 @@ class QuantApplication(object):
         ReportView(data, self.hisTop)
         self.hisTop.display_()
 
-    def updateStatus(self, strategyId, dataDict):
+    def updateStatus(self, strategyId, status):
         """
         更新策略状态
-        :param strategyIdList: 策略Id列表
-        :param dataDict: strategeId对应的策略的所有信息
+        :param strategyId: 策略Id
+        :param dataDict: strategeId对应的策略状态信息
         :return:
         """
-        self.quant_monitor.updateStatus(strategyId, dataDict)
+        self.quant_monitor.updateStatus(strategyId, status)
+
+    def updateValue(self, strategyId, values):
+        """
+        更新策略的运行数据
+        :param strategyId: 策略id
+        :param values: 策略的运行数据
+        :return:
+        """
+        self.quant_monitor.updateValue(strategyId, values)
 
     def delUIStrategy(self, strategyId):
         """
@@ -235,3 +251,8 @@ class QuantApplication(object):
     def clearError(self):
         """清除错误信息"""
         self.quant_monitor.clearErrorText("")
+
+    def updateSyncPosition(self, position):
+        """更新组合监控持仓信息"""
+        # self.quant_monitor.
+        pass

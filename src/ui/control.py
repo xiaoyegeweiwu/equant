@@ -73,24 +73,36 @@ class TkinterController(object):
         strategyDict = self.strategyManager.getStrategyDict()
         #TODO: strategyDict的异常策略应该怎么处理?
         for stId in strategyDict:
-            if len(strategyDict[stId]) < 4:
+            if "RunningData" not in strategyDict[stId]:
                 return
-            self.app.updateStatus(stId, strategyDict[stId])
+            if strategyDict[stId]["StrategyState"] == ST_STATUS_PAUSE or strategyDict[stId][
+                  "StrategyState"] == ST_STATUS_QUIT or strategyDict[stId][
+                  "StrategyState"] == ST_STATUS_EXCEPTION:
+                return
+
+            self.app.updateValue(stId, strategyDict[stId]["RunningData"])
 
     def quitThread(self):
         self.logger.info("quitThread exit")
         # 停止更新界面子线程
+        # print("----------------------")
         self.monitorThread.stop()
+        # print("0000000000000000000000")
         self.monitorThread.join()
 
         # 停止更新信号记录
+        # print("-----------------------")
         self.sigThread.stop()
+        # print("111111111111111111")
         self.sigThread.join()
 
         # 停止接收策略引擎队列数据
+        # print("-----------------------")
         self.receiveEgThread.stop()
         self.model.receiveExit()
+        # print("222222222222222222222222")
         self.receiveEgThread.join()
+        # print("3333333333333333333333333")
 
         self.logger.info("before top.destroy")
         self.top.destroy()
@@ -172,7 +184,6 @@ class TkinterController(object):
                 self.app.reportDisplay(reportData, id)
                 return
             self._request.reportRequest(id)
-
 
     def newStrategy(self, path):
         """右键新建策略"""
@@ -265,14 +276,12 @@ class TkinterController(object):
     def delStrategy(self, strategyIdList):
         # 获取策略管理器
         for id in strategyIdList:
-            # self._request.strategyRemove(id)
             strategyDict = self.strategyManager.getStrategyDict()
             if id in strategyDict:
                 if strategyDict[id]["StrategyState"] == ST_STATUS_QUIT or \
                         strategyDict[id]["StrategyState"] == ST_STATUS_EXCEPTION:  # 策略已经停止或策略异常
                     self.strategyManager.removeStrategy(id)
                     self.app.delUIStrategy(id)
-                    # return
                 self._request.strategyRemove(id)
             else:
                 self.app.delUIStrategy(id)
