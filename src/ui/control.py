@@ -75,6 +75,10 @@ class TkinterController(object):
         for stId in strategyDict:
             if "RunningData" not in strategyDict[stId]:
                 return
+            if strategyDict[stId]["StrategyState"] == ST_STATUS_PAUSE or strategyDict[stId][
+                  "StrategyState"] == ST_STATUS_QUIT or strategyDict[stId][
+                  "StrategyState"] == ST_STATUS_EXCEPTION:
+                return
 
             self.app.updateValue(stId, strategyDict[stId]["RunningData"])
 
@@ -181,7 +185,6 @@ class TkinterController(object):
                 return
             self._request.reportRequest(id)
 
-
     def newStrategy(self, path):
         """右键新建策略"""
         if not os.path.exists(path):
@@ -278,9 +281,10 @@ class TkinterController(object):
                 if strategyDict[id]["StrategyState"] == ST_STATUS_QUIT or \
                         strategyDict[id]["StrategyState"] == ST_STATUS_EXCEPTION:  # 策略已经停止或策略异常
                     self.strategyManager.removeStrategy(id)
+                    self.app.delUIStrategy(id)
                 self._request.strategyRemove(id)
-            # else:
-            #     self.app.delUIStrategy(id)
+            else:
+                self.app.delUIStrategy(id)
 
     def signalDisplay(self, strategyIdList):
         """查看策略的信号及指标图(默认查看一个)"""

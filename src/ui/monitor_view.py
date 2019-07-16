@@ -232,7 +232,8 @@ class QuantMonitor(object):
                 return
         except Exception as e:
             self._logger.warn("addExecute exception")
-        self.executeListTree.insert("", END, iid=strategyId, values=tuple(values), tag=0)
+        else:
+            self.executeListTree.insert("", END, iid=strategyId, values=tuple(values), tag=0)
 
     def createErr(self):
         # 错误信息展示

@@ -5993,6 +5993,50 @@ class BaseApi(object):
             CountIf(Close > Open , 10); 最近10周期出现Close>Open的周期总数
         '''
         return self._dataModel.getCountIf(cond, period)
+        
+    def CrossOver(self, price1, price2):
+        '''
+        【说明】
+            求是否上穿
+
+        【语法】
+            Bool CrossOver(np.array Price1, np.array Price2)
+
+        【参数】
+            Price1 求相关系统的数据源1，必须是np数组;
+            Price2 求相关系统的数据源2，必须是np数组;
+
+        【备注】
+            该函数返回Price1数值型序列值是否上穿Price2数值型序列值，返回值为布尔型。
+
+        【示例】
+            CrossOver(Close[1], AvgPrice); 判断上一个Bar的收盘价Close是否上穿AvgPrice.
+            注意：在使用判断穿越的函数时，要尽量避免使用例如close等不确定的元素，否则会导致信号消失，
+            一般情况下，Close可以改用High和Low分别判断向上突破（函数CrossOver）和向下突破（函数CrossUnder）。
+        '''
+        return self._dataModel.getCrossOver(price1, price2)
+        
+    def CrossUnder(self, price1, price2):
+        '''
+        【说明】
+            求是否下破
+
+        【语法】
+            Bool CrossUnder(np.array Price1, np.array Price2)
+
+        【参数】
+            Price1 求相关系统的数据源1，必须是np数组;
+            Price2 求相关系统的数据源2，必须是np数组;
+
+        【备注】
+            该函数返回Price1数值型序列值是否上穿Price2数值型序列值，返回值为布尔型。
+
+        【示例】
+            CrossOver(Close[1], AvgPrice); 判断上一个Bar的收盘价Close是否上穿AvgPrice.
+            注意：在使用判断穿越的函数时，要尽量避免使用例如close等不确定的元素，否则会导致信号消失，
+            一般情况下，Close可以改用High和Low分别判断向上突破（函数CrossOver）和向下突破（函数CrossUnder）。
+        '''
+        return self._dataModel.getCrossUnder(price1, price2)
 
     def strategyStatus(self):
         '''
@@ -7044,5 +7088,11 @@ def Lowest(price, length):
     return baseApi.Lowest(price, length)
     
 def CountIf(cond, peroid):
-    return baseApi.CountIf(cond, peroid)    
+    return baseApi.CountIf(cond, peroid) 
+
+def CrossOver(price1, price2):
+    return baseApi.CrossOver(price1, price2) 
+
+def CrossUnder(price1, price2):
+    return baseApi.CrossUnder(price1, price1)     
     

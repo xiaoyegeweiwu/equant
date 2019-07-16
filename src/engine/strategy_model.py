@@ -1671,7 +1671,7 @@ class StrategyModel(object):
         return delta
         
     def getRef(self, price, n):
-        return self.getRef(price,n-1) if len(price) < n else price[-n]
+            return self.getRef(price,n-1) if len(price) < n else price[-n]
         
 
     def isInSession(self, contNo):
@@ -2166,4 +2166,23 @@ class StrategyModel(object):
             if i == 0: break
             
         return sum
-            
+        
+    def getCrossOver(self, price1, price2):
+        if price1[-1]  <= price2[-1]:
+            return False
+
+        for i in range(len(price1)-1, -1, -1):
+            if price1[i] < price2[i]:
+                return True
+
+        return False
+
+    def getCrossUnder(self, price1, price2):
+        if price1[-1]  >= price2[-1]:
+            return False
+
+        for i in range(len(price1)-1, -1, -1):
+            if price1[i] > price2[i]:
+                return True
+
+        return False

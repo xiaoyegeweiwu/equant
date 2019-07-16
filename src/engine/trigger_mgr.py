@@ -21,7 +21,7 @@ class TriggerMgr(object):
         else:
             return
 
-        print("key = ", key, apiEvent.getData())
+        # print("key = ", key, apiEvent.getData())
         self._data[key] = copy.deepcopy(apiEvent)
         self.setDataReady(key)
 

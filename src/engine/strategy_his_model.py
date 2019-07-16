@@ -6,6 +6,7 @@ import datetime
 import copy
 import math
 import pandas as pd
+import traceback
 
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
@@ -1129,7 +1130,8 @@ class StrategyHisQuote(object):
             try:
                 self._calcProfitByQuote(event)
             except Exception as e:
-                self.logger.error("即时行情计算浮动盈亏出现错误")
+                errText = traceback.format_exc()
+                self.logger.error(f"即时行情计算浮动盈亏出现错误，{errText}")
 
             # 处理止损止盈
             self._handleStopWinLose(event)
