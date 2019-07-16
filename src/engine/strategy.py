@@ -857,9 +857,9 @@ class Strategy:
         :param apiEvent: 引擎返回事件
         :return: None
         '''
-        print("sun ++++++++++++ strategy OrderNotice :")
+        self.logger.debug("sun ++++++++++++ strategy OrderNotice :")
         for data in apiEvent.getData():
-            print("OrderId ", data['OrderId'], " OrderState ", data['OrderState'])
+            self.logger.debug(f"OrderId {data['OrderId']} OrderState {data['OrderState']}")
         self._dataModel._trdModel.updateOrderData(apiEvent)
 
         # 更新本地订单信息
@@ -887,9 +887,9 @@ class Strategy:
         self._dataModel._trdModel.updatePosData(apiEvent)
 
     def _onTradeOrderQry(self, apiEvent):
-        print("sun ++++++++++++ strategy OrderQty :")
+        self.logger.debug("sun ++++++++++++ strategy OrderQty :")
         for data in apiEvent.getData():
-            print("OrderId ", data['OrderId'], " OrderState ", data['OrderState'])
+            self.logger.debug(f"OrderId {data['OrderId']}, OrderState {data['OrderState']}")
         self._dataModel._trdModel.updateOrderData(apiEvent)
 
     def _onTradeMatch(self, apiEvent):
