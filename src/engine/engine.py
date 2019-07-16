@@ -646,9 +646,9 @@ class StrategyEngine(object):
         
     def _onApiOrderDataQry(self, apiEvent):
         self._trdModel.updateOrderData(apiEvent)
-        print("sun ++++++++++++ engine OrderQry :")
+        self.logger.debug("sun ++++++++++++ engine OrderQry :")
         for data in apiEvent.getData():
-            print("OrderId ", data['OrderId'], " OrderState ", data['OrderState'])
+            self.logger.debug(f"OrderId {data['OrderId']}, OrderState {data['OrderState']}")
         self._sendEvent2AllStrategy(apiEvent)
         # 获取关联的策略id和订单id
         self._engineOrderModel.updateEpoleStarOrder(apiEvent)
@@ -670,12 +670,12 @@ class StrategyEngine(object):
         # 订单信息
         self._trdModel.updateOrderData(apiEvent)
         self._engineOrderModel.updateEpoleStarOrder(apiEvent)
-        print("sun ++++++++++++ engine OrderNotice :")
+        self.logger.debug("sun ++++++++++++ engine OrderNotice :")
         for data in apiEvent.getData():
-            print("OrderId ", data['OrderId'], " OrderState ", data['OrderState'])
+            self.logger.debug(f"OrderId {data['OrderId']}, OrderState {data['OrderState']}")
         strategyId = apiEvent.getStrategyId()
         if strategyId > 0:
-            print("sun ++++++++++++ engine OrderNotice strategyId : ", strategyId)
+            self.logger.debug(f"sun ++++++++++++ engine OrderNotice strategyId : {strategyId}")
             self._sendEvent2Strategy(strategyId, apiEvent)
         else:
             contractNo = apiEvent.getContractNo()
@@ -683,7 +683,7 @@ class StrategyEngine(object):
             # 客户端手动开仓平仓
             if not contractNo:
                 contractNo = apiEvent.getData()[0]["Cont"]
-            print("sun ++++++++++++ engine OrderNotice getContractNo : ", apiEvent.getContractNo(), " Cont : ", contractNo)
+            self.logger.debug(f"sun ++++++++++++ engine OrderNotice getContractNo : {apiEvent.getContractNo()}, Cont : {contractNo}")
             if not contractNo:
                 return
             apiEvent.setContractNo(contractNo)
