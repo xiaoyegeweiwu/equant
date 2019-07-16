@@ -1,4 +1,4 @@
-class NumericArray(list):
+class NumericSeries(list):
     def __init__(self, isOpenLog=True):
         super().__init__()
         self._curBarIndex = -1
