@@ -508,13 +508,14 @@ class CalcCenter(object):
         return 1  # 订单发送成功
 
     def _formatOrder(self, order):
+        print("AAAAAAAAAAAAAAAA: ", order)
         if "OrderId" in order:
             return {
                 "StrategyId"   :    order["StrategyId"],
                 "StrategyStage":    StrategyStatus[order["StrategyStage"]],
                 "OrderId"      :    order["OrderId"],
                 "TradeDate":        order["TradeDate"],
-                "DateTimeStamp":    order["CurBar"]["DateTimeStamp"],
+                "DateTimeStamp":    order["DateTimeStamp"],
                 "UserNo"       :    order["UserNo"],
                 "Cont"         :    order["Cont"],
                 "Direct"       :    DirectDict[order["Direct"]],
@@ -530,10 +531,9 @@ class CalcCenter(object):
                 "StrategyId"   :    order["StrategyId"],
                 "StrategyStage":    StrategyStatus[order["StrategyStage"]],
                 "TradeDate":        order["TradeDate"],
-                "DateTimeStamp":    order["CurBar"]["DateTimeStamp"],
+                "DateTimeStamp":    order["DateTimeStamp"],
                 "UserNo"       :    order["UserNo"],
                 "OrderCont"    :    order["Cont"],
-                "BarCont"      :    order["CurBar"]["ContractNo"],
                 "Direct"       :    DirectDict[order["Direct"]],
                 "Offset"       :    OffsetDict[order["Offset"]],
                 "OrderPrice"   :    '{:.2f}'.format(order["OrderPrice"]),
