@@ -519,7 +519,7 @@ class CalcCenter(object):
                 "Cont"         :    order["Cont"],
                 "Direct"       :    DirectDict[order["Direct"]],
                 "Offset"       :    OffsetDict[order["Offset"]],
-                "OrderPrice"   :    '{:.2f}'.format(order["OrderPrice"]),
+                "OrderPrice"   :    '{:.7f}'.format(order["OrderPrice"]),
                 "OrderQty"     :    order["OrderQty"],
                 "OrderType"    :    OrderTypeDict[order["OrderType"]],
                 "Hedge"        :    HedgeDict[order["Hedge"]],
