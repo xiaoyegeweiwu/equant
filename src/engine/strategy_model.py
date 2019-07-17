@@ -411,8 +411,6 @@ class StrategyModel(object):
     def setBuy(self, userNo, contractNo, share, price, needCover=True):
         contNo = contractNo if contractNo else self._cfgModel.getBenchmark()
         
-        self.logger.info("3333:%s,%s,%f,%d"%(userNo, contractNo, price, share))
-
         underlayContNo = self._qteModel.getUnderlayContractNo(contNo)
         if len(underlayContNo) > 0:
             contNo = underlayContNo
@@ -472,8 +470,6 @@ class StrategyModel(object):
     def setSellShort(self, userNo, contractNo, share, price, needCover=True):
         contNo = contractNo if contractNo is not None else self._cfgModel.getBenchmark()
         
-        self.logger.info("1111:%s,%s,%f,%d"%(userNo, contractNo, price, share))
-
         underlayContNo = self._qteModel.getUnderlayContractNo(contNo)
         if len(underlayContNo) > 0:
             contNo = underlayContNo
@@ -784,7 +780,6 @@ class StrategyModel(object):
             2. 如果支持K线触发，会产生下单信号
             3. 对于即时行情和委托触发，在日志中分析下单信号
         '''
-        self.logger.info("AAAAAAA:%s,%s,%f,%d"%(userNo, contNo, orderPrice, orderQty))
         triggerInfo = self._strategy.getCurTriggerSourceInfo()
         dateTime = triggerInfo["DateTimeStamp"]
         tradeDate = triggerInfo["TradeDate"]
@@ -1679,7 +1674,19 @@ class StrategyModel(object):
         return delta
         
     def getRef(self, price, n):
-            return self.getRef(price,n-1) if len(price) < n else price[-n]
+        '''n从0开始'''
+        if len(price) < 1:
+            return np.nan
+            
+        if len(price) >= n:
+            return price[-n]
+            
+        last = n-1
+        while last > len(price):
+            last = last - 1
+            if last <= 1: break
+            
+        return price[-last]
         
 
     def isInSession(self, contNo):
@@ -2204,6 +2211,7 @@ class StrategyModel(object):
         for i in range(len(price1)-1, -1, -1):
             if price1[i] < price2[i]:
                 return True
+            if i == 0:break
 
         return False
 
@@ -2214,5 +2222,6 @@ class StrategyModel(object):
         for i in range(len(price1)-1, -1, -1):
             if price1[i] > price2[i]:
                 return True
+            if i == 0:break
 
         return False
