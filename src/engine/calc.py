@@ -293,7 +293,7 @@ class CalcCenter(object):
                 # 判断持仓
                 if pInfo["TotalSell"] < order["OrderQty"]:
                     self._logger.error(f"平卖仓失败，仓位不足，订单数据：{ftOrder}")
-                    return -1  # 平卖仓失败， 仓位不足
+                    return -1
 
                 # 计算平仓手续费
                 if cost["CloseRatio"]:
@@ -304,7 +304,7 @@ class CalcCenter(object):
                 # 判断资金
                 if availableFund < coverCharge:
                     self._logger.error(f"平卖仓失败，资金不足，订单数据：{ftOrder}")
-                    ret = -2  # 平卖仓失败，资金不足
+                    ret = -2
                 else:
                     ret = 1
             else:
@@ -315,7 +315,7 @@ class CalcCenter(object):
                 # 判断持仓
                 if pInfo["TotalBuy"] < order["OrderQty"]:
                     self._logger.error(f"平买仓失败，仓位不足，订单数据：{ftOrder}")
-                    return -1  # 平买仓失败， 仓位不足
+                    return -1
 
                 # 计算平仓手续费
                 if cost["CloseRatio"]:
@@ -326,7 +326,7 @@ class CalcCenter(object):
                 # 判断资金
                 if availableFund < coverCharge:
                     self._logger.error(f"平买仓失败，资金不足，订单数据：{ftOrder}")
-                    ret = -2  # 平买仓失败，资金不足
+                    ret = -2
                 else:
                     ret = 1
             else:
@@ -371,7 +371,7 @@ class CalcCenter(object):
                 # 判断资金
                 if availableFund < coverCharge:
                     self._logger.error(f"卖平今失败，资金不足，订单数据：{ftOrder}")
-                    ret = -2  # 平买仓失败，资金不足
+                    ret = -2
                 else:
                     ret = 1
             else:
@@ -426,11 +426,6 @@ class CalcCenter(object):
         self._endDate = order["TradeDate"]
         self._updateTradeDate(order["TradeDate"])
 
-        ftOrder = self._formatOrder(order)
-        if order["OrderQty"] <= 0:
-            self._logger.error(f"订单手数不大于0，订单数据：{ftOrder}")
-            return 0
-
         # TODO:限制信息写在这里
         # TODO: 应该先判断下面的限制再判断needCover 和 coverJudge
         if len(self._orders) < 1:
@@ -446,6 +441,12 @@ class CalcCenter(object):
         self._orderId += 1
         self._costs[order["Cont"]] = self.getCostRate(order["Cont"])
         # self._updateTradeDate(order["TradeDate"])
+
+        ftOrder = self._formatOrder(order)
+
+        if order["OrderQty"] <= 0:
+            self._logger.error(f"订单手数不大于0，订单数据：{ftOrder}")
+            return 0
 
         self._logger.sig_info("[%3s] [%4s] [%5s], %s, %s, %s, %s, %s, %s, %s, %s, %s, %s" % (
             ftOrder["StrategyId"],
@@ -532,14 +533,13 @@ class CalcCenter(object):
                 "DateTimeStamp":    order["CurBar"]["DateTimeStamp"],
                 "UserNo"       :    order["UserNo"],
                 "OrderCont"    :    order["Cont"],
+                "BarCont"      :    order["CurBar"]["ContractNo"],
                 "Direct"       :    DirectDict[order["Direct"]],
                 "Offset"       :    OffsetDict[order["Offset"]],
                 "OrderPrice"   :    '{:.2f}'.format(order["OrderPrice"]),
                 "OrderQty"     :    order["OrderQty"],
                 "OrderType"    :    OrderTypeDict[order["OrderType"]],
                 "Hedge"        :    HedgeDict[order["Hedge"]],
-
-                "BarCont"      :    order["CurBar"]["ContractNo"]
             }
 
     def _calcOrder(self, order):
