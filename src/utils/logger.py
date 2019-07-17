@@ -109,7 +109,7 @@ class Logger(object):
         self.renameHisLog()
 
         trade_path = self.logpath + "trade.dat"
-        user_path  = self.logpath + "user.dat"
+        user_path  = self.logpath + "user.log"
         sys_path   = self.logpath + "equant.log"
 
         #交易日志
@@ -142,7 +142,7 @@ class Logger(object):
     def renameHisLog(self):
         """重命名历史日志文件"""
         # 重命名历史日志文件
-        lognames = ["trade.dat", "equant.log", "user.dat"]
+        lognames = ["trade.dat", "equant.log", "user.log"]
         time_now = datetime.datetime.now().strftime("%Y%m%d%H%M%S%f")[:-3]
         for name in lognames:
             path = self.logpath + name
