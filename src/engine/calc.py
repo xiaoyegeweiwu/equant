@@ -282,19 +282,18 @@ class CalcCenter(object):
 
         ret = -1
 
+        ftOrder = self._formatOrder(order)
+
         if order["OrderQty"] <= 0:
-            self._logger.error(f"订单手数不大于0，策略Id:{order['StrategyId']}, 运行阶段：{order['StrategyStage']}，"
-                               f"订单数据：{repr(order)}")
+            self._logger.error(f"订单手数不大于0，订单数据：{ftOrder}")
             return ret
 
         if order["Direct"] == dBuy and order["Offset"] == oCover:  # 买平
             if pInfo["TotalSell"] > 0:
                 # 判断持仓
                 if pInfo["TotalSell"] < order["OrderQty"]:
-                    self._logger.error(f"平卖仓失败，仓位不足，策略Id:{order['StrategyId']}, "
-                                       f"运行阶段：{order['StrategyStage']}，"
-                                       f"订单数据：{repr(order)}")
-                    return -1  # 平卖仓失败， 仓位不足
+                    self._logger.error(f"平卖仓失败，仓位不足，订单数据：{ftOrder}")
+                    return -1
 
                 # 计算平仓手续费
                 if cost["CloseRatio"]:
@@ -304,21 +303,19 @@ class CalcCenter(object):
 
                 # 判断资金
                 if availableFund < coverCharge:
-                    self._logger.error(f"平卖仓失败，资金不足，策略Id:{order['StrategyId']},"
-                                       f" 运行阶段：{order['StrategyStage']}，"
-                                       f"订单数据：{repr(order)}")
-                    ret = -2  # 平卖仓失败，资金不足
+                    self._logger.error(f"平卖仓失败，资金不足，订单数据：{ftOrder}")
+                    ret = -2
                 else:
                     ret = 1
+            else:
+                self._logger.error(f"平卖仓失败，仓位不足，订单数据：{ftOrder}")
 
         elif order["Direct"] == dSell and order["Offset"] == oCover:  # 卖平
             if pInfo["TotalBuy"] > 0:
                 # 判断持仓
                 if pInfo["TotalBuy"] < order["OrderQty"]:
-                    self._logger.error(f"平买仓失败，仓位不足，策略Id:{order['StrategyId']},"
-                                       f" 运行阶段：{order['StrategyStage']}，"
-                                       f"订单数据：{repr(order)}")
-                    return -1  # 平买仓失败， 仓位不足
+                    self._logger.error(f"平买仓失败，仓位不足，订单数据：{ftOrder}")
+                    return -1
 
                 # 计算平仓手续费
                 if cost["CloseRatio"]:
@@ -328,21 +325,19 @@ class CalcCenter(object):
 
                 # 判断资金
                 if availableFund < coverCharge:
-                    self._logger.error(f"平买仓失败，资金不足，策略Id:{order['StrategyId']},"
-                                       f" 运行阶段：{order['StrategyStage']}，"
-                                       f"订单数据：{repr(order)}")
-                    ret = -2  # 平买仓失败，资金不足
+                    self._logger.error(f"平买仓失败，资金不足，订单数据：{ftOrder}")
+                    ret = -2
                 else:
                     ret = 1
+            else:
+                self._logger.error(f"平买仓失败，仓位不足，订单数据：{ftOrder}")
 
         elif order["Direct"] == dBuy and order["Offset"] == oCoverT:  # 买平今
             if pInfo["TodaySell"] > 0:
                 # 判断持仓
                 if pInfo["TodaySell"] < order["OrderQty"]:
-                    self._logger.error(f"买平今仓失败，仓位不足，策略Id:{order['StrategyId']},"
-                                       f" 运行阶段：{order['StrategyStage']}，"
-                                       f"订单数据：{repr(order)}")
-                    return -1  # 平买仓失败， 仓位不足
+                    self._logger.error(f"买平今失败，仓位不足，订单数据：{ftOrder}")
+                    return -1
 
                 # 计算平仓手续费
                 # TODO：平今手续费和平仓手续费是不是不一样
@@ -353,21 +348,19 @@ class CalcCenter(object):
 
                 # 判断资金
                 if availableFund < coverCharge:
-                    self._logger.error(f"买平今仓失败，资金不足，策略Id:{order['StrategyId']},"
-                                       f" 运行阶段：{order['StrategyStage']}，"
-                                       f"订单数据：{repr(order)}")
-                    ret = -2  # 平买仓失败，资金不足
+                    self._logger.error(f"买平今失败，资金不足，订单数据：{ftOrder}")
+                    ret = -2
                 else:
                     ret = 1
+            else:
+                self._logger.error(f"买平今失败，仓位不足，订单数据：{ftOrder}")
 
         else:  # 卖平今
             if pInfo["TodayBuy"] > 0:
                 # 判断持仓
                 if pInfo["TodayBuy"] < order["OrderQty"]:
-                    self._logger.error(f"卖平今仓失败，仓位不足，策略Id:{order['StrategyId']},"
-                                       f" 运行阶段：{order['StrategyStage']}，"
-                                       f"订单数据：{repr(order)}")
-                    return -1  # 平买仓失败， 仓位不足
+                    self._logger.error(f"卖平今失败，仓位不足，订单数据：{ftOrder}")
+                    return -1
 
                 # 计算平仓手续费
                 if cost["CloseRatio"]:
@@ -377,12 +370,12 @@ class CalcCenter(object):
 
                 # 判断资金
                 if availableFund < coverCharge:
-                    self._logger.error(f"卖平今仓失败，资金不足，策略Id:{order['StrategyId']},"
-                                       f" 运行阶段：{order['StrategyStage']}，"
-                                       f"订单数据：{repr(order)}")
-                    ret = -2  # 平买仓失败，资金不足
+                    self._logger.error(f"卖平今失败，资金不足，订单数据：{ftOrder}")
+                    ret = -2
                 else:
                     ret = 1
+            else:
+                self._logger.error(f"卖平今失败，仓位不足，订单数据：{ftOrder}")
 
         return ret
 
@@ -433,11 +426,6 @@ class CalcCenter(object):
         self._endDate = order["TradeDate"]
         self._updateTradeDate(order["TradeDate"])
 
-        if order["OrderQty"] <= 0:
-            self._logger.error(f"订单手数不大于0，策略Id:{order['StrategyId']}, 运行阶段：{order['StrategyStage']}，"
-                               f"订单数据：{repr(order)}")
-            return 0
-
         # TODO:限制信息写在这里
         # TODO: 应该先判断下面的限制再判断needCover 和 coverJudge
         if len(self._orders) < 1:
@@ -455,6 +443,10 @@ class CalcCenter(object):
         # self._updateTradeDate(order["TradeDate"])
 
         ftOrder = self._formatOrder(order)
+
+        if order["OrderQty"] <= 0:
+            self._logger.error(f"订单手数不大于0，订单数据：{ftOrder}")
+            return 0
 
         self._logger.sig_info("[%3s] [%4s] [%5s], %s, %s, %s, %s, %s, %s, %s, %s, %s, %s" % (
             ftOrder["StrategyId"],
@@ -516,22 +508,39 @@ class CalcCenter(object):
         return 1  # 订单发送成功
 
     def _formatOrder(self, order):
+        if "OrderId" in order:
+            return {
+                "StrategyId"   :    order["StrategyId"],
+                "StrategyStage":    StrategyStatus[order["StrategyStage"]],
+                "OrderId"      :    order["OrderId"],
+                "TradeDate":        order["TradeDate"],
+                "DateTimeStamp":    order["CurBar"]["DateTimeStamp"],
+                "UserNo"       :    order["UserNo"],
+                "Cont"         :    order["Cont"],
+                "Direct"       :    DirectDict[order["Direct"]],
+                "Offset"       :    OffsetDict[order["Offset"]],
+                "OrderPrice"   :    '{:.2f}'.format(order["OrderPrice"]),
+                "OrderQty"     :    order["OrderQty"],
+                "OrderType"    :    OrderTypeDict[order["OrderType"]],
+                "Hedge"        :    HedgeDict[order["Hedge"]],
 
+            }
         return {
-            "StrategyId": order["StrategyId"],
-            "StrategyStage": StrategyStatus[order["StrategyStage"]],
-            "OrderId": order["OrderId"],
-            "TradeDate": order["TradeDate"],
-            "DateTimeStamp": order["DateTimeStamp"],
-            "UserNo": order["UserNo"],
-            "Cont": order["Cont"],
-            "Direct": DirectDict[order["Direct"]],
-            "Offset": OffsetDict[order["Offset"]],
-            "OrderPrice": '{:.2f}'.format(order["OrderPrice"]),
-            "OrderQty": order["OrderQty"],
-            "OrderType": OrderTypeDict[order["OrderType"]],
-            "Hedge": HedgeDict[order["Hedge"]],
-        }
+                "StrategyName" :    order["StrategyName"],
+                "StrategyId"   :    order["StrategyId"],
+                "StrategyStage":    StrategyStatus[order["StrategyStage"]],
+                "TradeDate":        order["TradeDate"],
+                "DateTimeStamp":    order["CurBar"]["DateTimeStamp"],
+                "UserNo"       :    order["UserNo"],
+                "OrderCont"    :    order["Cont"],
+                "BarCont"      :    order["CurBar"]["ContractNo"],
+                "Direct"       :    DirectDict[order["Direct"]],
+                "Offset"       :    OffsetDict[order["Offset"]],
+                "OrderPrice"   :    '{:.2f}'.format(order["OrderPrice"]),
+                "OrderQty"     :    order["OrderQty"],
+                "OrderType"    :    OrderTypeDict[order["OrderType"]],
+                "Hedge"        :    HedgeDict[order["Hedge"]],
+            }
 
     def _calcOrder(self, order):
         """"
@@ -1887,7 +1896,7 @@ class CalcCenter(object):
         # 这样中间出报告时会报错，self._test_days为0
 
         ret = self._calcTestDay(self._beginDate, self._endDate)
-        if ret < 0: return None
+        if ret < 0: return []
         # TODO: 回测开始日期和回测结束日期在calcProfit中更新，所以把self._beginDate和self._endDate传进类中
         self._reportDetails = ReportDetail(self._runSet, self._positions, self._profit, self._testDays,
                                            self._fundRecords, self._tradeTimeInfo, self._orders,
