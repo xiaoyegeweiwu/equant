@@ -508,7 +508,6 @@ class CalcCenter(object):
         return 1  # 订单发送成功
 
     def _formatOrder(self, order):
-        print("AAAAAAAAAAAAAAAA: ", order)
         if "OrderId" in order:
             return {
                 "StrategyId"   :    order["StrategyId"],
