@@ -1927,11 +1927,33 @@ class StrategyModel(object):
 
     def getBuyPositionInStrategy(self, contNo):
         '''获得当前持仓的买入方向的持仓量'''
-        return self.getPositionValue(contNo, 'TotalBuy')
+        if not contNo:
+            contNo = self._cfgModel.getBenchmark()
+
+        pos = self.getMarketPosition(contNo)
+        if pos == 0:
+            return 0
+
+        positionInfo = self._calcCenter.getPositionInfo(contNo)
+        if not positionInfo or 'TotalBuy' not in positionInfo:
+            return -1
+
+        return positionInfo['TotalBuy']
 
     def getSellPositionInStrategy(self, contNo):
         '''当前持仓的卖出持仓量'''
-        return self.getPositionValue(contNo, 'TotalSell')
+        if not contNo:
+            contNo = self._cfgModel.getBenchmark()
+
+        pos = self.getMarketPosition(contNo)
+        if pos == 0:
+            return 0
+
+        positionInfo = self._calcCenter.getPositionInfo(contNo)
+        if not positionInfo or 'TotalSell' not in positionInfo:
+            return -1
+
+        return positionInfo['TotalSell']
 
     def getEntryPrice(self, contNo):
         '''获得当前持仓的第一次建仓的委托价格'''
