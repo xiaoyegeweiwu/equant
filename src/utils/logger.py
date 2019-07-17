@@ -102,8 +102,10 @@ class Logger(object):
     def _initialize(self):
 
         self.logpath = r"./log/"
-        if not os.path.exists(self.logpath):
-            os.makedirs(self.logpath)
+        self.hispath = r"./log/his/"
+        for path in (self.logpath, self.hispath):
+            if not os.path.exists(path):
+                os.makedirs(path)
 
         # 重命名历史日志
         self.renameHisLog()
@@ -146,7 +148,8 @@ class Logger(object):
         time_now = datetime.datetime.now().strftime("%Y%m%d%H%M%S%f")[:-3]
         for name in lognames:
             path = self.logpath + name
-            his_path = self.logpath + name[:-4] + time_now + name[-4:]
+            his_path = self.hispath + name[:-4] + time_now + name[-4:]
+
             if os.path.exists(path):
                 os.rename(path, his_path)
 
