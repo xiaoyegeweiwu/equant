@@ -639,8 +639,6 @@ class StrategyEngine(object):
 
         self._trdModel.setStatus(TM_STATUS_USER)
         
-        #先查询一次资金
-        eventList = self._trdModel.getMoneyEvent()
         # 查询所有账户下的资金
         allMoneyReqEvent = Event({
             "StrategyId": 0,
