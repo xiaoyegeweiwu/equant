@@ -445,6 +445,7 @@ class QuantMonitor(object):
         """删除策略"""
         if str(strategyId) in self.executeListTree.get_children():
             self.executeListTree.delete(strategyId)
+            self._logger.info(f"[UI][{strategyId}]: Delete strategy {strategyId} successfully!")
 
     def updateValue(self, strategyId, dataDict):
         """更新策略ID对应的运行数据"""

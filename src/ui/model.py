@@ -1,8 +1,10 @@
 import os
 
+import threading
 import copy
 import traceback
 import queue
+from tkinter import messagebox
 
 from utils.utils import load_file
 from capi.com_types import *
@@ -237,7 +239,7 @@ class GetEgData(object):
         self._eg2uiQueue = queue
         self._curStId = None  # 当前加载的策略ID
         self._reportData = {}  # 回测报告请求数据
-        self._stManager = StrategyManager(app)  # 策略管理器
+        self._stManager = StrategyManager(app, logger)  # 策略管理器
         self._exchangeList = []
         self._commodityList = []
         self._contractList = []
@@ -279,8 +281,12 @@ class GetEgData(object):
         id = event.getStrategyId()
 
         tempResult = data["Result"]
+        if not tempResult["Fund"]:
+            messagebox.showinfo("提示", "回测数据为空！")
+            return
 
         self._reportData = tempResult
+
         # 取到报告数据弹出报告
         if self._reportData:
             self._app.reportDisplay(self._reportData, id)
@@ -364,14 +370,13 @@ class GetEgData(object):
                 # 删除策略需要接到通知之后再进行删除
                 self._stManager.removeStrategy(id)
                 # 更新界面
-                self._app.delUIStrategy(id)
                 self._logger.info(f"[UI][{id}]: Receiving strategy removing answer info successfully!")
+                self._app.delUIStrategy(id)
 
     def _onEgPositionNotice(self, event):
-        return
         syncPosition = event.getData()
-        print("aaaaaaaaaa: ", syncPosition)
-        self._logger.info("[UI]: Receiving sync position info successfully!")
+        # print("aaaaaaaaaa: ", syncPosition)
+        # self._logger.info("[UI]: Receiving sync position info successfully!")
 
     def _onEgConnect(self, event):
         src = event.getEventSrc()
@@ -448,9 +453,11 @@ class StrategyManager(object):
     }
     """
 
-    def __init__(self, app):
+    def __init__(self, app, logger):
         self._app = app
+        self._logger = logger
         self._strategyDict = {}
+        self.lock = threading.RLock()
 
     def addStrategy(self, dataDict):
         id = dataDict['StrategyId']
@@ -493,7 +500,13 @@ class StrategyManager(object):
 
     def getStrategyDict(self):
         """获取全部运行策略"""
-        return copy.deepcopy(self._strategyDict)
+        self.lock.acquire()
+        try:
+            return copy.deepcopy(self._strategyDict)
+        except RuntimeError:
+            self._logger.warn("strategyDict在访问过程中更改")
+        finally:
+            self.lock.release()
 
     def getSingleStrategy(self, id):
         """获取某个运行策略"""

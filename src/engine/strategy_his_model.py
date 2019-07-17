@@ -1239,19 +1239,24 @@ class StrategyHisQuote(object):
             # print(f"{contractNo} 的即时行情触发了止损, 触发价格:{lastPrice}, TotalBuy: {allPos['TotalBuy']}, TotalSell: {allPos['TotalSell']}")
 
         if isStopLoseTrigger:
-            coverPosPriceLose = self.getCoverPosPrice(lv1Data, stopLoseParams["CoverPosOrderType"], stopLoseParams["AddPoint"], priceTick)
+            #coverPosPriceLose = self.getCoverPosPrice(lv1Data, stopLoseParams["CoverPosOrderType"], stopLoseParams["AddPoint"], priceTick, )
             if allPos["TotalBuy"] >= 1:
-                self._dataModel.setSell(contractNo, allPos["TotalBuy"], coverPosPriceLose, dSell)
+                coverPosPriceLose = self.getCoverPosPrice(lv1Data, stopLoseParams["CoverPosOrderType"], stopLoseParams["AddPoint"], priceTick, dSell)
+                #self._dataModel.setSell(contractNo, allPos["TotalBuy"], coverPosPriceLose, dSell)
+                self._dataModel.setSell('', contractNo, allPos["TotalBuy"], coverPosPriceLose)
             elif allPos["TotalSell"] >= 1:
-                self._dataModel.setBuyToCover(contractNo, allPos["TotalSell"], coverPosPriceLose, dBuy)
+                coverPosPriceLose = self.getCoverPosPrice(lv1Data, stopLoseParams["CoverPosOrderType"], stopLoseParams["AddPoint"], priceTick, dBuy)
+                self._dataModel.setBuyToCover('', contractNo, allPos["TotalSell"], coverPosPriceLose)
             # allPos = self._calc.getPositionInfo(contractNo)
             # print(f"after cover pos , TotalBuy: {allPos['TotalBuy']}, TotalSell: {allPos['TotalSell']}")
         elif isStopWinTrigger:
-            coverPosPriceWin = self.getCoverPosPrice(lv1Data, stopWinParams["CoverPosOrderType"], stopWinParams["AddPoint"], priceTick)
+            #coverPosPriceWin = self.getCoverPosPrice(lv1Data, stopWinParams["CoverPosOrderType"], stopWinParams["AddPoint"], priceTick)
             if allPos["TotalBuy"] >= 1:
-                self._dataModel.setSell(contractNo, allPos["TotalBuy"], coverPosPriceWin, dSell)
+                coverPosPriceWin = self.getCoverPosPrice(lv1Data, stopWinParams["CoverPosOrderType"], stopWinParams["AddPoint"], priceTick, dSell)
+                self._dataModel.setSell('', contractNo, allPos["TotalBuy"], coverPosPriceWin)
             elif allPos["TotalSell"] >= 1:
-                self._dataModel.setBuyToCover(contractNo, allPos["TotalSell"], coverPosPriceWin, dBuy)
+                coverPosPriceWin = self.getCoverPosPrice(lv1Data, stopWinParams["CoverPosOrderType"], stopWinParams["AddPoint"], priceTick, dBuy)
+                self._dataModel.setBuyToCover('', contractNo, allPos["TotalSell"], coverPosPriceWin)
 
     def getCoverPosPrice(self, lv1Data, coverPosOrderType, addPoint, priceTick, direction):
         # price 应该根据coverPosOrderType调整, todo

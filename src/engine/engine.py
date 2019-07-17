@@ -14,7 +14,7 @@ import os, json
 from collections import OrderedDict
 import traceback
 from .engine_order_model import EngineOrderModel, EnginePosModel
-from .strategy_cfg_model import StrategyConfig
+from .strategy_cfg_model_new import StrategyConfig_new as StrategyConfig
 from datetime import datetime
 
 
@@ -77,6 +77,7 @@ class StrategyEngine(object):
         try:
             self._resumeStrategy()
         except Exception as e:
+            traceback.print_exc()
             self.logger.error(f"恢复策略失败")
         self._engineOrderModel = EngineOrderModel(self._strategyOrder)
         self._enginePosModel = EnginePosModel()
@@ -262,10 +263,11 @@ class StrategyEngine(object):
                 self.logger.warn(f"engine向策略发事件时阻塞，策略id:{strategyId}, 事件号: {event.getEventCode()}")
 
     def _sendEvent2AllStrategy(self, event):
-        for id in self._eg2stQueueDict:
-            self._sendEvent2Strategy(id, event)
-            # self._eg2stQueueDict[id].put(event)
-        
+        for strategyId in self._eg2stQueueDict:
+            eventCopy = copy.deepcopy(event)
+            eventCopy.setStrategyId(strategyId)
+            self._sendEvent2Strategy(strategyId, eventCopy)
+
     def _dispathQuote2Strategy(self, code, apiEvent):
         '''分发即时行情'''
         contractNo = apiEvent.getContractNo()
