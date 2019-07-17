@@ -1482,8 +1482,7 @@ class PyAPI(object):
                 'StrategyOrderId'  : None,
             }
             dataList.append(idict)
-            self.logger.debug(f"sun +++++++ py2c OrderId {idict['OrderId']}, OrderState : {idict['OrderState']}")
-        #
+
         def getStrategyIdAndOrderId(apiSessionId, args):
             strategyId, eSessionId = 0, 0
             if apiSessionId in args:
