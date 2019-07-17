@@ -429,7 +429,7 @@ class StrategyEngine(object):
             self._lastMoneyTime = nowTime
             return
             
-        if self._lastMoneyTime == 0 or (nowTime - self._lastMoneyTime).total_seconds() >= 60:
+        if self._lastMoneyTime == 0 or (nowTime - self._lastMoneyTime).total_seconds() >= 30:
             eventList = self._trdModel.getMoneyEvent()
             # 查询所有账户下的资金
             allMoneyReqEvent = Event({
@@ -638,6 +638,18 @@ class StrategyEngine(object):
             return
 
         self._trdModel.setStatus(TM_STATUS_USER)
+        
+        #先查询一次资金
+        eventList = self._trdModel.getMoneyEvent()
+        # 查询所有账户下的资金
+        allMoneyReqEvent = Event({
+            "StrategyId": 0,
+            "Data": {
+            }
+        })
+        self._reqMoney(allMoneyReqEvent)
+        
+        
         # 查询所有账户下委托信息
         allOrderReqEvent = Event({
             "StrategyId":0,
