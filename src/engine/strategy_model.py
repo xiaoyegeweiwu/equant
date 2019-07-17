@@ -1477,19 +1477,19 @@ class StrategyModel(object):
 
     def LogDebug(self, args):
         logInfo = self.formatArgs(args)
-        self.logger.debug(logInfo)
+        self.logger.user_debug(logInfo)
 
     def LogInfo(self, args):
         logInfo = self.formatArgs(args)
-        self.logger.info(logInfo)
+        self.logger.user_info(logInfo)
 
     def LogWarn(self, args):
         logInfo = self.formatArgs(args)
-        self.logger.warn(logInfo)
+        self.logger.user_warn(logInfo)
 
     def LogError(self, args):
         logInfo = self.formatArgs(args)
-        self.logger.error(logInfo)
+        self.logger.user_error(logInfo)
 
     # ///////////////////////属性函数///////////////////////////
     def getBarInterval(self):
