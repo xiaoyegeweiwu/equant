@@ -128,4 +128,10 @@ class NumericSeries(list):
 
     def __invert__(self):
         pass
-
+    
+    # 调试函数__repr__和__str__
+    def __repr__(self):
+        return f"Meta Class: {self.__class__}:\nClass Member:\n\tsuper() = {list(super().__iter__())}\n\tself._isOpenLog = {self._isOpenLog}\n\tself._curBarIndex = {self._curBarIndex}"
+    
+    def __str__(self):
+        return self.__repr__()
