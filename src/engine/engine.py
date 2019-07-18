@@ -681,7 +681,7 @@ class StrategyEngine(object):
         self._engineOrderModel.updateEpoleStarOrder(apiEvent)
         strategyId = apiEvent.getStrategyId()
         if strategyId > 0:
-            self._sendEvent2Strategy(strategyId, apiEvent)
+            self._sendEvent2AllStrategy(apiEvent)
         else:
             contractNo = apiEvent.getContractNo()
             # print("contractNo = ", contractNo, apiEvent.getData())
