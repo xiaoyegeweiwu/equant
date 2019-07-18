@@ -100,7 +100,7 @@ class RunWin(QuantToplevel, QuantFrame):
         self.defaultType      =    tk.StringVar()  # 默认下单方式
         self.defaultQty       =    tk.StringVar()  # 默认下单量（或资金、或比例）
         self.minQty           =    tk.StringVar()  # 最小下单量
-        self.hedge            =    tk.StringVar()  # 投保标志
+        # self.hedge            =    tk.StringVar()  # 投保标志
         self.margin           =    tk.StringVar()  # 保证金
 
         self.openType         =    tk.StringVar()  # 开仓收费方式
@@ -159,7 +159,7 @@ class RunWin(QuantToplevel, QuantFrame):
             self.defaultType.set(conf[VDefaultType]),
             self.defaultQty.set(conf[VDefaultQty]),
             self.minQty.set(conf[VMinQty]),
-            self.hedge.set(conf[VHedge]),
+            # self.hedge.set(conf[VHedge]),
             self.margin.set(conf[VMinQty]),
 
             self.openType.set(conf[VOpenType]),
@@ -235,7 +235,7 @@ class RunWin(QuantToplevel, QuantFrame):
             self.minQty.set(1)
 
             # 投保标志
-            self.hedge.set("投机")
+            # self.hedge.set("投机")
             # 保证金率
             self.margin.set(8)
             #TODO:直接设置界面怎么更改（有没有百分号）
@@ -488,7 +488,7 @@ class RunWin(QuantToplevel, QuantFrame):
         self.setInitFunds(frame)
         self.setTradeDir(frame)
         self.setDefaultOrder(frame)
-        self.setOrderSym(frame)
+        # self.setOrderSym(frame)
         self.setMargin(frame)
         self.setCommision(frame)
         self.setSlippage(frame)
@@ -746,19 +746,19 @@ class RunWin(QuantToplevel, QuantFrame):
         else:
             pass
 
-    def setOrderSym(self, frame):
-        """投保标志"""
-        symFrame = tk.Frame(frame, relief=tk.RAISED, bg=rgb_to_hex(255, 255, 255))
-        symFrame.pack(fill=tk.X, padx=15, pady=5)
-        symLabel = tk.Label(symFrame, text="投保标志:", bg=rgb_to_hex(255, 255, 255),
-                            justif=tk.LEFT, anchor=tk.W, width=15)
-        symLabel.pack(side=tk.LEFT)
-
-        symChosen = ttk.Combobox(symFrame, state="readonly", textvariable=self.hedge)
-        symList = ['投机', '套利', '保值', '做市']  # TODO: userList需要从后台获取
-        symChosen["values"] = symList
-        # symChosen.current(0)
-        symChosen.pack(side=tk.LEFT, fill=tk.X, padx=5)
+    # TODO: 删除
+    # def setOrderSym(self, frame):
+    #     """投保标志"""
+    #     symFrame = tk.Frame(frame, relief=tk.RAISED, bg=rgb_to_hex(255, 255, 255))
+    #     symFrame.pack(fill=tk.X, padx=15, pady=5)
+    #     symLabel = tk.Label(symFrame, text="投保标志:", bg=rgb_to_hex(255, 255, 255),
+    #                         justif=tk.LEFT, anchor=tk.W, width=15)
+    #     symLabel.pack(side=tk.LEFT)
+    #
+    #     symChosen = ttk.Combobox(symFrame, state="readonly", textvariable=self.hedge)
+    #     symList = ['投机', '套利', '保值', '做市']
+    #     symChosen["values"] = symList
+    #     symChosen.pack(side=tk.LEFT, fill=tk.X, padx=5)
 
     def setMargin(self, frame):
         """设置保证金比率"""
@@ -1153,7 +1153,7 @@ class RunWin(QuantToplevel, QuantFrame):
         defaultType = self.defaultType.get()
         defaultQty = self.defaultQty.get()
         minQty = self.minQty.get()
-        hedge = self.hedge.get()
+        # hedge = self.hedge.get()
         margin = self.margin.get()
 
         openType = self.openType.get()
@@ -1347,16 +1347,16 @@ class RunWin(QuantToplevel, QuantFrame):
         # 最小下单量
         self._strConfig.setMinQty(int(minQty))
         # 投保标志
-        if hedge == "投机":
-            self._strConfig.setHedge("T")
-        elif hedge == "套利":
-            self._strConfig.setHedge("B")
-        elif hedge == "保值":
-            self._strConfig.setHedge("S")
-        elif hedge == "做市":
-            self._strConfig.setHedge("M")
-        else:
-            raise Exception("投保标志异常")
+        # if hedge == "投机":
+        #     self._strConfig.setHedge("T")
+        # elif hedge == "套利":
+        #     self._strConfig.setHedge("B")
+        # elif hedge == "保值":
+        #     self._strConfig.setHedge("S")
+        # elif hedge == "做市":
+        #     self._strConfig.setHedge("M")
+        # else:
+        #     raise Exception("投保标志异常")
 
         # # 保证金率
         # TODO: margin类型没有设置！！！！！
@@ -1409,7 +1409,7 @@ class RunWin(QuantToplevel, QuantFrame):
                 VDefaultType: defaultType,
                 VDefaultQty: defaultQty,
                 VMinQty: minQty,
-                VHedge: hedge,
+                # VHedge: hedge,
                 VMargin: margin,
                 VOpenType: openType,
                 VCloseType: closeType,

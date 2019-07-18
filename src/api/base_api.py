@@ -7094,5 +7094,5 @@ def CrossOver(price1, price2):
     return baseApi.CrossOver(price1, price2) 
 
 def CrossUnder(price1, price2):
-    return baseApi.CrossUnder(price1, price1)     
+    return baseApi.CrossUnder(price1, price2)     
     

@@ -429,7 +429,7 @@ class StrategyEngine(object):
             self._lastMoneyTime = nowTime
             return
             
-        if self._lastMoneyTime == 0 or (nowTime - self._lastMoneyTime).total_seconds() >= 60:
+        if self._lastMoneyTime == 0 or (nowTime - self._lastMoneyTime).total_seconds() >= 30:
             eventList = self._trdModel.getMoneyEvent()
             # 查询所有账户下的资金
             allMoneyReqEvent = Event({
@@ -638,6 +638,16 @@ class StrategyEngine(object):
             return
 
         self._trdModel.setStatus(TM_STATUS_USER)
+        
+        # 查询所有账户下的资金
+        allMoneyReqEvent = Event({
+            "StrategyId": 0,
+            "Data": {
+            }
+        })
+        self._reqMoney(allMoneyReqEvent)
+        
+        
         # 查询所有账户下委托信息
         allOrderReqEvent = Event({
             "StrategyId":0,
@@ -648,9 +658,6 @@ class StrategyEngine(object):
         
     def _onApiOrderDataQry(self, apiEvent):
         self._trdModel.updateOrderData(apiEvent)
-        self.logger.debug("sun ++++++++++++ engine OrderQry :")
-        for data in apiEvent.getData():
-            self.logger.debug(f"OrderId {data['OrderId']}, OrderState {data['OrderState']}")
         self._sendEvent2AllStrategy(apiEvent)
         # 获取关联的策略id和订单id
         self._engineOrderModel.updateEpoleStarOrder(apiEvent)
@@ -672,12 +679,8 @@ class StrategyEngine(object):
         # 订单信息
         self._trdModel.updateOrderData(apiEvent)
         self._engineOrderModel.updateEpoleStarOrder(apiEvent)
-        self.logger.debug("sun ++++++++++++ engine OrderNotice :")
-        for data in apiEvent.getData():
-            self.logger.debug(f"OrderId {data['OrderId']}, OrderState {data['OrderState']}")
         strategyId = apiEvent.getStrategyId()
         if strategyId > 0:
-            self.logger.debug(f"sun ++++++++++++ engine OrderNotice strategyId : {strategyId}")
             self._sendEvent2Strategy(strategyId, apiEvent)
         else:
             contractNo = apiEvent.getContractNo()
@@ -685,7 +688,6 @@ class StrategyEngine(object):
             # 客户端手动开仓平仓
             if not contractNo:
                 contractNo = apiEvent.getData()[0]["Cont"]
-            self.logger.debug(f"sun ++++++++++++ engine OrderNotice getContractNo : {apiEvent.getContractNo()}, Cont : {contractNo}")
             if not contractNo:
                 return
             apiEvent.setContractNo(contractNo)
