@@ -351,8 +351,7 @@ class StrategyConfig_new(object):
         return bool(self._metaData['Trigger']['KLine'])
 
     def hasSnapShotTrigger(self):
-        # return bool(self._metaData['Trigger']['SnapShot'])
-        return True
+        return bool(self._metaData['Trigger']['SnapShot'])
 
     def hasTradeTrigger(self):
         return bool(self._metaData['Trigger']['Trade'])

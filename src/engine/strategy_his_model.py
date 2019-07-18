@@ -10,6 +10,7 @@ import traceback
 
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
+from .trigger_mgr import TriggerMgr
 
 
 class TradeDateBars:
@@ -182,12 +183,13 @@ class StrategyHisQuote(object):
 
         #
         self._firstRealTimeKLine = {}
+        self._triggerMgr = None
 
     def initialize(self):
         self._contractTuple = self._config.getContract()
         # 基准合约
         self._contractNo = self._config.getBenchmark()
-        
+        self._triggerMgr = TriggerMgr(list(self._dataModel.getConfigModel().getKLineKindsInfo()), self._strategy)
         # Bar
         for record in self._config.getKLineKindsInfo():
             key = (record["ContractNo"], record["KLineType"], record["KLineSlice"])
@@ -205,6 +207,7 @@ class StrategyHisQuote(object):
             self._curEarliestKLineDateTimeStamp[key] = sys.maxsize
             self._lastEarliestKLineDateTimeStamp[key] = -1
             self._firstRealTimeKLine[key] = True
+
 
     # //////////////`////////////////////////////////////////////////////
 
@@ -698,25 +701,25 @@ class StrategyHisQuote(object):
             # 处理触发
             # 一定要先填触发事件，在填充数据。
             # 否则触发有可能会覆盖
-            #isRealTimeStatus = self._strategy.isRealTimeStatus()
-            #
-            # orderWay = str(self._config.getSendOrder())
-            # kLineTrigger = self._config.hasKLineTrigger()
-            # if not kLineTrigger:
-            #     pass
-            # elif self._strategy.isHisStatus() and len(localDataList) >= 2 and localDataList[-2]["IsKLineStable"] and isNewKLine:
-            #     self._sendHisKLineTriggerEvent(key, localDataList[-2])
-            # elif isRealTimeStatus:
-            #     # 一种特殊情况
-            #     if self._firstRealTimeKLine[key] and isNewKLine and len(localDataList) >= 2 and localDataList[-2]["IsKLineStable"] and orderWay == SendOrderRealTime:
-            #         self._sendHisKLineTriggerEvent(key, localDataList[-2])
-            #     self._firstRealTimeKLine[key] = False
-            #     if orderWay == SendOrderRealTime:
-            #         self._sendRealTimeKLineTriggerEvent(key, localDataList[-1])
-            #     elif orderWay == SendOrderStable and len(localDataList) >= 2 and localDataList[-2]["IsKLineStable"] and isNewKLine:
-            #         self._sendRealTimeKLineTriggerEvent(key, localDataList[-2])
-            # else:
-            #     pass
+            isRealTimeStatus = self._strategy.isRealTimeStatus()
+            orderWay = str(self._config.getSendOrder())
+            kLineTrigger = self._config.hasKLineTrigger()
+            if not kLineTrigger:
+                pass
+            elif not isRealTimeStatus and len(localDataList) >= 2 and localDataList[-2]["IsKLineStable"] and isNewKLine:
+                self._sendHisKLineTriggerEvent(key, localDataList[-2])
+            elif isRealTimeStatus:
+                # 一种特殊情况
+                if self._firstRealTimeKLine[key] and isNewKLine and len(localDataList) >= 2 and localDataList[-2]["IsKLineStable"] and orderWay == SendOrderRealTime:
+                    self._sendHisKLineTriggerEvent(key, localDataList[-2])
+                self._firstRealTimeKLine[key] = False
+                # 处理实时触发和k线稳定后触发
+                if orderWay == SendOrderRealTime:
+                    self._sendRealTimeKLineTriggerEvent(key, localDataList[-1])
+                elif orderWay == SendOrderStable and len(localDataList) >= 2 and localDataList[-2]["IsKLineStable"] and isNewKLine:
+                    self._sendRealTimeKLineTriggerEvent(key, localDataList[-2])
+            else:
+                pass
             #
             # # 实时阶段填充最新数据。
             # # 触发和填充都更新运行位置数据
@@ -789,35 +792,22 @@ class StrategyHisQuote(object):
 
         assert self._strategy.isRealTimeStatus(), " Error "
         orderWay = str(self._config.getSendOrder())
-        if orderWay == SendOrderRealTime:
-            event = Event({
-                'EventCode': ST_TRIGGER_KLINE,
-                'ContractNo': key[0],
-                "KLineType": key[1],
-                "KLineSlice": key[2],
-                'Data': {
-                    "Data":data,
-                    "TradeDate": data["TradeDate"],
-                    "DateTimeStamp":data["DateTimeStamp"],
-                }
-            })
-            self._strategy.sendTriggerQueue(event)
+        if orderWay == SendOrderRealTime or (orderWay == SendOrderStable and data["IsKLineStable"]):
+            self._triggerMgr.updateData(key, data)
+            if not self._triggerMgr.isAllDataReady(key[0]):
+                return
+            self._sendSyncTriggerEvent(key[0])
+            self._triggerMgr.resetAllData(key[0])
             return
 
-        if orderWay == SendOrderStable and data["IsKLineStable"]:
-            event = Event({
-                'EventCode': ST_TRIGGER_KLINE,
-                'ContractNo': key[0],
-                "KLineType": key[1],
-                "KLineSlice": key[2],
-                'Data': {
-                    "Data": data,
-                    "TradeDate": data["TradeDate"],
-                    "DateTimeStamp": data["DateTimeStamp"],
-                }
-            })
-            self._strategy.sendTriggerQueue(event)
-            return
+        # if orderWay == SendOrderStable and data["IsKLineStable"]:
+        #     # **************************同步数据
+        #     self._triggerMgr.updateData(key, data)
+        #     if not self._triggerMgr.isAllDataReady(key[0]):
+        #         return
+        #     self._sendSyncTriggerEvent(key[0])
+        #     self._triggerMgr.resetAllData(key[0])
+        #     return
 
     def onHisQuoteNotice(self, event):
         key = (event.getContractNo(), event.getKLineType(), event.getKLineSlice())
@@ -1268,3 +1258,39 @@ class StrategyHisQuote(object):
             return price-addPoint*priceTick
         else:
             return None
+
+    def _sendSyncTriggerEvent(self, contractNo):
+        syncTriggerInfo = self._triggerMgr.getSyncTriggerInfo(contractNo)
+
+        # 发送填充k线事件
+        for record, kLine in syncTriggerInfo.items():
+            if record[1] ==0:
+                continue
+            event = Event({
+                "EventCode": ST_TRIGGER_FILL_DATA,
+                "ContractNo": record[0],
+                "KLineType": record[1],
+                "KLineSlice": record[2],
+                "Data": {
+                    "Data": kLine,
+                    "Status": ST_STATUS_CONTINUES
+                }
+            })
+            self._strategy.sendTriggerQueue(event)
+
+        for record, kLine in syncTriggerInfo.items():
+            if record == (contractNo, 0, 0):
+                pass
+            else:
+                event = Event({
+                    "EventCode": ST_TRIGGER_KLINE,
+                    "ContractNo": record[0],
+                    "KLineType": record[1],
+                    "KLineSlice": record[2],
+                    "Data": {
+                        "Data": kLine,
+                        "DateTimeStamp": kLine["DateTimeStamp"],
+                        "TradeDate": kLine["TradeDate"],
+                    }
+                })
+                self._strategy.sendTriggerQueue(event)

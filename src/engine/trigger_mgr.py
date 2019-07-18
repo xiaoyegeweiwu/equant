@@ -2,6 +2,22 @@ import numpy as np
 from capi.com_types import *
 import copy
 
+import pickle
+from functools import wraps
+
+
+# by gyt 便于调试
+def debug(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        funcResult = func(*args, **kwargs)
+        argsStr = "(" + ", ".join([str(positionArg) for positionArg in args])
+        kwargsStr = ", " + repr(kwargs) + ")" if kwargs else ")"
+        print(f"{func.__name__}{argsStr}{kwargsStr} -> {funcResult}")
+        return funcResult
+
+    return wrapper
+
 
 class TriggerMgr(object):
     def __init__(self, subsInfo, strategy):
@@ -9,20 +25,16 @@ class TriggerMgr(object):
         self._kLineSubsInfo = subsInfo
         self._isReady = {}
         self._data = {}
+
         for record in self._kLineSubsInfo:
             kLineKey = (record["ContractNo"], record["KLineType"], record["KLineSlice"])
             self._isReady.setdefault(record["ContractNo"], {})
             # k线订阅
             self._isReady.get(record["ContractNo"]).setdefault(kLineKey, False)
 
-    def updateData(self, apiEvent):
-        if apiEvent.getEventCode() == EV_EG2ST_HISQUOTE_NOTICE:
-            key = (apiEvent.getContractNo(), apiEvent.getKLineType(), apiEvent.getKLineSlice())
-        else:
-            return
-
+    def updateData(self, key, kLine):
         # print("key = ", key, apiEvent.getData())
-        self._data[key] = copy.deepcopy(apiEvent)
+        self._data[key] = copy.deepcopy(kLine)
         self.setDataReady(key)
 
     def setDataReady(self, key):
@@ -47,3 +59,6 @@ class TriggerMgr(object):
             if k[0] == contractNo:
                 result[k] = v
         return result
+
+
+

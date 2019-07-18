@@ -16,7 +16,7 @@ import datetime
 from datetime import datetime
 import copy
 from collections import OrderedDict
-from .trigger_mgr import TriggerMgr
+
 
 
 class StartegyManager(object):
@@ -325,7 +325,7 @@ class Strategy:
         self._st2uiQueue = args['st2ui']
         moduleDir, moduleName = os.path.split(self._filePath)
         self._strategyName = ''.join(moduleName.split('.')[:-1])
-        self._triggerMgr = None
+
 
         # 策略所在进程状态, Ready、Running、Exit、Pause
         self._strategyState = StrategyStatusReady
@@ -394,9 +394,6 @@ class Strategy:
         self._userModule = userModule
         # 5.1 同步配置
         self._sendConfig2Engine()
-
-        self._triggerMgr = TriggerMgr(list(self._dataModel.getConfigModel().getKLineKindsInfo()), self)
-
         # 6. 初始化model
         self._dataModel.initialize()
 
@@ -738,60 +735,6 @@ class Strategy:
         
     def _onHisQuoteNotice(self, event):
         self._dataModel.getHisQuoteModel().onHisQuoteNotice(event)
-        if self.isRealTimeStatus():
-            self._triggerMgr.updateData(event)
-            if self._triggerMgr.isAllDataReady(event.getContractNo()):
-                self._sendSyncTriggerEvent(event.getContractNo())
-                self._triggerMgr.resetAllData(event.getContractNo())
-
-    def _sendSyncTriggerEvent(self, contractNo):
-        syncTriggerInfo = self._triggerMgr.getSyncTriggerInfo(contractNo)
-
-        # 发送填充k线事件
-        for record, dataEvent in syncTriggerInfo.items():
-            if record[1] ==0:
-                continue
-
-            event = Event({
-                "EventCode": ST_TRIGGER_FILL_DATA,
-                "ContractNo": record[0],
-                "KLineType": record[1],
-                "KLineSlice": record[2],
-                "Data": {
-                    "Data": dataEvent.getData()[0],
-                    "Status": ST_STATUS_CONTINUES
-                }
-            })
-            self.sendTriggerQueue(event)
-
-        for record, dataEvent in syncTriggerInfo.items():
-            if record == (contractNo, 0, 0):
-                dateTimeStamp, tradeDate, lv1Data = self.getTriggerTimeAndData(contractNo)
-                event = Event({
-                    "EventCode": ST_TRIGGER_SANPSHOT_FILL,
-                    "ContractNo": contractNo,
-                    "KLineType": None,
-                    "KLineSlice": None,
-                    "Data": {
-                        "Data": lv1Data,
-                        "DateTimeStamp": dateTimeStamp,
-                        "TradeDate": tradeDate,
-                        "IsLastPriceChanged": 4 in dataEvent.getData()[0]["FieldData"],  # 最新价是否改变
-                    }
-                })
-            else:
-                event = Event({
-                    "EventCode": ST_TRIGGER_KLINE,
-                    "ContractNo": record[0],
-                    "KLineType": record[1],
-                    "KLineSlice": record[2],
-                    "Data": {
-                        "Data": dataEvent.getData()[0],
-                        "DateTimeStamp": dataEvent.getData()[0]["DateTimeStamp"],
-                        "TradeDate": dataEvent.getData()[0]["TradeDate"],
-                    }
-                })
-            self.sendTriggerQueue(event)
 
     # 报告事件, 发到engine进程中，engine进程 再发到ui进程。
     def _onReport(self, event):
@@ -1098,16 +1041,6 @@ class Strategy:
             # 4:最新价 11:成交量 17:最优买价 18:买量 19:最优卖价 20:卖量
             return
 
-        # 如果有成交量变化，将等待该合约所有k线到达后再触发。
-        # if 11 in data[0]["FieldData"].keys():
-        #     self._triggerMgr.updateData(event)
-        #     # ************************************
-        #     if self._triggerMgr.isAllDataReady(event.getContractNo()):
-        #         self._sendSyncTriggerEvent(event.getContractNo())
-        #         self._triggerMgr.restAllData(event.getContractNo())
-        #     return
-            # ************************************
-
         dateTimeStamp, tradeDate, lv1Data = self.getTriggerTimeAndData(event.getContractNo())
         event = Event({
             "EventCode" : ST_TRIGGER_SANPSHOT_FILL,
@@ -1208,6 +1141,3 @@ class Strategy:
     def _onSyncEngineInfo(self, event):
         orderId = event.getData()["MaxOrderId"]
         self._eSessionId = orderId
-
-    def getTriggerMgr(self):
-        return self._triggerMgr
