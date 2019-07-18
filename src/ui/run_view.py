@@ -1272,6 +1272,7 @@ class RunWin(QuantToplevel, QuantFrame):
 
             kLineTypeDict = {
                 "分笔": 'T',
+                "秒"  : 'T',
                 "分钟": 'M',
                 "日线": 'D',
             }
@@ -1825,7 +1826,7 @@ class AddContWin(QuantToplevel, QuantFrame):
         kLineTypeLabel.pack(side=tk.LEFT)
 
         self.kLineTypeChosen = ttk.Combobox(kLineTypeFrame, state="readonly", textvariable=self.kLineType, width=17)
-        self.kLineTypeChosen['values'] = ['分笔', '分钟', '日线']
+        self.kLineTypeChosen['values'] = ['分笔', '秒', '分钟', '日线']
         self.kLineTypeChosen.pack(side=tk.LEFT, fill=tk.X, padx=5)
         self.kLineTypeChosen.bind("<<ComboboxSelected>>", self.kLineChosenCallback)
 
