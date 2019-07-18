@@ -348,7 +348,7 @@ class Strategy:
     
     def _initialize(self):
         self._strategyState = StrategyStatusRunning
-        #用户模板函数路径加入系统路径，并扩展baseapi的作用域
+        # 用户模板函数路径加入系统路径，并扩展baseapi的作用域
         workPath = os.path.abspath('.')
         userPath = workPath + "\strategy\FuncTemplate"
         if userPath not in sys.path:
@@ -391,7 +391,6 @@ class Strategy:
         else:
             self._context.params = self._argsDict["Params"]
 
-        print(self._argsDict)
         self._userModule = userModule
         # 5.1 同步配置
         self._sendConfig2Engine()
@@ -743,14 +742,14 @@ class Strategy:
             self._triggerMgr.updateData(event)
             if self._triggerMgr.isAllDataReady(event.getContractNo()):
                 self._sendSyncTriggerEvent(event.getContractNo())
-                self._triggerMgr.restAllData(event.getContractNo())
+                self._triggerMgr.resetAllData(event.getContractNo())
 
     def _sendSyncTriggerEvent(self, contractNo):
         syncTriggerInfo = self._triggerMgr.getSyncTriggerInfo(contractNo)
 
         # 发送填充k线事件
         for record, dataEvent in syncTriggerInfo.items():
-            if record[1] ==0 or record[2] == 0:
+            if record[1] ==0:
                 continue
 
             event = Event({
