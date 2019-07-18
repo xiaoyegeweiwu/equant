@@ -37,7 +37,7 @@ class TriggerMgr(object):
         result = np.array(list(self._isReady[contractNo].values()))
         return result.all()
 
-    def restAllData(self, contractNo):
+    def resetAllData(self, contractNo):
         self._isReady[contractNo] = {k:False for k, _ in self._isReady[contractNo].items()}
         self._data = {}
 
