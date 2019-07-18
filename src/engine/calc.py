@@ -1062,8 +1062,13 @@ class CalcCenter(object):
         else:
             self._profit["YieldRate"] = 0
         # 年化单利收益率
-        self._profit["AnnualizedSimple"] = self._profit["Returns"] * 365 / self._calcTestDay(self._beginDate,
-                                                                                             self._endDate)
+        try:
+            self._profit["AnnualizedSimple"] = self._profit["Returns"] * 365 / self._calcTestDay(self._beginDate,
+                                                                                                 self._endDate)
+        except ZeroDivisionError as e:
+            testDay = self._calcTestDay(self._beginDate, self._endDate)
+            self._logger.error(f"计算年化收益时出错，数据详情: {self._beginDate}, {self._endDate}, {testDay}")
+
 
         # 计算空仓周期
         # self._calcEmptyPositionPeriod()
