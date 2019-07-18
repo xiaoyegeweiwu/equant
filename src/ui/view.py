@@ -118,7 +118,7 @@ class QuantApplication(object):
         # self.create_monitor()
         self.quant_monitor.createSignal()
         self.quant_monitor.createErr()
-        # self.quant_monitor.createPos()
+        self.quant_monitor.createPos()
 
     def updateLogText(self):
         self.quant_monitor.updateLogText()
@@ -194,7 +194,16 @@ class QuantApplication(object):
         save(data, runMode, stName)
 
         self.hisTop = HistoryToplevel(self, self.root)
+
         ReportView(data, self.hisTop)
+
+        # def test():
+        #     #TODO: 增加matplotlib.pyplot.close()
+        #     # a.dire.detail_frame.fund.canvas.destroy()
+        #     # a.dire.detail_frame.graph.canvas.destroy()
+        #     self.hisTop.destroy()
+        #
+        # self.hisTop.protocol("WM_DELETE_WINDOW", test)
         self.hisTop.display_()
 
     def updateStatus(self, strategyId, status):
@@ -252,7 +261,6 @@ class QuantApplication(object):
         """清除错误信息"""
         self.quant_monitor.clearErrorText("")
 
-    def updateSyncPosition(self, position):
+    def updateSyncPosition(self, positions):
         """更新组合监控持仓信息"""
-        # self.quant_monitor.
-        pass
+        self.quant_monitor.updatePos(positions)

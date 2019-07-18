@@ -374,8 +374,10 @@ class GetEgData(object):
                 self._app.delUIStrategy(id)
 
     def _onEgPositionNotice(self, event):
+        #TODO：没有登录交易账户时接收不到该事件
         syncPosition = event.getData()
         # print("aaaaaaaaaa: ", syncPosition)
+        self._app.updateSyncPosition(syncPosition)
         # self._logger.info("[UI]: Receiving sync position info successfully!")
 
     def _onEgConnect(self, event):
