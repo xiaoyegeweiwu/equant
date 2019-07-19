@@ -8,7 +8,7 @@ def initialize(context):
     SetOrderWay(2)
 
 def handle_data(context):  
-    # 等待数据是否就绪
+    # 等待数据就绪，否则计算果结为异常值
     if len(Close()) < p:
         return
   
