@@ -724,8 +724,8 @@ class StrategyHisQuote(object):
             # # 实时阶段填充最新数据。
             # # 触发和填充都更新运行位置数据
             # # 但是仅填充数据事件向9.5发送数据
-            # if isRealTimeStatus:
-            #     self._fillDataWhenRealTime(key, localDataList[-1])
+            if isRealTimeStatus:
+                self._fillDataWhenRealTime(key, localDataList[-1])
 
     def _handleSameKLine(self, localDataList, data, lastKLineSource):
         if lastKLineSource == KLineFromHis:
