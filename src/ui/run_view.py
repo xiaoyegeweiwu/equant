@@ -36,6 +36,7 @@ class RunWin(QuantToplevel, QuantFrame):
         self._commodity = self._control.model.getCommodity()
         self._contract = self._control.model.getContract()
         self._userNo = self._control.model.getUserNo()
+        print("-----------: ", self._exchange)
 
         # 参数设置
         self._strConfig = StrategyConfig_new()
@@ -1555,22 +1556,41 @@ class SelectContractWin(QuantToplevel, QuantFrame):
         #                                               text=exch["ExchangeNo"] + "【" + exch["ExchangeName"] + "】",
         #                                               values=exch["ExchangeNo"])
 
-        for exchangeNo in self.exchangeList:
-            for exch in self._exchange:
-                if exch["ExchangeNo"] == exchangeNo:
-                    exchangeId = self.exchangeTree.insert("", tk.END,
-                                                         text=exch["ExchangeNo"] + "【" + exch["ExchangeName"] + "】",
-                                                         values=exch["ExchangeNo"])
+        # for exchangeNo in self.exchangeList:
+        #     for exch in self._exchange:
+        #         if exch["ExchangeNo"] == exchangeNo:
+        #             exchangeId = self.exchangeTree.insert("", tk.END,
+        #                                                  text=exch["ExchangeNo"] + "【" + exch["ExchangeName"] + "】",
+        #                                                  values=exch["ExchangeNo"])
+        #
+        #             for commodity in self._commodity:
+        #                 if commodity["ExchangeNo"] == exch["ExchangeNo"] and commodity["CommodityType"] in self.commodityType.keys():
+        #                     if commodity["ExchangeNo"] == "SPD":
+        #                         text = commodity["CommodityName"]
+        #                     else:
+        #                         text = commodity["CommodityName"] + " [" + self.commodityType[commodity["CommodityType"]] + "]"
+        #                     commId = self.exchangeTree.insert(exchangeId, tk.END,
+        #                                                       text=text,
+        #                                                       values=commodity["CommodityNo"])
 
-                    for commodity in self._commodity:
-                        if commodity["ExchangeNo"] == exch["ExchangeNo"] and commodity["CommodityType"] in self.commodityType.keys():
-                            if commodity["ExchangeNo"] == "SPD":
-                                text = commodity["CommodityName"]
-                            else:
-                                text = commodity["CommodityName"] + " [" + self.commodityType[commodity["CommodityType"]] + "]"
-                            commId = self.exchangeTree.insert(exchangeId, tk.END,
-                                                              text=text,
-                                                              values=commodity["CommodityNo"])
+        #-----------------------------------------------------------------------------
+        for exchangeNo in self.exchangeList:
+            exchange = self._exchange.loc[self._exchange.ExchangeNo == exchangeNo]
+            for _, exch in exchange.iterrows():
+                exchangeId = self.exchangeTree.insert("", tk.END,
+                                                      text=exch.ExchangeNo + "【" + exch.ExchangeName + "】",
+                                                      values=exch.ExchangeNo)
+
+            commodity = self._commodity.loc[self._commodity.ExchangeNo == exchangeNo]
+            for _, comm in commodity.iterrows():
+                if comm.CommodityType in self.commodityType.keys():
+                    if comm.ExchangeNo == "SPD":
+                        text = comm.CommodityName
+                    else:
+                        text = comm.CommodityName + " [" + self.commodityType[comm.CommodityType] + "]"
+                    commId = self.exchangeTree.insert(exchangeId, tk.END,
+                                                      text=text,
+                                                      values=comm.CommodityNo)
 
         self.exchangeTree.pack(fill=tk.BOTH, expand=tk.YES)
         self.exchangeTree.bind("<ButtonRelease-1>", self.updateContractFrame)
@@ -1692,9 +1712,9 @@ class AddContWin(QuantToplevel, QuantFrame):
         self.title("商品属性")
         self.attributes("-toolwindow", 1)
 
-        self._exchange = exchange
-        self._commodity = commodity
-        self._contract = pd.DataFrame(contract)
+        self._exchange = pd.DataFrame(exchange).drop_duplicates()
+        self._commodity = pd.DataFrame(commodity).drop_duplicates()
+        self._contract = pd.DataFrame(contract).drop_duplicates()
 
         # 用于保存用户所选的用户合约
         self.userContList = []
@@ -1730,6 +1750,10 @@ class AddContWin(QuantToplevel, QuantFrame):
         self.createWidgets(self.topFrame)
 
         self._initArgs()
+
+    def dropDuplicate(self, data):
+        """去重"""
+        pass
 
     def _initArgs(self):
         self.margin.set("5")
