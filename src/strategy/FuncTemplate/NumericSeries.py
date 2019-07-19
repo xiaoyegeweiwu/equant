@@ -1,3 +1,5 @@
+import numpy as np
+
 class NumericSeries(list):
     def __init__(self, rawList=[], isOpenLog=True):
         super().__init__(rawList)
@@ -28,7 +30,7 @@ class NumericSeries(list):
     def __getitem__(self, item):
         length = len(self)
         if length == 0:
-            return None
+            return np.nan
         elif 0<=item<length or -length<=item<=-1:
             return super().__getitem__(item)
         elif item<0 and item<-length:
@@ -53,8 +55,83 @@ class NumericSeries(list):
         if len(self) != len(other):
             if self._isOpenLog:
                 LogInfo(f"长度不一样,{len(self)}, {len(other)}")
-            return
-        result = [a+b for a,b in zip(super().__iter__(), other)]
+            return self
+        result = [a+b for a, b in zip(self, other)]
         resultObj = self.__class__(result, self._isOpenLog)
         return resultObj
 
+    def __sub__(self, other):
+        pass
+
+    def __mul__(self, other):
+        pass
+
+    def __truediv__(self, other):
+        pass
+
+    def __floordiv__(self, other):
+        pass
+
+    def __imod__(self, other):
+        pass
+
+    def __isub__(self, other):
+        pass
+
+    def __imul__(self, other):
+        pass
+
+    def __itruediv__(self, other):
+        pass
+
+    def __ifloordiv__(self, other):
+        pass
+
+    def __imod__(self, other):
+        pass
+
+    def __ipow__(self, other):
+        pass
+
+    def __pow__(self, other):
+        pass
+
+    def __abs__(self):
+        pass
+
+    def __repr__(self):
+        pass
+
+    def __contains__(self, item):
+        pass
+
+    def __and__(self, other):
+        pass
+
+    def __or__(self, other):
+        pass
+
+    def __xor__(self, other):
+        pass
+
+    def __lshift__(self, other):
+        pass
+
+    def __rshift__(self, other):
+        pass
+
+    def __neg__(self):
+        pass
+
+    def __pos__(self):
+        pass
+
+    def __invert__(self):
+        pass
+    
+    # 调试函数__repr__和__str__
+    def __repr__(self):
+        return f"Meta Class: {self.__class__}:\nClass Member:\n\tsuper() = {list(super().__iter__())}\n\tself._isOpenLog = {self._isOpenLog}\n\tself._curBarIndex = {self._curBarIndex}"
+    
+    def __str__(self):
+        return self.__repr__()

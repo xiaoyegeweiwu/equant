@@ -90,8 +90,9 @@ class QuantMonitor(object):
         self.sigText.pack(fill=BOTH, expand=YES)
 
     def createPos(self):
-        headList = ["账号", "合约", "账户仓", "策略仓", "仓差", "策略多", "策略空", "账户多", "账户空"]
-        widthList = [10, 10, 10, 10, 10, 10, 10, 10, 10]
+        headList = ["账号", "合约", "账户仓", "策略仓", "仓差",
+                    "策略多", "策略空","策略今多", "策略今空", "账户多", "账户空", "账户今多", "账户今空"]
+        widthList = [20, 20, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5]
 
         funcFrame = Frame(self.posMonitor, relief=RAISED, bg=rgb_to_hex(245, 245, 245), height=25)
         funcFrame.pack(side=TOP, fill=X, expand=YES, padx=1, pady=2)
@@ -465,6 +466,79 @@ class QuantMonitor(object):
         """更新策略状态"""
         if str(strategyId) in self.executeListTree.get_children():
             self.executeListTree.set(strategyId, column="#6", value=StrategyStatus[status])
+
+    def updatePos(self, positions):
+        for itemId in self.posTree.get_children():
+            self.posTree.delete(itemId)
+
+        strategyPos = {}
+        accountPos  = {}
+        # 重组策略仓
+        for sid in positions["Strategy"]:
+            for pCont, pInfo in positions["Strategy"][sid].items():
+                if pCont not in strategyPos:
+                    strategyPos[pCont] = {
+                        "TotalBuy": pInfo["TotalBuy"],
+                        "TotalSell": pInfo["TotalSell"],
+                        "TodayBuy": pInfo["TodayBuy"],
+                        "TodaySell": pInfo["TodaySell"]
+                    }
+                else:
+                    strategyPos[pCont]["TotalBuy"]  += pInfo["TotalBuy"]
+                    strategyPos[pCont]["TotalSell"] += pInfo["TotalSell"]
+                    strategyPos[pCont]["TodayBuy"]  += pInfo["TodayBuy"]
+                    strategyPos[pCont]["TodaySell"] += pInfo["TodaySell"]
+
+        # 重组账户仓
+        for user in positions["Account"]:
+            accountPos[user] = {}
+            for pCont, pInfo in positions["Account"][user].items():
+                if pCont[-1] == "T":    # 只关注账户中的投机单的持仓
+                    if pCont[:-2] not in accountPos[user]:
+                        if pCont[-2] == "S":
+                            accountPos[user][pCont[:-2]] = {
+                                "TotalSell": pInfo["PositionQty"],
+                                "TodaySell": pInfo["PositionQty"] - pInfo["PrePositionQty"],
+                                "TotalBuy" : 0,
+                                "TodayBuy" : 0
+                            }
+                        else:
+                            accountPos[user][pCont[:-2]] = {
+                                "TotalBuy" : pInfo["PositionQty"],
+                                "TodayBuy" : pInfo["PositionQty"] - pInfo["PrePositionQty"],
+                                "TotalSell": 0,
+                                "TodaySell": 0
+                            }
+
+                    else:
+                        if pCont[-2] == "S":
+                            accountPos[user][pCont[:-2]]["TotalSell"] += pInfo["PositionQty"]
+                            accountPos[user][pCont[:-2]]["TodaySell"] += pInfo["PositionQty"] - pInfo["PrePositionQty"]
+
+                        else:
+                            accountPos[user][pCont[:-2]]["TotalBuy"] += pInfo["PositionQty"]
+                            accountPos[user][pCont[:-2]]["TodayBuy"] += pInfo["PositionQty"] - pInfo["PrePositionQty"]
+
+        rlt = []
+        for c, p in strategyPos.items():
+            for user in accountPos:
+                if c in accountPos[user]:
+                    aTPos = accountPos[user][c]["TotalBuy"] - (-accountPos[user][c]["TotalSell"]) # 账户仓
+                    sTPos = p["TotalBuy"] - (-p["TotalSell"])   # 策略仓
+                    posDif = sTPos - aTPos                      # 仓差
+                    rlt.append([user, c, aTPos, sTPos, posDif,
+                                p["TotalBuy"], p["TotalSell"], p["TodayBuy"], p["TodaySell"],
+                                accountPos[user][c]["TotalBuy"], accountPos[user][c]["TotalSell"],
+                                accountPos[user][c]["TodayBuy"], accountPos[user][c]["TodaySell"]])
+                else:
+                    rlt.append([user, c, 0, p["TotalBuy"] - (-p["TotalSell"]), p["TotalBuy"] - (-p["TotalSell"]),
+                                p["TotalBuy"], p["TotalSell"], p["TodayBuy"], p["TodaySell"], 0, 0, 0, 0])
+
+        # rlt = [{user: {c: p}} for user in accountPos for (c, p) in strategyPos.items()]
+        # rlt = [{user: {c : pos}} for cont in accountPos ]
+        # print("BBBBBBBBBBB: ", rlt)
+        for v in rlt:
+            self.posTree.insert("", 'end', values=v)
 
 
 

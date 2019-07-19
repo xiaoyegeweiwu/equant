@@ -74,35 +74,35 @@ class TkinterController(object):
         #TODO: strategyDict的异常策略应该怎么处理?
         for stId in strategyDict:
             if "RunningData" not in strategyDict[stId]:
-                return
+                continue
             if strategyDict[stId]["StrategyState"] == ST_STATUS_PAUSE or strategyDict[stId][
                   "StrategyState"] == ST_STATUS_QUIT or strategyDict[stId][
                   "StrategyState"] == ST_STATUS_EXCEPTION:
-                return
+                continue
 
             self.app.updateValue(stId, strategyDict[stId]["RunningData"])
 
     def quitThread(self):
         self.logger.info("quitThread exit")
         # 停止更新界面子线程
-        # print("----------------------")
+        #print("----------------------")
         self.monitorThread.stop()
-        # print("0000000000000000000000")
+        #print("0000000000000000000000")
         self.monitorThread.join()
 
         # 停止更新信号记录
-        # print("-----------------------")
+        #print("-----------------------")
         self.sigThread.stop()
-        # print("111111111111111111")
+        #print("111111111111111111")
         self.sigThread.join()
 
         # 停止接收策略引擎队列数据
-        # print("-----------------------")
+        #print("-----------------------")
         self.receiveEgThread.stop()
         self.model.receiveExit()
-        # print("222222222222222222222222")
+        #print("222222222222222222222222")
         self.receiveEgThread.join()
-        # print("3333333333333333333333333")
+        #print("3333333333333333333333333")
 
         self.logger.info("before top.destroy")
         self.top.destroy()

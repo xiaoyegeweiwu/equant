@@ -679,19 +679,15 @@ class StrategyEngine(object):
         # 订单信息
         self._trdModel.updateOrderData(apiEvent)
         self._engineOrderModel.updateEpoleStarOrder(apiEvent)
-        strategyId = apiEvent.getStrategyId()
-        if strategyId > 0:
-            self._sendEvent2Strategy(strategyId, apiEvent)
-        else:
-            contractNo = apiEvent.getContractNo()
-            # print("contractNo = ", contractNo, apiEvent.getData())
-            # 客户端手动开仓平仓
-            if not contractNo:
-                contractNo = apiEvent.getData()[0]["Cont"]
-            if not contractNo:
-                return
-            apiEvent.setContractNo(contractNo)
-            self._sendEvent2AllStrategy(apiEvent)
+        contractNo = apiEvent.getContractNo()
+        # print("contractNo = ", contractNo, apiEvent.getData())
+        # 客户端手动开仓平仓
+        if not contractNo:
+            contractNo = apiEvent.getData()[0]["Cont"]
+        if not contractNo:
+            return
+        apiEvent.setContractNo(contractNo)
+        self._sendEvent2AllStrategy(apiEvent)
 
     def _onApiMatchDataQry(self, apiEvent):
         self._engineOrderModel.updateEpoleStarOrder(apiEvent)
