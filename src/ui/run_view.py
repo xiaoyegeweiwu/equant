@@ -36,7 +36,6 @@ class RunWin(QuantToplevel, QuantFrame):
         self._commodity = self._control.model.getCommodity()
         self._contract = self._control.model.getContract()
         self._userNo = self._control.model.getUserNo()
-        print("-----------: ", self._exchange)
 
         # 参数设置
         self._strConfig = StrategyConfig_new()
@@ -1489,11 +1488,13 @@ class RunWin(QuantToplevel, QuantFrame):
 class SelectContractWin(QuantToplevel, QuantFrame):
 
     # exchangeList = ["CFFEX", "CME", "DCE", "SGE", "SHFE", "ZCE", "SPD", "INE", "NYMEX", "SSE", "SZSE"]
-    exchangeList = ["SPD", "ZCE", "DCE", "SHFE", "INE", "CFFEX", "SSE", "SZSE", "SGE", "CBOT", "CME", "NYMEX"]
+    exchangeList = ["SPD", "ZCE", "DCE", "SHFE", "INE", "CFFEX", "SSE", "SZSE", "SGE", "CME", "COMEX", "NYMEX", "HKEX"]
     commodityType = {"P": "现货", "Y": "现货", "F": "期货", "O": "期权",
                      "S": "跨期套利", "M": "品种套利", "s": "", "m": "",
-                     "y": "", "Z": "指数", "T": "股票", "X": "外汇",
+                     "y": "", "T": "股票", "X": "外汇",
                      "I": "外汇", "C": "外汇"}
+    # 外盘保留品种
+    FCommodity = {"NYMEX": ["美原油"], "COMEX": ["美黄金"], "HKEX": ["恒指", "小恒指", "H股指"], "CME": ["小标普"]}
 
     def __init__(self, master, exchange, commodity, contract):
         super().__init__(master)
@@ -1573,7 +1574,6 @@ class SelectContractWin(QuantToplevel, QuantFrame):
         #                                                       text=text,
         #                                                       values=commodity["CommodityNo"])
 
-        #-----------------------------------------------------------------------------
         for exchangeNo in self.exchangeList:
             exchange = self._exchange.loc[self._exchange.ExchangeNo == exchangeNo]
             for _, exch in exchange.iterrows():
@@ -1583,6 +1583,13 @@ class SelectContractWin(QuantToplevel, QuantFrame):
 
             commodity = self._commodity.loc[self._commodity.ExchangeNo == exchangeNo]
             for _, comm in commodity.iterrows():
+                # 仅保留外盘支持的品种
+                if exchangeNo in self.FCommodity:
+                    print("aaaaaaaaaa: ", exchangeNo)
+                    print("bbbbbbbbbb: ", self.FCommodity[exchangeNo])
+                    if comm.CommodityName not in self.FCommodity[exchangeNo]:
+                        continue
+
                 if comm.CommodityType in self.commodityType.keys():
                     if comm.ExchangeNo == "SPD":
                         text = comm.CommodityName
@@ -1665,9 +1672,22 @@ class SelectContractWin(QuantToplevel, QuantFrame):
                 commodityNo = self.exchangeTree.item(idx)['values']
                 directory_id = self.exchangeTree.parent(idx)
                 exchangeNo = self.exchangeTree.item(directory_id)['values']
+
+                # 将F和Z合并到一个节点下
+                commodityNoZ = commodityNo[0]
+                temp = commodityNo[0].split("|")
+                if temp[1] == "F":
+                    temp[1] = "Z"
+                    commodityNoZ = "|".join(temp)
+
                 contract = self._contract.loc[
                     (self._contract.ExchangeNo == exchangeNo[0])
-                    & (self._contract.CommodityNo == commodityNo[0])]
+                    & (
+                        (self._contract.CommodityNo == commodityNo[0])
+                        |
+                        (self._contract.CommodityNo == commodityNoZ)
+                    )
+                        ]
                 for index, row in contract.iterrows():
                     self.contractTree.insert("", tk.END, text=row["ContractNo"], values=row["CommodityNo"])
 
@@ -1715,6 +1735,7 @@ class AddContWin(QuantToplevel, QuantFrame):
         self._exchange = pd.DataFrame(exchange).drop_duplicates()
         self._commodity = pd.DataFrame(commodity).drop_duplicates()
         self._contract = pd.DataFrame(contract).drop_duplicates()
+        print("222222:\n", commodity)
 
         # 用于保存用户所选的用户合约
         self.userContList = []
