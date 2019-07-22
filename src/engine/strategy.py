@@ -379,7 +379,7 @@ class Strategy:
         # 1. 加载用户策略
         userModule = importlib.import_module(moduleName)
         userModule.__dict__.update(base_api.__dict__)
-
+        userModule.__dict__.update({"g_params":{}})
         # 2. 创建策略上下文
         self._context = StrategyContext()
 
