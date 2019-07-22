@@ -1937,10 +1937,6 @@ class StrategyModel(object):
         if not contNo:
             contNo = self._cfgModel.getBenchmark()
 
-        pos = self.getMarketPosition(contNo)
-        if pos == 0:
-            return 0
-
         positionInfo = self._calcCenter.getPositionInfo(contNo)
         if not positionInfo or 'TotalBuy' not in positionInfo:
             return -1
@@ -1951,10 +1947,6 @@ class StrategyModel(object):
         '''当前持仓的卖出持仓量'''
         if not contNo:
             contNo = self._cfgModel.getBenchmark()
-
-        pos = self.getMarketPosition(contNo)
-        if pos == 0:
-            return 0
 
         positionInfo = self._calcCenter.getPositionInfo(contNo)
         if not positionInfo or 'TotalSell' not in positionInfo:
