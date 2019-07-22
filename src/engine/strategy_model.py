@@ -418,8 +418,7 @@ class StrategyModel(object):
         # 非K线触发的策略，不使用Bar
         curBar = None
         # 计算考虑滑点损耗后的价格
-        if not self._cfgModel.isActualRun():
-            price = self._calcCenter.calcOrderPrice(contNo, dBuy, price)
+        price = self._calcCenter.calcOrderPrice(contNo, dBuy, price)
 
         # 对于开仓，需要平掉反向持仓
         qty = self._calcCenter.needCover(userNo, contNo, dBuy, share, price)
@@ -441,8 +440,7 @@ class StrategyModel(object):
         curBar = None
 
         # 计算考虑滑点损耗后的价格
-        if not self._cfgModel.isActualRun():
-            price = self._calcCenter.calcOrderPrice(contNo, dBuy, price)
+        price = self._calcCenter.calcOrderPrice(contNo, dBuy, price)
 
         # 交易计算、生成回测报告
         eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtGFD, dBuy, oCover, hSpeculate, price, share, curBar)
@@ -460,8 +458,7 @@ class StrategyModel(object):
         curBar = None
 
         # 计算考虑滑点损耗后的价格
-        if not self._cfgModel.isActualRun():
-            price = self._calcCenter.calcOrderPrice(contNo, dSell, price)
+        price = self._calcCenter.calcOrderPrice(contNo, dSell, price)
 
         # 交易计算、生成回测报告
         eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtGFD, dSell, oCover, hSpeculate, price, share, curBar)
@@ -477,8 +474,7 @@ class StrategyModel(object):
         curBar = None
 
         # 计算考虑滑点损耗后的价格
-        if not self._cfgModel.isActualRun():
-            price = self._calcCenter.calcOrderPrice(contNo, dSell, price)
+        price = self._calcCenter.calcOrderPrice(contNo, dSell, price)
 
         qty = self._calcCenter.needCover(userNo, contNo, dSell, share, price)
         if qty > 0 and needCover:
