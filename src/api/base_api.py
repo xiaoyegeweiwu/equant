@@ -2103,7 +2103,6 @@ class BaseApi(object):
               contractNo 合约编号，默认为基准合约。
          【备注】
               获得策略当前持仓的买入方向的持仓量，返回值为整数。
-              当MarketPosition() == 0时，该函数返回0。
          【示例】
               无
         '''
@@ -2119,7 +2118,6 @@ class BaseApi(object):
               contractNo 合约编号，默认为基准合约。
          【备注】
               获得策略当前持仓的卖出持仓量，返回值为整数。
-              当MarketPosition() == 0时，该函数返回0。
          【示例】
               无
         '''
