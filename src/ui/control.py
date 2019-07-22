@@ -1,5 +1,9 @@
+import os
+import sys
 import threading
 import time
+import importlib
+import traceback
 
 from tkinter import Tk
 from tkinter import messagebox
@@ -85,24 +89,17 @@ class TkinterController(object):
     def quitThread(self):
         self.logger.info("quitThread exit")
         # 停止更新界面子线程
-        #print("----------------------")
         self.monitorThread.stop()
-        #print("0000000000000000000000")
         self.monitorThread.join()
 
         # 停止更新信号记录
-        #print("-----------------------")
         self.sigThread.stop()
-        #print("111111111111111111")
         self.sigThread.join()
 
         # 停止接收策略引擎队列数据
-        #print("-----------------------")
         self.receiveEgThread.stop()
         self.model.receiveExit()
-        #print("222222222222222222222222")
         self.receiveEgThread.join()
-        #print("3333333333333333333333333")
 
         self.logger.info("before top.destroy")
         self.top.destroy()
@@ -137,6 +134,32 @@ class TkinterController(object):
         """保存当前策略"""
         self.app.quant_editor.saveEditor()
 
+    def parseStrategtParam(self, strategyPath):
+        """解析策略中的用户参数"""
+        moduleDir, moduleName = os.path.split(strategyPath)
+        moduleName = os.path.splitext(moduleName)[0]
+        if moduleDir not in sys.path:
+            sys.path.insert(0, moduleDir)
+        try:
+            userModule = importlib.import_module(moduleName)
+            userModule = importlib.reload(userModule)
+        except:
+            errorText = traceback.format_exc(0)
+            self.sendErrorMessage(errorText)
+            return {}
+        finally:
+            sys.path.remove(sys.path[0])
+
+        # varsKey = [k for k in vars(userModule) if k == "g_params"]
+        # g_params = {key: vars(userModule)[key] for key in varsKey}
+        g_params = {}
+        if "g_params" in vars(userModule):
+            g_params = vars(userModule)["g_params"]
+        return g_params
+
+    def sendErrorMessage(self, errorText):
+        self.model.receiveDebugMessage(errorText)
+
     def load(self, strategyPath, param={}):
         #TODO：新增param参数，用于接收用户策略的参数
         """
@@ -145,15 +168,16 @@ class TkinterController(object):
         :param param: 策略参数信息
         :return:
         """
+        # 运行策略前将用户修改保存
+        self.saveStrategy()
+        # 解析策略参数
+        param = self.parseStrategtParam(strategyPath)
         self.app.createRunWin(param)
 
         config = self.app.runWin.getConfig()
         if config:   # 获取到config
             self._request.loadRequest(strategyPath, config)
             self.logger.info("load strategy")
-            return
-
-        return
 
     def paramLoad(self, id):
         """用户参数修改后策略重新启动"""

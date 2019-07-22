@@ -266,7 +266,7 @@ class StrategyQuote(QuoteModel):
     @paramValidatorFactory(0)
     def getQAvgPrice(self, contNo):
         quoteDataModel = self._contractData[contNo]
-        return quoteDataModel.getLv1Data(15, 0.0)
+        return quoteDataModel.getLv1Data(13, 0.0)
 
     # 合约最新买价
     @paramValidatorFactory(0)

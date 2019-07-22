@@ -34,6 +34,10 @@ class QuantModel(object):
         '''处理队列退出'''
         self._receive.handlerExit()
 
+    def receiveDebugMessage(self, debugInfo):
+        """处理界面发来的错误信息"""
+        self._receive.handlerDebugInfo(debugInfo)
+
     def getCurStId(self):
         """获取当前运行的策略ID"""
         return self._receive.getCurStId()
@@ -85,13 +89,6 @@ class SendRequest(object):
 
         # 注册发送请求事件
         # self._regRequestCallback()
-
-    # def _regRequestCallback(self):
-    #     self._uiRequestCallback = {
-    #         EV_UI2EG_LOADSTRATEGY: self.,
-    #         EV_UI2EG_REPORT: self.,
-    #
-    #     }
 
     def loadRequest(self, path, config):
         """加载请求"""
@@ -296,6 +293,7 @@ class GetEgData(object):
     def _onEgDebugInfo(self, event):
         """获取引擎策略调试信息"""
         data = event.getData()
+        print("111111111112")
         stId = event.getStrategyId()
         if data:
             errText = data["ErrorText"]
@@ -317,7 +315,7 @@ class GetEgData(object):
         """获取引擎推送交易所信息"""
         exData = event.getData()
         self._exchangeList.extend(exData)
-        
+
     def _onEgExchangeStatus(self, event):
         '''获取交易所状态及时间'''
         pass
@@ -394,6 +392,18 @@ class GetEgData(object):
         self._eg2uiQueue.put(Event({"EventCode":999}))
         self._logger.info(f"[UI]: handlerExit")
 
+    def handlerDebugInfo(self, errorText):
+        """接收界面解析参数时发来的错误信息"""
+        event = Event({
+            "EventCode": EV_EG2UI_CHECK_RESULT,
+            "StrategyId": 0,
+            "Data": {
+                "ErrorText": errorText,
+            }
+        })
+        self._eg2uiQueue.put(event)
+        self._logger.info("[UI]: Receiving debug info successfully when handling parse parameter!")
+
     def handlerEgEvent(self):
 
         try:
@@ -425,6 +435,9 @@ class GetEgData(object):
 
     def getExchange(self):
         """取得接收到的交易所信息"""
+        # 去重
+        # exchangeList = []
+        # [exchangeList.append(ex) for ex in self._exchangeList if not ex in exchangeList]
         return self._exchangeList
 
     def getCommodity(self):

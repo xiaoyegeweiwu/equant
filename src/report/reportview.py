@@ -34,6 +34,7 @@ class ReportView(tk.Frame):
         self.data = data
         self.config(width=800, height=500)
         self.pack(side=tk.LEFT, fill=tk.BOTH, expand=tk.YES)
+        self.dire = None
         self.make_widgets()
 
     def make_widgets(self):

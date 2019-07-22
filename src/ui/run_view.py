@@ -524,7 +524,7 @@ class RunWin(QuantToplevel, QuantFrame):
     # 生成参数设置的目录树
     def addParam(self, frame):
         headList = ["参数", "当前值", "类型", "描述"]
-        widthList = [5, 20, 5, 200]
+        widthList = [5, 20, 20, 200]
 
         self.paramBar = ttk.Scrollbar(frame, orient="horizontal")
         self.paramBar.pack(side=tk.BOTTOM, fill=tk.X)
@@ -550,7 +550,7 @@ class RunWin(QuantToplevel, QuantFrame):
     def insertParams(self):
         """恢复用户选择的参数信息"""
         for key in self._userParam:
-            self.paramTree.insert("", tk.END, values=tuple([key, self._userParam[key]]), tags=key)
+            self.paramTree.insert("", tk.END, values=tuple([key, self._userParam[key], type(self._userParam[key])]), tags=key)
 
     def insertContInfo(self):
         """恢复配置文件中用户选择的多合约信息"""
@@ -1585,8 +1585,6 @@ class SelectContractWin(QuantToplevel, QuantFrame):
             for _, comm in commodity.iterrows():
                 # 仅保留外盘支持的品种
                 if exchangeNo in self.FCommodity:
-                    print("aaaaaaaaaa: ", exchangeNo)
-                    print("bbbbbbbbbb: ", self.FCommodity[exchangeNo])
                     if comm.CommodityName not in self.FCommodity[exchangeNo]:
                         continue
 
@@ -1735,7 +1733,6 @@ class AddContWin(QuantToplevel, QuantFrame):
         self._exchange = pd.DataFrame(exchange).drop_duplicates()
         self._commodity = pd.DataFrame(commodity).drop_duplicates()
         self._contract = pd.DataFrame(contract).drop_duplicates()
-        print("222222:\n", commodity)
 
         # 用于保存用户所选的用户合约
         self.userContList = []

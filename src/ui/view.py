@@ -157,8 +157,6 @@ class QuantApplication(object):
     def createRunWin(self, param):
         """弹出量化设置界面"""
         self.setLoadState("disabled")
-        # 运行策略前将用户修改保存
-        self.quant_editor.saveEditor()
         self.runWin = RunWin(self.control, self.root, param)
         self.runWin.display()
         self.setLoadState("normal")
@@ -174,6 +172,11 @@ class QuantApplication(object):
 
             # 退出子线程和主线程
             self.control.quitThread()
+
+    def autoExit(self):
+        """量化终端自动退出"""
+        self.control.sendExitRequest()
+        self.control.quitThread()
 
     def reportDisplay(self, data, id):
         """
@@ -235,27 +238,29 @@ class QuantApplication(object):
     def setConnect(self, src):
 
         if src == 'Q':
-            self.quant_editor_head.stateLabel.config(text="即时行情连接成功")
+            self.quant_editor_head.stateLabel.config(text="即时行情连接成功", fg="black")
         if src == 'H':
-            self.quant_editor_head.stateLabel.config(text="历史行情连接成功")
+            self.quant_editor_head.stateLabel.config(text="历史行情连接成功", fg="black")
 
         if src == 'T':
-            self.quant_editor_head.stateLabel.config(text="交易服务连接成功")
+            self.quant_editor_head.stateLabel.config(text="交易服务连接成功", fg="black")
 
         if src == 'S':
-            self.quant_editor_head.stateLabel.config(text="极星9.5连接成功")
+            self.quant_editor_head.stateLabel.config(text="极星9.5连接成功", fg="black")
 
     def setDisconnect(self, src):
         if src == 'Q':
-            self.quant_editor_head.stateLabel.config(text="即时行情断连")
+            self.quant_editor_head.stateLabel.config(text="即时行情断连", fg="red")
         if src == 'H':
-            self.quant_editor_head.stateLabel.config(text="历史行情断连")
+            self.quant_editor_head.stateLabel.config(text="历史行情断连", fg="red")
 
         if src == 'T':
-            self.quant_editor_head.stateLabel.config(text="交易服务断连")
+            self.quant_editor_head.stateLabel.config(text="交易服务断连", fg="red")
 
         if src == 'S':
-            self.quant_editor_head.stateLabel.config(text="极星9.5退出")
+            self.quant_editor_head.stateLabel.config(text="极星9.5退出", fg="red")
+            messagebox.showerror("错误", "极星9.5退出", parent=self.root)
+
 
     def clearError(self):
         """清除错误信息"""
