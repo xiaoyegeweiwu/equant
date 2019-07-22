@@ -4,8 +4,7 @@ import traceback
 from tkinter import *
 from tkinter import ttk, messagebox, Frame
 from utils.utils import *
-from .language import Language
-from .com_view import QuantFrame, QuantToplevel
+
 from .editor import MonitorText, SignalText, ErrorText
 from .menu import RunMenu
 from capi.com_types import *
