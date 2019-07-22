@@ -1698,7 +1698,7 @@ class StrategyModel(object):
         if len(contNoInfo) >= 4 and (contNoInfo[1] == 'S' or contNoInfo[1] == 's'):
             contNo = contNoInfo[0] + '|F|' + contNoInfo[2] + '|' + contNoInfo[3]
 
-        currentTime = self.getCurrentTime()
+        currentTime = float(datetime.now().strftime('0.%H%M%S'))
         sessionCount = self.getGetSessionCount(contNo)
         for index in range(0, sessionCount):
             startTime = self.getGetSessionStartTime(contNo, index)
