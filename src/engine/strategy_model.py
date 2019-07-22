@@ -1672,22 +1672,6 @@ class StrategyModel(object):
             delta = -(mtime1 - mtime2).seconds
 
         return delta
-        
-    def getRef(self, price, n):
-        '''n从0开始'''
-        if len(price) < 1:
-            return np.nan
-            
-        if len(price) >= n:
-            return price[-n]
-            
-        last = n-1
-        while last > len(price):
-            last = last - 1
-            if last <= 1: break
-            
-        return price[-last]
-        
 
     def isInSession(self, contNo):
         if not contNo:
@@ -2141,79 +2125,3 @@ class StrategyModel(object):
         '''交易总开仓手数'''
         # return self._calcCenter.getProfit()["AllTrade"]
         return 0
-
-    def SMA(self, price, period, weight):
-        '''计算加权移动平均值'''
-        return self._staModel.SMA(price, period, weight)
-
-    def ParabolicSAR(self, high, low, afstep, aflimit):
-        '''计算抛物线转向'''
-        return self._staModel.ParabolicSAR(high, low, afstep, aflimit)
-        
-    def getHighest2(self, price, length):
-        high = price[-1]
-        for i in range(len(price)-1, len(price)-length-1, -1):
-            if price[i] > high:
-                high = price[i]
-            if i == 0: break
-            
-        return high
-        
-    def getLowest2(self, price, length):
-        low = price[-1]
-        for i in range(len(price)-1, len(price)-length-1, -1):
-            if price[i] < low:
-                low = price[i]
-            if i == 0: break
-            
-        return low
-
-    def getHighest(self, price, length):
-        if (not isinstance(price, np.ndarray) and not isinstance(price, list)) or len(price) == 0:
-            return np.array([])
-
-        arr = np.array(price) if isinstance(price, list) else price
-        if length <= 1:
-            return arr
-
-        return talib.MAX(arr, length)
-
-    def getLowest(self, price, length):
-        if (not isinstance(price, np.ndarray) and not isinstance(price, list)) or len(price) == 0:
-            return np.array([])
-
-        arr = np.array(price) if isinstance(price, list) else price
-        if length <= 1:
-            return arr
-
-        return talib.MIN(arr, length)
-        
-    def getCountIf(self, cond, peroid):
-        sum = 0
-        for i in range(len(cond)-1, len(cond)-peroid-1, -1):
-            if cond[i]: sum += 1
-            if i == 0: break
-            
-        return sum
-        
-    def getCrossOver(self, price1, price2):
-        if price1[-1]  <= price2[-1]:
-            return False
-
-        for i in range(len(price1)-1, -1, -1):
-            if price1[i] < price2[i]:
-                return True
-            if i == 0:break
-
-        return False
-
-    def getCrossUnder(self, price1, price2):
-        if price1[-1]  >= price2[-1]:
-            return False
-
-        for i in range(len(price1)-1, -1, -1):
-            if price1[i] > price2[i]:
-                return True
-            if i == 0:break
-
-        return False

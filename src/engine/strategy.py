@@ -350,7 +350,7 @@ class Strategy:
         self._strategyState = StrategyStatusRunning
         # 用户模板函数路径加入系统路径，并扩展baseapi的作用域
         workPath = os.path.abspath('.')
-        userPath = workPath + "\strategy\FuncTemplate"
+        userPath = workPath + r"\strategy\扩展函数"
         if userPath not in sys.path:
             sys.path.insert(0, userPath)
         

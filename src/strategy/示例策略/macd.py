@@ -7,6 +7,7 @@ qty = 1   # 下单量
 
 def initialize(context): 
     # K线稳定后发单
+    SetBarInterval("DCE|F|I|1909", 'M', 1, 2000)
     SetOrderWay(2)
 
 def handle_data(context):
@@ -18,9 +19,9 @@ def handle_data(context):
     diff, dea, macd = talib.MACD(Close(), fast, slow, back)
 
     # 突破下单
-    if MarketPosition() != 1 and macd[-1] > 2:
+    if MarketPosition() != 1 and macd[-1] > 0.2:
         Buy(qty, Open()[-1]) 
-    elif MarketPosition() != -1 and macd[-1] < -2:
+    elif MarketPosition() != -1 and macd[-1] < -0.2:
         SellShort(qty, Open()[-1]) 
 
     # 绘制MACD曲线
