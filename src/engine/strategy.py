@@ -326,7 +326,6 @@ class Strategy:
         moduleDir, moduleName = os.path.split(self._filePath)
         self._strategyName = ''.join(moduleName.split('.')[:-1])
 
-
         # 策略所在进程状态, Ready、Running、Exit、Pause
         self._strategyState = StrategyStatusReady
         #
@@ -377,9 +376,10 @@ class Strategy:
                 self._userModelDict[modelFile] = model
 
         # 1. 加载用户策略
+        import builtins
+        builtins.g_params = {}
         userModule = importlib.import_module(moduleName)
         userModule.__dict__.update(base_api.__dict__)
-        userModule.__dict__.update({"g_params":{}})
         # 2. 创建策略上下文
         self._context = StrategyContext()
 

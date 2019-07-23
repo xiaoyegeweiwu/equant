@@ -626,8 +626,8 @@ class StrategyHisQuote(object):
     def onHisQuoteRsp(self, event):
         key = (event.getContractNo(), event.getKLineType(), event.getKLineSlice())
         kindInfo = {"ContractNo":key[0], "KLineType":key[1],"KLineSlice":key[2]}
-        #print("key = ", key, len(event.getData()), event.isChainEnd(), kindInfo)
-        #print(self._config.getKLineKindsInfo())
+        # print("key = ", key, len(event.getData()), event.isChainEnd(), kindInfo)
+        # print(self._config.getKLineKindsInfo())
 
         assert kindInfo in self._config.getKLineKindsInfo(), " Error "
         if not self._isReqByDate[key]:                        # req by count
