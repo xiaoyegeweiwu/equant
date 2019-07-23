@@ -14,6 +14,7 @@ import copy
 
 from engine.calc import CalcCenter
 from datetime import datetime
+from .play_audio import PlayAudio
 
 
 class StrategyModel(object):
@@ -960,6 +961,12 @@ class StrategyModel(object):
             'Remark': '',
             'AddOneIsValid': tsDay,
         }
+        
+        #self.logger.info("AAAAAAAA:%s"%self._cfgModel.getAlarm())
+        
+        if self._cfgModel.getAlarm():
+            #self.logger.info("Play signal audio!")
+            PlayAudio.play('Signal')
 
         self.sendActualOrder2Engine(aOrder, eId, self._strategy.getStrategyId(), aFunc)
         # self.logger.trade_info(self._strategy.getStrategyId(), aOrder)
