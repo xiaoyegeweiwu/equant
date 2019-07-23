@@ -1339,7 +1339,7 @@ class RunWin(QuantToplevel, QuantFrame):
         if isActual:
             self._strConfig.setActual()
         # 发单报警
-        self._strConfig.setAlarm(True) if isAlarm else self._strConfig.setAlarm(False)
+        self._strConfig.setAlarm(True) if int(isAlarm) else self._strConfig.setAlarm(False)
         # 账户
         #TODO: user类型对不对呢？
         self._strConfig.setUserNo(user)
@@ -1415,7 +1415,7 @@ class RunWin(QuantToplevel, QuantFrame):
         self._strConfig.setParams(params)
 
         self.config = self._strConfig.getConfig()
-        # print("-----------: ", self.config)
+        #print("-----------: ", self.config)
 
 
         # -------------保存用户配置--------------------------
