@@ -152,6 +152,7 @@ class StrategyConfig_new(object):
         self._metaData = {
             'SubContract' : [],     # 订阅的合约信息，列表中的第一个合约为基准合约
             'Sample'      : {
+                'SetByUI': True,  # 由界面设置
             },
             'Trigger': {    # 触发方式
                 'SetByUI': True,    # 由界面设置
@@ -196,16 +197,22 @@ class StrategyConfig_new(object):
         }
 
     # ----------------------- 合约/K线类型/K线周期 ----------------------
-    def setBarInterval(self, contNo, barType, barInterval, sampleConfig, trigger=True):
-        self.setBarInfoInSample(contNo, barType, barInterval, sampleConfig, trigger)
+    def setBarInterval(self, contNo, barType, barInterval, sampleConfig, trigger=True, setByUI=False):
+        self.setBarInfoInSample(contNo, barType, barInterval, sampleConfig, trigger, setByUI)
 
-    def setBarInfoInSample(self, contNo, kLineType, kLineSlice, sampleConfig, trigger=True):
+    def setBarInfoInSample(self, contNo, kLineType, kLineSlice, sampleConfig, trigger=True, setByUI=True):
         '''设置订阅的合约、K线类型和周期'''
         if not contNo:
             raise Exception("请确保在设置界面或者SetBarInterval方法中设置的合约编号不为空！")
             # if barType not in ('t', 'T', 'S', 'M', 'H', 'D', 'W', 'm', 'Y'):
         if kLineType not in ('T', 'M', 'D'):
             raise Exception("请确保设置的K线类型为 'T':分笔，'M':分钟，'D':日线 中的一个！")
+
+        # 清空界面设置信息
+        if (not setByUI and self._metaData['Sample']['SetByUI']) or (setByUI and not self._metaData['Sample']['SetByUI']):
+            self._metaData['SubContract'] = []
+            self._metaData['Sample'] = {}
+            self._metaData['Sample']['SetByUI'] = False
 
         # 设置订阅的合约列表
         if contNo not in self._metaData['SubContract']:
@@ -669,7 +676,10 @@ class StrategyConfig_new(object):
         kLineTypetupleList = []
         kLineTypeDictList = []
         subDict = {}
-        for contNo, barList in self._metaData['Sample'].items():
+        for contNo in self._metaData['Sample']:
+            barList = self._metaData['Sample'][contNo]
+            if not isinstance(barList, list):
+                continue
             for barInfo in barList:
                 triggerTuple = (contNo, barInfo['KLineType'], barInfo['KLineSlice'])
                 if triggerTuple not in kLineTypetupleList:

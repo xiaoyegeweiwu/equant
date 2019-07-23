@@ -38,7 +38,7 @@ class TriggerMgr(object):
         self.setDataReady(key)
 
     def setDataReady(self, key):
-        #assert self._isReady.get(key[0]).get(key) is False, "Error"
+        # assert self._isReady.get(key[0]).get(key) is False, "Error"
         self._isReady.get(key[0]).update({key:True})
 
     # 轮询机制

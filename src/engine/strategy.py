@@ -350,7 +350,7 @@ class Strategy:
         self._strategyState = StrategyStatusRunning
         # 用户模板函数路径加入系统路径，并扩展baseapi的作用域
         workPath = os.path.abspath('.')
-        userPath = workPath + "\strategy\FuncTemplate"
+        userPath = workPath + r"\strategy\扩展函数"
         if userPath not in sys.path:
             sys.path.insert(0, userPath)
         
@@ -379,7 +379,7 @@ class Strategy:
         # 1. 加载用户策略
         userModule = importlib.import_module(moduleName)
         userModule.__dict__.update(base_api.__dict__)
-
+        userModule.__dict__.update({"g_params":{}})
         # 2. 创建策略上下文
         self._context = StrategyContext()
 
