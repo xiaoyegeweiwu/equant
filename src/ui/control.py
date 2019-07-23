@@ -164,7 +164,6 @@ class TkinterController(object):
                 reg = regex.search(c)
                 if reg:
                     ret = [reg.groups()[1], reg.groups()[3]]
-                    print("11111: ", reg.groups())
                     if ret[1] is None: ret[1] = ""
                     try:
                         ret[0] = int(ret[0])
