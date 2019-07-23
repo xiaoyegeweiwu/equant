@@ -5089,25 +5089,24 @@ class BaseApi(object):
         '''
         return self._dataModel.setSample(sampleType, sampleValue)
         
-    def SetInitCapital(self, capital, userNo):
+    def SetInitCapital(self, capital):
         '''
         【说明】
               设置初始资金，不设置默认100万
 
         【语法】
-              int SetInitCapital(float capital=10000000, string usrNo='')
+              int SetInitCapital(float capital=10000000)
 
         【参数】
               capital 初始资金，默认为10000000
-              usrNo 账号名称，默认为设置界面选中的账号
 
         【备注】
               返回整型，0成功，-1失败
 
         【示例】
-              SetInitCapital(200*10000, 'ET001'), 设置账户ET001的初始资金为200万
+              SetInitCapital(200*10000), 设置初始资金为200万
         '''
-        return self._dataModel.setInitCapital(capital, userNo)
+        return self._dataModel.setInitCapital(capital)
         
     def SetMargin(self, type, value, contractNo):
         '''
@@ -6870,8 +6869,8 @@ def SetBarInterval(contractNo, barType, barInterval, barCount=2000):
 # def SetSample(sampleType='C', sampleValue=2000):
 #     return baseApi.SetSample(sampleType, sampleValue)
 
-def SetInitCapital(capital=10000000, userNo=''):
-    return baseApi.SetInitCapital(capital, userNo)
+def SetInitCapital(capital=10000000):
+    return baseApi.SetInitCapital(capital)
 
 def SetMargin(type, value=0, contractNo=''):
     return baseApi.SetMargin(type, value, contractNo)

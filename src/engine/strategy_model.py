@@ -542,9 +542,9 @@ class StrategyModel(object):
     def setSample(self, sampleType, sampleValue):
         return self._cfgModel.setSample(sampleType, sampleValue)
 
-    def setInitCapital(self, capital, userNo):
+    def setInitCapital(self, capital):
         initFund = capital if capital else 1000000
-        self._cfgModel.setInitCapital(initFund, userNo)
+        self._cfgModel.setInitCapital(initFund)
         return 0
 
     def setMargin(self, type, value, contNo):

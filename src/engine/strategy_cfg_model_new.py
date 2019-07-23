@@ -397,7 +397,7 @@ class StrategyConfig_new(object):
         '''设置初始资金'''
         self._metaData['Money']['InitFunds'] = capital
 
-    def getInitCapital(self, userNo='Default'):
+    def getInitCapital(self):
         '''获取初始资金'''
         return self._metaData['Money']['InitFunds']
 
