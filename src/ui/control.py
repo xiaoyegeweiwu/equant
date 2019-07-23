@@ -160,7 +160,7 @@ class TkinterController(object):
             content = [line.strip() for line in f]
             for c in content:
                 #regex = re.compile(r"\s*g_params[\[][\"\'](.*)[\"\'][\]]\s*=[\s]*([^\s]*)[\s]*(#[\s]*(.*))?")
-                regex = re.compile(r"g_params[\[][\"\'](.*)[\"\'][\]]\s*=[\s]*([^\s]*)[\s]*(#[\s]*(.*))?")
+                regex = re.compile(r"^g_params[\[][\"\'](.*)[\"\'][\]]\s*=[\s]*([^\s]*)[\s]*(#[\s]*(.*))?")
                 reg = regex.search(c)
                 if reg:
                     ret = [reg.groups()[1], reg.groups()[3]]

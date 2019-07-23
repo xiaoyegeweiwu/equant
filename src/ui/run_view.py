@@ -201,11 +201,11 @@ class RunWin(QuantToplevel, QuantFrame):
 
             # 用户配置参数信息
             # 若保存的设置中用户参数为空，则不对self._userParam赋值
-            try:
-                if conf[VParams]:
-                    self._userParam = conf[VParams]
-            except KeyError as e:
-                traceback.print_exc()
+            # try:
+            #     if conf[VParams]:
+            #         self._userParam = conf[VParams]
+            # except KeyError as e:
+            #     traceback.print_exc()
 
             #TODO: DefaultSample
             try:
@@ -1455,7 +1455,7 @@ class RunWin(QuantToplevel, QuantFrame):
                 VCanClose: canClose,
                 VCanOpen: canOpen,
 
-                VParams: params,
+                #VParams: params,
                 VContSettings: contsInfo
             }
         }
