@@ -155,7 +155,27 @@ class TkinterController(object):
         # if "g_params" in vars(userModule):
         #     g_params = vars(userModule)["g_params"]
         # return g_params
-        return {}
+        g_params = {}
+        with open(strategyPath, 'r', encoding="utf-8") as f:
+            content = [line.strip() for line in f]
+            for c in content:
+                #regex = re.compile(r"\s*g_params[\[][\"\'](.*)[\"\'][\]]\s*=[\s]*([^\s]*)[\s]*(#[\s]*(.*))?")
+                regex = re.compile(r"g_params[\[][\"\'](.*)[\"\'][\]]\s*=[\s]*([^\s]*)[\s]*(#[\s]*(.*))?")
+                reg = regex.search(c)
+                if reg:
+                    ret = [reg.groups()[1], reg.groups()[3]]
+                    print("11111: ", reg.groups())
+                    if ret[1] is None: ret[1] = ""
+                    try:
+                        ret[0] = int(ret[0])
+                    except:
+                        pass
+                    g_params.update(
+                        {
+                            reg.groups()[0]: ret
+                        }
+                    )
+        return g_params
 
     def load(self, strategyPath, param={}):
         #TODO：新增param参数，用于接收用户策略的参数

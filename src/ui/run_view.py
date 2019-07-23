@@ -550,7 +550,10 @@ class RunWin(QuantToplevel, QuantFrame):
     def insertParams(self):
         """恢复用户选择的参数信息"""
         for key in self._userParam:
-            self.paramTree.insert("", tk.END, values=tuple([key, self._userParam[key], type(self._userParam[key])]), tags=key)
+            self.paramTree.insert("", tk.END, values=tuple(
+                [key, self._userParam[key][0], type(self._userParam[key][0]), self._userParam[key][1]]), tags=key)
+            # self.paramTree.insert("", tk.END, values=tuple(
+            #     [key, self._userParam[key][0], type(self._userParam[key]), self._userParam[key][1]]), tags=key)
 
     def insertContInfo(self):
         """恢复配置文件中用户选择的多合约信息"""
@@ -1392,8 +1395,7 @@ class RunWin(QuantToplevel, QuantFrame):
         params = {}
         for item in self.paramTree.get_children():
             paramValues = self.paramTree.item(item)['values']
-            # print("111111: ", itemValues)
-            params[paramValues[0]] = paramValues[1]
+            params[paramValues[0]] = (paramValues[1], paramValues[3])
 
         self._strConfig.setParams(params)
 
