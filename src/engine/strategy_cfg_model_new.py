@@ -456,6 +456,8 @@ class StrategyConfig_new(object):
         if value < 0 or type not in (EEQU_FEE_TYPE_RATIO, EEQU_FEE_TYPE_FIXED):
             raise Exception("保证金类型只能是 'R': 按比例收取，'F': 按定额收取 中的一个，并且保证金比例/额度不能小于0！")
 
+        # TODO : 清空界面设置的参数
+
         if contNo not in self._metaData['Money']:
             self._metaData['Money']['Margin'][contNo] = {'Type':'', 'Value':''}
         self._metaData['Money']['Margin'][contNo]['Type'] = type
@@ -489,6 +491,8 @@ class StrategyConfig_new(object):
 
         if feeType not in (EEQU_FEE_TYPE_RATIO, EEQU_FEE_TYPE_FIXED):
             raise Exception("手续费收取方式只能取 'R': 按比例收取，'F': 按定额收取 中的一个！")
+
+        # TODO : 清空界面设置信息
 
         keyList = typeMap[type]
         for key in keyList:
