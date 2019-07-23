@@ -25,9 +25,9 @@ def handle_data(context):
         SellShort(qty, Open()[-1]) 
 
     # 绘制MACD曲线
+    PlotStickLine('macd', 0, macd[-1], RGB_Red() if macd[-1] > 0 else RGB_Blue(), False, False) 
     PlotNumeric('diff', diff[-1], RGB_Red(), False, False)
     PlotNumeric('dea', dea[-1], RGB_Blue(), False, False)    
-    PlotStickLine('macd', 0, macd[-1], RGB_Red() if macd[-1] > 0 else RGB_Blue(), False, False) 
     # 绘制盈亏曲线
     PlotNumeric("profit", NetProfit() + FloatProfit(), 0xcccccc, False, True) 
 

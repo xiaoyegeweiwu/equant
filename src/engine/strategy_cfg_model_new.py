@@ -624,14 +624,11 @@ class StrategyConfig_new(object):
         }
 
     def getFloatStopPoint(self, contractNo=None):
-        if not contractNo:
-            contNo = self.getBenchmark() if not contractNo else contractNo
-
-        if contNo not in self._metaData['FloatStopPoint']:
+        contractNo = self.getBenchmark() if not contractNo else contractNo
+        if contractNo not in self._metaData['FloatStopPoint']:
             return None
 
-        return self._metaData['FloatStopPoint'][contNo]
-
+        return self._metaData['FloatStopPoint'][contractNo]
 
     # ----------------------- 用户设置参数 ----------------------
     def setParams(self, params):
