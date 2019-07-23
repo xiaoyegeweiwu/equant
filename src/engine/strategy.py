@@ -345,7 +345,6 @@ class Strategy:
         # self._userModelDict = {}
 
     # ////////////////////////////对外接口////////////////////
-    
     def _initialize(self):
         self._strategyState = StrategyStatusRunning
         # 用户模板函数路径加入系统路径，并扩展baseapi的作用域
@@ -389,6 +388,8 @@ class Strategy:
             userModule.initialize(self._context)
 
         self._dataModel.getConfigModel().setParams(self._argsDict["Params"])
+
+        builtins.g_params = {k:v[0] for k,v in self._argsDict["Params"].items()}
         #     self._argsDict["Params"] = self._context.params
         #     self._dataModel.getConfigModel().setParams(self._context.params)
         # else:
