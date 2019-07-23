@@ -34,6 +34,7 @@ class CalcCenter(object):
         self._costs = defaultdict()  # 费率，存放所有合约的费率
         self._profit = defaultdict(int)  # 策略收益统计信息
         self._positions = {}
+        self._usersPos  = {}     # 持仓信息按账户统计
 
         self._orders = []  # 订单列表
         self._prices = defaultdict(dict)  # 每个合约的最新价信息
@@ -277,8 +278,6 @@ class CalcCenter(object):
 
         """
         pInfo = self.getPositionInfo(order["Cont"])
-        availableFund = self.getAvailableFund()
-        cost = self.getCostRate(order["Cont"])
 
         ret = -1
 
@@ -293,20 +292,8 @@ class CalcCenter(object):
                 # 判断持仓
                 if pInfo["TotalSell"] < order["OrderQty"]:
                     self._logger.error(f"平卖仓失败，仓位不足，订单数据：{ftOrder}")
-                    return -1
+                else: ret = 1
 
-                # 计算平仓手续费
-                if cost["CloseRatio"]:
-                    coverCharge = order["OrderPrice"] * pInfo["TotalSell"] * cost["TradeDot"] * cost["CloseRatio"]
-                else:
-                    coverCharge = pInfo["TotalSell"] * cost["CloseFixed"]
-
-                # 判断资金
-                if availableFund < coverCharge:
-                    self._logger.error(f"平卖仓失败，资金不足，订单数据：{ftOrder}")
-                    ret = -2
-                else:
-                    ret = 1
             else:
                 self._logger.error(f"平卖仓失败，仓位不足，订单数据：{ftOrder}")
 
@@ -315,20 +302,8 @@ class CalcCenter(object):
                 # 判断持仓
                 if pInfo["TotalBuy"] < order["OrderQty"]:
                     self._logger.error(f"平买仓失败，仓位不足，订单数据：{ftOrder}")
-                    return -1
+                else: ret = 1
 
-                # 计算平仓手续费
-                if cost["CloseRatio"]:
-                    coverCharge = order["OrderPrice"] * pInfo["TotalBuy"] * cost["TradeDot"] * cost["CloseRatio"]
-                else:
-                    coverCharge = pInfo["TotalBuy"] * cost["CloseFixed"]
-
-                # 判断资金
-                if availableFund < coverCharge:
-                    self._logger.error(f"平买仓失败，资金不足，订单数据：{ftOrder}")
-                    ret = -2
-                else:
-                    ret = 1
             else:
                 self._logger.error(f"平买仓失败，仓位不足，订单数据：{ftOrder}")
 
@@ -337,21 +312,8 @@ class CalcCenter(object):
                 # 判断持仓
                 if pInfo["TodaySell"] < order["OrderQty"]:
                     self._logger.error(f"买平今失败，仓位不足，订单数据：{ftOrder}")
-                    return -1
+                else: ret = 1
 
-                # 计算平仓手续费
-                # TODO：平今手续费和平仓手续费是不是不一样
-                if cost["CloseRatio"]:
-                    coverCharge = order["OrderPrice"] * pInfo["TodaySell"] * cost["TradeDot"] * cost["CloseRatio"]
-                else:
-                    coverCharge = pInfo["TodaySell"] * cost["CloseFixed"]
-
-                # 判断资金
-                if availableFund < coverCharge:
-                    self._logger.error(f"买平今失败，资金不足，订单数据：{ftOrder}")
-                    ret = -2
-                else:
-                    ret = 1
             else:
                 self._logger.error(f"买平今失败，仓位不足，订单数据：{ftOrder}")
 
@@ -360,20 +322,8 @@ class CalcCenter(object):
                 # 判断持仓
                 if pInfo["TodayBuy"] < order["OrderQty"]:
                     self._logger.error(f"卖平今失败，仓位不足，订单数据：{ftOrder}")
-                    return -1
+                else: ret = 1
 
-                # 计算平仓手续费
-                if cost["CloseRatio"]:
-                    coverCharge = order["OrderPrice"] * pInfo["TodayBuy"] * cost["TradeDot"] * cost["CloseRatio"]
-                else:
-                    coverCharge = pInfo["TodayBuy"] * cost["CloseFixed"]
-
-                # 判断资金
-                if availableFund < coverCharge:
-                    self._logger.error(f"卖平今失败，资金不足，订单数据：{ftOrder}")
-                    ret = -2
-                else:
-                    ret = 1
             else:
                 self._logger.error(f"卖平今失败，仓位不足，订单数据：{ftOrder}")
 
@@ -420,6 +370,7 @@ class CalcCenter(object):
         }
         :return:
         """
+        # print("---------: ", order)
         # print("begin:", datetime.now().strftime('%H:%M:%S.%f'))
         if not self._beginDate:
             self._beginDate = order["TradeDate"]
@@ -634,6 +585,7 @@ class CalcCenter(object):
         cost = self.getCostRate(order["Cont"])
         pInfo = self.getPositionInfo(order["Cont"])
 
+        # TODO: 计算持仓时默认是优先平今，后期可能会存在优先平今、优先平昨可选的情况
         if order["Direct"] == dBuy and order["Offset"] == oOpen:  # 买入开仓(买开）
             pInfo["BuyPrice"] = (pInfo["TotalBuy"] * pInfo["BuyPrice"] + order["OrderQty"]
                                  * order["OrderPrice"]) / (pInfo["TotalBuy"] + order["OrderQty"])
@@ -731,6 +683,100 @@ class CalcCenter(object):
         self._positions[order["Cont"]] = pInfo
 
         return
+
+    # def _getUserPosition(self, user, contract):
+    #     """
+    #     获取用户的持仓信息
+    #     :param: user: 账户
+    #     :param: contract: 合约编号
+    #     :return: 持仓信息
+    #     {
+    #     "contractNo": {
+    #         "userNo":
+    #                 {
+    #                    "Cont"       :   合约编号
+    #                    "TodayBuy"   :   今持买开手数
+    #                    "TotalBuy"   :   总持买开手数
+    #
+    #                    "TodaySell"  :  今持卖开手数
+    #                    "TotalSell"  :  总持卖开手数
+    #                 }
+    #              }
+    #     }
+    #     """
+    #     # if not contract:
+    #     #     return copy.deepcopy(self._usersPos)
+    #     if contract in self._usersPos:
+    #         if user not in self._usersPos[contract]:
+    #             return {
+    #                 "Cont": contract,  # 合约
+    #                 "TodayBuy": 0,
+    #                 "TotalBuy": 0,
+    #
+    #                 "TodaySell": 0,
+    #                 "TotalSell": 0,
+    #             }
+    #         else:
+    #             return copy.deepcopy(self._usersPos[contract][user])
+    #     else:
+    #         return {
+    #             "Cont": contract,  # 合约
+    #             "TodayBuy": 0,
+    #             "TotalBuy": 0,
+    #
+    #             "TodaySell": 0,
+    #             "TotalSell": 0,
+    #         }
+    #
+    # def _getContPosition(self, contract):
+    #     """获取合约的持仓信息"""
+    #
+    #     if contract in self._usersPos:
+    #         return self._usersPos[contract]
+    #     return {}
+    #
+    # def _calcUserPosition(self, order):
+    #     """持仓信息按订单指定的账户统计"""
+    #     if order["Offset"] == oOpen:
+    #         userPInfo = self._getUserPosition(order["UserNo"], order["Cont"])
+    #     else:
+    #         userPInfo = self._getContPosition(order["Cont"])
+    #
+    #     if order["Direct"] == dBuy and order["Offset"] == oOpen:  # 买入开仓(买开)
+    #         userPInfo["TotalBuy"] += order["OrderQty"]
+    #         userPInfo["TodayBuy"] = self._calcTodayPosition(order, userPInfo, False)
+    #
+    #     elif order["Direct"] == dBuy and order["Offset"] == oCover:  # 买入平仓（买平）
+    #         #TODO: 平仓有问题
+    #
+    #         vol = order["OrderQty"] if userPInfo["TotalSell"] > order["OrderQty"] else userPInfo["TotalSell"]
+    #         userPInfo["TotalSell"] -= vol
+    #         userPInfo["TodaySell"] = userPInfo["TotalSell"] if userPInfo["TotalSell"] < userPInfo["TodaySell"] else \
+    #         userPInfo["TodaySell"]
+    #
+    #     elif order["Direct"] == dSell and order["Offset"] == oOpen:  # 卖出开仓
+    #         userPInfo["TotalSell"] += order["OrderQty"]
+    #         userPInfo["TodaySell"] = self._calcTodayPosition(order, userPInfo, True)
+    #
+    #     elif order["Direct"] == dSell and order["Offset"] == oCover:  # 卖出平仓
+    #         vol = order["OrderQty"] if userPInfo["TotalBuy"] > order["OrderQty"] else userPInfo["TotalBuy"]
+    #         userPInfo["TotalBuy"] -= vol
+    #         userPInfo["TodayBuy"] = userPInfo["TotalBuy"] if userPInfo["TotalBuy"] < userPInfo["TodayBuy"] else \
+    #         userPInfo["TodayBuy"]
+    #
+    #     if order["Cont"] not in self._usersPos:
+    #         self._usersPos.update(
+    #             {
+    #                 order["Cont"]: {order["UserNo"]: userPInfo}
+    #             }
+    #         )
+    #     else:
+    #         if order["UserNo"] not in self._usersPos[order["Cont"]]:
+    #             self._usersPos[order["Cont"]].update({order["UserNo"]: userPInfo})
+    #         else:
+    #             self._usersPos[order["Cont"]][order["UserNo"]] = userPInfo
+
+
 
     def _updateFirstOrder(self, contract):
         pInfo = self.getPositionInfo(contract)
@@ -1100,6 +1146,7 @@ class CalcCenter(object):
                     # TODO: self._profit["LastAssets"]不存在为0的情况么？？？？？
                     self._profit["MaxRetracementRate"] = self._profit["MaxRetracement"] / self._profit["LastAssets"]
                     self._profit["MaxRetracementRateTm"] = time
+                # print(f"============: {diff}, {self._profit['MaxRetracement']}", )
 
     def calcProfit(self, contractList, barInfo):
         """

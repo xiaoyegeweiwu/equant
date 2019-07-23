@@ -431,7 +431,6 @@ class StrategyModel(object):
 
     def setBuyToCover(self, userNo, contractNo, share, price):
         contNo = contractNo if contractNo is not None else self._cfgModel.getBenchmark()
-        self.logger.info("2222:%s,%s,%f,%d"%(userNo, contractNo, price, share))
 
         underlayContNo = self._qteModel.getUnderlayContractNo(contNo)
         if len(underlayContNo) > 0:
@@ -449,8 +448,6 @@ class StrategyModel(object):
     def setSell(self, userNo, contractNo, share, price):
         contNo = contractNo if contractNo is not None else self._cfgModel.getBenchmark()
         
-        self.logger.info("0000:%s,%s,%f,%d"%(userNo, contractNo, price, share))
-
         underlayContNo = self._qteModel.getUnderlayContractNo(contNo)
         if len(underlayContNo) > 0:
             contNo = underlayContNo
@@ -542,9 +539,9 @@ class StrategyModel(object):
     def setSample(self, sampleType, sampleValue):
         return self._cfgModel.setSample(sampleType, sampleValue)
 
-    def setInitCapital(self, capital, userNo):
+    def setInitCapital(self, capital):
         initFund = capital if capital else 1000000
-        self._cfgModel.setInitCapital(initFund, userNo)
+        self._cfgModel.setInitCapital(initFund)
         return 0
 
     def setMargin(self, type, value, contNo):
@@ -2121,3 +2118,67 @@ class StrategyModel(object):
         '''交易总开仓手数'''
         # return self._calcCenter.getProfit()["AllTrade"]
         return 0
+
+    def SMA(self, price, period, weight):
+        '''计算加权移动平均值'''
+        return self._staModel.SMA(price, period, weight)
+
+    def ParabolicSAR(self, high, low, afstep, aflimit):
+        '''计算抛物线转向'''
+        return self._staModel.ParabolicSAR(high, low, afstep, aflimit)
+        
+    def getRef(self, price, length):
+        if length >= len(price):
+            return price[0]
+        else:
+            return price[-length-1]
+
+    def getHighest(self, price, length):
+        if (not isinstance(price, np.ndarray) and not isinstance(price, list)) or len(price) == 0:
+            return np.array([])
+
+        arr = np.array(price) if isinstance(price, list) else price
+        if length <= 1:
+            return arr
+
+        return talib.MAX(arr, length)
+
+    def getLowest(self, price, length):
+        if (not isinstance(price, np.ndarray) and not isinstance(price, list)) or len(price) == 0:
+            return np.array([])
+
+        arr = np.array(price) if isinstance(price, list) else price
+        if length <= 1:
+            return arr
+
+        return talib.MIN(arr, length)
+        
+    def getCountIf(self, cond, peroid):
+        sum = 0
+        for i in range(len(cond)-1, len(cond)-peroid-1, -1):
+            if cond[i]: sum += 1
+            if i == 0: break
+            
+        return sum
+        
+    def getCrossOver(self, price1, price2):
+        if price1[-1]  <= price2[-1]:
+            return False
+
+        for i in range(len(price1)-1, -1, -1):
+            if price1[i] < price2[i]:
+                return True
+            if i == 0:break
+
+        return False
+
+    def getCrossUnder(self, price1, price2):
+        if price1[-1]  >= price2[-1]:
+            return False
+
+        for i in range(len(price1)-1, -1, -1):
+            if price1[i] > price2[i]:
+                return True
+            if i == 0:break
+
+        return False
