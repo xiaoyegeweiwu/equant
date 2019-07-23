@@ -4,6 +4,7 @@ import threading
 import time
 import importlib
 import traceback
+import re
 
 from tkinter import Tk
 from tkinter import messagebox
@@ -136,29 +137,25 @@ class TkinterController(object):
 
     def parseStrategtParam(self, strategyPath):
         """解析策略中的用户参数"""
-        moduleDir, moduleName = os.path.split(strategyPath)
-        moduleName = os.path.splitext(moduleName)[0]
-        if moduleDir not in sys.path:
-            sys.path.insert(0, moduleDir)
-        try:
-            userModule = importlib.import_module(moduleName)
-            userModule = importlib.reload(userModule)
-        except:
-            errorText = traceback.format_exc(0)
-            self.sendErrorMessage(errorText)
-            return {}
-        finally:
-            sys.path.remove(sys.path[0])
-
-        # varsKey = [k for k in vars(userModule) if k == "g_params"]
-        # g_params = {key: vars(userModule)[key] for key in varsKey}
-        g_params = {}
-        if "g_params" in vars(userModule):
-            g_params = vars(userModule)["g_params"]
-        return g_params
-
-    def sendErrorMessage(self, errorText):
-        self.model.receiveDebugMessage(errorText)
+        # moduleDir, moduleName = os.path.split(strategyPath)
+        # moduleName = os.path.splitext(moduleName)[0]
+        # if moduleDir not in sys.path:
+        #     sys.path.insert(0, moduleDir)
+        # try:
+        #     userModule = importlib.import_module(moduleName)
+        #     userModule = importlib.reload(userModule)
+        # except:
+        #     errorText = traceback.format_exc(0)
+        #     self.sendErrorMessage(errorText)
+        #     return {}
+        # finally:
+        #     sys.path.remove(sys.path[0])
+        #
+        # g_params = {}
+        # if "g_params" in vars(userModule):
+        #     g_params = vars(userModule)["g_params"]
+        # return g_params
+        return {}
 
     def load(self, strategyPath, param={}):
         #TODO：新增param参数，用于接收用户策略的参数

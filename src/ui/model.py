@@ -34,10 +34,6 @@ class QuantModel(object):
         '''处理队列退出'''
         self._receive.handlerExit()
 
-    def receiveDebugMessage(self, debugInfo):
-        """处理界面发来的错误信息"""
-        self._receive.handlerDebugInfo(debugInfo)
-
     def getCurStId(self):
         """获取当前运行的策略ID"""
         return self._receive.getCurStId()
@@ -391,18 +387,6 @@ class GetEgData(object):
     def handlerExit(self):
         self._eg2uiQueue.put(Event({"EventCode":999}))
         self._logger.info(f"[UI]: handlerExit")
-
-    def handlerDebugInfo(self, errorText):
-        """接收界面解析参数时发来的错误信息"""
-        event = Event({
-            "EventCode": EV_EG2UI_CHECK_RESULT,
-            "StrategyId": 0,
-            "Data": {
-                "ErrorText": errorText,
-            }
-        })
-        self._eg2uiQueue.put(event)
-        self._logger.info("[UI]: Receiving debug info successfully when handling parse parameter!")
 
     def handlerEgEvent(self):
 
