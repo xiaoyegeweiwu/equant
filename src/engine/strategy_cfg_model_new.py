@@ -194,6 +194,7 @@ class StrategyConfig_new(object):
             'SubQuoteContract' : [], # 即时行情订阅合约列表
             'Params': {}, # 用户设置参数
             'Pending': False,
+            'Alarm': False, # 是否开启警报
         }
 
     # ----------------------- 合约/K线类型/K线周期 ----------------------
@@ -650,6 +651,14 @@ class StrategyConfig_new(object):
         '''获取是否暂停向实盘下单标志'''
         return self._metaData['Pending']
 
+    # ----------------------- 警报开关状态 ----------------------
+    def setAlarm(self, alarmOn):
+        '''设置警报开关'''
+        self._metaData['Alarm'] = alarmOn
+
+    def getAlarm(self):
+        '''获取警报开启状态'''
+        return bool(self._metaData['Alarm'])
     # --------------------- 订阅/退订即时行情 --------------------
     def updateSubQuoteContract(self, contNoList):
         pass
