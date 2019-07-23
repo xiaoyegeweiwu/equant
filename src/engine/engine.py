@@ -108,17 +108,18 @@ class StrategyEngine(object):
                     pass
 
     def resumeAllStrategyConfig(self, strategyConfig):
-        #self.logger.info(strategyConfig)
+        # self.logger.info(strategyConfig)
         copyConfig = {}
         for k, v in strategyConfig.items():
             copyConfig[int(k)] = None
             
         sortedList = sorted(copyConfig)
-        #self.logger.info(sortedList)
+        # self.logger.info(sortedList)
         for strategyId in sortedList:
             strategyIni = strategyConfig[str(strategyId)]
             config = StrategyConfig(strategyIni["Config"])
             key = config.getKLineShowInfoSimple()
+
             fakeEvent = Event({
                 "EventCode": EV_EG2UI_LOADSTRATEGY_RESPONSE,
                 "StrategyId": strategyId,
@@ -128,16 +129,14 @@ class StrategyEngine(object):
                     "StrategyId": strategyId,
                     "StrategyName": strategyIni["StrategyName"],
                     "StrategyState": ST_STATUS_QUIT,
-                    "Path": strategyIni["Path"],
                     "ContractNo": key[0],
                     "KLineType": key[1],
                     "KLinceSlice": key[2],
                     "IsActualRun": config.isActualRun(),
                     "InitialFund": config.getInitCapital(),
                     "Config": strategyIni["Config"],
-                    # 取其ui配置
-                    # "Config": strategyIni["Config"],
-                    # "UIConfig": strategyIni["UIConfig"],
+                    "Path": strategyIni["Path"],
+                    "Params":config.getParams(),
                 }
             })
             self._eg2uiQueue.put(fakeEvent)

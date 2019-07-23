@@ -315,6 +315,7 @@ class Strategy:
         data = event.getData()
         self._filePath = data['Path']
         self._argsDict = data['Args']
+
         # 是否运行initialize函数
         self._noInitialize = "NoInitialize" in data and data["NoInitialize"]
         self._uiConfig = copy.deepcopy(data['Args'])
@@ -341,7 +342,7 @@ class Strategy:
         
         self._moneyLastTime = 0
         self._virtualPosTime = 0
-        #self._userModelDict = {}
+        # self._userModelDict = {}
 
     # ////////////////////////////对外接口////////////////////
     
@@ -386,10 +387,12 @@ class Strategy:
         # 5. 初始化用户策略参数
         if not self._noInitialize:
             userModule.initialize(self._context)
-            self._argsDict["Params"] = self._context.params
-            self._dataModel.getConfigModel().setParams(self._context.params)
-        else:
-            self._context.params = self._argsDict["Params"]
+
+        self._dataModel.getConfigModel().setParams(self._argsDict["Params"])
+        #     self._argsDict["Params"] = self._context.params
+        #     self._dataModel.getConfigModel().setParams(self._context.params)
+        # else:
+        #     self._context.params = self._argsDict["Params"]
 
         self._userModule = userModule
         # 5.1 同步配置
@@ -755,6 +758,7 @@ class Strategy:
         '''向界面返回策略加载应答'''
         cfg = self._dataModel.getConfigData()
         key = self._dataModel.getConfigModel().getKLineShowInfoSimple()
+
         revent = Event({
             "EventCode" : EV_EG2UI_LOADSTRATEGY_RESPONSE,
             "StrategyId": self._strategyId,
@@ -768,7 +772,7 @@ class Strategy:
                 "IsActualRun"  : self._dataModel.getConfigModel().isActualRun(),
                 "InitialFund"  : self._dataModel.getConfigModel().getInitCapital(),
                 "Config"       : cfg,
-                "Params"       : self._context.params,
+                "Params"       : self._dataModel.getConfigModel().getParams(),
             }
         })
         self.sendEvent2UI(revent)
