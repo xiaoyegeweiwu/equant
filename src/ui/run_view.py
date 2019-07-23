@@ -124,6 +124,7 @@ class RunWin(QuantToplevel, QuantFrame):
 
         self.sendOrderMode    =   tk.IntVar()     # 发单时机： 0. 实时发单 1. K线稳定后发单
         self.isActual         =   tk.IntVar()     # 实时发单
+        self.isAlarm          =   tk.StringVar()  # 发单报警
 
         self.isOpenTimes      =   tk.IntVar()     # 每根K线同向开仓次数标志
         self.openTimes        =   tk.StringVar()  # 每根K线同向开仓次数
@@ -186,6 +187,10 @@ class RunWin(QuantToplevel, QuantFrame):
 
             self.sendOrderMode.set(conf[VSendOrderMode]),
             self.isActual.set(conf[VIsActual]),
+            try:
+                self.isAlarm.set(conf[VIsAlarm])
+            except KeyError as e:
+                pass
 
             self.isOpenTimes.set(conf[VIsOpenTimes]),
             self.openTimes.set(conf[VOpenTimes]),
@@ -223,6 +228,8 @@ class RunWin(QuantToplevel, QuantFrame):
             self.sendOrderMode.set(0)
             # 运行模式
             self.isActual.set(0)
+            # 发单报警
+            self.isAlarm.set(0)
 
             # 初始资金
             self.initFund.set(10000000)
@@ -1026,6 +1033,11 @@ class RunWin(QuantToplevel, QuantFrame):
         #                                     anchor=tk.W, variable=self.isContinue)
         # self.continueCheck.pack(side=tk.LEFT, padx=5)
 
+        # 发单报警
+        self.alarmCheck = tk.Checkbutton(runModeFrame, text="发单报警", bg=rgb_to_hex(255, 255, 255),
+                                         anchor=tk.W, variable=self.isAlarm)
+        self.alarmCheck.pack(side=tk.LEFT, padx=50)
+
     def setSendOrderLimit(self, frame):
         sendModeFrame = tk.LabelFrame(frame, text="发单设置", bg=rgb_to_hex(255, 255, 255), padx=5)
         sendModeFrame.pack(side=tk.TOP, fill=tk.X, anchor=tk.W, padx=15, pady=15)
@@ -1193,6 +1205,7 @@ class RunWin(QuantToplevel, QuantFrame):
         sendOrderMode = self.sendOrderMode.get()  # 发单时机： 0. 实时发单 1. K线稳定后发单
 
         isActual = self.isActual.get()
+        isAlarm  = self.isAlarm.get()
         # isContinue = self.isContinue.get()
         isOpenTimes = self.isOpenTimes.get()
         openTimes = self.openTimes.get()
@@ -1325,6 +1338,8 @@ class RunWin(QuantToplevel, QuantFrame):
         # 运行模式
         if isActual:
             self._strConfig.setActual()
+        # 发单报警
+        self._strConfig.setAlarm(True) if isAlarm else self._strConfig.setAlarm(False)
         # 账户
         #TODO: user类型对不对呢？
         self._strConfig.setUserNo(user)
@@ -1400,7 +1415,7 @@ class RunWin(QuantToplevel, QuantFrame):
         self._strConfig.setParams(params)
 
         self.config = self._strConfig.getConfig()
-        # print("-----------: ", self.config)
+        print("-----------: ", self.config)
 
 
         # -------------保存用户配置--------------------------

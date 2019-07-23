@@ -540,14 +540,15 @@ VKLineType                   = "24"     # K线类型
 VKLineSlice                  = "25"     # K线周期
 VSendOrderMode               = "26"     # 发单时机： 0. 实时发单 1. K线稳定后发单
 VIsActual                    = "27"     # 实时发单
-VIsOpenTimes                 = "28"     #每根K线同向开仓次数标志
+VIsOpenTimes                 = "28"     # 每根K线同向开仓次数标志
 VOpenTimes                   = "29"     # 每根K线同向开仓次数
 VIsConOpenTimes              = "30"     # 最大连续同向开仓次数标志
 VConOpenTimes                = "31"     # 最大连续同向开仓次数
 VCanClose                    = "32"     # 开仓的当前K线不允许平仓
 VCanOpen                     = "33"     # 平仓的当前K线不允许开仓
 VParams                      = "34"     # 用户设置的参数
-VContSettings                = "35"     # 多合约设置信息
+VContSettings                = "35"     # 多合约设置信息\
+VIsAlarm                     = "36"     # 发单报警
 
 # K线数据类型
 BarDataClose        = 'C' # 收盘价
