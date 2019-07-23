@@ -53,8 +53,6 @@ class QuantFrame(object):
         return lambda event, fun=fun, kwargs=kwargs: fun(event, **kwargs)
 
 
-
-
 class QuantToplevel(tk.Toplevel):
     def __init__(self, master=None):
         tk.Toplevel.__init__(self, master)
@@ -319,3 +317,41 @@ class HistoryToplevel(QuantToplevel):
     def display_(self):
         self.update()
         self.deiconify()
+
+
+class AlarmToplevel(QuantToplevel):
+    def __init__(self, text, master=None):
+        super().__init__(master)
+        self.attributes("-toolwindow", 1)
+        self.dspText = text
+
+        self.title("下单提醒")
+        self.createWidget(self.dspText)
+
+    def createWidget(self, text):
+        f1 = tk.Frame(self, width=30, height=10)
+        f1.pack(side=tk.TOP, fill=tk.X, pady=5)
+
+        textWgt = tk.Text(f1, width=60, height=20)
+
+        textWgt.insert(tk.END, text)
+        textWgt.see(tk.END)
+        textWgt.config(state="disabled")
+        textWgt.pack()
+
+    def setPos(self):
+        # 获取主窗口大小和位置，根据主窗口调整输入框位置
+        ws = self._master.winfo_width()
+        hs = self._master.winfo_height()
+        wx = self._master.winfo_x()
+        wy = self._master.winfo_y()
+
+        #计算窗口位置
+        w, h = 350, 260
+        x = (wx + ws/2) - w/2
+        y = (wy + hs/2) - h/2
+
+        #弹出输入窗口，输入文件名称
+        self.geometry('%dx%d+%d+%d' % (w, h, x, y))
+        self.minsize(200, 120)
+

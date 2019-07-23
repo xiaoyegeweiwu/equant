@@ -190,7 +190,7 @@ class RunWin(QuantToplevel, QuantFrame):
             try:
                 self.isAlarm.set(conf[VIsAlarm])
             except KeyError as e:
-                pass
+                self.isAlarm.set(0)
 
             self.isOpenTimes.set(conf[VIsOpenTimes]),
             self.openTimes.set(conf[VOpenTimes]),
@@ -1415,7 +1415,7 @@ class RunWin(QuantToplevel, QuantFrame):
         self._strConfig.setParams(params)
 
         self.config = self._strConfig.getConfig()
-        print("-----------: ", self.config)
+        # print("-----------: ", self.config)
 
 
         # -------------保存用户配置--------------------------
@@ -1448,6 +1448,7 @@ class RunWin(QuantToplevel, QuantFrame):
 
                 VSendOrderMode: sendOrderMode,
                 VIsActual: isActual,
+                VIsAlarm: isAlarm,
                 VIsOpenTimes: isOpenTimes,
                 VOpenTimes: openTimes,
                 VIsConOpenTimes: isConOpenTimes,
