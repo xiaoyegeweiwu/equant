@@ -1936,10 +1936,10 @@ class BaseApi(object):
               获取商品主连/近月对应的合约
 
         【语法】
-              string GetTrendContract(string contractNo='')
+              string GetTrendContract(string contractNo="")
 
         【参数】
-              contractNo 取商品主连/近月编号，不能为空。
+              contractNo 取商品主连/近月编号，为空时，取基准合约。
 
         【备注】
               返回字符串

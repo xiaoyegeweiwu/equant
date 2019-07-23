@@ -670,42 +670,55 @@ class StrategyModel(object):
         return self._trdModel.getTotalFreeze()
 
     def getBuyAvgPrice(self, contNo):
+        contNo = self.getIndexMap(contNo)
         return self._trdModel.getBuyAvgPrice(contNo)
 
     def getBuyPosition(self, contNo):
+        contNo = self.getIndexMap(contNo)
         return self._trdModel.getBuyPosition(contNo)
 
     def getBuyPositionCanCover(self, contNo):
+        contNo = self.getIndexMap(contNo)
         return self._trdModel.getBuyPositionCanCover(contNo)
 
     def getBuyProfitLoss(self, contNo):
+        contNo = self.getIndexMap(contNo)
         return self._trdModel.getBuyProfitLoss(contNo)
 
     def getSellAvgPrice(self, contNo):
+        contNo = self.getIndexMap(contNo)
         return self._trdModel.getSellAvgPrice(contNo)
 
     def getSellPosition(self, contNo):
+        contNo = self.getIndexMap(contNo)
         return self._trdModel.getSellPosition(contNo)
 
     def getSellPositionCanCover(self, contNo):
+        contNo = self.getIndexMap(contNo)
         return self._trdModel.getSellPositionCanCover(contNo)
 
     def getSellProfitLoss(self, contNo):
+        contNo = self.getIndexMap(contNo)
         return self._trdModel.getSellProfitLoss(contNo)
 
     def getTotalAvgPrice(self, contNo):
+        contNo = self.getIndexMap(contNo)
         return self._trdModel.getTotalAvgPrice(contNo)
 
     def getTotalPosition(self, contNo):
+        contNo = self.getIndexMap(contNo)
         return self._trdModel.getTotalPosition(contNo)
 
     def getTotalProfitLoss(self, contNo):
+        contNo = self.getIndexMap(contNo)
         return self._trdModel.getTotalProfitLoss(contNo)
 
     def getTodayBuyPosition(self, contNo):
+        contNo = self.getIndexMap(contNo)
         return self._trdModel.getTodayBuyPosition(contNo)
 
     def getTodaySellPosition(self, contNo):
+        contNo = self.getIndexMap(contNo)
         return self._trdModel.getTodaySellPosition(contNo)
 
     def getOrderBuyOrSell(self, eSession):
@@ -733,21 +746,32 @@ class StrategyModel(object):
         return self._trdModel.getOrderTime(eSession)
 
     def getFirstOrderNo(self, contNo1, contNo2):
+        contNo1 = self.getIndexMap(contNo1)
+        contNo2 = self.getIndexMap(contNo2)
         return self._trdModel.getFirstOrderNo(contNo1, contNo2)
 
     def getNextOrderNo(self, orderId, contNo1, contNo2):
+        contNo1 = self.getIndexMap(contNo1)
+        contNo2 = self.getIndexMap(contNo2)
         return self._trdModel.getNextOrderNo(orderId, contNo1, contNo2)
 
     def getLastOrderNo(self, contNo1, contNo2):
+        contNo1 = self.getIndexMap(contNo1)
+        contNo2 = self.getIndexMap(contNo2)
         return self._trdModel.getLastOrderNo(contNo1, contNo2)
 
     def getFirstQueueOrderNo(self, contNo1, contNo2=''):
+        contNo1 = self.getIndexMap(contNo1)
+        contNo2 = self.getIndexMap(contNo2)
         return self._trdModel.getFirstQueueOrderNo(contNo1, contNo2)
 
     def getNextQueueOrderNo(self, orderId, contNo1, contNo2=''):
+        contNo1 = self.getIndexMap(contNo1)
+        contNo2 = self.getIndexMap(contNo2)
         return self._trdModel.getNextQueueOrderNo(orderId, contNo1, contNo2)
 
     def getAllQueueOrderNo(self, contNo):
+        contNo = self.getIndexMap(contNo)
         orderIdList = []
         orderId = self.getFirstQueueOrderNo(contNo)
         if orderId != -1:
@@ -759,6 +783,7 @@ class StrategyModel(object):
         return orderIdList
 
     def getALatestFilledTime(self, contNo):
+        contNo = self.getIndexMap(contNo)
         return self._trdModel.getALatestFilledTime(contNo)
 
     def getOrderContractNo(self, orderId):
@@ -977,6 +1002,7 @@ class StrategyModel(object):
         return orderId, orderNo
 
     def deleteAllOrders(self, contNo):
+        contNo = self.getIndexMap(contNo)
         orderList = self.getAllQueueOrderNo(contNo)
         if len(orderList) == 0:
             return True
@@ -1772,14 +1798,17 @@ class StrategyModel(object):
     def getSymbolType(self, contNo):
         return self.getCommodityInfoFromContNo(contNo)['CommodityCode']
 
-    def getIndexMap(self, contNo):
-        return self._qteModel.getUnderlayContractNo(contNo)
+    def getIndexMap(self, contNo=''):
+        if not contNo:
+            contNo = self._config.getBenchmark()
+
+        underlayCont = self._qteModel.getUnderlayContractNo(contNo)
+        return contNo if len(underlayCont) == 0 else underlayCont
 
     # ///////////////////////策略状态///////////////////////////
     def getAvgEntryPrice(self, contNo):
         '''当前持仓的平均建仓价格'''
-        if not contNo:
-            contNo = self._config.getBenchmark()
+        contNo = self.getIndexMap(contNo)
 
         posInfo = self._calcCenter.getPositionInfo(contNo)
         if not posInfo:
@@ -1818,6 +1847,7 @@ class StrategyModel(object):
 
     def getBarsSinceEntry(self, contNo):
         '''获得当前持仓中指定合约的第一个建仓位置到当前位置的Bar计数'''
+        contNo = self.getIndexMap(contNo)
         barIndex = self.getFirstOpenOrderInfo(contNo, 'CurBarIndex')
         if barIndex == -1:
             return barIndex
@@ -1827,8 +1857,7 @@ class StrategyModel(object):
 
     def getBarsSinceExit(self, contNo):
         '''获得当前持仓中指定合约的最近平仓位置到当前位置的Bar计数'''
-        if not contNo:
-            contNo = self._cfgModel.getBenchmark()
+        contNo = self.getIndexMap(contNo)
 
         orderInfo = self._calcCenter.getLatestCoverOrder(contNo)
         if not orderInfo or 'CurBarIndex' not in orderInfo:
@@ -1841,8 +1870,7 @@ class StrategyModel(object):
 
     def getBarsSinceLastEntry(self, contNo):
         '''获得当前持仓的最后一个建仓位置到当前位置的Bar计数'''
-        if not contNo:
-            contNo = self._cfgModel.getBenchmark()
+        contNo = self.getIndexMap(contNo)
 
         if self.getMarketPosition(contNo) == 0:
             return -1
@@ -1857,7 +1885,8 @@ class StrategyModel(object):
         return (int(curBar['KLineIndex']) - barIndex)
 
     def getBarsSinceToday(self, contractNo, barType, barValue):
-        key = self.getKey(contractNo, barType, barValue)
+        contNo = self.getIndexMap(contractNo)
+        key = self.getKey(contNo, barType, barValue)
         curBar = self._hisModel.getCurBar(key)
         tradeDate = curBar['TradeDate']
         barList = self._hisModel._curBarDict[key].getTradeDateKLine(tradeDate)
@@ -1884,6 +1913,7 @@ class StrategyModel(object):
 
     def getContractProfit(self, contNo):
         '''获得当前持仓的每手浮动盈亏'''
+        contNo = self.getIndexMap(contNo)
         holdProfit = self.getPositionValue(contNo, 'HoldProfit')
         if holdProfit == -1:
             return 0
@@ -1895,6 +1925,7 @@ class StrategyModel(object):
 
     def getCurrentContracts(self, contNo):
         '''获得策略当前的持仓合约数(净持仓)'''
+        contNo = self.getIndexMap(contNo)
         totalBuy = self.getPositionValue(contNo, 'TotalBuy')
         totalSell = self.getPositionValue(contNo, 'TotalSell')
 
@@ -1905,6 +1936,7 @@ class StrategyModel(object):
 
     def getEntryDate(self, contNo):
         '''获得当前持仓的第一个建仓位置的日期'''
+        contNo = self.getIndexMap(contNo)
         entryDate = self.getFirstOpenOrderInfo(contNo, 'TradeDate')
         if entryDate == -1:
             return 19700101
@@ -1912,8 +1944,7 @@ class StrategyModel(object):
 
     def getBuyPositionInStrategy(self, contNo):
         '''获得当前持仓的买入方向的持仓量'''
-        if not contNo:
-            contNo = self._cfgModel.getBenchmark()
+        contNo = self.getIndexMap(contNo)
 
         positionInfo = self._calcCenter.getPositionInfo(contNo)
         if not positionInfo or 'TotalBuy' not in positionInfo:
@@ -1923,8 +1954,7 @@ class StrategyModel(object):
 
     def getSellPositionInStrategy(self, contNo):
         '''当前持仓的卖出持仓量'''
-        if not contNo:
-            contNo = self._cfgModel.getBenchmark()
+        contNo = self.getIndexMap(contNo)
 
         positionInfo = self._calcCenter.getPositionInfo(contNo)
         if not positionInfo or 'TotalSell' not in positionInfo:
@@ -1934,8 +1964,7 @@ class StrategyModel(object):
 
     def getEntryPrice(self, contNo):
         '''获得当前持仓的第一次建仓的委托价格'''
-        if not contNo:
-            contNo = self._cfgModel.getBenchmark()
+        contNo = self.getIndexMap(contNo)
 
         orderInfo = self._calcCenter.getFirstOpenOrder(contNo)
         if not orderInfo or 'OrderPrice' not in orderInfo:
@@ -1945,6 +1974,7 @@ class StrategyModel(object):
 
     def getEntryTime(self, contNo):
         '''获得当前持仓的第一个建仓位置的时间'''
+        contNo = self.getIndexMap(contNo)
         dateTimeStamp = self.getFirstOpenOrderInfo(contNo, 'DateTimeStamp')
         if dateTimeStamp == -1:
             return 0
@@ -1952,8 +1982,7 @@ class StrategyModel(object):
 
     def getExitDate(self, contNo):
         ''' 获得最近平仓位置Bar日期'''
-        if not contNo:
-            contNo = self._cfgModel.getBenchmark()
+        contNo = self.getIndexMap(contNo)
 
         orderInfo = self._calcCenter.getLatestCoverOrder(contNo)
         if not orderInfo or 'TradeDate' not in orderInfo:
@@ -1963,8 +1992,7 @@ class StrategyModel(object):
 
     def getExitPrice(self, contNo):
         '''获得合约最近一次平仓的委托价格'''
-        if not contNo:
-            contNo = self._cfgModel.getBenchmark()
+        contNo = self.getIndexMap(contNo)
 
         orderInfo = self._calcCenter.getLatestCoverOrder(contNo)
         if not orderInfo or 'OrderPrice' not in orderInfo:
@@ -1974,8 +2002,7 @@ class StrategyModel(object):
 
     def getExitTime(self, contNo):
         '''获得最近平仓位置Bar时间'''
-        if not contNo:
-            contNo = self._cfgModel.getBenchmark()
+        contNo = self.getIndexMap(contNo)
 
         orderInfo = self._calcCenter.getLatestCoverOrder(contNo)
         if not orderInfo or 'DateTimeStamp' not in orderInfo:
@@ -1986,8 +2013,7 @@ class StrategyModel(object):
 
     def getLastEntryDate(self, contNo):
         '''获得当前持仓的最后一个建仓位置的日期'''
-        if not contNo:
-            contNo = self._cfgModel.getBenchmark()
+        contNo = self.getIndexMap(contNo)
 
         orderInfo = self._calcCenter.getLatestOpenOrder(contNo)
         if not orderInfo or 'TradeDate' not in orderInfo:
@@ -1997,8 +2023,7 @@ class StrategyModel(object):
 
     def getLastEntryPrice(self, contNo):
         '''获得当前持仓的最后一次建仓的委托价格'''
-        if not contNo:
-            contNo = self._cfgModel.getBenchmark()
+        contNo = self.getIndexMap(contNo)
 
         orderInfo = self._calcCenter.getLatestOpenOrder(contNo)
         if not orderInfo or 'OrderPrice' not in orderInfo:
@@ -2008,8 +2033,7 @@ class StrategyModel(object):
 
     def getLastEntryTime(self, contNo):
         '''获得当前持仓的最后一个建仓位置的时间'''
-        if not contNo:
-            contNo = self._cfgModel.getBenchmark()
+        contNo = self.getIndexMap(contNo)
 
         orderInfo = self._calcCenter.getLatestOpenOrder(contNo)
         if not orderInfo or 'DateTimeStamp' not in orderInfo:
@@ -2019,8 +2043,7 @@ class StrategyModel(object):
         return (int(dateTimeStamp) % 1000000000) / 1000000000
 
     def getMarketPosition(self, contNo):
-        if not contNo:
-            contNo = self._cfgModel.getBenchmark()
+        contNo = self.getIndexMap(contNo)
 
         positionInfo = self._calcCenter.getPositionInfo(contNo)
         if not positionInfo:
@@ -2033,8 +2056,7 @@ class StrategyModel(object):
         return 1 if buy > sell else -1
 
     def getPositionProfit(self, contNo):
-        if not contNo:
-            contNo = self._config.getBenchmark()
+        contNo = self.getIndexMap(contNo)
 
         if contNo not in list(self._calcCenter.getPositionInfo()):
             return 0.0
@@ -2055,8 +2077,7 @@ class StrategyModel(object):
         return fundRecordDict['DynamicEquity']
 
     def getFloatProfit(self, contNo):
-        if not contNo:
-            contNo = self._cfgModel.getBenchmark()
+        contNo = self.getIndexMap(contNo)
         return self._calcCenter._getHoldProfit(contNo)
 
     def getGrossLoss(self):
