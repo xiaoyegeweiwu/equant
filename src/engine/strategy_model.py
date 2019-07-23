@@ -90,10 +90,11 @@ class StrategyModel(object):
             "CloseTodayRatio": self._cfgModel.getCloseTodayRatio(),
             "CloseTodayFixed": self._cfgModel.getCloseTodayFixed(),
             "KLineType": "M",  # todo
-            "KLineSlice": 1,  # todo
+            "KLineSlice": 1,   # todo
             "TradeDot": self.getContractUnit(contNo),  # 每手乘数
             "PriceTick": self.getPriceScale(contNo),  # 最小变动价位
             "Limit": self._config.getLimit(),
+            "UnderLayTransFunc": self._qteModel.getUnderlayContractNo,
         }
         self._calcCenter.initArgs(strategyParam)
 
