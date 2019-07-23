@@ -365,7 +365,7 @@ class StrategyEngine(object):
         except queue.Empty as e:
             self.maxContinuousIdleTimes += 1
             pass
-            
+
     def _handleStData(self):
         try:
             event = self._st2egQueue.get_nowait()
@@ -1164,8 +1164,7 @@ class StrategyEngine(object):
             pass
 
     def _handleEngineExceptionCausedByStrategy(self, strategyId):
-        self._isEffective[strategyId] = False
-        self._isSt2EngineDataEffective[strategyId] = False
+        self._cleanStrategyInfo(strategyId)
         self._strategyMgr._strategyInfo[strategyId]['StrategyState'] = ST_STATUS_EXCEPTION
         self._strategyMgr.destroyProcessByStrategyId(strategyId)
         quitEvent = Event({
