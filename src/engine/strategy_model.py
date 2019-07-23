@@ -431,7 +431,6 @@ class StrategyModel(object):
 
     def setBuyToCover(self, userNo, contractNo, share, price):
         contNo = contractNo if contractNo is not None else self._cfgModel.getBenchmark()
-        self.logger.info("2222:%s,%s,%f,%d"%(userNo, contractNo, price, share))
 
         underlayContNo = self._qteModel.getUnderlayContractNo(contNo)
         if len(underlayContNo) > 0:
@@ -449,8 +448,6 @@ class StrategyModel(object):
     def setSell(self, userNo, contractNo, share, price):
         contNo = contractNo if contractNo is not None else self._cfgModel.getBenchmark()
         
-        self.logger.info("0000:%s,%s,%f,%d"%(userNo, contractNo, price, share))
-
         underlayContNo = self._qteModel.getUnderlayContractNo(contNo)
         if len(underlayContNo) > 0:
             contNo = underlayContNo
@@ -2124,7 +2121,6 @@ class StrategyModel(object):
 
     def SMA(self, price, period, weight):
         '''计算加权移动平均值'''
-        self.logger.info("SMA")
         return self._staModel.SMA(price, period, weight)
 
     def ParabolicSAR(self, high, low, afstep, aflimit):
