@@ -7069,3 +7069,28 @@ def LogWarn(*args):
 
 def LogError(*args):
     return baseApi.LogError(args)
+
+def SMA(price, period, weight):
+    return baseApi.SMA(price, period, weight)
+    
+def REF(price, length):
+    return baseApi.REF(price, length)
+
+def ParabolicSAR(high, low, afstep, aflimit):
+    return baseApi.ParabolicSAR(high, low, afstep, aflimit)
+
+def Highest(price, length):
+    return baseApi.Highest(price, length)
+
+def Lowest(price, length):
+    return baseApi.Lowest(price, length)
+    
+def CountIf(cond, peroid):
+    return baseApi.CountIf(cond, peroid) 
+
+def CrossOver(price1, price2):
+    return baseApi.CrossOver(price1, price2) 
+
+def CrossUnder(price1, price2):
+    return baseApi.CrossUnder(price1, price2)     
+    
