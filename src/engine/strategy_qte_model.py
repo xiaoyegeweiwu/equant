@@ -96,17 +96,19 @@ class StrategyQuote(QuoteModel):
     # /////////////////////////////应答消息处理///////////////////
     def onExchange(self, event):
         dataDict = event.getData()
+        strategyId = event.getStrategyId()
         for k, v in dataDict.items():
             self._exchangeData[k] = ExchangeModel(self.logger, v) 
-            self._exchangeData[k].updateStatus(v)
+            self._exchangeData[k].updateStatus(strategyId, v)
        
-    def onExchangeStateNotice(self, event):
+    def onExchangeStatus(self, event):
         dataDict = event.getData()
+        strategyId = event.getStrategyId()
         for k, v in dataDict.items():
             if k not in self._exchangeData:
                 continue
             exchangeModel = self._exchangeData[k]
-            exchangeModel.updateStatus(v) 
+            exchangeModel.updateStatus(strategyId, v) 
         
     def onCommodity(self, event):
         dataDict = event.getData()

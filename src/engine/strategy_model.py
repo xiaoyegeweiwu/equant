@@ -147,7 +147,7 @@ class StrategyModel(object):
     def onUnderlayMap(self, event):
         self._qteModel.onUnderlayMap(event)
 
-    def onExchangeStateNotice(self, event):
+    def onExchangeStatus(self, event):
         self._qteModel.onExchangeStatus(event)
 
     def onQuoteRsp(self, event):

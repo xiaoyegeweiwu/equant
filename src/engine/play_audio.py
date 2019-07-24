@@ -41,11 +41,3 @@ class PlayAudio(object):
         
         #close PyAudio
         p.terminate()
-        
-
-if __name__ == '__main__':
-    count = 0
-    
-    while count < 100:
-        PlayAudio.play('Signal')
-            

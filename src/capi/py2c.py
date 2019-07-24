@@ -1729,6 +1729,8 @@ class PyAPI(object):
             }
             dataList.append(idict)
         
+        #self.logger.debug("AAAAA:%s"%dataList)
+        
         #发送到引擎  
         apiEvent.setData(dataList)
         sid = apiEvent.getSessionId()

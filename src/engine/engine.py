@@ -537,7 +537,8 @@ class StrategyEngine(object):
         
     def _onExchangeStateNotice(self, apiEvent):
         self._qteModel.updateExchangeStatus(apiEvent)
-        self._sendEvent2Strategy(apiEvent.getStrategyId(), apiEvent)
+        #self._sendEvent2Strategy(apiEvent.getStrategyId(), apiEvent)
+        self._sendEvent2AllStrategy(apiEvent)
         #self._eg2uiQueue.put(apiEvent)
         self._send2uiQueue(apiEvent)
         

@@ -12,3 +12,4 @@ def handle_data(context):
     LogInfo("ZCE", ExchangeTime("ZCE"), ExchangeStatus("ZCE"))
     LogInfo("SHFE", ExchangeTime("SHFE"), ExchangeStatus("SHFE"))
     LogInfo("INE", ExchangeTime("INE"), ExchangeStatus("INE"))
+    LogInfo("CFFEX", ExchangeTime("CFFEX"), ExchangeStatus("CFFEX"))
