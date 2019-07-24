@@ -29,7 +29,8 @@ class RunWin(QuantToplevel, QuantFrame):
     bgColor = rgb_to_hex(245, 245, 245)
     bgColorW = "white"
 
-    def __init__(self, control, path, master=None, param={}):
+    def __init__(self, control, path, flag=False, master=None, param={}):
+        # flag: 是否是从策略右键弹出的标志位
         super().__init__(master)
         self._control = control
         self._exchange = self._control.model.getExchange()
@@ -47,6 +48,8 @@ class RunWin(QuantToplevel, QuantFrame):
         self._userParam = param
         # 策略路径
         self._strategyPath = path
+        # 是否时属性设置运行窗口标志位
+        self._paramFlag = flag
 
         # 用户设置的多合约信息
         self._contsInfo = []
@@ -1268,6 +1271,12 @@ class RunWin(QuantToplevel, QuantFrame):
                 messagebox.showinfo("极星量化", "每根K线同向开仓次数必须介于1-100之间", parent=self)
                 self.timesEntry.focus_set()
                 self.toSampFrame()
+                return
+
+        # 用户是否确定用新参数重新运行
+        if self._paramFlag:
+            userSlt = messagebox.askokcancel("提示", "点确定后会重新运行策略", parent=self)
+            if not userSlt:
                 return
 
         # TODO: 合约设置，K线类型， K线周期、运算起始点设置

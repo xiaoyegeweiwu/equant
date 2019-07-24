@@ -188,7 +188,7 @@ class TkinterController(object):
         self.saveStrategy()
         # 解析策略参数
         param = self.parseStrategtParam(strategyPath)
-        self.app.createRunWin(param, strategyPath)
+        self.app.createRunWin(param, strategyPath, False)
 
         config = self.app.runWin.getConfig()
         if config:   # 获取到config
@@ -199,7 +199,7 @@ class TkinterController(object):
         """用户参数修改后策略重新启动"""
         param = self.getUserParam(id)
         strategyPath = self.strategyManager.getSingleStrategy(id)["Path"]
-        self.app.createRunWin(param, strategyPath)
+        self.app.createRunWin(param, strategyPath, True)
 
         config = self.app.runWin.getConfig()
         if config:  # 获取到config

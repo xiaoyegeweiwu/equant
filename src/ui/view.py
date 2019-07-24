@@ -154,13 +154,13 @@ class QuantApplication(object):
     def sortStrategyExecute(self):
         self.quant_monitor.sortStrategyExecute()
 
-    def createRunWin(self, param, path):
+    def createRunWin(self, param, path, flag):
         """弹出量化设置界面"""
         self.setLoadState("disabled")
         # a = AlarmToplevel("ABCDE", self.root)
         # a.display()
         # return
-        self.runWin = RunWin(self.control, path, self.root, param)
+        self.runWin = RunWin(self.control, path, flag, self.root, param)
         self.runWin.display()
         self.setLoadState("normal")
 
