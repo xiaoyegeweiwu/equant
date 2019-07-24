@@ -774,6 +774,7 @@ class Strategy:
                 "InitialFund"  : self._dataModel.getConfigModel().getInitCapital(),
                 "Config"       : cfg,
                 "Params"       : self._dataModel.getConfigModel().getParams(),
+                "Path"         : self._filePath,
             }
         })
         self.sendEvent2UI(revent)
