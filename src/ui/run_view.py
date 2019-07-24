@@ -29,7 +29,7 @@ class RunWin(QuantToplevel, QuantFrame):
     bgColor = rgb_to_hex(245, 245, 245)
     bgColorW = "white"
 
-    def __init__(self, control, master=None, param={}):
+    def __init__(self, control, path, master=None, param={}):
         super().__init__(master)
         self._control = control
         self._exchange = self._control.model.getExchange()
@@ -45,6 +45,8 @@ class RunWin(QuantToplevel, QuantFrame):
 
         # 获取用户参数
         self._userParam = param
+        # 策略路径
+        self._strategyPath = path
 
         # 用户设置的多合约信息
         self._contsInfo = []
@@ -124,7 +126,7 @@ class RunWin(QuantToplevel, QuantFrame):
 
         self.sendOrderMode    =   tk.IntVar()     # 发单时机： 0. 实时发单 1. K线稳定后发单
         self.isActual         =   tk.IntVar()     # 实时发单
-        self.isAlarm          =   tk.StringVar()  # 发单报警
+        self.isAlarm          =   tk.IntVar()     # 发单报警
 
         self.isOpenTimes      =   tk.IntVar()     # 每根K线同向开仓次数标志
         self.openTimes        =   tk.StringVar()  # 每根K线同向开仓次数
@@ -145,7 +147,8 @@ class RunWin(QuantToplevel, QuantFrame):
         except EOFError:
             configure = None
 
-        key = self._control.getEditorText()["path"]
+        # key = self._control.getEditorText()["path"]
+        key = self._strategyPath
         if configure:
             if key in configure:
                 return configure[key]
@@ -1419,7 +1422,8 @@ class RunWin(QuantToplevel, QuantFrame):
 
 
         # -------------保存用户配置--------------------------
-        strategyPath = self._control.getEditorText()["path"]
+        # strategyPath = self._control.getEditorText()["path"]
+        strategyPath = self._strategyPath
         userConfig = {
             strategyPath: {
                 VUser: user,

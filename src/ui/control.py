@@ -166,7 +166,7 @@ class TkinterController(object):
                     ret = [reg.groups()[1], reg.groups()[3]]
                     if ret[1] is None: ret[1] = ""
                     try:
-                        ret[0] = int(ret[0])
+                        ret[0] = eval(ret[0])
                     except:
                         pass
                     g_params.update(
@@ -188,7 +188,7 @@ class TkinterController(object):
         self.saveStrategy()
         # 解析策略参数
         param = self.parseStrategtParam(strategyPath)
-        self.app.createRunWin(param)
+        self.app.createRunWin(param, strategyPath)
 
         config = self.app.runWin.getConfig()
         if config:   # 获取到config
@@ -198,7 +198,8 @@ class TkinterController(object):
     def paramLoad(self, id):
         """用户参数修改后策略重新启动"""
         param = self.getUserParam(id)
-        self.app.createRunWin(param)
+        strategyPath = self.strategyManager.getSingleStrategy(id)["Path"]
+        self.app.createRunWin(param, strategyPath)
 
         config = self.app.runWin.getConfig()
         if config:  # 获取到config

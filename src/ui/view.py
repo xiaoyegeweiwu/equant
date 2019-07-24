@@ -9,7 +9,7 @@ from .monitor_view import QuantMonitor
 from .run_view import RunWin
 
 from report.reportview import ReportView
-from .com_view import HistoryToplevel
+from .com_view import HistoryToplevel, AlarmToplevel
 
 from datetime import datetime
 
@@ -154,10 +154,13 @@ class QuantApplication(object):
     def sortStrategyExecute(self):
         self.quant_monitor.sortStrategyExecute()
 
-    def createRunWin(self, param):
+    def createRunWin(self, param, path):
         """弹出量化设置界面"""
         self.setLoadState("disabled")
-        self.runWin = RunWin(self.control, self.root, param)
+        # a = AlarmToplevel("ABCDE", self.root)
+        # a.display()
+        # return
+        self.runWin = RunWin(self.control, path, self.root, param)
         self.runWin.display()
         self.setLoadState("normal")
 
