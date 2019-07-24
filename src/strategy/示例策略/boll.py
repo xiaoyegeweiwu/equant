@@ -5,8 +5,9 @@ qty = 1  # 下单量
 
 def initialize(context): 
     # K线稳定后发单
-    SetBarInterval("NYMEX|F|CL|1908", 'M', 1, 2000)
+    SetBarInterval("NYMEX|F|CL|1909", 'M', 1, 2000)
     SetOrderWay(2)
+    SetActual()
 
 def handle_data(context):  
     # 等待数据就绪，否则计算果结为异常值
