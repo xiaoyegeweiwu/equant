@@ -412,6 +412,9 @@ class StrategyModel(object):
     def setBuy(self, userNo, contractNo, share, price, needCover=True):
         contNo = contractNo if contractNo else self._cfgModel.getBenchmark()
         
+        if contNo not in self._cfgModel.getContract():
+            raise Exception(f"请先在设置界面获知使用SetBarInterval方法订阅 {contNo} 合约！")
+
         underlayContNo = self._qteModel.getUnderlayContractNo(contNo)
         if len(underlayContNo) > 0:
             contNo = underlayContNo
@@ -433,6 +436,9 @@ class StrategyModel(object):
     def setBuyToCover(self, userNo, contractNo, share, price):
         contNo = contractNo if contractNo is not None else self._cfgModel.getBenchmark()
 
+        if contNo not in self._cfgModel.getContract():
+            raise Exception(f"请先在设置界面获知使用SetBarInterval方法订阅 {contNo} 合约！")
+
         underlayContNo = self._qteModel.getUnderlayContractNo(contNo)
         if len(underlayContNo) > 0:
             contNo = underlayContNo
@@ -448,7 +454,10 @@ class StrategyModel(object):
 
     def setSell(self, userNo, contractNo, share, price):
         contNo = contractNo if contractNo is not None else self._cfgModel.getBenchmark()
-        
+
+        if contNo not in self._cfgModel.getContract():
+            raise Exception(f"请先在设置界面获知使用SetBarInterval方法订阅 {contNo} 合约！")
+
         underlayContNo = self._qteModel.getUnderlayContractNo(contNo)
         if len(underlayContNo) > 0:
             contNo = underlayContNo
@@ -464,7 +473,10 @@ class StrategyModel(object):
 
     def setSellShort(self, userNo, contractNo, share, price, needCover=True):
         contNo = contractNo if contractNo is not None else self._cfgModel.getBenchmark()
-        
+
+        if contNo not in self._cfgModel.getContract():
+            raise Exception(f"请先在设置界面获知使用SetBarInterval方法订阅 {contNo} 合约！")
+
         underlayContNo = self._qteModel.getUnderlayContractNo(contNo)
         if len(underlayContNo) > 0:
             contNo = underlayContNo
