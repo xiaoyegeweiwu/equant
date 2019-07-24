@@ -14,7 +14,11 @@ import copy
 
 from engine.calc import CalcCenter
 from datetime import datetime
-from .play_audio import PlayAudio
+
+try:
+    from .play_audio import PlayAudio
+except:
+    pass
 
 
 class StrategyModel(object):
@@ -527,6 +531,13 @@ class StrategyModel(object):
             }
         })
         self._strategy.sendEvent2Engine(signalNoticeEvent)
+        
+        #处理报警
+        if self._strategy.isRealTimeStatus() and self._cfgModel.getAlarm():
+            try:
+                PlayAudio.play('Signal')
+            except:
+                self.logger.error('No module named PlayAudio')
 
     def setStartTrade(self):
         self._cfgModel.setPending(False)
@@ -973,12 +984,6 @@ class StrategyModel(object):
             'Remark': '',
             'AddOneIsValid': tsDay,
         }
-        
-        #self.logger.info("AAAAAAAA:%s"%self._cfgModel.getAlarm())
-        
-        if self._cfgModel.getAlarm():
-            #self.logger.info("Play signal audio!")
-            PlayAudio.play('Signal')
 
         self.sendActualOrder2Engine(aOrder, eId, self._strategy.getStrategyId(), aFunc)
         # self.logger.trade_info(self._strategy.getStrategyId(), aOrder)
@@ -1002,7 +1007,7 @@ class StrategyModel(object):
         '''A函数 发送实盘信号'''
         curBar = self.getHisQuoteModel().getCurBar(self._config.getKLineShowInfoSimple())
         if aFunc and self._config.hasKLineTrigger() and curBar:
-            self.logger.debug(f"实盘信号已经发送，k线时间戳：{curBar['DateTimeStamp']}")
+            #self.logger.debug(f"实盘信号已经发送，k线时间戳：{curBar['DateTimeStamp']}")
             self.sendSignalEvent(self._signalName, aOrder["Cont"], aOrder["Direct"], aOrder["Offset"],
                                  aOrder["OrderPrice"], aOrder["OrderQty"], curBar)
         self.logger.trade_info(f"发送实盘订单，策略Id:{strategyId}, 本地订单号：{eId}, 订单数据：{repr(aOrder)}")
