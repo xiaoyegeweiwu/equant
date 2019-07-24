@@ -543,8 +543,8 @@ class StrategyModel(object):
     def getConfig(self):
         return self._cfgModel._metaData
 
-    def addUserNo(self, userNo):
-        self._cfgModel.addUserNo(userNo)
+    def setUserNo(self, userNo):
+        self._cfgModel.setUserNo(userNo)
 
     def setBarInterval(self, contractNo, barType, barInterval, sampleConfig, trigger=True):
         self._cfgModel.setBarInterval(contractNo, barType, barInterval, sampleConfig, trigger)

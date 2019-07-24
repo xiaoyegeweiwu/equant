@@ -5007,10 +5007,10 @@ class BaseApi(object):
     def GetConfig(self):
         return self._dataModel.getConfig()
 
-    def AddUserNo(self, userNo):
+    def SetUserNo(self, userNo):
         '''
         【说明】
-              添加实盘交易账户
+              设置实盘交易账户
 
         【语法】
               int SetUserNo(string userNo)
@@ -5025,7 +5025,7 @@ class BaseApi(object):
         【示例】
               SetUserNo('ET001')
         '''
-        return self._dataModel.addUserNo(userNo)
+        return self._dataModel.setUserNo(userNo)
 
     def SetBarInterval(self, contractNo, barType, barInterval, sampleConfig):
         '''
@@ -6860,8 +6860,8 @@ def Enum_Data_Time():
 def GetConfig():
     return baseApi.GetConfig()
 
-# def AddUserNo(userNo):
-#     return baseApi.AddUserNo(userNo)
+def SetUserNo(userNo):
+    return baseApi.SetUserNo(userNo)
 
 def SetBarInterval(contractNo, barType, barInterval, barCount=2000):
     return baseApi.SetBarInterval(contractNo, barType, barInterval, barCount)
