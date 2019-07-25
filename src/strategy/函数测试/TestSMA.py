@@ -7,7 +7,7 @@ def initialize(context):
 
 def handle_data(context):
     ta_sma = talib.SMA(Close(), timeperiod=5)
-    _,es_sma = SMA(Close(), 5, 1)
+    es_sma = SMA(Close(), 5, 1)
 
     LogInfo("SMA", ta_sma[-1], es_sma[-1])
 

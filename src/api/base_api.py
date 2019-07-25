@@ -5873,9 +5873,9 @@ class BaseApi(object):
             weight  权重
 
         【备注】
-            返回值为两个值，第一个为整型，第二个为浮点型numpy.array；
-            当第一个值为0时，此时第二个值是计算出的sma值序列；
-            当第一个值小于0时，此时计算失败，此时第二个值numpy.array为空
+            返回值为浮点型numpy.array；
+            如果计算成功，此时返回值是计算出的sma值序列；
+            如果计算失败，此时返回值numpy.array为空
 
         【示例】
             SMA(Close(), 12, 2)
