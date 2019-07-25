@@ -86,7 +86,7 @@ class StrategyModel(object):
             "StrategyName": self._strategy.getStrategyName(),  # 策略名称
             "StartTime": "2019-04-01",  # 回测开始时间
             "EndTime": "2019-04-17",  # 回测结束时间
-            "Margin": self._cfgModel.getMarginValue() if not self._cfgModel.getMarginValue() else 0.08,  # 保证金
+            "Margin": self._cfgModel.getMarginValue(),  # 保证金
             "Slippage": self._cfgModel.getSlippage(),  # 滑点
             "OpenRatio": self._cfgModel.getOpenRatio(),
             "CloseRatio": self._cfgModel.getCloseRatio(),
