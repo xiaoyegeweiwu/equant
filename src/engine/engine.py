@@ -658,9 +658,9 @@ class StrategyEngine(object):
         
     def _onApiOrderDataQry(self, apiEvent):
         self._trdModel.updateOrderData(apiEvent)
-        # self.logger.debug(f"sun --------------- engine qry : ")
-        # for dataDict in apiEvent.getData():
-        #     self.logger.debug(f"sun ------ OrderId :  {dataDict['OrderId']} , OrderState : {dataDict['OrderState']}")
+        self.logger.debug(f"sun --------------- engine qry : ")
+        for dataDict in apiEvent.getData():
+            self.logger.debug(f"sun ------ OrderId :  {dataDict['OrderId']} , OrderState : {dataDict['OrderState']}")
         self._sendEvent2AllStrategy(apiEvent)
         # 获取关联的策略id和订单id
         self._engineOrderModel.updateEpoleStarOrder(apiEvent)
@@ -685,15 +685,15 @@ class StrategyEngine(object):
         contractNo = apiEvent.getContractNo()
         # print("contractNo = ", contractNo, apiEvent.getData())
         # 客户端手动开仓平仓
-        # self.logger.debug(f"sun --------------- engine notice : ")
-        # self.logger.debug(f"sun ------ contNo :  {apiEvent.getContractNo()} , cont : {apiEvent.getData()[0]['Cont']}")
+        self.logger.debug(f"sun --------------- engine notice : ")
+        self.logger.debug(f"sun ------ contNo :  {apiEvent.getContractNo()} , cont : {apiEvent.getData()[0]['Cont']}")
         if not contractNo:
             contractNo = apiEvent.getData()[0]["Cont"]
         if not contractNo:
             return
         apiEvent.setContractNo(contractNo)
-        # for dataDict in apiEvent.getData():
-        #     self.logger.debug(f"sun ------ OrderId :  {dataDict['OrderId']} , OrderState : {dataDict['OrderState']}")
+        for dataDict in apiEvent.getData():
+            self.logger.debug(f"sun ------ OrderId :  {dataDict['OrderId']} , OrderState : {dataDict['OrderState']}")
         self._sendEvent2AllStrategy(apiEvent)
 
     def _onApiMatchDataQry(self, apiEvent):

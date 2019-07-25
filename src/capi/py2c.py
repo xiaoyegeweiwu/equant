@@ -1301,6 +1301,9 @@ class PyAPI(object):
         
         # 发送到引擎
         apiEvent.setData(dataList)
+        self.logger.debug(f"sun --------------- py2c : ")
+        for dataDict in dataList:
+            self.logger.debug(f"sun ------ OrderId :  {dataDict['OrderId']} , OrderState : {dataDict['OrderState']}")
         sid = apiEvent.getSessionId()
         apiEvent.setStrategyId(self._getStrategyId(sid))
         self._api2egQueue.put(apiEvent)
