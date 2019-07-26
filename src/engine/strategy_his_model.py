@@ -1213,10 +1213,21 @@ class StrategyHisQuote(object):
 
         # 止损或者止盈是否触发
         isStopWinTrigger = False; isStopLoseTrigger = False
+
+        #买方向，价格上涨，需要止盈，价格下跌需要止损
+        #卖方向，价格下跌，需要止盈，价格上涨需要止损
+        #self.logger.debug('AAAA:%s,%s,%f'%(latestPos, stopWinParams, curPrice))
         if stopWinParams:
-            isStopWinTrigger = (curPrice-latestPos["OrderPrice"])>stopWinParams["StopPoint"]*priceTick
+            if latestPos['Direct'] == 'B':
+                isStopWinTrigger = (curPrice-latestPos["OrderPrice"])>stopWinParams["StopPoint"]*priceTick
+            else:
+                isStopWinTrigger = (latestPos["OrderPrice"]-curPrice)>stopWinParams["StopPoint"]*priceTick
         if stopLoseParams:
-            isStopLoseTrigger = (latestPos["OrderPrice"]-curPrice)>stopLoseParams["StopPoint"]*priceTick
+            if latestPos['Direct'] == 'B':
+                isStopLoseTrigger = (latestPos["OrderPrice"]-curPrice)>stopLoseParams["StopPoint"]*priceTick
+            else:
+                isStopLoseTrigger = (curPrice-latestPos["OrderPrice"])>stopLoseParams["StopPoint"]*priceTick
+        
 
         # 日志记录
         if isStopWinTrigger:
@@ -1271,16 +1282,22 @@ class StrategyHisQuote(object):
         isFloatStopTrigger = False
         isContractMonitorTrigger = self.isMonitorTrigger.get(contractNo, False)
         # 监控最高点
-        if not isContractMonitorTrigger:
-            if (curPrice-latestPos["OrderPrice"])>floatStopParams["StartPoint"]*priceTick:
-                self.isMonitorTrigger[contractNo] = True
+        # 买方向，达到最高点，开始监控止损，下跌到止损点时触发
+        # 卖方向，达到最低点，开始监控止损，上涨到止损点时触发
+        if latestPos['Direct'] == 'B':
+            if not isContractMonitorTrigger:
+                if (curPrice-latestPos["OrderPrice"]) > floatStopParams["StartPoint"]*priceTick:
+                    self.isMonitorTrigger[contractNo] = True
             else:
-                pass
+                if (curPrice-latestPos["OrderPrice"]) > (floatStopParams["StartPoint"]-floatStopParams["StopPoint"])*priceTick:
+                    isFloatStopTrigger = True
         else:
-            if (curPrice-latestPos["OrderPrice"])>(floatStopParams["StartPoint"]-floatStopParams["StopPoint"])*priceTick:
-                isFloatStopTrigger = True
+            if not isContractMonitorTrigger:
+                if (latestPos["OrderPrice"]-curPrice) > floatStopParams["StartPoint"]*priceTick:
+                    self.isMonitorTrigger[contractNo] = True
             else:
-                pass
+                if (latestPos["OrderPrice"]-curPrice) > (floatStopParams["StartPoint"]-floatStopParams["StopPoint"])*priceTick:
+                    isFloatStopTrigger = True
 
         allPos = self._calc.getPositionInfo(contractNo)
         if not isFloatStopTrigger:
