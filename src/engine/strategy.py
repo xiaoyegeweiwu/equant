@@ -809,10 +809,10 @@ class Strategy:
         # 更新本地订单信息
         dataList = apiEvent.getData()
         eSessionId = apiEvent.getESessionId()
-        # self.logger.debug(f"sun --------------- strategy : ")
-        # self.logger.debug(f"sun ------ eSessionId : {eSessionId}")
-        # for dataDict in dataList:
-        #     self.logger.debug(f"sun ------ OrderId :  {dataDict['OrderId']} , OrderState : {dataDict['OrderState']}")
+        self.logger.debug(f"sun --------------- strategy : ")
+        self.logger.debug(f"sun ------ eSessionId : {eSessionId}")
+        for dataDict in dataList:
+            self.logger.debug(f"sun ------ OrderId :  {dataDict['OrderId']} , OrderState : {dataDict['OrderState']}")
         for data in dataList:
             self.updateLocalOrder(eSessionId, data)
         if self.isRealTimeStatus():
@@ -835,9 +835,9 @@ class Strategy:
         self._dataModel._trdModel.updatePosData(apiEvent)
 
     def _onTradeOrderQry(self, apiEvent):
-        # self.logger.debug(f"sun --------------- strategy qry : ")
-        # for dataDict in apiEvent.getData():
-        #     self.logger.debug(f"sun ------ OrderId :  {dataDict['OrderId']} , OrderState : {dataDict['OrderState']}")
+        self.logger.debug(f"sun --------------- strategy qry : ")
+        for dataDict in apiEvent.getData():
+            self.logger.debug(f"sun ------ OrderId :  {dataDict['OrderId']} , OrderState : {dataDict['OrderState']}")
         self._dataModel._trdModel.updateOrderData(apiEvent)
 
     def _onTradeMatch(self, apiEvent):
