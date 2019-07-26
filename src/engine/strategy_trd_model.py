@@ -478,17 +478,14 @@ class StrategyTrade(TradeModel):
         if self._selectedUserNo not in self._userInfo:
             raise Exception("请先在极星客户端登录您的交易账号")
 
-        self.logger.debug(f"sun ------ userNo : {self._selectedUserNo}")
         tUserInfoModel = self._userInfo[self._selectedUserNo]
         if len(tUserInfoModel._order) == 0:
-            self.logger.debug(f"sun ------ orderCount is 0 !")
             return -1
 
         orderId = -1
         for orderKey in list(tUserInfoModel._order.keys()):
             orderModel = tUserInfoModel._order[orderKey]
             if not contNo1 or contNo1 == orderModel._metaData['Cont']:
-                self.logger.debug(f"sun ------ orderId in func :{orderModel._metaData['OrderId']}")
                 if orderId == -1 or orderId > orderModel._metaData['OrderId']:
                     orderId = orderModel._metaData['OrderId']
 
