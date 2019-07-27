@@ -10,6 +10,7 @@ from tkinter import Tk
 from tkinter import messagebox
 from .model import QuantModel, SendRequest
 from .view import QuantApplication
+from .com_view import AlarmWin
 from .language import *
 from capi.com_types import *
 
@@ -58,6 +59,10 @@ class TkinterController(object):
 
     def get_logger(self):
         return self.logger
+
+    def createAlarmWin(self, text):
+        """创建弹窗供弹窗函数调用"""
+        AlarmWin(text, self.top)
 
     def update_log(self):
         try:

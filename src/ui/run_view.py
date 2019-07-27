@@ -1427,7 +1427,7 @@ class RunWin(QuantToplevel, QuantFrame):
         self._strConfig.setParams(params)
 
         self.config = self._strConfig.getConfig()
-        #print("-----------: ", self.config)
+        # print("-----------: ", self.config)
 
 
         # -------------保存用户配置--------------------------
