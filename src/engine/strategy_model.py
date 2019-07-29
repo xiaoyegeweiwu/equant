@@ -769,32 +769,60 @@ class StrategyModel(object):
         return self._trdModel.getOrderTime(eSession)
 
     def getFirstOrderNo(self, contNo1, contNo2):
-        contNo1 = self.getIndexMap(contNo1)
-        contNo2 = self.getIndexMap(contNo2)
+        underlayCont1 = self._qteModel.getUnderlayContractNo(contNo1)
+        if len(underlayCont1) > 0:
+            contNo1 = underlayCont1
+        underlayCont2 = self._qteModel.getUnderlayContractNo(contNo2)
+        if len(underlayCont2) > 0:
+            contNo2 = underlayCont2
+
         return self._trdModel.getFirstOrderNo(contNo1, contNo2)
 
     def getNextOrderNo(self, orderId, contNo1, contNo2):
-        contNo1 = self.getIndexMap(contNo1)
-        contNo2 = self.getIndexMap(contNo2)
+        underlayCont1 = self._qteModel.getUnderlayContractNo(contNo1)
+        if len(underlayCont1) > 0:
+            contNo1 = underlayCont1
+        underlayCont2 = self._qteModel.getUnderlayContractNo(contNo2)
+        if len(underlayCont2) > 0:
+            contNo2 = underlayCont2
+
         return self._trdModel.getNextOrderNo(orderId, contNo1, contNo2)
 
     def getLastOrderNo(self, contNo1, contNo2):
-        contNo1 = self.getIndexMap(contNo1)
-        contNo2 = self.getIndexMap(contNo2)
+        underlayCont1 = self._qteModel.getUnderlayContractNo(contNo1)
+        if len(underlayCont1) > 0:
+            contNo1 = underlayCont1
+        underlayCont2 = self._qteModel.getUnderlayContractNo(contNo2)
+        if len(underlayCont2) > 0:
+            contNo2 = underlayCont2
+
         return self._trdModel.getLastOrderNo(contNo1, contNo2)
 
     def getFirstQueueOrderNo(self, contNo1, contNo2=''):
-        contNo1 = self.getIndexMap(contNo1)
-        contNo2 = self.getIndexMap(contNo2)
+        underlayCont1 = self._qteModel.getUnderlayContractNo(contNo1)
+        if len(underlayCont1) > 0:
+            contNo1 = underlayCont1
+        underlayCont2 = self._qteModel.getUnderlayContractNo(contNo2)
+        if len(underlayCont2) > 0:
+            contNo2 = underlayCont2
+
         return self._trdModel.getFirstQueueOrderNo(contNo1, contNo2)
 
     def getNextQueueOrderNo(self, orderId, contNo1, contNo2=''):
-        contNo1 = self.getIndexMap(contNo1)
-        contNo2 = self.getIndexMap(contNo2)
+        underlayCont1 = self._qteModel.getUnderlayContractNo(contNo1)
+        if len(underlayCont1) > 0:
+            contNo1 = underlayCont1
+        underlayCont2 = self._qteModel.getUnderlayContractNo(contNo2)
+        if len(underlayCont2) > 0:
+            contNo2 = underlayCont2
+
         return self._trdModel.getNextQueueOrderNo(orderId, contNo1, contNo2)
 
     def getAllQueueOrderNo(self, contNo):
-        contNo = self.getIndexMap(contNo)
+        underlayCont = self._qteModel.getUnderlayContractNo(contNo)
+        if len(underlayCont) > 0:
+            contNo = underlayCont
+
         orderIdList = []
         orderId = self.getFirstQueueOrderNo(contNo)
         if orderId != -1:
@@ -806,7 +834,9 @@ class StrategyModel(object):
         return orderIdList
 
     def getALatestFilledTime(self, contNo):
-        contNo = self.getIndexMap(contNo)
+        underlayCont = self._qteModel.getUnderlayContractNo(contNo)
+        if len(underlayCont) > 0:
+            contNo = underlayCont
         return self._trdModel.getALatestFilledTime(contNo)
 
     def getOrderContractNo(self, orderId):
@@ -1025,7 +1055,10 @@ class StrategyModel(object):
         return orderId, orderNo
 
     def deleteAllOrders(self, contNo):
-        contNo = self.getIndexMap(contNo)
+        underlayCont = self._qteModel.getUnderlayContractNo(contNo)
+        if len(underlayCont) > 0:
+            contNo = underlayCont
+
         orderList = self.getAllQueueOrderNo(contNo)
         if len(orderList) == 0:
             return True
