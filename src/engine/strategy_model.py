@@ -2240,23 +2240,27 @@ class StrategyModel(object):
         return sum
         
     def getCrossOver(self, price1, price2):
+        '''price1是否上穿price2,前一个在下，当前跟在上'''
         if price1[-1]  <= price2[-1]:
             return False
-
-        for i in range(len(price1)-1, -1, -1):
-            if price1[i] < price2[i]:
-                return True
-            if i == 0:break
+        #前一根
+        if len(price1) <= 1:
+            return False
+            
+        if price1[-2] < price2[-2]:
+            return True
 
         return False
 
     def getCrossUnder(self, price1, price2):
+        '''price1是否下破price2,前一个在上，当前跟在下'''
         if price1[-1]  >= price2[-1]:
             return False
-
-        for i in range(len(price1)-1, -1, -1):
-            if price1[i] > price2[i]:
-                return True
-            if i == 0:break
+            
+        if len(price1) <= 1:
+            return False 
+        
+        if price1[-2] > price2[-2]:
+            return True
 
         return False
