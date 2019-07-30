@@ -373,7 +373,7 @@ class AlarmWin(tk.Toplevel):
             super().__init__(master)
             self._master = master
             self._textWgt = None
-            self._textList = []
+            self._textRecords = []
             self._onPage = 1
             self._pages = 1
             self._autoPages = True
@@ -383,7 +383,7 @@ class AlarmWin(tk.Toplevel):
             self._createFrames()
             AlarmWin.__has_initialization = True
             self.protocol("WM_DELETE_WINDOW", self.closeWin)
-        self.updateTextList(text)
+        self.updateTextRecords(text)
 
         if self._autoPages:
             self.updateOnPage()
@@ -481,13 +481,13 @@ class AlarmWin(tk.Toplevel):
         self.pageLabel.config(text="%d/%d" % (self._onPage, self._pages))
 
     def updateOnPage(self):
-        self._onPage = len(self._textList)
+        self._onPage = len(self._textRecords)
 
-    def updateTextList(self, text):
-        self._textList.append(text)
+    def updateTextRecords(self, text):
+        self._textRecords.append(text)
 
     def updatePages(self):
-        self._pages = len(self._textList)
+        self._pages = len(self._textRecords)
         if self._onPage == self._pages:
             for wgt, image in zip([self.nxtBtn, self.btmBtn], [self.nxtImage2, self.btmImage2]):
                 self.setBtnImage(wgt, image)
@@ -511,11 +511,11 @@ class AlarmWin(tk.Toplevel):
                 self.setBtnImage(wgt, image)
 
         self.updatePagesLabel()
-        self.insertSpecificPageText(self._textList[self._onPage-1])
+        self.insertSpecificPageText(self._textRecords[self._onPage-1])
 
     def toBottom(self, event):
         self._autoPages = True
-        self._onPage = len(self._textList)
+        self._onPage = len(self._textRecords)
         # self.setBtnDisabeldImage(self.btmBtn)
         if self._onPage != self._onPage:
             for wgt, image in zip([self.topBtn, self.befBtn], [self.topImage1, self.befImage1]):
@@ -524,7 +524,7 @@ class AlarmWin(tk.Toplevel):
         for wgt, image in zip([self.nxtBtn, self.btmBtn], [self.nxtImage2, self.btmImage2]):
             self.setBtnImage(wgt, image)
         self.updatePagesLabel()
-        self.insertSpecificPageText(self._textList[self._onPage-1])
+        self.insertSpecificPageText(self._textRecords[self._onPage-1])
 
     def toBefore(self, event):
         # 在最左侧的情况
@@ -540,7 +540,7 @@ class AlarmWin(tk.Toplevel):
                 self.setBtnImage(wgt, image)
 
         self.updatePagesLabel()
-        self.insertSpecificPageText(self._textList[self._onPage-1])
+        self.insertSpecificPageText(self._textRecords[self._onPage-1])
 
     def toNext(self, event):
         if self._onPage != self._pages:
@@ -553,7 +553,7 @@ class AlarmWin(tk.Toplevel):
                 self.setBtnImage(wgt, image)
 
         self.updatePagesLabel()
-        self.insertSpecificPageText(self._textList[self._onPage-1])
+        self.insertSpecificPageText(self._textRecords[self._onPage-1])
 
     def setBtnImage(self, widget, image):
         iimage = tk.PhotoImage(file=image)
@@ -564,175 +564,3 @@ class AlarmWin(tk.Toplevel):
     def rebuild(cls):
         cls.__instance = None
         cls.__has_initialization = False
-
-
-"""
-class AlarmWin(tk.Toplevel):
-    _instance_lock = Lock()
-    __instance = None
-    __has_initialization = False
-
-    def __new__(cls, *args, **kwargs):
-        with cls._instance_lock:
-            if not cls.__instance:
-                cls.__instance = object.__new__(cls)
-        return cls.__instance
-
-    def __init__(self, text, master=None):
-        if not AlarmWin.__has_initialization:
-            super().__init__(master)
-            self._master = master
-            self._textWgt = None
-            self._textList = []
-            self._onPage = 1
-            self._pages = 1
-            self._autoPages = True
-            self.setPos()
-            self.createFrames()
-            AlarmWin.__has_initialization = True
-        self.updateTextList(text)
-
-        if self._autoPages:
-            self.updateOnPage()
-            self.insertSpecificPageText(text)
-        self.updatePages()
-        self.updatePagesLabel()
-
-    def setPos(self):
-        self.title("下单提醒")
-        self.attributes("-toolwindow", 1)
-        self.wm_attributes("-topmost", 1)
-
-        ws = self._master.winfo_width()
-        hs = self._master.winfo_height()
-        wx = self._master.winfo_x()
-        wy = self._master.winfo_y()
-
-        #计算窗口位置
-        w, h = 400, 400
-        x = (wx + ws/2) - w/2
-        y = (wy + hs/2) - h/2
-
-        #弹出输入窗口，输入文件名称
-        self.geometry('%dx%d+%d+%d' % (w, h, x, y))
-        self.minsize(400, 400)
-
-    def createFrames(self):
-        textFrame = tk.Frame(self, width=400, height=360)
-        textFrame.pack(side=tk.TOP, padx=1)
-        textFrame.pack_propagate(False)
-        btnFrame = tk.Frame(self, padx=1)
-        btnFrame.pack(side=tk.TOP, fill=tk.X)
-        self.createTextWgt(textFrame)
-        self.createBtn(btnFrame)
-
-    def createTextWgt(self, frame):
-        self.textWgt = tk.Text(frame, bg="black")
-        self.textWgt.config(state="disabled", font=("Consolas", 16), fg="white")
-        self.textWgt.pack(fill=tk.BOTH, expand=tk.YES)
-
-    def insertSpecificPageText(self, text):
-        self.textWgt.config(state="normal")
-        self.textWgt.delete(0.0, "end" + "-1c")
-        self.textWgt.insert(tk.END, text)
-        self.textWgt.see(tk.END)
-        self.textWgt.config(state="disabled")
-
-    def createBtn(self, frame):
-        self.topBtn = tk.Button(frame, text="top", command=self.toTop)
-        self.btmBtn = tk.Button(frame, text="bottom", command=self.toBottom)
-        self.befBtn = tk.Button(frame, text="before", command=self.toBefore)
-        self.nxtBtn = tk.Button(frame, text="next", command=self.toNext)
-        self.pageLabel = tk.Label(frame, text="%d/%d" % (self._onPage, self._pages))
-
-        self.topBtn.pack(side=tk.LEFT)
-        self.befBtn.pack(side=tk.LEFT)
-        self.pageLabel.pack(side=tk.LEFT)
-        self.nxtBtn.pack(side=tk.LEFT)
-        self.btmBtn.pack(side=tk.LEFT)
-
-    def updatePagesLabel(self):
-        print("11111111: ", self.pageLabel)
-        self.pageLabel.config(text="%d/%d" % (self._onPage, self._pages))
-
-    def updateTextList(self, text):
-        self._textList.append(text)
-
-    def updatePages(self):
-        self._pages = len(self._textList)
-        if self._onPage == self._pages:
-            for wgt in [self.nxtBtn, self.btmBtn]:
-                self.setBtnDisabeld(wgt)
-            if self._onPage == 1:
-                for wgt in [self.topBtn, self.befBtn]:
-                    self.setBtnDisabeld(wgt)
-            else:
-                for wgt in [self.topBtn, self.befBtn]:
-                    self.setBtnNormal(wgt)
-        else:
-            for wgt in [self.nxtBtn, self.btmBtn]:
-                self.setBtnNormal(wgt)
-
-    def updateOnPage(self):
-        self._onPage = len(self._textList)
-
-    def toTop(self):
-        self._onPage = 1
-        self._autoPages = False
-        for wgt in [self.topBtn, self.befBtn]:
-            self.setBtnDisabeld(wgt)
-
-        for wgt in [self.nxtBtn, self.btmBtn]:
-            self.setBtnNormal(wgt)
-
-        self.updatePagesLabel()
-        self.insertSpecificPageText(self._textList[self._onPage-1])
-
-    def toBottom(self):
-        self._autoPages = True
-        self._onPage = len(self._textList)
-        self.setBtnDisabeld(self.btmBtn)
-        for wgt in [self.topBtn, self.befBtn]:
-            self.setBtnNormal(wgt)
-
-        for wgt in [self.nxtBtn, self.btmBtn]:
-            self.setBtnDisabeld(wgt)
-        self.updatePagesLabel()
-        self.insertSpecificPageText(self._textList[self._onPage-1])
-
-    def toBefore(self):
-        # 在最左侧的情况
-        self._autoPages = False
-        self._onPage -= 1
-        if self._onPage == 1:
-            for wgt in [self.befBtn, self.topBtn]:
-                self.setBtnDisabeld(wgt)
-        for wgt in [self.nxtBtn, self.btmBtn]:
-            self.setBtnNormal(wgt)
-
-        self.updatePagesLabel()
-        self.insertSpecificPageText(self._textList[self._onPage-1])
-
-    def toNext(self):
-        self._onPage += 1
-        if self._onPage == self._pages:
-            #self._autoPages = True
-            for wgt in [self.nxtBtn, self.btmBtn]:
-                self.setBtnDisabeld(wgt)
-        for wgt in [self.befBtn, self.topBtn]:
-            self.setBtnNormal(wgt)
-
-        self.updatePagesLabel()
-        self.insertSpecificPageText(self._textList[self._onPage-1])
-
-    def setBtnNormal(self, widget):
-        widget.config(state="normal")
-
-    def setBtnDisabeld(self, widget):
-        widget.config(state="disabled")
-
-    @classmethod
-    def rebuild(cls):
-        cls.__instance = None
-        cls.__has_initialization = False
-"""
