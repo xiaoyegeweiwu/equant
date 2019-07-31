@@ -512,9 +512,10 @@ class Strategy:
         if not self._dataModel.getConfigModel().hasTimerTrigger() or not self.isRealTimeStatus():
             return
 
-        nowStr = datetime.now().strftime("%Y%m%d%H%M%S")
+        nowTime = datetime.now()
         for i,timeSecond in enumerate(self._dataModel.getConfigTimer()):
-            if 0<=(int(nowStr)-int(timeSecond))<1 and not self._isTimeTriggered[i]:
+            specifiedTime = datetime.strptime(timeSecond, "%H%M%S")
+            if 0<=(nowTime-specifiedTime).seconds<1 and not self._isTimeTriggered[i]:
                 self._isTimeTriggered[i] = True
                 key = self._dataModel.getConfigModel().getKLineShowInfoSimple()
                 dateTimeStamp, tradeDate, lv1Data = self.getTriggerTimeAndData(key[0])
