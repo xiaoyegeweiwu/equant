@@ -2243,24 +2243,31 @@ class StrategyModel(object):
         '''price1是否上穿price2,前一个在下，当前跟在上'''
         if price1[-1]  <= price2[-1]:
             return False
-        #前一根
+        #只有一根线，不做比较
         if len(price1) <= 1:
             return False
             
-        if price1[-2] < price2[-2]:
-            return True
-
-        return False
+        #如果前一根相等，则继续往前找上一根
+        pos = -2;
+        while price1[pos] == price2[pos]:
+            pos = pos -1
+            if pos <= -len(price1):
+                break
+        return price1[pos] < price2[pos]
 
     def getCrossUnder(self, price1, price2):
         '''price1是否下破price2,前一个在上，当前跟在下'''
         if price1[-1]  >= price2[-1]:
             return False
             
+        #只有一根线，不做比较
         if len(price1) <= 1:
-            return False 
-        
-        if price1[-2] > price2[-2]:
-            return True
-
-        return False
+            return False
+            
+        #如果前一根相等，则继续往前找上一根
+        pos = -2;
+        while price1[pos] == price2[pos]:
+            pos = pos -1
+            if pos <= -len(price1):
+                break
+        return price1[pos] > price2[pos]
