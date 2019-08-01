@@ -428,6 +428,9 @@ class StrategyModel(object):
         # 计算考虑滑点损耗后的价格
         price = self._calcCenter.calcOrderPrice(contNo, dBuy, price)
 
+        userNo = self._cfgModel.getUserNo() if not userNo else userNo
+        if not userNo:
+            userNo = "Default"
         # 对于开仓，需要平掉反向持仓
         qty = self._calcCenter.needCover(userNo, contNo, dBuy, share, price)
         if qty > 0 and needCover:
@@ -452,6 +455,9 @@ class StrategyModel(object):
         # 计算考虑滑点损耗后的价格
         price = self._calcCenter.calcOrderPrice(contNo, dBuy, price)
 
+        userNo = self._cfgModel.getUserNo() if not userNo else userNo
+        if not userNo:
+            userNo = "Default"
         # 交易计算、生成回测报告
         eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtGFD, dBuy, oCover, hSpeculate, price, share, curBar)
         if eSessionId != "": self._strategy.updateBarInfoInLocalOrder(eSessionId, curBar)
@@ -471,6 +477,9 @@ class StrategyModel(object):
         # 计算考虑滑点损耗后的价格
         price = self._calcCenter.calcOrderPrice(contNo, dSell, price)
 
+        userNo = self._cfgModel.getUserNo() if not userNo else userNo
+        if not userNo:
+            userNo = "Default"
         # 交易计算、生成回测报告
         eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtGFD, dSell, oCover, hSpeculate, price, share, curBar)
         if eSessionId != "": self._strategy.updateBarInfoInLocalOrder(eSessionId, curBar)
@@ -490,6 +499,9 @@ class StrategyModel(object):
         # 计算考虑滑点损耗后的价格
         price = self._calcCenter.calcOrderPrice(contNo, dSell, price)
 
+        userNo = self._cfgModel.getUserNo() if not userNo else userNo
+        if not userNo:
+            userNo = "Default"
         qty = self._calcCenter.needCover(userNo, contNo, dSell, share, price)
         if qty > 0 and needCover:
             eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtGFD, dSell, oCover, hSpeculate, price, qty,
@@ -865,10 +877,6 @@ class StrategyModel(object):
         if curShowBar:
             curBar = copy.deepcopy(curShowBar)
             curBarIndex = curBar["KLineIndex"]
-
-        userNo = self._cfgModel.getUserNo() if not userNo else userNo
-        if not userNo:
-            userNo = "Default"
 
         orderParam = {
             "UserNo": userNo,  # 账户编号
