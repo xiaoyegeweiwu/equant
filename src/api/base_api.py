@@ -5299,7 +5299,7 @@ class BaseApi(object):
 
         【示例】
               SetTriggerType(3, 1000) # 每隔1000毫秒触发一次
-              SetTriggerType(4, ['20190511121314', '20190511121315', '20190511121316']) # 指定时刻触发
+              SetTriggerType(4, ['084000', '084030', '084100']) # 指定时刻触发
         '''
         return self._dataModel.setTriggerMode(type, value)
 
