@@ -62,6 +62,8 @@ class QuantToplevel(tk.Toplevel):
         self.setPos()
         #图标
         self.iconbitmap(bitmap=r"./icon/epolestar ix2.ico")
+        # 点击窗口右侧关闭按钮事件
+        self.protocol("WM_DELETE_WINDOW", self.closeEvent)
 
     def setPos(self):
         # 获取主窗口大小和位置，根据主窗口调整输入框位置
@@ -83,9 +85,14 @@ class QuantToplevel(tk.Toplevel):
         """显示并设置模态窗口"""
         self.update()
         self.deiconify()
-        self.grab_set()
         self.focus_set()
+        self.grab_set()
+        self.transient(self._master)
         self.wait_window()
+
+    def closeEvent(self):
+        self.grab_release()
+        self.destroy()
 
 
 class NewFileToplevel(QuantToplevel):
@@ -390,6 +397,12 @@ class AlarmWin(tk.Toplevel):
             self.insertSpecificPageText(text)
         self.updatePages()
         self.updatePagesLabel()
+
+    # TODO：实现__call__方法将类实例变成可调用对象
+    def __call__(self, new_text):
+        """可调用对象"""
+        self._textRecords.append(new_text)
+        # TODO: 需要将__init__函数中的更新部分代码放到这里
 
     def closeWin(self):
         self.rebuild()

@@ -242,7 +242,6 @@ class CalcCenter(object):
 
              "Cost": 0.0  # 平仓所需手续费
         }
-
         if user not in self._positions:
             return defaultInfo
         else:
@@ -322,11 +321,7 @@ class CalcCenter(object):
     def coverJudge(self, order):
         """
         平仓单是否合法判断
-        :param userNo:      用户编号
-        :param contNo:      合约编号
-        :param direct:      方向
-        :param orderQty:    订单数量
-        :param orderPrice:  订单价格
+        :param order:        订单详情
         :return:
                 -1:          平仓失败， 仓位不足
                 -2:          平仓失败，资金不足
@@ -393,6 +388,14 @@ class CalcCenter(object):
         :param orderprice: 订单委托价格
         :return: 计算滑点之后的订单成交价
         """
+        if not isinstance(contract, str):
+            self._logger.error("考虑滑点计算订单成交价时出错，contract类型错误!")
+            raise TypeError
+
+        if direct not in (dBuy, dSell):
+            self._logger.error("考虑滑点计算订单成交价时出错，direct类型错误!")
+            raise TypeError
+
         cost = self.getCostRate(contract)
         slippage = cost["Slippage"]
         priceTick = cost["PriceTick"]
@@ -410,7 +413,6 @@ class CalcCenter(object):
         order:
         {
         "UserNo":         # 用户编号
-        "OrderId":        # 订单编号
         "OrderType":      # 定单类型
         "ValidType":      # 有效类型
         "ValidTime":      # 有效日期时间(GTD情况下使用)
@@ -421,10 +423,15 @@ class CalcCenter(object):
         "OrderPrice":     # 委托价格 或 期权应价买入价格
         "OrderQty" :      # 委托数量 或 期权应价数量
         "DateTimeStamp":  # 时间戳（基准合约）
-        "TradeDate":       # 交易日（基准合约）
+        "TradeDate":      # 交易日（基准合约）
+        "TriggerType":    # 触发方式
+        "CurBar":         # K线信息
         "CurBarIndex":    # K线索引
+        "StrategyId":     # 策略Id
+        "StrategyName":   # 策略名称
+        "StrategyStage":  # 策略运行阶段
         }
-        :return:
+        :return: 1, 0, addOrder 成功  失败标志
         """
         # print("---------: ", order)
         # print("begin:", datetime.now().strftime('%H:%M:%S.%f'))
@@ -1100,6 +1107,7 @@ class CalcCenter(object):
 
         self._profit["EmptyAssets"] = self._profit["LastAsset"] - totalCost
         temp = self._profit["LastAssets"]
+        self._logger.info(f"============: {self._profit['LastAssets']}, {self._profit['StartFund']}， {self._profit['MaxAssets']}", )
         if temp >= self._profit["StartFund"]:
             if temp > self._profit["MaxAssets"]:
                 self._profit["MaxAssets"] = temp
@@ -1116,10 +1124,14 @@ class CalcCenter(object):
                     self._profit["MaxRetracementEndTm"] = time
                     self._profit["MaxRetracementStartTm"] = self._profit["MinAssetsTm"]
                     # 权益最大回撤比
-                    # TODO: self._profit["LastAssets"]不存在为0的情况么？？？？？
-                    self._profit["MaxRetracementRate"] = self._profit["MaxRetracement"] / self._profit["LastAssets"]
-                    self._profit["MaxRetracementRateTm"] = time
-                # print(f"============: {diff}, {self._profit['MaxRetracement']}", )
+
+                    tempAssetRetraceRate = diff/self._profit["MaxAssets"]
+                    if tempAssetRetraceRate > self._profit["MaxRetracementRate"]:
+                        try:
+                            self._profit["MaxRetracementRate"] = tempAssetRetraceRate
+                        except ZeroDivisionError:
+                            raise ZeroDivisionError
+                        self._profit["MaxRetracementRateTm"] = time
 
     def calcProfit(self, contractList, barInfo):
         """
@@ -1128,10 +1140,12 @@ class CalcCenter(object):
         :param barInfo: 合约的bar信息，类型为字典类型，键值是合约代码
         :return:
         """
-        if contractList is None:
-            return
+        if contractList is None or barInfo is None:
+            self._logger.error("calcProfit(): contractList error")
+            raise ImportError("args error")
 
         if len(contractList) != len(barInfo):
+            self._logger.error("calcProfit(): length error")
             raise ImportError("args error")
 
         # 计算空仓周期
@@ -1921,9 +1935,10 @@ class CalcCenter(object):
         # 先暂时把计算self._testDays的方法放在这里吧，没想好放在哪里比较合适
         # 放在info文件的show方法中，知道最后出报告时才会计算self._testDays
         # 这样中间出报告时会报错，self._test_days为0
-
         ret = self._calcTestDay(self._beginDate, self._endDate)
-        if ret < 0: return []
+        if ret <= 0:
+            self._logger.error(f"计算TestDay时出错, 错误详情：开始日期：{self._beginDate}, 结束日期：{self._endDate}")
+            return []
         # TODO: 回测开始日期和回测结束日期在calcProfit中更新，所以把self._beginDate和self._endDate传进类中
         positions = self.getPositionInfo()
         self._reportDetails = ReportDetail(self._runSet, positions, self._profit, self._testDays,

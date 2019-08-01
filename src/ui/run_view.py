@@ -1353,7 +1353,6 @@ class RunWin(QuantToplevel, QuantFrame):
         # 发单报警
         self._strConfig.setAlarm(True) if int(isAlarm) else self._strConfig.setAlarm(False)
         # 账户
-        #TODO: user类型对不对呢？
         self._strConfig.setUserNo(user)
         # 初始资金
         self._strConfig.setInitCapital(int(initFund))
@@ -1680,14 +1679,11 @@ class SelectContractWin(QuantToplevel, QuantFrame):
 
         self._master.codeEntry.config(state="disabled")
 
-        # 不加self._master.display()会出现选择合约确定后设置窗口后移
         # self._master.focus()
         self.destroy()
-        self._master.display()
 
     def cancel(self):
         self.destroy()
-        self._master.display()
 
     def updateContractFrame(self, event):
         contractItems = self.contractTree.get_children()
@@ -2118,16 +2114,11 @@ class AddContWin(QuantToplevel, QuantFrame):
         else:
             self._master.contTree.insert("", tk.END, values=selectRlt)
 
-        # 不加self._master.display()会出现选择合约确定后设置窗口后移
-        # self._master.focus()
-        # TODO：点击量化主界面后master窗口会消失
         self.destroy()
-        self._master.display()
 
     def cancel(self):
         """关闭窗口"""
         self.destroy()
-        self._master.display()
 
     def setUserContract(self, contList):
         """设置用户所选数据合约"""
