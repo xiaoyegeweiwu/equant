@@ -1107,7 +1107,7 @@ class CalcCenter(object):
 
         self._profit["EmptyAssets"] = self._profit["LastAsset"] - totalCost
         temp = self._profit["LastAssets"]
-        self._logger.info(f"============: {self._profit['LastAssets']}, {self._profit['StartFund']}， {self._profit['MaxAssets']}", )
+        # self._logger.info(f"============: {self._profit['LastAssets']}, {self._profit['StartFund']}， {self._profit['MaxAssets']}", )
         if temp >= self._profit["StartFund"]:
             if temp > self._profit["MaxAssets"]:
                 self._profit["MaxAssets"] = temp
