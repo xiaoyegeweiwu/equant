@@ -888,6 +888,9 @@ class StrategyEngine(object):
     def getContractList(self, contList):
         contractList = []
         for subContNo in contList:
+            if not subContNo or len(subContNo) == 0:
+                continue
+
             if subContNo in self._qteModel._contractData:
                 contractList.append(subContNo)
                 continue
