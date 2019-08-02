@@ -153,7 +153,7 @@ _all_func_ = {
                     ['NumEventTimes'       , '保本次数'],
                     ['PercentProfit'       , '盈利成功率'],
                     ['TradeCost'           , '交易产生的手续费'],
-                    # ['TotalTrades'         , '交易总开仓手数'],
+                    ['TotalTrades'         , '交易总开仓手数'],
                 ],
                 
     '账户函数': [

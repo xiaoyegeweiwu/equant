@@ -2670,7 +2670,7 @@ class BaseApi(object):
         '''
         return self._dataModel.getTradeCost()
 
-    def TotalTrades(self):
+    def TotalTrades(self, contractNo):
         '''
         【说明】
               返回该账户的交易总开仓手数。
@@ -2687,7 +2687,10 @@ class BaseApi(object):
         【示例】
               无
         '''
-        return self._dataModel.getTotalTrades()
+        buyPos  = self._dataModel.getBuyPositionInStrategy(contractNo)
+        sellPos = self._dataModel.getSellPositionInStrategy(contractNo)
+        return buyPos + sellPos
+        #return self._dataModel.getTotalTrades()
 
 
     #////////////////////////////账户函数/////////////////
@@ -6487,8 +6490,8 @@ def PercentProfit():
 def TradeCost():
     return baseApi.TradeCost()
 
-def TotalTrades():
-    return baseApi.TotalTrades()
+def TotalTrades(contractNo=''):
+    return baseApi.TotalTrades(contractNo)
 
 # 账户函数
 def A_AccountID():
