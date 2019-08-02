@@ -369,7 +369,7 @@ class GetEgData(object):
     def _onEgPositionNotice(self, event):
         #TODO：没有登录交易账户时接收不到该事件
         syncPosition = event.getData()
-        print("aaaaaaaaaa: ", syncPosition)
+        #print("aaaaaaaaaa: ", syncPosition)
         self._app.updateSyncPosition(syncPosition)
         # self._logger.info("[UI]: Receiving sync position info successfully!")
 

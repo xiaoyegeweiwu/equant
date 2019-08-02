@@ -10,10 +10,10 @@ from tkinter import Tk
 from tkinter import messagebox
 from .model import QuantModel, SendRequest
 from .view import QuantApplication
-from .com_view import AlarmWin
 from .language import *
 from capi.com_types import *
 
+from engine.popup_win import createAlarmWin
 
 
 class TkinterController(object):
@@ -59,10 +59,6 @@ class TkinterController(object):
 
     def get_logger(self):
         return self.logger
-
-    def createAlarmWin(self, text):
-        """创建弹窗供弹窗函数调用"""
-        AlarmWin(text, self.top)
 
     def update_log(self):
         try:
@@ -142,24 +138,6 @@ class TkinterController(object):
 
     def parseStrategtParam(self, strategyPath):
         """解析策略中的用户参数"""
-        # moduleDir, moduleName = os.path.split(strategyPath)
-        # moduleName = os.path.splitext(moduleName)[0]
-        # if moduleDir not in sys.path:
-        #     sys.path.insert(0, moduleDir)
-        # try:
-        #     userModule = importlib.import_module(moduleName)
-        #     userModule = importlib.reload(userModule)
-        # except:
-        #     errorText = traceback.format_exc(0)
-        #     self.sendErrorMessage(errorText)
-        #     return {}
-        # finally:
-        #     sys.path.remove(sys.path[0])
-        #
-        # g_params = {}
-        # if "g_params" in vars(userModule):
-        #     g_params = vars(userModule)["g_params"]
-        # return g_params
         g_params = {}
         with open(strategyPath, 'r', encoding="utf-8") as f:
             content = [line.strip() for line in f]

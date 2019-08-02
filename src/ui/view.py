@@ -262,7 +262,6 @@ class QuantApplication(object):
             self.quant_editor_head.stateLabel.config(text="极星9.5退出", fg="red")
             messagebox.showerror("错误", "极星9.5退出", parent=self.root)
 
-
     def clearError(self):
         """清除错误信息"""
         self.quant_monitor.clearErrorText("")
