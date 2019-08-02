@@ -1219,14 +1219,14 @@ class StrategyHisQuote(object):
         # self.logger.debug('AAAA:%s,%s,%f'%(latestPos, stopWinParams, curPrice))
         if stopWinParams:
             if latestPos['Direct'] == 'B':
-                isStopWinTrigger = (highPrice-latestPos["OrderPrice"])>stopWinParams["StopPoint"]*priceTick
+                isStopWinTrigger = highPrice-latestPos["OrderPrice"]-stopWinParams["StopPoint"]*priceTick>-1e-6
             else:
-                isStopWinTrigger = (latestPos["OrderPrice"]-lowPrice)>stopWinParams["StopPoint"]*priceTick
+                isStopWinTrigger = latestPos["OrderPrice"]-lowPrice-stopWinParams["StopPoint"]*priceTick>-1e-6
         if stopLoseParams:
             if latestPos['Direct'] == 'B':
-                isStopLoseTrigger = (latestPos["OrderPrice"]-lowPrice)>stopLoseParams["StopPoint"]*priceTick
+                isStopLoseTrigger = latestPos["OrderPrice"]-lowPrice-stopLoseParams["StopPoint"]*priceTick>-1e-6
             else:
-                isStopLoseTrigger = (highPrice-latestPos["OrderPrice"])>stopLoseParams["StopPoint"]*priceTick
+                isStopLoseTrigger = highPrice-latestPos["OrderPrice"]-stopLoseParams["StopPoint"]*priceTick>-1e-6
 
         # 日志记录
         if isStopWinTrigger:
