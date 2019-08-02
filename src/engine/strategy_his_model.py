@@ -1060,7 +1060,7 @@ class StrategyHisQuote(object):
             handle_data(context)
 
         # 处理中间阶段止损止盈,按照历史回测止损止盈
-        self._stopWinOrLose(key[0], kLineData["LastPrice"])
+        self._stopWinOrLose(key[0], kLineData["LastPrice"], kLineData["LastPrice"])
         self._stopFloatWinLose(key[0], kLineData["LastPrice"])
         # **********************************
         if isShow:

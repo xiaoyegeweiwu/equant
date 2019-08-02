@@ -31,8 +31,118 @@ class StatisticsModel(object):
             smas.append(sma)
 
         return np.array(smas)
+        
+    def ParabolicSAR(self, High:np.array, Low:np.array, AfStep, AfLimit):
+    
+        #输出参数
+        roParClose,roParOpen,roPosition,roTransition = [], [], [], []
+        #中间参数
+        oParClose, oTransition = 0, 0
+        HHValue, LLValue, PHHValue,  PLLValue= 0, 0, 0, 0
+        Af, ParOpen, Position = 0, 0, 0
+        
+        
+        for i in range(len(High)):
+            if i == 0:
+                Position = 1
+                oTransition = 1
+                
+                Af = AfStep
+                
+                HHValue  = High[i]
+                LLValue  = Low[i]
+         
+                oParClose = LLValue
+                
+                ParOpen = oParClose + Af * ( HHValue - oParClose)
+                
+                if ParOpen > Low[i]:
+                    ParOpen = Low[i]
+                
+            else:
+                oTransition = 0
 
-    def ParabolicSAR(self, high:np.array, low:np.array, afstep, aflimit):
+                PHHValue = HHValue
+                PLLValue = LLValue
+                
+                if High[i] > HHValue:
+                    HHValue = High[i] 
+                if Low[i] < LLValue:
+                    LLValue = Low[i]
+                    
+                if Position == 1:
+                    if Low[i] <= ParOpen:
+                        Position = -1
+                        oTransition = -1
+                        oParClose = HHValue
+                        
+                        PHHValue = HHValue
+                        PLLValue = LLValue
+                
+                        HHValue = High[i]
+                        LLValue = Low[i]
+                        
+                        Af = AfStep
+                        ParOpen = oParClose + Af * ( LLValue - oParClose)
+                        if ParOpen < High[i]:
+                            ParOpen = High[i]
+                        if ParOpen < High[i-1]:
+                            ParOpen = High[i-1]
+                    else:
+                        oParClose = ParOpen
+                        
+                        if HHValue > PHHValue and Af < AfLimit:
+                            if Af + AfStep > AfLimit:
+                                Af = AfLimit
+                            else:
+                                Af = Af + AfStep
+                                
+                        ParOpen = oParClose + Af * ( HHValue - oParClose)
+                        if ParOpen > Low[i]:
+                            ParOpen = Low[i]
+                        if ParOpen > Low[i-1]:
+                            ParOpen = Low[i-1]
+                        
+                else:
+                    if High[i] >= ParOpen:
+                        Position = 1
+                        oTransition = 1
+                        oParClose = LLValue
+
+                        PHHValue = HHValue
+                        PLLValue = LLValue
+                        HHValue  = High[i]
+                        LLValue  = Low[i]
+                        
+                        Af = AfStep
+                        ParOpen = oParClose + Af * ( HHValue - oParClose)
+                        if ParOpen > Low[i]:
+                            ParOpen = Low[i]
+                        if ParOpen > Low[i-1]:
+                            ParOpen = Low[i-1]
+                    else:
+                        oParClose = ParOpen
+                        
+                        if LLValue < PLLValue and Af < AfLimit:
+                            if Af+ AfStep > AfLimit:
+                                Af = AfLimit
+                            else:
+                                Af = Af + AfStep
+
+                        ParOpen = oParClose + Af * ( LLValue - oParClose)
+                        if ParOpen < High[i]:
+                            ParOpen = High[i]
+                        if ParOpen < High[i-1]:
+                            ParOpen = High[i-1]
+            
+            roParOpen.append(ParOpen)
+            roPosition.append(Position)
+            roParClose.append(oParClose)
+            roTransition.append(oTransition)
+            
+        return roParClose, roParOpen, roPosition, roTransition
+
+    def ParabolicSAR2(self, high:np.array, low:np.array, afstep, aflimit):
         oParClose = None
         oParOpen = None
         oPosition = None
