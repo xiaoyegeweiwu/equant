@@ -580,7 +580,7 @@ class Strategy:
             self._virtualPosTime = nowTime
             calc = self._dataModel.getCalcCenter()
             #获取该策略所有合约的虚拟持仓
-            posDict = calc.getPositionInfo()
+            posDict = calc.getUsersPosition()
             if len(posDict) == 0:
                 return
             event = Event({
