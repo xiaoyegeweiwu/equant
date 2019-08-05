@@ -625,14 +625,11 @@ class StrategyHisQuote(object):
     # response 数据
     def onHisQuoteRsp(self, event):
         key = (event.getContractNo(), event.getKLineType(), event.getKLineSlice())
-        kindInfo = {"ContractNo":key[0], "KLineType":key[1],"KLineSlice":key[2]}
-        # print("key = ", key, len(event.getData()), event.isChainEnd(), kindInfo)
-        # print(self._config.getKLineKindsInfo())
-
-        assert kindInfo in self._config.getKLineKindsInfo(), " Error "
+        # print("key = ", key, len(event.getData()), event.isChainEnd(), key)
+        # assert kindInfo in self._config.getKLineKindsInfo(), " Error "
         if not self._isReqByDate[key]:                        # req by count
             self._handleKLineRspByCount(event)
-        else:                                               # req by date
+        else:                                                 # req by date
             self._handleKLineRspByDate(event)
 
     def isHisQuoteRspEnd(self, event):
@@ -656,6 +653,10 @@ class StrategyHisQuote(object):
             kLineData["KLineType"] = event.getKLineType()
             kLineData['KLineSlice'] = event.getKLineSlice()
             kLineData["Priority"] = self._config.getPriority(key)
+            if key[1] == EEQU_KLINE_TICK and key[2] == 0:
+                kLineData["HighPrice"] = kLineData["LastPrice"]
+                kLineData["LowPrice"] = kLineData["LastPrice"]
+                kLineData["OpeningPrice"] = kLineData["LastPrice"]
             if self._isReqByDate[key]:
                 if len(localRspKLineData) == 0 or (len(localRspKLineData) >= 1 and kLineData["DateTimeStamp"]<localRspKLineData[0]["DateTimeStamp"] and \
                 kLineData["DateTimeStamp"] >= self._reqBeginDate[key]):
@@ -678,6 +679,10 @@ class StrategyHisQuote(object):
         for data in event.getData():
             isNewKLine = True
             data["IsKLineStable"] = False
+            if key[1] == EEQU_KLINE_TICK and key[2] == 0:
+                data["HighPrice"] = data["LastPrice"]
+                data["LowPrice"] = data["LastPrice"]
+                data["OpeningPrice"] = data["LastPrice"]
             storedLastKLine, lastKLineSource = self.getLastStoredKLine(key)
             # 没有数据，索引取回测数据的最后一条数据的索引，没有数据从1开始
             if storedLastKLine is None:
