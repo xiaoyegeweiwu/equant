@@ -933,10 +933,16 @@ class Strategy:
                 break
             except queue.Full:
                 time.sleep(0.1)
-                self.logger.error(f"策略{self._strategyId}强制向引擎传递事件{event.getEventCode()}时卡住")
+                self.logger.error(f"策略{self._strategyId}强制向引擎传递事件{event.getEventCode()}时阻塞")
 
     def sendEvent2UI(self, event):
-        self._st2uiQueue.put(event)
+        while True:
+            try:
+                self._st2uiQueue.put(event)
+                break
+            except queue.Full:
+                time.sleep(0.1)
+                self.logger.error(f"策略{self._strategyId}制向UI传递事件{event.getEventCode()}时阻塞")
 
     def sendTriggerQueue(self, event):
         self._triggerQueue.put(event)
