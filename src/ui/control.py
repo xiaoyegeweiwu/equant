@@ -53,6 +53,8 @@ class TkinterController(object):
         self.receiveEgThread = ChildThread(self.model.receiveEgEvent)
         # 信号记录线程
         self.sigThread = ChildThread(self.updateSig, 0.01)
+        # 用户日志线程
+        self.usrThread = ChildThread(self.updateUsr, 0.01)
 
         # 设置日志更新
         self.update_log()
@@ -73,6 +75,9 @@ class TkinterController(object):
 
     def updateSig(self):
         self.app.updateSigText()
+
+    def updateUsr(self):
+        self.app.updateUsrText()
 
     def updateMonitor(self):
         # 更新监控界面策略信息
@@ -98,6 +103,10 @@ class TkinterController(object):
         self.sigThread.stop()
         self.sigThread.join()
 
+        # 停止更新用户日志
+        self.usrThread.stop()
+        self.usrThread.join()
+
         # 停止接收策略引擎队列数据
         self.receiveEgThread.stop()
         self.model.receiveExit()
@@ -114,6 +123,8 @@ class TkinterController(object):
         self.receiveEgThread.start()
 
         self.sigThread.start()
+
+        self.usrThread.start()
 
         #启动主界面线程
         self.app.mainloop()

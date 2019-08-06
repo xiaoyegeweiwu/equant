@@ -112,11 +112,11 @@ class QuantApplication(object):
         
         # 监控窗口
         self.quant_monitor = QuantMonitor(left_down_frame, self.control, self.language)
-        self.quant_monitor.createMonitor()
-        # self.quant_monitor.create_execute()
+        # self.quant_monitor.createSysLog()
         self.quant_monitor.createExecute()
         # self.create_monitor()
-        self.quant_monitor.createSignal()
+        # self.quant_monitor.createSignal()
+        self.quant_monitor.createLog()
         self.quant_monitor.createErr()
         self.quant_monitor.createPos()
 
@@ -125,6 +125,9 @@ class QuantApplication(object):
 
     def updateSigText(self):
         self.quant_monitor.updateSigText()
+
+    def updateUsrText(self):
+        self.quant_monitor.updateUsrText()
 
     def updateErrText(self):
         self.quant_monitor.updateErrText()

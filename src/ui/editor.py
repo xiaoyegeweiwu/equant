@@ -401,7 +401,7 @@ class EditorText(ParentText, ModifiedMixin):
         menu.post(event.x_root, event.y_root)
 
 
-class SignalText(ParentText):
+class LogText(ParentText):
     def __init__(self, master, **kw):
         ParentText.__init__(self, master, **kw)
         color_config(self, fontSize=10)
