@@ -573,7 +573,7 @@ class Strategy:
             })
 
             self.sendEvent2UI(event)
-            
+
     def _noticeVirtualPos(self):
         nowTime = datetime.now()
         if self._virtualPosTime == 0 or (nowTime - self._virtualPosTime).total_seconds() >= 1:
@@ -716,21 +716,6 @@ class Strategy:
         self._dataModel.onQuoteNotice(event)
         self._snapShotTrigger(event)
 
-    # def _calcProfitByQuote(self, event):
-    #     data = event.getData()
-    #     if len(data) == 0 or (4 not in data[0]["FieldData"]):
-    #         # 4:最新价
-    #         return
-    #
-    #     priceInfos = {}
-    #     priceInfos[event.getContractNo()] = {
-    #         "LastPrice": data[0]["FieldData"][4],
-    #         "TradeDate": data[0]["UpdateTime"]//1000000000,
-    #         "DateTimeStamp" : data[0]["UpdateTime"],
-    #         "LastPriceSource": LastPriceFromQuote
-    #     }
-    #     self._dataModel.getHisQuoteModel().calcProfitByQuote(event.getContractNo(), priceInfos)
-
     def _onDepthNotice(self, event):
         self._dataModel.onDepthNotice(event)
 
@@ -817,6 +802,7 @@ class Strategy:
         for data in dataList:
             self.updateLocalOrder(eSessionId, data)
         if self.isRealTimeStatus():
+            # print("in strategy", repr(apiEvent.getData()[0]["OrderState"]))
             self._tradeTriggerOrder(apiEvent)
 
     def _onTradeLoginQry(self, apiEvent):
@@ -848,7 +834,7 @@ class Strategy:
         :return: None
         '''
         self._dataModel._trdModel.updateMatchData(apiEvent)
-        self._tradeTriggerMatch(apiEvent)
+        # self._tradeTriggerMatch(apiEvent) # 去掉成交触发
 
     def _onTradePosition(self, apiEvent):
         '''
