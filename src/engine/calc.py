@@ -435,7 +435,6 @@ class CalcCenter(object):
         """
         # print("---------: ", order)
         # print("begin:", datetime.now().strftime('%H:%M:%S.%f'))
-        print("111111111")
         if not self._beginDate:
             self._beginDate = order["TradeDate"]
         self._endDate = order["TradeDate"]
@@ -1154,7 +1153,6 @@ class CalcCenter(object):
         :param barInfo: 合约的bar信息，类型为字典类型，键值是合约代码
         :return:
         """
-        print("22222")
         if contractList is None or barInfo is None:
             self._logger.error("calcProfit(): contractList error")
             raise ImportError("args error")

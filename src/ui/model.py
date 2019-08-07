@@ -388,7 +388,6 @@ class GetEgData(object):
         self._logger.info(f"[UI]: handlerExit")
 
     def handlerEgEvent(self):
-
         try:
             # 如果不给出超时则会导致线程退出时阻塞
             event = self._eg2uiQueue.get(timeout=0.1)
