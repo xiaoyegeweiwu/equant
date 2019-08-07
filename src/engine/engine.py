@@ -1183,7 +1183,7 @@ class StrategyEngine(object):
     def sendEvent2UI(self, event):
         while True:
             try:
-                self._eg2uiQueue.put(event)
+                self._eg2uiQueue.put_nowait(event)
                 break
             except queue.Full:
                 time.sleep(0.1)
