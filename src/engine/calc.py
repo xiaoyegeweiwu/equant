@@ -435,6 +435,7 @@ class CalcCenter(object):
         """
         # print("---------: ", order)
         # print("begin:", datetime.now().strftime('%H:%M:%S.%f'))
+        print("111111111")
         if not self._beginDate:
             self._beginDate = order["TradeDate"]
         self._endDate = order["TradeDate"]
@@ -833,6 +834,19 @@ class CalcCenter(object):
             return self._latestCoverOrder[contract]
         return {}
 
+    # def _updateLatestBuyOpenOrder(self, user, contract):
+    #     """更新最近一笔买方向开仓单"""
+    #     pInfo = self._getSpecificPositionInfo(user, contract)
+    #     if pInfo["TotalBuy"] > 0 or pInfo["TotalSell"] > 0:
+    #         head = self._firstHoldPosition - 1 if self._firstHoldPosition > 0 else (-len(self._orders) - 1)
+    #         # for eo in self._orders[:(-len(self._orders)+1-self._firstHoldPosition):-1]:
+    #         for eo in self._orders[:head:-1]:
+    #             if eo["Order"]["Cont"] == contract and eo["LeftNum"] > 0:
+    #                 self._latestOpenOrder[contract] = eo["Order"]
+    #                 return
+    #     else:
+    #         self._latestOpenOrder[contract] = {}
+
     def _getOpenCharge(self, contract, num, offset, flag, linkList):
         """
 
@@ -1140,6 +1154,7 @@ class CalcCenter(object):
         :param barInfo: 合约的bar信息，类型为字典类型，键值是合约代码
         :return:
         """
+        print("22222")
         if contractList is None or barInfo is None:
             self._logger.error("calcProfit(): contractList error")
             raise ImportError("args error")
@@ -1933,12 +1948,8 @@ class CalcCenter(object):
 
     def getReportDetail(self):
         # 先暂时把计算self._testDays的方法放在这里吧，没想好放在哪里比较合适
-        # 放在info文件的show方法中，知道最后出报告时才会计算self._testDays
-        # 这样中间出报告时会报错，self._test_days为0
         ret = self._calcTestDay(self._beginDate, self._endDate)
-        if ret <= 0:
-            self._logger.error(f"计算TestDay时出错, 错误详情：开始日期：{self._beginDate}, 结束日期：{self._endDate}")
-            return []
+        if ret <= 0: return []
         # TODO: 回测开始日期和回测结束日期在calcProfit中更新，所以把self._beginDate和self._endDate传进类中
         positions = self.getPositionInfo()
         self._reportDetails = ReportDetail(self._runSet, positions, self._profit, self._testDays,
