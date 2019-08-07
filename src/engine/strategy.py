@@ -579,7 +579,7 @@ class Strategy:
         if self._virtualPosTime == 0 or (nowTime - self._virtualPosTime).total_seconds() >= 1:
             self._virtualPosTime = nowTime
             calc = self._dataModel.getCalcCenter()
-            #获取该策略所有合约的虚拟持仓
+            # 获取该策略所有合约的虚拟持仓
             posDict = calc.getUsersPosition()
             if len(posDict) == 0:
                 return
@@ -938,7 +938,7 @@ class Strategy:
     def sendEvent2UI(self, event):
         while True:
             try:
-                self._st2uiQueue.put(event)
+                self._st2uiQueue.put_nowait(event)
                 break
             except queue.Full:
                 time.sleep(0.1)
