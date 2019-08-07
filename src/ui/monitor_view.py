@@ -530,7 +530,7 @@ class QuantMonitor(object):
                         }
                     )
                 else:
-                    for pCont, pInfo in positions["Strategy"][sid][user]:
+                    for pCont, pInfo in positions["Strategy"][sid][user].items():
                         if pCont not in strategyPos[user]:
                             strategyPos[user].update(
                                 {
