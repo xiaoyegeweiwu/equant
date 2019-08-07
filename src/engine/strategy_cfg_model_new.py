@@ -476,6 +476,7 @@ class StrategyConfig_new(object):
         '''获取保证金比例值'''
         if contNo not in self._metaData['Money']['Margin']:
             raise Exception("请确保为合约%s设置了保证金比例/额度！"%contNo)
+
         return self._metaData['Money']['Margin'][contNo]['Value']
 
     # ----------------------- 交易手续费 ----------------------
@@ -745,13 +746,27 @@ class StrategyConfig_new(object):
 
         return subDict.values()
 
-    def getKLineTriggerInfo(self):
-        kLineTypetupleList, kLineTypeDictList, subDict = self.getSampleInfo()
-        return kLineTypeDictList
-
+    #
+    periodSize = {
+        EEQU_KLINE_DAY: 24*3600,
+        EEQU_KLINE_MINUTE: 60,
+        EEQU_KLINE_TICK: 1,
+    }
     def getKLineTriggerInfoSimple(self):
+        if hasattr(self, "_triggerKLine"):
+            return getattr(self, "_triggerKLine")
         kLineTypetupleList, kLineTypeDictList, subDict = self.getSampleInfo()
-        return kLineTypetupleList
+
+        result = {}
+        for key in kLineTypetupleList:
+            result.setdefault(key[0], key)
+            lastKey = result.get(key[0])
+            if self.periodSize[key[1]]*key[2] < self.periodSize[lastKey[1]]*lastKey[2]:
+                result[key[0]] = key
+
+        setattr(self, "_triggerKLine", set(result.values()))
+        return getattr(self, "_triggerKLine")
+
 
     def getKLineShowInfo(self):
         displayCont = self.getBenchmark()
@@ -768,6 +783,7 @@ class StrategyConfig_new(object):
         showInfo = self.getKLineShowInfo()
         for value in showInfo.values():
             showInfoSimple.append(value)
+
         return tuple(showInfoSimple)
 
     priorityDict = {
@@ -784,7 +800,8 @@ class StrategyConfig_new(object):
     }
 
     def getPriority(self, key):
-        kLineTypetupleList = self.getKLineTriggerInfoSimple()
+        kLineKindsInfo = self.getKLineKindsInfo()
+        kLineTypetupleList = [(record["ContractNo"], record["KLineType"], record["KLineSlice"]) for record in kLineKindsInfo]
         return kLineTypetupleList.index(key) + self.priorityDict[key[1]] + int(key[2])
 
     def getContract(self):

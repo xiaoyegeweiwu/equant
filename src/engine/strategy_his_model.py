@@ -773,7 +773,7 @@ class StrategyHisQuote(object):
 
 
     def _sendHisKLineTriggerEvent(self, key, data):
-        if not data["IsKLineStable"]:
+        if not data["IsKLineStable"] or not self._config.hasKLineTrigger() or key not in self._config.getKLineTriggerInfoSimple():
             return
 
         assert key[1] is not None, "k line type error"
@@ -982,7 +982,7 @@ class StrategyHisQuote(object):
             self._stopWinOrLose(key[0], row["HighPrice"], row["LowPrice"])
             self._stopFloatWinLose(key[0], row["HighPrice"], row["LowPrice"])
 
-            if key == self._config.getKLineShowInfoSimple():
+            if key in self._config.getKLineTriggerInfoSimple():
                 args = {
                     "Status": ST_STATUS_HISTORY,
                     "TriggerType":ST_TRIGGER_HIS_KLINE,
@@ -1049,6 +1049,7 @@ class StrategyHisQuote(object):
         if lastBar is None or math.fabs(curBar["LastPrice"] - lastBar["LastPrice"]) > 1e-4:
             self._calcProfitWhenHis()
         # **************************
+        print(key, self._config.getKLineTriggerInfoSimple(), key in self._config.getKLineTriggerInfoSimple())
         if self._config.hasKLineTrigger() and key in self._config.getKLineTriggerInfoSimple():
             args = {
                 "Status": ST_STATUS_HISTORY,
@@ -1164,6 +1165,7 @@ class StrategyHisQuote(object):
             "DateTimeStamp": allData["DateTimeStamp"],
             "TriggerData": allData["Data"]
         }
+        print(args)
         self._strategy.setCurTriggerSourceInfo(args)
         context.setCurTriggerSourceInfo(args)
         handle_data(context)
