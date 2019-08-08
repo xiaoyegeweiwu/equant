@@ -989,7 +989,7 @@ class EEquLoginInfoRsp(Structure):
     _fields_ = [
         ('LoginNo', c_char*21),
         ('Sign', c_char*21),
-        ('LoginName', c_char*21),
+        ('LoginName', c_char*51),
         ('LoginApi', c_char*51),
         ('TradeDate', c_char*11),
         ('IsReady', c_char),
