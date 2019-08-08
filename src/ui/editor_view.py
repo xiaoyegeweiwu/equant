@@ -527,7 +527,7 @@ class QuantEditor(StrategyTree):
                 editorCode = self.control.getEditorText()["code"]
                 self.editor_text.delete(0.0, END + "-1c")
                 self.updateEditorText(editorCode)
-                # self.editor_text.edit_reset()
+                self.editor_text.edit_reset()
 
     def _treeMonitor(self, event):
         editorPath = self.control.getEditorText()["path"]
