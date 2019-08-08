@@ -1012,7 +1012,7 @@ class EEquUserInfoRsp(Structure):
         ('UserNo', c_char*21),
         ('Sign', c_char*21),
         ('LoginNo', c_char*21),
-        ('UserName', c_char*21),
+        ('UserName', c_char*51),
     ]
 
 
