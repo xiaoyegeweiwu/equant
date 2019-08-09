@@ -224,7 +224,7 @@ class EditorText(ParentText, ModifiedMixin):
         self.tk.call("rename", self._w, self._orig)
         self.tk.createcommand(self._w, self._proxy)
 
-        self._view = view
+        self._view = view   # EditorText类
         self._controller = view.control
         self.prog = re.compile(make_pat(), re.S)
         self.idprog = re.compile(r"\s+(\w+)", re.S)
@@ -283,6 +283,8 @@ class EditorText(ParentText, ModifiedMixin):
                     strategyPath = self._controller.getEditorText()["path"]
                     text = os.path.basename(strategyPath)
                     self._view.updateEditorHead(text+"*")
+                    # 设置策略被修改标志位
+                    self._view.setModifyFlag(True)
                 return
 
     def config_colors(self):

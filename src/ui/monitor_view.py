@@ -596,10 +596,7 @@ class QuantMonitor(object):
                                     accountPos[user][c]["TotalBuy"], accountPos[user][c]["TotalSell"],
                                     accountPos[user][c]["TodayBuy"], accountPos[user][c]["TodaySell"]])
                         continue
-                    # else:
-                    #     rlt.append([user, c, 0, p["TotalBuy"] - (-p["TotalSell"]), p["TotalBuy"] - (-p["TotalSell"]),
-                    #                 p["TotalBuy"], p["TotalSell"], p["TodayBuy"], p["TodaySell"], 0, 0, 0, 0])
-                # user not in accountPos && c not in accountPos[user]
+
                 rlt.append([user, c, 0, p["TotalBuy"] - (-p["TotalSell"]), p["TotalBuy"] - (-p["TotalSell"]),
                             p["TotalBuy"], p["TotalSell"], p["TodayBuy"], p["TodaySell"], 0, 0, 0, 0])
 
