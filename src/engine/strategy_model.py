@@ -14,6 +14,7 @@ import copy
 
 from engine.calc import CalcCenter
 from datetime import datetime
+from .popup_win import *
 
 try:
     from .play_audio import PlayAudio
@@ -42,6 +43,10 @@ class StrategyModel(object):
         self._hisModel = StrategyHisQuote(strategy, self._cfgModel, self._calcCenter, self)
         self._trdModel = StrategyTrade(strategy, self._cfgModel)
         self._staModel = StatisticsModel(strategy, self._cfgModel)
+        
+        self._bsMap = {dBuy : '买', dSell: '卖', dBoth: '双边'}
+        self._ocMap = {oNone: '无', oOpen: '开仓', oCover: '平仓', oCoverT: '平今', oOpenCover: '开平', oCoverOpen: '平开'}
+        
 
     def setRunStatus(self, status):
         self._runStatus = status
@@ -546,10 +551,20 @@ class StrategyModel(object):
         
         #处理报警
         if self._strategy.isRealTimeStatus() and self._cfgModel.getAlarm():
+        #if self._cfgModel.getAlarm():
             try:
+                #出声音
                 PlayAudio.play('Signal')
-            except:
-                self.logger.error('No module named PlayAudio')
+                #弹窗,合约，方向，手数，价格
+                alarmStr = '合约: ' + contNo + '\n'\
+                           '方向: ' + self._bsMap[direct] + self._ocMap[offset] + '\n' +\
+                           '数量: ' + str(share) + '\n' +\
+                           '价格: ' + str(price) + '\n' +\
+                           '时间: ' + str(curBar['DateTimeStamp']) + '\n'
+          
+                #createAlarmWin(alarmStr);
+            except Exception as e:
+                self.logger.error('Alarm error:%s'%e)
 
     def setStartTrade(self):
         self._cfgModel.setPending(False)
@@ -2279,3 +2294,19 @@ class StrategyModel(object):
             if pos <= -len(price1):
                 break
         return price1[pos] > price2[pos]
+        
+    def getSwingHigh(self, Price, Length, Instance, Strength):
+        ispivot, pivot, bar = self._staModel.Pivot(Price,Length,Strength,Strength,Instance,1);
+        return pivot;
+        
+    def getSwingLow(self, Price, Length, Instance, Strength):
+        ispivot, pivot, bar = self._staModel.Pivot(Price,Length,Strength,Strength,Instance,-1);
+        return pivot;
+        
+    def setAlert(self, Info, bKeep):
+        try:
+            #出声音
+            PlayAudio.play('Signal')     
+            createAlarmWin(Info);
+        except Exception as e:
+            self.logger.error('Alarm error:%s'%e)
