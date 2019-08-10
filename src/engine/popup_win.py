@@ -1,10 +1,10 @@
 #-*-coding:utf-8
-from threading import Lock
+import threading
 import tkinter as tk
 
 
-class AlarmWin(tk.Toplevel):
-    _instance_lock = Lock()
+class AlarmWin(tk.Tk):
+    _instance_lock = threading.Lock()
     __instance = None
     __has_initialization = False
 
@@ -14,7 +14,7 @@ class AlarmWin(tk.Toplevel):
                 cls.__instance = object.__new__(cls)
         return cls.__instance
 
-    def __init__(self, text, master=None):
+    def __init__(self, master=None):
         if not AlarmWin.__has_initialization:
             super().__init__(master)
             self._master = master
@@ -28,20 +28,28 @@ class AlarmWin(tk.Toplevel):
             self._setPos()
             self._createFrames()
             AlarmWin.__has_initialization = True
-            self.protocol("WM_DELETE_WINDOW", self.closeWin)
-        self.updateTextRecords(text)
+            self.protocol("WM_DELETE_WINDOW", self._closeWin)
+        # self.updateTextRecords(text)
+        #
+        # if self._autoPages:
+        #     self.updateOnPage()
+        #     self._insertSpecificPageText(text)
+        # self.updatePages()
+        # self._updatePagesLabel()
+        # self.update()
+
+    def __call__(self, new_text):
+        # self._textRecords.append(new_text)
+        self.updateTextRecords(new_text)
 
         if self._autoPages:
             self.updateOnPage()
-            self.insertSpecificPageText(text)
+            self._insertSpecificPageText(new_text)
         self.updatePages()
-        self.updatePagesLabel()
+        self._updatePagesLabel()
+        self.update()
 
-    def __call__(self, new_text):
-        return
-        self._textRecords.append(new_text)
-
-    def closeWin(self):
+    def _closeWin(self):
         self.rebuild()
         self.destroy()
 
@@ -74,7 +82,6 @@ class AlarmWin(tk.Toplevel):
         self.geometry('%dx%d+%d+%d' % (w, h, x, y))
         # self.minsize(400, 400)
 
-
     def _createFrames(self):
         textFrame = tk.Frame(self, width=400, height=370)
         textFrame.pack(side=tk.TOP, padx=1)
@@ -90,7 +97,7 @@ class AlarmWin(tk.Toplevel):
         self.textWgt.config(state="disabled", font=("Consolas", 16), fg="white")
         self.textWgt.pack(fill=tk.BOTH, expand=tk.YES)
 
-    def insertSpecificPageText(self, text):
+    def _insertSpecificPageText(self, text):
         self.textWgt.config(state="normal")
         self.textWgt.delete(0.0, "end" + "-1c")
         self.textWgt.insert(tk.END, text)
@@ -115,17 +122,17 @@ class AlarmWin(tk.Toplevel):
         self.nxtBtn.pack(side=tk.LEFT, padx=4, pady=4)
         self.btmBtn.pack(side=tk.LEFT, padx=4, pady=4)
 
-        self.topBtn.bind("<Button-1>", self.toTop)
-        self.btmBtn.bind("<Button-1>", self.toBottom)
-        self.befBtn.bind("<Button-1>", self.toBefore)
-        self.nxtBtn.bind("<Button-1>", self.toNext)
+        self.topBtn.bind("<Button-1>", self._toTop)
+        self.btmBtn.bind("<Button-1>", self._toBottom)
+        self.befBtn.bind("<Button-1>", self._toBefore)
+        self.nxtBtn.bind("<Button-1>", self._toNext)
 
         self.topBtn.image = topImage1
         self.btmBtn.image = btmImage1
         self.befBtn.image = befImage1
         self.nxtBtn.image = nxtImage1
 
-    def updatePagesLabel(self):
+    def _updatePagesLabel(self):
         self.pageLabel.config(text="%d/%d" % (self._onPage, self._pages))
 
     def updateOnPage(self):
@@ -138,43 +145,43 @@ class AlarmWin(tk.Toplevel):
         self._pages = len(self._textRecords)
         if self._onPage == self._pages:
             for wgt, image in zip([self.nxtBtn, self.btmBtn], [self.nxtImage2, self.btmImage2]):
-                self.setBtnImage(wgt, image)
+                self._setBtnImage(wgt, image)
             if self._onPage == 1:
                 for wgt, image in zip([self.topBtn, self.befBtn], [self.topImage2, self.befImage2]):
-                    self.setBtnImage(wgt, image)
+                    self._setBtnImage(wgt, image)
             else:
                 for wgt, image in zip([self.topBtn, self.befBtn], [self.topImage1, self.befImage1]):
-                    self.setBtnImage(wgt, image)
+                    self._setBtnImage(wgt, image)
         else:
             for wgt, image in zip([self.nxtBtn, self.btmBtn], [self.nxtImage1, self.btmImage1]):
-                self.setBtnImage(wgt, image)
+                self._setBtnImage(wgt, image)
 
-    def toTop(self, event):
+    def _toTop(self, event):
         self._onPage = 1
         self._autoPages = False
         for wgt, image in zip([self.topBtn, self.befBtn], [self.topImage2, self.befImage2]):
-            self.setBtnImage(wgt, image)
+            self._setBtnImage(wgt, image)
         if self._onPage != self._pages:
             for wgt, image in zip([self.nxtBtn, self.btmBtn], [self.nxtImage1, self.btmImage1]):
-                self.setBtnImage(wgt, image)
+                self._setBtnImage(wgt, image)
 
-        self.updatePagesLabel()
-        self.insertSpecificPageText(self._textRecords[self._onPage-1])
+        self._updatePagesLabel()
+        self._insertSpecificPageText(self._textRecords[self._onPage-1])
 
-    def toBottom(self, event):
+    def _toBottom(self, event):
         self._autoPages = True
         self._onPage = len(self._textRecords)
         # self.setBtnDisabeldImage(self.btmBtn)
         if self._onPage != self._onPage:
             for wgt, image in zip([self.topBtn, self.befBtn], [self.topImage1, self.befImage1]):
-                self.setBtnImage(wgt, image)
+                self._setBtnImage(wgt, image)
 
         for wgt, image in zip([self.nxtBtn, self.btmBtn], [self.nxtImage2, self.btmImage2]):
-            self.setBtnImage(wgt, image)
-        self.updatePagesLabel()
-        self.insertSpecificPageText(self._textRecords[self._onPage-1])
+            self._setBtnImage(wgt, image)
+        self._updatePagesLabel()
+        self._insertSpecificPageText(self._textRecords[self._onPage-1])
 
-    def toBefore(self, event):
+    def _toBefore(self, event):
         # 在最左侧的情况
         self._autoPages = False
         # self._onPage -= 1
@@ -182,28 +189,28 @@ class AlarmWin(tk.Toplevel):
             self._onPage -= 1
         if self._onPage == 1:
             for wgt, image in zip([self.befBtn, self.topBtn], [self.befImage2, self.topImage2]):
-                self.setBtnImage(wgt, image)
+                self._setBtnImage(wgt, image)
         if self._pages != 1:
             for wgt, image in zip([self.nxtBtn, self.btmBtn], [self.nxtImage1, self.btmImage1]):
-                self.setBtnImage(wgt, image)
+                self._setBtnImage(wgt, image)
 
-        self.updatePagesLabel()
-        self.insertSpecificPageText(self._textRecords[self._onPage-1])
+        self._updatePagesLabel()
+        self._insertSpecificPageText(self._textRecords[self._onPage-1])
 
-    def toNext(self, event):
+    def _toNext(self, event):
         if self._onPage != self._pages:
             self._onPage += 1
         if self._onPage == self._pages:
             for wgt, image in zip([self.nxtBtn, self.btmBtn], [self.nxtImage2, self.btmImage2]):
-                self.setBtnImage(wgt, image)
+                self._setBtnImage(wgt, image)
         if self._pages != self._onPage:
             for wgt, image in zip([self.befBtn, self.topBtn], [self.befImage1, self.topImage1]):
-                self.setBtnImage(wgt, image)
+                self._setBtnImage(wgt, image)
 
-        self.updatePagesLabel()
-        self.insertSpecificPageText(self._textRecords[self._onPage-1])
+        self._updatePagesLabel()
+        self._insertSpecificPageText(self._textRecords[self._onPage-1])
 
-    def setBtnImage(self, widget, image):
+    def _setBtnImage(self, widget, image):
         iimage = tk.PhotoImage(file=image)
         widget.config(image=iimage)
         widget.image = iimage
@@ -215,5 +222,17 @@ class AlarmWin(tk.Toplevel):
 
 
 def createAlarmWin(text):
+    A = AlarmWin()
     if text:
-        AlarmWin(text)
+        A(text)
+
+
+if __name__ == "__main__":
+
+    for i in range(100):
+        A = AlarmWin("1111111111", top)
+        A("111111111111111111111")
+
+    A.mainloop()
+
+

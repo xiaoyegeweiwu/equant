@@ -367,11 +367,11 @@ class GetEgData(object):
                 self._app.delUIStrategy(id)
 
     def _onEgPositionNotice(self, event):
+        self._logger.error("t333333333333333333333333333")
         #TODO：没有登录交易账户时接收不到该事件
         syncPosition = event.getData()
-        #print("aaaaaaaaaa: ", syncPosition)
         self._app.updateSyncPosition(syncPosition)
-        # self._logger.info("[UI]: Receiving sync position info successfully!")
+        self._logger.error("t44444444444444444444444444")
 
     def _onEgConnect(self, event):
         src = event.getEventSrc()
@@ -390,8 +390,8 @@ class GetEgData(object):
     def handlerEgEvent(self):
         try:
             # 如果不给出超时则会导致线程退出时阻塞
-            event = self._eg2uiQueue.get(timeout=0.1)
-            # event = self._eg2uiQueue.get_nowait()
+            # event = self._eg2uiQueue.get(timeout=0.1)
+            event = self._eg2uiQueue.get_nowait()
             eventCode = event.getEventCode()
 
             if eventCode not in self._egAskCallbackDict:
