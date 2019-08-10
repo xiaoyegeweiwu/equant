@@ -3,7 +3,7 @@ import threading
 import tkinter as tk
 
 
-class AlarmWin(tk.Tk):
+class AlarmWin(tk.Toplevel):
     _instance_lock = threading.Lock()
     __instance = None
     __has_initialization = False

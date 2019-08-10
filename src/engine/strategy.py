@@ -16,6 +16,7 @@ import datetime
 from datetime import datetime
 import copy
 from collections import OrderedDict
+from tkinter import Tk
 
 
 
@@ -410,8 +411,8 @@ class Strategy:
 
         # 9. 启动策略心跳线程
         self._startStrategyTimer()
-
-    def run(self):
+        
+    def _actualRun(self):
         try:
             # 1. 内部初始化
             self._initialize()
@@ -435,6 +436,14 @@ class Strategy:
             errorText = traceback.format_exc()
             # traceback.print_exc()
             self._exit(-1, errorText)
+
+    def run(self):
+        self._actualThread = Thread(target=self._actualRun)
+        self._actualThread.start()
+    
+        self.top = Tk()
+        self.top.withdraw()
+        self.top.mainloop()
     
     # ////////////////////////////内部接口////////////////////
     def _isExit(self):

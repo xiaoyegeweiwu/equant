@@ -562,7 +562,7 @@ class StrategyModel(object):
                            '价格: ' + str(price) + '\n' +\
                            '时间: ' + str(curBar['DateTimeStamp']) + '\n'
           
-                #createAlarmWin(alarmStr);
+                createAlarmWin(alarmStr);
             except Exception as e:
                 self.logger.error('Alarm error:%s'%e)
 
@@ -2306,7 +2306,8 @@ class StrategyModel(object):
     def setAlert(self, Info, bKeep):
         try:
             #出声音
-            PlayAudio.play('Signal')     
+            if bKeep:
+                PlayAudio.play('Signal')     
             createAlarmWin(Info);
         except Exception as e:
             self.logger.error('Alarm error:%s'%e)
