@@ -9,4 +9,6 @@ def initialize(context):
 def handle_data(context):
     global count
     count += 1
-    Alert(str(count), False)
+    if count > 10:
+        return
+    Alert(str(count), True, 'Info')

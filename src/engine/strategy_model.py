@@ -15,11 +15,7 @@ import copy
 from engine.calc import CalcCenter
 from datetime import datetime
 from .popup_win import *
-
-try:
-    from .play_audio import PlayAudio
-except:
-    pass
+import winsound
 
 
 class StrategyModel(object):
@@ -46,6 +42,14 @@ class StrategyModel(object):
         
         self._bsMap = {dBuy : '买', dSell: '卖', dBoth: '双边'}
         self._ocMap = {oNone: '无', oOpen: '开仓', oCover: '平仓', oCoverT: '平今', oOpenCover: '开平', oCoverOpen: '平开'}
+        
+        
+        self._audioDict = {
+            'Signal' : r'./audio/Signal.wav',
+            'Info'   : r'./audio/Info.wav',
+            'Warn'   : r'./audio/Warn.wav',
+            'Error'   : r'./audio/Error.wav',
+        }
         
 
     def setRunStatus(self, status):
@@ -552,19 +556,17 @@ class StrategyModel(object):
         #处理报警
         if self._strategy.isRealTimeStatus() and self._cfgModel.getAlarm():
         #if self._cfgModel.getAlarm():
-            try:
-                #出声音
-                PlayAudio.play('Signal')
-                #弹窗,合约，方向，手数，价格
-                alarmStr = '合约: ' + contNo + '\n'\
-                           '方向: ' + self._bsMap[direct] + self._ocMap[offset] + '\n' +\
-                           '数量: ' + str(share) + '\n' +\
-                           '价格: ' + str(price) + '\n' +\
-                           '时间: ' + str(curBar['DateTimeStamp']) + '\n'
-          
-                createAlarmWin(alarmStr);
-            except Exception as e:
-                self.logger.error('Alarm error:%s'%e)
+            #出声音
+            audioName = self._audioDict['Signal']
+            winsound.PlaySound(audioName, winsound.SND_ASYNC) 
+            #弹窗,合约，方向，手数，价格
+            alarmStr = '合约: ' + contNo + '\n'\
+                       '方向: ' + self._bsMap[direct] + self._ocMap[offset] + '\n' +\
+                       '数量: ' + str(share) + '\n' +\
+                       '价格: ' + str(price) + '\n' +\
+                       '时间: ' + str(curBar['DateTimeStamp']) + '\n'
+      
+            createAlarmWin(alarmStr)
 
     def setStartTrade(self):
         self._cfgModel.setPending(False)
@@ -2303,11 +2305,13 @@ class StrategyModel(object):
         ispivot, pivot, bar = self._staModel.Pivot(Price,Length,Strength,Strength,Instance,-1);
         return pivot;
         
-    def setAlert(self, Info, bKeep):
-        try:
-            #出声音
-            if bKeep:
-                PlayAudio.play('Signal')     
-            createAlarmWin(Info);
-        except Exception as e:
-            self.logger.error('Alarm error:%s'%e)
+    def setAlert(self, Info, bKeep, level):
+        #出声音
+        if bKeep:
+            if level in self._audioDict:
+                audioName = self._audioDict[level]
+            else:
+                audioName = 'SystemQuestion'
+            winsound.PlaySound(audioName, winsound.SND_ASYNC) 
+        #弹窗        
+        createAlarmWin(Info);
