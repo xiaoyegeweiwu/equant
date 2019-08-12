@@ -432,9 +432,15 @@ class StrategyModel(object):
         if len(underlayContNo) > 0:
             contNo = underlayContNo
 
+        if share <= 0:
+            share = self.getDefaultShare(contNo, price)
+        defaultPrice = self._qteModel.getQLast(contNo) if price <= 0 else -1
+
         # 非K线触发的策略，不使用Bar
         curBar = None
         # 计算考虑滑点损耗后的价格
+        if defaultPrice > 0:
+            price = defaultPrice
         price = self._calcCenter.calcOrderPrice(contNo, dBuy, price)
 
         userNo = self._cfgModel.getUserNo() if not userNo else userNo
@@ -443,10 +449,10 @@ class StrategyModel(object):
         # 对于开仓，需要平掉反向持仓
         qty = self._calcCenter.needCover(userNo, contNo, dBuy, share, price)
         if qty > 0 and needCover:
-            eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtGFD, dBuy, oCover, hSpeculate, price, qty, curBar)
+            eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtGFD, dBuy, oCover, hSpeculate, price, qty, curBar, (defaultPrice > 0))
             if eSessionId != "": self._strategy.updateBarInfoInLocalOrder(eSessionId, curBar)
 
-        eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtGFD, dBuy, oOpen, hSpeculate, price, share, curBar)
+        eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtGFD, dBuy, oOpen, hSpeculate, price, share, curBar, (defaultPrice > 0))
         if eSessionId != "": self._strategy.updateBarInfoInLocalOrder(eSessionId, curBar)
 
     def setBuyToCover(self, userNo, contractNo, share, price):
@@ -459,16 +465,22 @@ class StrategyModel(object):
         if len(underlayContNo) > 0:
             contNo = underlayContNo
 
+        if share <= 0:
+            share = self.getDefaultShare(contNo, price)
+        defaultPrice = self._qteModel.getQLast(contNo) if price <= 0 else -1
+
         curBar = None
 
         # 计算考虑滑点损耗后的价格
+        if defaultPrice > 0:
+            price = defaultPrice
         price = self._calcCenter.calcOrderPrice(contNo, dBuy, price)
 
         userNo = self._cfgModel.getUserNo() if not userNo else userNo
         if not userNo:
             userNo = "Default"
         # 交易计算、生成回测报告
-        eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtGFD, dBuy, oCover, hSpeculate, price, share, curBar)
+        eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtGFD, dBuy, oCover, hSpeculate, price, share, curBar, (defaultPrice > 0))
         if eSessionId != "": self._strategy.updateBarInfoInLocalOrder(eSessionId, curBar)
 
     def setSell(self, userNo, contractNo, share, price):
@@ -481,16 +493,22 @@ class StrategyModel(object):
         if len(underlayContNo) > 0:
             contNo = underlayContNo
 
+        if share <= 0:
+            share = self.getDefaultShare(contNo, price)
+        defaultPrice = self._qteModel.getQLast(contNo) if price <= 0 else -1
+
         curBar = None
 
         # 计算考虑滑点损耗后的价格
+        if defaultPrice > 0:
+            price = defaultPrice
         price = self._calcCenter.calcOrderPrice(contNo, dSell, price)
 
         userNo = self._cfgModel.getUserNo() if not userNo else userNo
         if not userNo:
             userNo = "Default"
         # 交易计算、生成回测报告
-        eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtGFD, dSell, oCover, hSpeculate, price, share, curBar)
+        eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtGFD, dSell, oCover, hSpeculate, price, share, curBar, (defaultPrice > 0))
         if eSessionId != "": self._strategy.updateBarInfoInLocalOrder(eSessionId, curBar)
 
     def setSellShort(self, userNo, contractNo, share, price, needCover=True):
@@ -503,9 +521,15 @@ class StrategyModel(object):
         if len(underlayContNo) > 0:
             contNo = underlayContNo
 
+        if share <= 0:
+            share = self.getDefaultShare(contNo, price)
+        defaultPrice = self._qteModel.getQLast(contNo) if price <= 0 else -1
+
         curBar = None
 
         # 计算考虑滑点损耗后的价格
+        if defaultPrice > 0:
+            price = defaultPrice
         price = self._calcCenter.calcOrderPrice(contNo, dSell, price)
 
         userNo = self._cfgModel.getUserNo() if not userNo else userNo
@@ -513,13 +537,59 @@ class StrategyModel(object):
             userNo = "Default"
         qty = self._calcCenter.needCover(userNo, contNo, dSell, share, price)
         if qty > 0 and needCover:
-            eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtGFD, dSell, oCover, hSpeculate, price, qty,
-                                           curBar)
+            eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtGFD, dSell, oCover, hSpeculate, price, qty, curBar, (defaultPrice > 0))
             if eSessionId != "": self._strategy.updateBarInfoInLocalOrder(eSessionId, curBar)
 
         # 交易计算、生成回测报告
-        eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtGFD, dSell, oOpen, hSpeculate, price, share, curBar)
+        eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtGFD, dSell, oOpen, hSpeculate, price, share, curBar, (defaultPrice > 0))
         if eSessionId != "": self._strategy.updateBarInfoInLocalOrder(eSessionId, curBar)
+
+    def getDefaultShare(self, contNo, price):
+        defaultPrice = self._qteModel.getQLast(contNo)
+        defaultOrderType = self._cfgModel.getOrderQtyType()
+        minQty = self._cfgModel.getMinQty()
+
+        if defaultOrderType == '1':
+            # 按固定合约数
+            defaultShare = self._cfgModel.getOrderQtyCount()
+            # 异常处理
+            if defaultShare < minQty:
+                raise Exception(f"请确保您设置的默认下单量 {defaultShare} 对应的手数不小于您设置的最小下单量 {minQty} ！")
+            fixCapital = self._calcCenter.getAvailableFund()
+            if price <= 0:
+                if fixCapital < defaultPrice * defaultShare:
+                    raise Exception(f"您当前的可用资金 {fixCapital} 小于当前最新价 {defaultPrice} 与您设置的默认下单量 {defaultShare} 的乘积！")
+            else:
+                if fixCapital < price * defaultShare:
+                    raise Exception(f"您当前的可用资金 {fixCapital} 小于您设置的价格 {price} 与您设置的默认下单量 {defaultShare} 的乘积！")
+            return defaultPrice
+        elif defaultOrderType == '2':
+            # 按固定资金
+            fixCapital = self._cfgModel.getOrderQtyCount()
+            # 异常处理
+            if price <= 0:
+                if fixCapital < defaultPrice * minQty:
+                    raise Exception(f"请确保您设置的默认下单量对应的固定资金 {fixCapital} 不小于当前最新价 {defaultPrice} 与您设置的最小下单量 {minQty} 的乘积！")
+            else:
+                if fixCapital < price * minQty:
+                    raise Exception(f"请确保您设置的默认下单量对应的固定资金 {fixCapital} 不小于您设置的价格 {price} 与您设置的最小下单量 {minQty} 的乘积！")
+
+            return fixCapital // price if price > 0 else fixCapital // defaultPrice
+        elif defaultOrderType == '3':
+            # 按资金比例
+            capitalRatio = self._cfgModel.getOrderQtyCount()
+            fixCapital = capitalRatio * self._calcCenter.getAvailableFund()
+
+            # 异常处理
+            if price <= 0:
+                if fixCapital < defaultPrice * minQty:
+                    raise Exception(f"请确保您当前的资金 {fixCapital} 不小于当前最新价 {defaultPrice} 与您设置的最小下单量 {minQty} 的乘积！")
+            else:
+                if fixCapital < price * minQty:
+                    raise Exception(f"请确保您当前的资金 {fixCapital} 不小于您设置的价格 {price} 与您设置的最小下单量 {minQty} 的乘积！")
+
+            return fixCapital // price if price > 0 else fixCapital // defaultPrice
+        return -1
 
     def sendFlushEvent(self):
         flushEvent = Event({
@@ -875,7 +945,7 @@ class StrategyModel(object):
         return self._trdModel.deleteOrder(eSession)
 
     def buySellOrder(self, userNo, contNo, orderType, validType, orderDirct, \
-                     entryOrExit, hedge, orderPrice, orderQty, curBar, signal=True):
+                     entryOrExit, hedge, orderPrice, orderQty, curBar, isPriceZero = False, signal=True):
         '''
             1. buySell下单，经过calc模块，会判断虚拟资金，会产生平仓单
             2. 如果支持K线触发，会产生下单信号
@@ -934,8 +1004,9 @@ class StrategyModel(object):
         if self._config.hasKLineTrigger() and curBar:
             self.sendSignalEvent(self._signalName, contNo, orderDirct, entryOrExit, orderPrice, orderQty, curBar)
 
+        realPrice = 0 if isPriceZero else orderPrice
         retCode, eSessionId = self.sendOrder(userNo, contNo, orderType, validType, orderDirct, entryOrExit, hedge,
-                                             orderPrice, orderQty)
+                                             realPrice, orderQty)
         return eSessionId if retCode == 0 else ""
 
     def sendOrder(self, userNo, contNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty, \

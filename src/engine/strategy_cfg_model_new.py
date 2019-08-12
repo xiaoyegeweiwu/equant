@@ -171,7 +171,7 @@ class StrategyConfig_new(object):
                 'InitFunds': 0, # 初始资金
                 'TradeDirection': 0, # 交易方向
                 'OrderQty': { # 默认下单量
-                    'Type': '',
+                    'Type': '', # 1:按固定合约数; 2:按固定资金; 3:按资金比例
                     'Count': 0
                 },
                 'MinQty': 0,    # 最小下单量
