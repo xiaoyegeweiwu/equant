@@ -561,7 +561,7 @@ class StrategyModel(object):
                            '数量: ' + str(share) + '\n' +\
                            '价格: ' + str(price) + '\n' +\
                            '时间: ' + str(curBar['DateTimeStamp']) + '\n'
-          
+
                 createAlarmWin(alarmStr);
             except Exception as e:
                 self.logger.error('Alarm error:%s'%e)
