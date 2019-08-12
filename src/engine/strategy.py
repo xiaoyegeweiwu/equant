@@ -323,6 +323,7 @@ class Strategy:
 
         self._eg2stQueue = args['eg2st']
         self._st2egQueue = args['st2eg']
+
         self._isSt2EgQueueEffective = True
         self._st2uiQueue = args['st2ui']
         moduleDir, moduleName = os.path.split(self._filePath)
@@ -600,7 +601,7 @@ class Strategy:
             
             self.sendEvent2Engine(event)
 
-        
+
     def _runTimer(self):
         timeList = self._dataModel.getConfigTimer()
         if timeList is None:

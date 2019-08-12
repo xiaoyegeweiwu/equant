@@ -787,22 +787,16 @@ class StrategyConfig_new(object):
         return tuple(showInfoSimple)
 
     priorityDict = {
-        EEQU_KLINE_YEAR: 90000,
-        EEQU_KLINE_MONTH: 80000,
-        EEQU_KLINE_WEEK: 70000,
-        EEQU_KLINE_DayX: 60000,
         EEQU_KLINE_DAY: 50000,
-        EEQU_KLINE_HOUR: 40000,
         EEQU_KLINE_MINUTE: 30000,
-        EEQU_KLINE_SECOND: 20000,
         EEQU_KLINE_TICK: 10000,
-        EEQU_KLINE_TIMEDIVISION: 0,
+
     }
 
     def getPriority(self, key):
         kLineKindsInfo = self.getKLineKindsInfo()
         kLineTypetupleList = [(record["ContractNo"], record["KLineType"], record["KLineSlice"]) for record in kLineKindsInfo]
-        return kLineTypetupleList.index(key) + self.priorityDict[key[1]] + int(key[2])
+        return len(kLineTypetupleList)-kLineTypetupleList.index(key) + self.priorityDict[key[1]] + int(key[2])
 
     def getContract(self):
         '''获取合约列表'''
