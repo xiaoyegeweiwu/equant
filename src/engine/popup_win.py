@@ -14,7 +14,7 @@ class AlarmWin(tk.Toplevel):
                 cls.__instance = object.__new__(cls)
         return cls.__instance
 
-    def __init__(self, master=None):
+    def __init__(self, strategyId=None, strategyName=None, master=None):
         if not AlarmWin.__has_initialization:
             super().__init__(master)
             self._master = master
@@ -25,7 +25,7 @@ class AlarmWin(tk.Toplevel):
             self._autoPages = True
 
             self._initImage()
-            self._setPos()
+            self._setPos(strategyId, strategyName)
             self._createFrames()
             AlarmWin.__has_initialization = True
             self.protocol("WM_DELETE_WINDOW", self._closeWin)
@@ -40,6 +40,7 @@ class AlarmWin(tk.Toplevel):
 
     def __call__(self, new_text):
         # self._textRecords.append(new_text)
+        self.showAlarm()
         self.updateTextRecords(new_text)
 
         if self._autoPages:
@@ -49,7 +50,13 @@ class AlarmWin(tk.Toplevel):
         self._updatePagesLabel()
         self.update()
 
+    def showAlarm(self):
+        self.update()
+        self.deiconify()
+
     def _closeWin(self):
+        self.withdraw()
+        return
         self.rebuild()
         self.destroy()
 
@@ -64,8 +71,8 @@ class AlarmWin(tk.Toplevel):
         self.befImage2 = r'./icon/before2.gif'
         self.nxtImage2 = r'./icon/next2.gif'
 
-    def _setPos(self):
-        self.title("下单提醒")
+    def _setPos(self, strategyId, strategyName):
+        self.title(f"下单提醒-{strategyId}-{strategyName}")
         self.attributes("-toolwindow", 1)
         self.wm_attributes("-topmost", 1)
         self.wm_resizable(0, 0)
@@ -171,8 +178,8 @@ class AlarmWin(tk.Toplevel):
     def _toBottom(self, event):
         self._autoPages = True
         self._onPage = len(self._textRecords)
-        # self.setBtnDisabeldImage(self.btmBtn)
-        if self._onPage != self._onPage:
+        # if self._onPage != self._onPage:
+        if self._onPage != 1:
             for wgt, image in zip([self.topBtn, self.befBtn], [self.topImage1, self.befImage1]):
                 self._setBtnImage(wgt, image)
 
@@ -184,7 +191,6 @@ class AlarmWin(tk.Toplevel):
     def _toBefore(self, event):
         # 在最左侧的情况
         self._autoPages = False
-        # self._onPage -= 1
         if self._onPage != 1:
             self._onPage -= 1
         if self._onPage == 1:
@@ -198,14 +204,17 @@ class AlarmWin(tk.Toplevel):
         self._insertSpecificPageText(self._textRecords[self._onPage-1])
 
     def _toNext(self, event):
-        if self._onPage != self._pages:
+        if self._onPage < self._pages:
             self._onPage += 1
         if self._onPage == self._pages:
             for wgt, image in zip([self.nxtBtn, self.btmBtn], [self.nxtImage2, self.btmImage2]):
                 self._setBtnImage(wgt, image)
-        if self._pages != self._onPage:
-            for wgt, image in zip([self.befBtn, self.topBtn], [self.befImage1, self.topImage1]):
-                self._setBtnImage(wgt, image)
+            if self._onPage != 1:
+                for wgt, image in zip([self.befBtn, self.topBtn], [self.befImage1, self.topImage1]):
+                    self._setBtnImage(wgt, image)
+        # if self._pages != self._onPage:
+        #     for wgt, image in zip([self.befBtn, self.topBtn], [self.befImage1, self.topImage1]):
+        #         self._setBtnImage(wgt, image)
 
         self._updatePagesLabel()
         self._insertSpecificPageText(self._textRecords[self._onPage-1])
@@ -221,18 +230,10 @@ class AlarmWin(tk.Toplevel):
         cls.__has_initialization = False
 
 
-def createAlarmWin(text):
-    A = AlarmWin()
+def createAlarmWin(text, strategyId=None, strategyName=None):
+    A = AlarmWin(strategyId, strategyName)
     if text:
         A(text)
 
-
-if __name__ == "__main__":
-
-    for i in range(100):
-        A = AlarmWin("1111111111", top)
-        A("111111111111111111111")
-
-    A.mainloop()
 
 

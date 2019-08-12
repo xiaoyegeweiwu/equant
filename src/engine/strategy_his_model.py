@@ -709,6 +709,8 @@ class StrategyHisQuote(object):
             isRealTimeStatus = self._strategy.isRealTimeStatus()
             orderWay = str(self._config.getSendOrder())
             kLineTrigger = self._config.hasKLineTrigger()
+
+            # print(isRealTimeStatus, orderWay, orderWay == SendOrderRealTime, orderWay == SendOrderStable)
             if not kLineTrigger:
                 pass
             elif not isRealTimeStatus and len(localDataList) >= 2 and localDataList[-2]["IsKLineStable"] and isNewKLine:
@@ -791,6 +793,7 @@ class StrategyHisQuote(object):
         self._strategy.sendTriggerQueue(event)
 
     def _sendRealTimeKLineTriggerEvent(self, key, data):
+        self._triggerMgr.updateData(key, data)
         kLineTrigger = self._config.hasKLineTrigger()
         if not kLineTrigger or key not in self._config.getKLineTriggerInfoSimple():
             return
@@ -798,7 +801,6 @@ class StrategyHisQuote(object):
         assert self._strategy.isRealTimeStatus(), " Error "
         orderWay = str(self._config.getSendOrder())
         if orderWay == SendOrderRealTime or (orderWay == SendOrderStable and data["IsKLineStable"]):
-            self._triggerMgr.updateData(key, data)
             if not self._triggerMgr.isAllDataReady(key[0]):
                 return
             self._sendSyncTriggerEvent(key[0])
@@ -817,7 +819,7 @@ class StrategyHisQuote(object):
     def onHisQuoteNotice(self, event):
         key = (event.getContractNo(), event.getKLineType(), event.getKLineSlice())
         kindInfo = {"ContractNo": key[0], "KLineType": key[1], "KLineSlice": key[2]}
-        # print("kind = ", event.getData()[0]["DateTimeStamp"], kindInfo, )
+        # print("kind = ", event.getData()[0]["DateTimeStamp"], kindInfo)
         # 丢掉
         if not self._kLineRspData[key]["KLineReady"]:
             return
@@ -1346,7 +1348,7 @@ class StrategyHisQuote(object):
             self._strategy.sendTriggerQueue(event)
 
         for record, kLine in syncTriggerInfo.items():
-            if record == (contractNo, 0, 0):
+            if record == (contractNo, 0, 0) or record not in self._config.getKLineTriggerInfoSimple():
                 pass
             else:
                 event = Event({

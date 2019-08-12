@@ -6084,18 +6084,17 @@ class BaseApi(object):
         '''
         return self._dataModel.getSwingLow(Price, Length, Instance, Strength)
         
-    def Alert(self, Info, bKeep, level):
+    def Alert(self, Info, bKeep):
         '''
         【说明】
             弹出警告提醒
 
         【语法】
-            void Alert(string Info, bool bKeep=True, level='Signal')
+            void Alert(string Info, bool bKeep=True)
 
         【参数】
             Info  提醒的内容
-            bBeep 是否播放警告声音，默认为True
-            level 声音类型，默认'Signal'，其他为'Info','Warn','Error'
+            bBeep 是否播放警告声音，默认为True 
 
         【备注】
             多行提示信息需要自行换行，例如：
@@ -6108,7 +6107,7 @@ class BaseApi(object):
         【示例】
             Alert("Hello"); 弹出提示
         '''
-        return self._dataModel.setAlert(Info, bKeep, level)
+        return self._dataModel.setAlert(Info, bKeep)
         
     def strategyStatus(self):
         '''
@@ -7174,7 +7173,7 @@ def SwingHigh(Price, Length, Instance, Strength):
 def SwingLow(Price, Length, Instance, Strength):
     return baseApi.SwingLow(Price, Length, Instance, Strength)
 
-def Alert(Info, bKeep=True, level='Signal'):
-    return baseApi.Alert(Info, bKeep, level)
+def Alert(Info, bKeep=True):
+    return baseApi.Alert(Info, bKeep)
 
     
