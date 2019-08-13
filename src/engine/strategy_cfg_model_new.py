@@ -195,6 +195,7 @@ class StrategyConfig_new(object):
             'Params': {}, # 用户设置参数
             'Pending': False,
             'Alarm': False, # 是否开启警报
+            'PopOn': False, # 是否允许弹窗
         }
 
     # ----------------------- 合约/K线类型/K线周期 ----------------------
@@ -656,6 +657,10 @@ class StrategyConfig_new(object):
     def setAlarm(self, alarmOn):
         '''设置警报开关'''
         self._metaData['Alarm'] = alarmOn
+    # ----------------------  允许弹窗 --------------------------
+    def setPop(self, popOn):
+        '''设置允许弹窗开关'''
+        self._metaData["PopOn"] = popOn
 
     def getAlarm(self):
         '''获取警报开启状态'''

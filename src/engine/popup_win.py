@@ -56,9 +56,9 @@ class AlarmWin(tk.Toplevel):
 
     def _closeWin(self):
         self.withdraw()
-        return
-        self.rebuild()
-        self.destroy()
+        # return
+        # self.rebuild()
+        # self.destroy()
 
     def _initImage(self):
         self.topImage1 = r'./icon/top1.gif'
@@ -73,7 +73,7 @@ class AlarmWin(tk.Toplevel):
 
     def _setPos(self, strategyId, strategyName):
         self.title(f"下单提醒-{strategyId}-{strategyName}")
-        self.attributes("-toolwindow", 1)
+        # self.wm_attributes("-toolwindow", 1)
         self.wm_attributes("-topmost", 1)
         self.wm_resizable(0, 0)
 
