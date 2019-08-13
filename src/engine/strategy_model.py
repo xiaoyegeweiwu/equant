@@ -598,7 +598,7 @@ class StrategyModel(object):
         })
         self._strategy.sendEvent2Engine(flushEvent)
 
-    def sendSignalEvent(self, signalName, contNo, direct, offset, price, share, curBar):
+    def sendSignalEvent(self, signalName, userNo, contNo, direct, offset, price, share, curBar):
         if not curBar:
             return
 
@@ -623,14 +623,19 @@ class StrategyModel(object):
         })
         self._strategy.sendEvent2Engine(signalNoticeEvent)
         
+        if not userNo:
+            userNo = self._cfgModel.getUserNo()
+        
         #处理报警
         if self._strategy.isRealTimeStatus() and self._cfgModel.getAlarm():
         #if self._cfgModel.getAlarm():
             #出声音
             audioName = self._audioDict['Signal']
-            winsound.PlaySound(audioName, winsound.SND_ASYNC) 
+            winsound.PlaySound(audioName, winsound.SND_ASYNC)
             #弹窗,合约，方向，手数，价格
-            alarmStr = '合约: ' + contNo + '\n'\
+            alarmStr = '策略: ' + str(self._strategy.getStrategyId()) + '\n' +\
+                       '账户: ' + userNo + '\n' +\
+                       '合约: ' + contNo + '\n' +\
                        '方向: ' + self._bsMap[direct] + self._ocMap[offset] + '\n' +\
                        '数量: ' + str(share) + '\n' +\
                        '价格: ' + str(price) + '\n' +\
@@ -1002,7 +1007,7 @@ class StrategyModel(object):
         '''
         curBar = self.getHisQuoteModel().getCurBar(self._config.getKLineShowInfoSimple())
         if self._config.hasKLineTrigger() and curBar:
-            self.sendSignalEvent(self._signalName, contNo, orderDirct, entryOrExit, orderPrice, orderQty, curBar)
+            self.sendSignalEvent(self._signalName, userNo, contNo, orderDirct, entryOrExit, orderPrice, orderQty, curBar)
 
         realPrice = 0 if isPriceZero else orderPrice
         retCode, eSessionId = self.sendOrder(userNo, contNo, orderType, validType, orderDirct, entryOrExit, hedge,
@@ -1079,7 +1084,7 @@ class StrategyModel(object):
                 'Remark': '',
                 'AddOneIsValid': tsDay,
             }
-            self.sendActualOrder2Engine(aOrder, eId, self._strategy.getStrategyId(), aFunc)
+            self.sendActualOrder2Engine(userNo, aOrder, eId, self._strategy.getStrategyId(), aFunc)
             if orderQty > positionInfo["TodayPos"]:
                 orderQty = orderQty - positionInfo["TodayPos"]
                 entryOrExit = oCover
@@ -1111,7 +1116,7 @@ class StrategyModel(object):
             'AddOneIsValid': tsDay,
         }
 
-        self.sendActualOrder2Engine(aOrder, eId, self._strategy.getStrategyId(), aFunc)
+        self.sendActualOrder2Engine(userNo, aOrder, eId, self._strategy.getStrategyId(), aFunc)
         # self.logger.trade_info(self._strategy.getStrategyId(), aOrder)
         # 更新策略的订单信息
         self._strategy.setESessionId(self._strategy.getESessionId() + 1)
@@ -1119,7 +1124,7 @@ class StrategyModel(object):
         return 0, eId
 
     # afunc表明是由A函数调用的，还是buy/sell调用的
-    def sendActualOrder2Engine(self, aOrder, eId, strategyId, aFunc):
+    def sendActualOrder2Engine(self, userNo, aOrder, eId, strategyId, aFunc):
         if int(aOrder["OrderQty"] + 0.5) <= 0:
             return
         aOrder["OrderQty"] = int(aOrder["OrderQty"] + 0.5)
@@ -1134,7 +1139,7 @@ class StrategyModel(object):
         curBar = self.getHisQuoteModel().getCurBar(self._config.getKLineShowInfoSimple())
         if aFunc and self._config.hasKLineTrigger() and curBar:
             #self.logger.debug(f"实盘信号已经发送，k线时间戳：{curBar['DateTimeStamp']}")
-            self.sendSignalEvent(self._signalName, aOrder["Cont"], aOrder["Direct"], aOrder["Offset"],
+            self.sendSignalEvent(self._signalName, userNo, aOrder["Cont"], aOrder["Direct"], aOrder["Offset"],
                                  aOrder["OrderPrice"], aOrder["OrderQty"], curBar)
         self.logger.trade_info(f"发送实盘订单，策略Id:{strategyId}, 本地订单号：{eId}, 订单数据：{repr(aOrder)}")
 
