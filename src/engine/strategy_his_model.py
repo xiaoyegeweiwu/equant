@@ -1051,7 +1051,7 @@ class StrategyHisQuote(object):
         if lastBar is None or math.fabs(curBar["LastPrice"] - lastBar["LastPrice"]) > 1e-4:
             self._calcProfitWhenHis()
         # **************************
-        print(key, self._config.getKLineTriggerInfoSimple(), key in self._config.getKLineTriggerInfoSimple())
+        # print(key, self._config.getKLineTriggerInfoSimple(), key in self._config.getKLineTriggerInfoSimple())
         if self._config.hasKLineTrigger() and key in self._config.getKLineTriggerInfoSimple():
             args = {
                 "Status": ST_STATUS_HISTORY,
@@ -1167,7 +1167,7 @@ class StrategyHisQuote(object):
             "DateTimeStamp": allData["DateTimeStamp"],
             "TriggerData": allData["Data"]
         }
-        print(args)
+        # print(args)
         self._strategy.setCurTriggerSourceInfo(args)
         context.setCurTriggerSourceInfo(args)
         handle_data(context)
