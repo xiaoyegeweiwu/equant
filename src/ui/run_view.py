@@ -571,7 +571,7 @@ class RunWin(QuantToplevel, QuantFrame):
         """恢复用户选择的参数信息"""
         for key in self._userParam:
             self.paramTree.insert("", tk.END, values=tuple(
-                [key, self._userParam[key][0], type(self._userParam[key][0]), self._userParam[key][1]]), tags=key)
+                [key, self._userParam[key][0], type(self._userParam[key][0]).__name__, self._userParam[key][1]]), tags=key)
             # self.paramTree.insert("", tk.END, values=tuple(
             #     [key, self._userParam[key][0], type(self._userParam[key]), self._userParam[key][1]]), tags=key)
 
