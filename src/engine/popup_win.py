@@ -76,8 +76,8 @@ class AlarmWin(tk.Toplevel):
         icon = r'./icon/epolestar ix2.ico'
         self.iconbitmap(bitmap=icon)
         self.bitmap = icon
-        
-        # self.wm_attributes("-toolwindow", 1)
+        #
+        self.wm_attributes("-toolwindow", 1)
         self.wm_attributes("-topmost", 1)
         self.wm_resizable(0, 0)
 

@@ -50,7 +50,7 @@ class TkinterController(object):
         # 创建策略信息更新线程
         self.monitorThread = ChildThread(self.updateMonitor, 1)
         # 创建接收引擎数据线程
-        self.receiveEgThread = ChildThread(self.model.receiveEgEvent, 0.1)
+        self.receiveEgThread = ChildThread(self.model.receiveEgEvent, 0.01)
         # 信号记录线程
         self.sigThread = ChildThread(self.updateSig, 0.01)
         # 用户日志线程
@@ -178,6 +178,8 @@ class TkinterController(object):
         :param param: 策略参数信息
         :return:
         """
+        # createAlarmWin("11111111111", 1, "test")
+        # return
         # 运行策略前将用户修改保存
         self.saveStrategy()
         # 解析策略参数
