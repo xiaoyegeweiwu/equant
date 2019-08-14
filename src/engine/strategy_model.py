@@ -640,8 +640,9 @@ class StrategyModel(object):
                        '数量: ' + str(share) + '\n' +\
                        '价格: ' + str(price) + '\n' +\
                        '时间: ' + str(curBar['DateTimeStamp']) + '\n'
-      
-            createAlarmWin(alarmStr)
+            #允许弹窗
+            if self._cfgModel.getPop():
+                createAlarmWin(alarmStr)
 
     def setStartTrade(self):
         self._cfgModel.setPending(False)

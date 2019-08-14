@@ -665,6 +665,10 @@ class StrategyConfig_new(object):
     def getAlarm(self):
         '''获取警报开启状态'''
         return bool(self._metaData['Alarm'])
+        
+    def getPop(self):
+        return bool(self._metaData['PopOn'])
+        
     # --------------------- 订阅/退订即时行情 --------------------
     def updateSubQuoteContract(self, contNoList):
         pass
