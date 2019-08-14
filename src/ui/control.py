@@ -50,7 +50,7 @@ class TkinterController(object):
         # 创建策略信息更新线程
         self.monitorThread = ChildThread(self.updateMonitor, 1)
         # 创建接收引擎数据线程
-        self.receiveEgThread = ChildThread(self.model.receiveEgEvent)
+        self.receiveEgThread = ChildThread(self.model.receiveEgEvent, 0.1)
         # 信号记录线程
         self.sigThread = ChildThread(self.updateSig, 0.01)
         # 用户日志线程
