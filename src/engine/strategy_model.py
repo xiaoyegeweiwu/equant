@@ -642,7 +642,7 @@ class StrategyModel(object):
                        '时间: ' + str(curBar['DateTimeStamp']) + '\n'
             #允许弹窗
             if self._cfgModel.getPop():
-                createAlarmWin(alarmStr)
+                createAlarmWin(alarmStr, self._strategy.getStrategyId(), self._strategy.getStrategyName())
 
     def setStartTrade(self):
         self._cfgModel.setPending(False)
@@ -2391,4 +2391,4 @@ class StrategyModel(object):
                 audioName = 'SystemQuestion'
             winsound.PlaySound(audioName, winsound.SND_ASYNC) 
         #弹窗        
-        createAlarmWin(Info);
+        createAlarmWin(Info, self._strategy.getStrategyId(), self._strategy.getStrategyName());
