@@ -158,6 +158,7 @@ _all_func_ = {
                 
     '账户函数': [
                     ['A_AccountID'         , '交易账户ID'],
+                    ['A_AllAccountID'      , '所有交易账户ID'],
                     ['A_GetAllPositionSymbol', '所有持仓合约'],
                     ['A_Cost'              , '手续费'],
                     ['A_Assets'            , '账户权益'],

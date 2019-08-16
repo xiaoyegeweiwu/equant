@@ -772,6 +772,9 @@ class StrategyModel(object):
     # ///////////////////////账户函数///////////////////////////
     def getAccountId(self):
         return self._trdModel.getAccountId()
+        
+    def getAllAccountId(self):
+        return self._trdModel.getAllAccountId()
 
     def getAllPositionSymbol(self):
         return self._trdModel.getAllPositionSymbol()

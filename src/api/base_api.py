@@ -2713,6 +2713,26 @@ class BaseApi(object):
               无
         '''
         return self._dataModel.getAccountId()
+        
+    def A_AllAccountID(self):
+        '''
+        【说明】
+              返回所有已登录交易帐户ID。
+
+        【语法】
+              list A_AllAccountID()
+
+        【参数】
+              无
+
+        【备注】
+              没有账号登录时，返回空列表
+              注：不能用于历史测试，仅适用于实时行情交易。
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getAllAccountId()
 
     def A_GetAllPositionSymbol(self):
         '''
@@ -6090,11 +6110,12 @@ class BaseApi(object):
             弹出警告提醒
 
         【语法】
-            void Alert(string Info, bool bKeep=True)
+            void Alert(string Info, bool bKeep=True, string level='Signal')
 
         【参数】
             Info  提醒的内容
             bBeep 是否播放警告声音，默认为True 
+            level 声音类型, 包括'Signal'、'Info'、'Warn'、'Error'
 
         【备注】
             多行提示信息需要自行换行，例如：
@@ -6567,6 +6588,9 @@ def TotalTrades(contractNo=''):
 # 账户函数
 def A_AccountID():
     return baseApi.A_AccountID()
+    
+def A_AllAccountID():
+    return baseApi.A_AllAccountID()
 
 def A_GetAllPositionSymbol():
     return baseApi.A_GetAllPositionSymbol()

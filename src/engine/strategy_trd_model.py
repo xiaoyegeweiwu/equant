@@ -31,6 +31,15 @@ class StrategyTrade(TradeModel):
         :return:当前公式应用的交易帐户ID
         '''
         return self._selectedUserNo
+        
+    def getAllAccountId(self):
+        '''
+        获取所有登录账号ID
+        '''
+        accList = []
+        for k in self._userInfo:
+            accList.append(k)
+        return accList
 
     def getAllPositionSymbol(self):
         '''
