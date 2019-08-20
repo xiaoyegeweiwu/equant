@@ -1143,7 +1143,9 @@ class StrategyHisQuote(object):
                 self._stopWinOrLose(event.getContractNo(), lv1Data[4], lv1Data[4])
                 self._stopFloatWinLose(event.getContractNo(), lv1Data[4], lv1Data[4])
             else:
-                self.logger.info(f"即时行情中的字段没有最新价")
+                # 交易所套利无最新价
+                if event.getContractNo().split('|')[1] != 'S':
+                    self.logger.info(f"即时行情中的字段没有最新价")
 
             # 延迟判断是否即时行情触发
             if not self._config.hasSnapShotTrigger() or not self._strategy.isRealTimeStatus():
