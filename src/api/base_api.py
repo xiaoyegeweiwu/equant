@@ -3119,7 +3119,7 @@ class BaseApi(object):
         【示例】
               无
          '''
-        return self._dataModel.getTotalProfitLoss(userNo, ontractNo)
+        return self._dataModel.getTotalProfitLoss(userNo, contractNo)
 
     def A_TodayBuyPosition(self, userNo, contractNo):
         '''
