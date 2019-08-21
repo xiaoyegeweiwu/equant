@@ -2734,16 +2734,16 @@ class BaseApi(object):
         '''
         return self._dataModel.getAllAccountId()
 
-    def A_GetAllPositionSymbol(self):
+    def A_GetAllPositionSymbol(self, userNo):
         '''
         【说明】
-              获得当前账户所有持仓合约。
+              获得指定账户所有持仓合约。
 
         【语法】
-              list A_GetAllPositionSymbol()
+              list A_GetAllPositionSymbol(string userNo)
 
         【参数】
-              无
+              userNo  指定的交易账户
 
         【备注】
               该参数返回类型为字符串列表，列表内容为账户所有持仓合约列表。
@@ -2751,195 +2751,198 @@ class BaseApi(object):
         【示例】
               无
         '''
-        return self._dataModel.getAllPositionSymbol()
+        return self._dataModel.getAllPositionSymbol(userNo)
 
-    def A_Cost(self):
+    def A_Cost(self, userNo):
         '''
         【说明】
-              返回当前公式应用的交易帐户的手续费。
+              返回指定交易帐户的手续费。
 
         【语法】
-              string A_Cost()
+              string A_Cost(string userNo)
 
         【参数】
-              无
+              userNo  指定的交易账户
 
         【备注】
-              返回当前公式应用的交易帐户的手续费，返回值为浮点数。
+              返回指定交易帐户的手续费，返回值为浮点数。
 
         【示例】
               无
         '''
-        return self._dataModel.getCost()
+        return self._dataModel.getCost(userNo)
 
-    def A_Assets(self):
+    def A_Assets(self, userNo):
         '''
         【说明】
-              返回当前公式应用的交易帐户的动态权益。
+              返回指定交易帐户的动态权益。
 
         【语法】
-              float A_Assets()
+              float A_Assets(string userNo)
 
         【参数】
-              无
+              userNo  指定的交易账户
 
         【备注】
-              返回当前公式应用的交易帐户的动态权益，返回值为浮点数。
+              返回指定交易帐户的动态权益，返回值为浮点数。
 
         【示例】
               无
         '''
-        return self._dataModel.getCurrentEquity()
+        return self._dataModel.getCurrentEquity(userNo)
 
-    def A_Available(self):
+    def A_Available(self, userNo):
         '''
         【说明】
-              返回当前公式应用的交易帐户的可用资金。
+              返回指定交易帐户的可用资金。
 
         【语法】
-              float A_Available()
+              float A_Available(string userNo)
 
         【参数】
-              无
+              userNo  指定的交易账户
 
         【备注】
-              返回当前公式应用的交易帐户的可用资金，返回值为浮点数。
+              返回指定交易帐户的可用资金，返回值为浮点数。
               注：不能使用于历史测试，仅适用于实时行情交易。
 
         【示例】
               无
         '''
-        return self._dataModel.getFreeMargin()
+        return self._dataModel.getFreeMargin(userNo)
 
-    def A_Margin(self):
+    def A_Margin(self, userNo):
         '''
         【说明】
-              返回当前公式应用的交易帐户的持仓保证金。
+              返回指定交易帐户的持仓保证金。
 
         【语法】
-              float A_Margin()
+              float A_Margin(string userNo)
 
         【参数】
-              无
+              userNo  指定的交易账户
 
         【备注】
-              返回当前公式应用的交易帐户的持仓保证金，返回值为浮点数。
+              返回指定交易帐户的持仓保证金，返回值为浮点数。
               注：不能使用于历史测试，仅适用于实时行情交易。
 
         【示例】
               无
         '''
-        return self._dataModel.getAMargin()
+        return self._dataModel.getAMargin(userNo)
 
-    def A_ProfitLoss(self):
+    def A_ProfitLoss(self, userNo):
         '''
         【说明】
-              返回当前公式应用的交易帐户的浮动盈亏。
+              返回指定交易帐户的浮动盈亏。
 
         【语法】
-              float A_ProfitLoss()
+              float A_ProfitLoss(string userNo)
 
         【参数】
-              无
+              userNo  指定的交易账户
 
         【备注】
-              返回当前公式应用的交易帐户的浮动盈亏，返回值为浮点数。
+              返回指定交易帐户的浮动盈亏，返回值为浮点数。
               注：不能使用于历史测试，仅适用于实时行情交易。
 
         【示例】
               无
         '''
-        return self._dataModel.getProfitLoss()
+        return self._dataModel.getProfitLoss(userNo)
 
-    def A_CoverProfit(self):
+    def A_CoverProfit(self, userNo):
         '''
         【说明】
               返回当前账户的平仓盈亏。
 
         【语法】
-              float A_CoverProfit()
+              float A_CoverProfit(string userNo)
 
         【参数】
-              无
+              userNo  指定的交易账户
 
         【备注】
-              返回当前公式应用的交易帐户的平仓盈亏，返回值为浮点数。
+              返回指定交易帐户的平仓盈亏，返回值为浮点数。
               注：不能使用于历史测试，仅适用于实时行情交易。
 
         【示例】
               无
         '''
-        return self._dataModel.getCoverProfit()
+        return self._dataModel.getCoverProfit(userNo)
 
-    def A_TotalFreeze(self):
+    def A_TotalFreeze(self, userNo):
         '''
         【说明】
-              返回当前公式应用的交易帐户的冻结资金。
+              返回指定交易帐户的冻结资金。
 
         【语法】
-              float A_TotalFreeze()
+              float A_TotalFreeze(string userNo)
 
         【参数】
-              无
+              userNo  指定的交易账户
 
         【备注】
-              返回当前公式应用的交易帐户的冻结资金，返回值为浮点数。
+              返回指定交易帐户的冻结资金，返回值为浮点数。
               注：不能使用于历史测试，仅适用于实时行情交易。
 
         【示例】
               无
         '''
-        return self._dataModel.getTotalFreeze()
+        return self._dataModel.getTotalFreeze(userNo)
 
-    def A_BuyAvgPrice(self, contractNo):
+    def A_BuyAvgPrice(self, userNo, contractNo):
         '''
         【说明】
-              返回当前公式应用的帐户下当前商品的买入持仓均价。
+              返回指定帐户下当前商品的买入持仓均价。
 
         【语法】
-              float A_BuyAvgPrice(string contractNo='')
+              float A_BuyAvgPrice(string userNo, string contractNo='')
 
         【参数】
+              userNo  指定的交易账户
               contractNo，指定商品的合约编号，为空时采用基准合约编号。
 
         【备注】
-              返回当前公式应用的帐户下当前商品的买入持仓均价，返回值为浮点数。
+              返回指定帐户下当前商品的买入持仓均价，返回值为浮点数。
               注：不能使用于历史测试，仅适用于实时行情交易。
 
         【示例】
               无
          '''
-        return self._dataModel.getBuyAvgPrice(contractNo)
+        return self._dataModel.getBuyAvgPrice(userNo, contractNo)
 
-    def A_BuyPosition(self, contractNo):
+    def A_BuyPosition(self, userNo, contractNo):
         '''
         【说明】
-              返回当前公式应用的帐户下当前商品的买入持仓。
+              返回指定帐户下当前商品的买入持仓。
 
         【语法】
-              float A_BuyPosition(string contractNo='')
+              float A_BuyPosition(string userNo, string contractNo='')
 
         【参数】
+              userNo  指定的交易账户
               contractNo，指定商品的合约编号，为空时采用基准合约编号。
 
         【备注】
-              返回当前公式应用的帐户下当前商品的买入持仓，返回值为浮点数。
+              返回指定帐户下当前商品的买入持仓，返回值为浮点数。
               注：不能使用于历史测试，仅适用于实时行情交易。
 
         【示例】
               当前持多仓2手，A_BuyPosition返回2。
          '''
-        return self._dataModel.getBuyPosition(contractNo)
+        return self._dataModel.getBuyPosition(userNo, contractNo)
 
-    def A_BuyPositionCanCover(self, contractNo):
+    def A_BuyPositionCanCover(self, userNo, contractNo):
         '''
         【说明】
-              返回当前公式应用的帐户下买仓可平数量。
+              返回指定帐户下买仓可平数量。
 
         【语法】
-              int A_BuyPositionCanCover(string contractNo='')
+              int A_BuyPositionCanCover(string userNo, string contractNo='')
 
         【参数】
+              userNo  指定的交易账户
               contractNo，指定商品的合约编号，为空时采用基准合约编号。
 
         【备注】
@@ -2948,77 +2951,81 @@ class BaseApi(object):
         【示例】
               无
          '''
-        return self._dataModel.getBuyPositionCanCover(contractNo)
+        return self._dataModel.getBuyPositionCanCover(userNo, contractNo)
 
-    def A_BuyProfitLoss(self, contractNo):
+    def A_BuyProfitLoss(self, userNo, contractNo):
         '''
         【说明】
-              返回当前公式应用的帐户下当前商品的买入持仓盈亏。
+              返回指定帐户下当前商品的买入持仓盈亏。
 
         【语法】
-              float A_BuyProfitLoss(string contractNo='')
+              float A_BuyProfitLoss(string userNo, string contractNo='')
 
         【参数】
+              userNo  指定的交易账户
               contractNo，指定商品的合约编号，为空时采用基准合约编号。
 
         【备注】
-              返回当前公式应用的帐户下当前商品的买入持仓盈亏，返回值为浮点数。
+              返回指定帐户下当前商品的买入持仓盈亏，返回值为浮点数。
               注：不能使用于历史测试，仅适用于实时行情交易。
 
         【示例】
               无
          '''
-        return self._dataModel.getBuyProfitLoss(contractNo)
+        return self._dataModel.getBuyProfitLoss(userNo, contractNo)
 
-    def A_SellAvgPrice(self, contractNo):
+    def A_SellAvgPrice(self, userNo, contractNo):
         '''
         【说明】
-              返回当前公式应用的帐户下当前商品的卖出持仓均价。
+              返回指定帐户下当前商品的卖出持仓均价。
 
         【语法】
-              float A_SellAvgPrice(string contractNo='')
+              float A_SellAvgPrice(string userNo, string contractNo='')
 
         【参数】
+              userNo  指定的交易账户
               contractNo，指定商品的合约编号，为空时采用基准合约编号。
 
         【备注】
-              返回当前公式应用的帐户下当前商品的卖出持仓均价，返回值为浮点数。
+              返回指定帐户下当前商品的卖出持仓均价，返回值为浮点数。
               注：不能使用于历史测试，仅适用于实时行情交易。
 
         【示例】
               无
          '''
-        return self._dataModel.getSellAvgPrice(contractNo)
+        return self._dataModel.getSellAvgPrice(userNo, contractNo)
 
-    def A_SellPosition(self, contractNo):
+    def A_SellPosition(self, userNo, contractNo):
         '''
         【说明】
-              返回当前公式应用的帐户下当前商品的卖出持仓。
+              返回指定帐户下当前商品的卖出持仓。
 
         【语法】
-              float A_SellPosition(string contractNo='')
+              float A_SellPosition(string userNo, string contractNo='')
 
         【参数】
+              userNo  指定的交易账户
               contractNo，指定商品的合约编号，为空时采用基准合约编号。
 
         【备注】
-              返回当前公式应用的帐户下当前商品的卖出持仓，返回值为浮点数。
+              返回指定帐户下当前商品的卖出持仓，返回值为浮点数。
               注：不能使用于历史测试，仅适用于实时行情交易。
 
         【示例】
               当前持空仓3手，A_SellPosition返回3。
          '''
-        return self._dataModel.getSellPosition(contractNo)
+        return self._dataModel.getSellPosition(userNo, contractNo)
 
-    def A_SellPositionCanCover(self, contractNo):
+    def A_SellPositionCanCover(self, userNo, contractNo):
         '''
         【说明】
-              返回当前公式应用的帐户下卖仓可平数量。
+              返回指定帐户下卖仓可平数量。
 
         【语法】
-              int A_SellPositionCanCover(string contractNo='')
+              int A_SellPositionCanCover(string userNo, string contractNo='')
 
         【参数】
+              userNo  指定的交易账户
               contractNo，指定商品的合约编号，为空时采用基准合约编号。
 
         【备注】
@@ -3027,142 +3034,149 @@ class BaseApi(object):
         【示例】
               无
          '''
-        return self._dataModel.getSellPositionCanCover(contractNo)
+        return self._dataModel.getSellPositionCanCover(userNo, contractNo)
 
-    def A_SellProfitLoss(self, contractNo):
+    def A_SellProfitLoss(self, userNo, contractNo):
         '''
         【说明】
-              返回当前公式应用的帐户下当前商品的卖出持仓盈亏。
+              返回指定帐户下当前商品的卖出持仓盈亏。
 
         【语法】
-              float A_SellProfitLoss(string contractNo='')
+              float A_SellProfitLoss(string userNo, string contractNo='')
 
         【参数】
+              userNo  指定的交易账户
               contractNo，指定商品的合约编号，为空时采用基准合约编号。
 
         【备注】
-              返回当前公式应用的帐户下当前商品的卖出持仓盈亏，返回值为浮点数。
+              返回指定帐户下当前商品的卖出持仓盈亏，返回值为浮点数。
               注：不能使用于历史测试，仅适用于实时行情交易。
 
         【示例】
               无
          '''
-        return self._dataModel.getSellProfitLoss(contractNo)
+        return self._dataModel.getSellProfitLoss(userNo, contractNo)
 
-    def A_TotalAvgPrice(self, contractNo):
+    def A_TotalAvgPrice(self, userNo, contractNo):
         '''
         【说明】
-              返回当前公式应用的帐户下当前商品的持仓均价。
+              返回指定帐户下当前商品的持仓均价。
 
         【语法】
-              float A_TotalAvgPrice(string contractNo='')
+              float A_TotalAvgPrice(string userNo, string contractNo='')
 
         【参数】
+              userNo  指定的交易账户
               contractNo，指定商品的合约编号，为空时采用基准合约编号。
 
         【备注】
-              返回当前公式应用的帐户下当前商品的持仓均价，返回值为浮点数。
+              返回指定帐户下当前商品的持仓均价，返回值为浮点数。
               注：不能使用于历史测试，仅适用于实时行情交易。
 
         【示例】
               无
          '''
-        return self._dataModel.getTotalAvgPrice(contractNo)
+        return self._dataModel.getTotalAvgPrice(userNo, contractNo)
 
-    def A_TotalPosition(self, contractNo):
+    def A_TotalPosition(self, userNo, contractNo):
         '''
         【说明】
-              返回当前公式应用的帐户下当前商品的总持仓。
+              返回指定帐户下当前商品的总持仓。
 
         【语法】
-              int A_TotalPosition(string contractNo='')
+              int A_TotalPosition(string userNo, string contractNo='')
 
         【参数】
+              userNo  指定的交易账户
               contractNo，指定商品的合约编号，为空时采用基准合约编号。
 
         【备注】
-              返回当前公式应用的帐户下当前商品的总持仓，返回值为浮点数。
+              返回指定帐户下当前商品的总持仓，返回值为浮点数。
               该持仓为所有持仓的合计值，正数表示多仓，负数表示空仓，零为无持仓。
               注：不能使用于历史测试，仅适用于实时行情交易。
 
         【示例】
               无
          '''
-        return self._dataModel.getTotalPosition(contractNo)
+        return self._dataModel.getTotalPosition(userNo, contractNo)
 
-    def A_TotalProfitLoss(self, contractNo):
+    def A_TotalProfitLoss(self, userNo, contractNo):
         '''
         【说明】
-              返回当前公式应用的帐户下当前商品的总持仓盈亏。
+              返回指定帐户下当前商品的总持仓盈亏。
 
         【语法】
-              float A_TotalProfitLoss(string contractNo='')
+              float A_TotalProfitLoss(string userNo, string contractNo='')
 
         【参数】
+              userNo  指定的交易账户
               contractNo，指定商品的合约编号，为空时采用基准合约编号。
 
         【备注】
-              返回当前公式应用的帐户下当前商品的总持仓盈亏，返回值为浮点数。
+              返回指定帐户下当前商品的总持仓盈亏，返回值为浮点数。
               注：不能使用于历史测试，仅适用于实时行情交易。
 
         【示例】
               无
          '''
-        return self._dataModel.getTotalProfitLoss(contractNo)
+        return self._dataModel.getTotalProfitLoss(userNo, ontractNo)
 
-    def A_TodayBuyPosition(self, contractNo):
+    def A_TodayBuyPosition(self, userNo, contractNo):
         '''
         【说明】
-              返回当前公式应用的帐户下当前商品的当日买入持仓。
+              返回指定帐户下当前商品的当日买入持仓。
 
         【语法】
-              float A_TodayBuyPosition(string contractNo='')
+              float A_TodayBuyPosition(string userNo, string contractNo='')
 
         【参数】
+              userNo  指定的交易账户
               contractNo，指定商品的合约编号，为空时采用基准合约编号。
 
         【备注】
-              返回当前公式应用的帐户下当前商品的当日买入持仓，返回值为浮点数。
+              返回指定帐户下当前商品的当日买入持仓，返回值为浮点数。
               注：不能使用于历史测试，仅适用于实时行情交易。
 
         【示例】
               无
          '''
-        return self._dataModel.getTodayBuyPosition(contractNo)
+        return self._dataModel.getTodayBuyPosition(userNo, contractNo)
 
-    def A_TodaySellPosition(self, contractNo):
+    def A_TodaySellPosition(self, userNo, contractNo):
         '''
         【说明】
-              返回当前公式应用的帐户下当前商品的当日卖出持仓。
+              返回指定帐户下当前商品的当日卖出持仓。
 
         【语法】
-              float A_TodaySellPosition(string contractNo='')
+              float A_TodaySellPosition(string userNo, string contractNo='')
 
         【参数】
+              userNo  指定的交易账户
               contractNo，指定商品的合约编号，为空时采用基准合约编号。
 
         【备注】
-              返回当前公式应用的帐户下当前商品的当日卖出持仓，返回值为浮点数。
+              返回指定帐户下当前商品的当日卖出持仓，返回值为浮点数。
               注：不能使用于历史测试，仅适用于实时行情交易。
 
         【示例】
               无
          '''
-        return self._dataModel.getTodaySellPosition(contractNo)
+        return self._dataModel.getTodaySellPosition(userNo, contractNo)
 
-    def A_OrderBuyOrSell(self, localOrderId):
+    def A_OrderBuyOrSell(self, userNo, localOrderId):
         '''
         【说明】
-              返回当前公式应用的帐户下当前商品的某个委托单的买卖类型。
+              返回指定帐户下当前商品的某个委托单的买卖类型。
 
         【语法】
-              char A_OrderBuyOrSell(int|string localOrderId='')
+              char A_OrderBuyOrSell(string userNo, int|string localOrderId='')
 
         【参数】
+              userNo  指定的交易账户
               localOrderId 定单号，或者使用A_SendOrder返回的下单编号。
 
         【备注】
-              返回当前公式应用的帐户下当前商品的某个委托单的买卖类型，返回值为：
+              返回指定帐户下当前商品的某个委托单的买卖类型，返回值为：
               B : 买入
               S : 卖出
               A : 双边
@@ -3174,21 +3188,22 @@ class BaseApi(object):
               if nBorS == Enum_Buy():
                 ...
          '''
-        return self._dataModel.getOrderBuyOrSell(localOrderId)
+        return self._dataModel.getOrderBuyOrSell(userNo, localOrderId)
 
-    def A_OrderEntryOrExit(self, localOrderId):
+    def A_OrderEntryOrExit(self, userNo, localOrderId):
         '''
         【说明】
-              返回当前公式应用的帐户下当前商品的某个委托单的开平仓状态。
+              返回指定帐户下当前商品的某个委托单的开平仓状态。
 
         【语法】
-              char A_OrderEntryOrExit(int|string localOrderId='')
+              char A_OrderEntryOrExit(string userNo, int|string localOrderId='')
 
         【参数】
+              userNo  指定的交易账户
               localOrderId 定单号，或者使用A_SendOrder返回的下单编号。
 
         【备注】
-              返回当前公式应用的帐户下当前商品的某个委托单的开平仓状态，返回值：
+              返回指定帐户下当前商品的某个委托单的开平仓状态，返回值：
               N : 无
               O : 开仓
               C : 平仓
@@ -3203,102 +3218,107 @@ class BaseApi(object):
               if orderFlag == Enum_Exit():
                 ...
          '''
-        return self._dataModel.getOrderEntryOrExit(localOrderId)
+        return self._dataModel.getOrderEntryOrExit(userNo, localOrderId)
 
-    def A_OrderFilledLot(self, localOrderId):
+    def A_OrderFilledLot(self, userNo, localOrderId):
         '''
         【说明】
-              返回当前公式应用的帐户下当前商品的某个委托单的成交数量。
+              返回指定帐户下当前商品的某个委托单的成交数量。
 
         【语法】
-              float A_OrderFilledLot(int|string localOrderId='')
+              float A_OrderFilledLot(string userNo, int|string localOrderId='')
 
         【参数】
+              userNo  指定的交易账户
               localOrderId 定单号，或者使用A_SendOrder返回的下单编号。
 
         【备注】
-              返回当前公式应用的帐户下当前商品的某个委托单的成交数量，返回值为浮点数。
+              返回指定帐户下当前商品的某个委托单的成交数量，返回值为浮点数。
               注：不能使用于历史测试，仅适用于实时行情交易。
 
         【示例】
               无
          '''
-        return self._dataModel.getOrderFilledLot(localOrderId)
+        return self._dataModel.getOrderFilledLot(userNo, localOrderId)
 
-    def A_OrderFilledPrice(self, localOrderId):
+    def A_OrderFilledPrice(self, userNo, localOrderId):
         '''
         【说明】
-              返回当前公式应用的帐户下当前商品的某个委托单的成交价格。
+              返回指定帐户下当前商品的某个委托单的成交价格。
 
         【语法】
-              float A_OrderFilledPrice(int|string localOrderId='')
+              float A_OrderFilledPrice(string userNo, int|string localOrderId='')
 
         【参数】
+              userNo  指定的交易账户
               localOrderId 定单号，或者使用A_SendOrder返回的下单编号。
 
         【备注】
-              返回当前公式应用的帐户下当前商品的某个委托单的成交价格，返回值为浮点数。
+              返回指定帐户下当前商品的某个委托单的成交价格，返回值为浮点数。
               该成交价格可能为多个成交价格的平均值。
               注：不能使用于历史测试，仅适用于实时行情交易。
 
         【示例】
               无
          '''
-        return self._dataModel.getOrderFilledPrice(localOrderId)
+        return self._dataModel.getOrderFilledPrice(userNo, localOrderId)
 
-    def A_OrderLot(self, localOrderId):
+    def A_OrderLot(self, userNo, localOrderId):
         '''
         【说明】
-              返回当前公式应用的帐户下当前商品的某个委托单的委托数量。
+              返回指定帐户下当前商品的某个委托单的委托数量。
 
         【语法】
-              float A_OrderLot(int|string localOrderId='')
+              float A_OrderLot(string userNo, int|string localOrderId='')
 
         【参数】
+              userNo  指定的交易账户
               localOrderId 定单号，或者使用A_SendOrder返回的下单编号。
 
         【备注】
-              返回当前公式应用的帐户下当前商品的某个委托单的委托数量，返回值为浮点数。
+              返回指定帐户下当前商品的某个委托单的委托数量，返回值为浮点数。
               注：不能使用于历史测试，仅适用于实时行情交易。
 
         【示例】
               无
          '''
-        return self._dataModel.getOrderLot(localOrderId)
+        return self._dataModel.getOrderLot(userNo, localOrderId)
 
-    def A_OrderPrice(self, localOrderId):
+    def A_OrderPrice(self, userNo, localOrderId):
         '''
         【说明】
-              返回当前公式应用的帐户下当前商品的某个委托单的委托价格。
+              返回指定帐户下当前商品的某个委托单的委托价格。
 
         【语法】
-              float A_OrderPrice(int|string localOrderId='')
+              float A_OrderPrice(string userNo, int|string localOrderId='')
 
         【参数】
+              userNo  指定的交易账户
               localOrderId 定单号，或者使用A_SendOrder返回的下单编号。
 
         【备注】
-              返回当前公式应用的帐户下当前商品的某个委托单的委托价格，返回值为浮点数。
+              返回指定帐户下当前商品的某个委托单的委托价格，返回值为浮点数。
               注：不能使用于历史测试，仅适用于实时行情交易。
 
         【示例】
               无
          '''
-        return self._dataModel.getOrderPrice(localOrderId)
+        return self._dataModel.getOrderPrice(userNo, localOrderId)
 
-    def A_OrderStatus(self, localOrderId):
+    def A_OrderStatus(self, userNo, localOrderId):
         '''
         【说明】
-              返回当前公式应用的帐户下当前商品的某个委托单的状态。
+              返回指定帐户下当前商品的某个委托单的状态。
 
         【语法】
-              char A_OrderStatus(int|string localOrderId='')
+              char A_OrderStatus(string userNo, int|string localOrderId='')
 
         【参数】
+              userNo  指定的交易账户
               localOrderId 定单号，或者使用A_SendOrder返回的下单编号。
 
         【备注】
-              返回当前公式应用的帐户下当前商品的某个委托单的状态，返回值：
+              返回指定帐户下当前商品的某个委托单的状态，返回值：
               N : 无
               0 : 已发送
               1 : 已受理
@@ -3325,37 +3345,39 @@ class BaseApi(object):
         【示例】
               无
          '''
-        return self._dataModel.getOrderStatus(localOrderId)
+        return self._dataModel.getOrderStatus(userNo, localOrderId)
 
-    def A_OrderTime(self, localOrderId):
+    def A_OrderTime(self, userNo, localOrderId):
         '''
         【说明】
-              返回当前公式应用的帐户下当前商品的某个委托单的委托时间。
+              返回指定公式应用的帐户下当前商品的某个委托单的委托时间。
 
         【语法】
-              struct_time A_OrderTime(int|string localOrderId='')
+              struct_time A_OrderTime(string userNo, int|string localOrderId='')
 
         【参数】
+              userNo  指定的交易账户
               localOrderId 定单号，或者使用A_SendOrder返回的下单编号。
 
         【备注】
-              返回当前公式应用的帐户下当前商品的某个委托单的委托时间，返回格式为YYYYMMDD.hhmmss的数值。
+              返回指定帐户下当前商品的某个委托单的委托时间，返回格式为YYYYMMDD.hhmmss的数值。
               注：不能使用于历史测试，仅适用于实时行情交易。
 
         【示例】
               无
          '''
-        return self._dataModel.getOrderTime(localOrderId)
+        return self._dataModel.getOrderTime(userNo, localOrderId)
 
-    def A_FirstOrderNo(self, contractNo1, contractNo2):
+    def A_FirstOrderNo(self, userNo, contractNo1, contractNo2):
         '''
         【说明】
-              返回当前账户第一个订单号。
+              返回指定账户第一个订单号。
 
         【语法】
-              int A_FirstOrderNo(string contractNo='')
+              int A_FirstOrderNo(string userNo, string contractNo='')
 
         【参数】
+              userNo  指定的交易账户
               contractNo 合约代码，默认为遍历所有合约。
 
         【备注】
@@ -3365,17 +3387,18 @@ class BaseApi(object):
         【示例】
               无
          '''
-        return self._dataModel.getFirstOrderNo(contractNo1, contractNo2)
+        return self._dataModel.getFirstOrderNo(userNo, contractNo1, contractNo2)
 
-    def A_NextOrderNo(self, localOrderId, contractNo1, contractNo2):
+    def A_NextOrderNo(self, userNo, localOrderId, contractNo1, contractNo2):
         '''
         【说明】
-              返回当前账户下一个订单号。
+              返回指定账户下一个订单号。
 
         【语法】
-              int A_NextOrderNo(int localOrderId=0, string contractNo='')
+              int A_NextOrderNo(string userNo, int localOrderId=0, string contractNo='')
 
         【参数】
+              userNo  指定的交易账户
               localOrderId 定单号，默认为0，
               contractNo 合约代码，默认为遍历所有合约。
 
@@ -3386,17 +3409,18 @@ class BaseApi(object):
         【示例】
               无
          '''
-        return self._dataModel.getNextOrderNo(localOrderId, contractNo1, contractNo2)
+        return self._dataModel.getNextOrderNo(userNo, localOrderId, contractNo1, contractNo2)
 
-    def A_LastOrderNo(self, contractNo1, contractNo2):
+    def A_LastOrderNo(self, userNo, contractNo1, contractNo2):
         '''
         【说明】
-              返回当前账户最近发送的订单号。
+              返回指定账户最近发送的订单号。
 
         【语法】
-              int A_LastOrderNo(string contractNo='')
+              int A_LastOrderNo(string userNo, string contractNo='')
 
         【参数】
+              userNo  指定的交易账户
               contractNo 合约代码，默认为遍历所有合约。
 
         【备注】
@@ -3405,17 +3429,18 @@ class BaseApi(object):
         【示例】
               无
          '''
-        return self._dataModel.getLastOrderNo(contractNo1, contractNo2)
+        return self._dataModel.getLastOrderNo(userNo, contractNo1, contractNo2)
 
-    def A_FirstQueueOrderNo(self, contractNo1, contractNo2):
+    def A_FirstQueueOrderNo(self, userNo, contractNo1, contractNo2):
         '''
         【说明】
-              返回当前账户第一个排队(可撤)订单号。
+              返回指定账户第一个排队(可撤)订单号。
 
         【语法】
-              int A_FirstQueueOrderNo(string contractNo='')
+              int A_FirstQueueOrderNo(string userNo, string contractNo='')
 
         【参数】
+              userNo  指定的交易账户
               contractNo 合约代码，默认为遍历所有合约。
 
         【备注】
@@ -3425,17 +3450,18 @@ class BaseApi(object):
         【示例】
               无
          '''
-        return self._dataModel.getFirstQueueOrderNo(contractNo1, contractNo2)
+        return self._dataModel.getFirstQueueOrderNo(userNo, contractNo1, contractNo2)
 
-    def A_NextQueueOrderNo(self, localOrderId, contractNo1, contractNo2):
+    def A_NextQueueOrderNo(self, userNo, localOrderId, contractNo1, contractNo2):
         '''
         【说明】
-              返回当前账户下一个排队(可撤)订单号。
+              返回指定账户下一个排队(可撤)订单号。
 
         【语法】
-              int A_NextQueueOrderNo(int localOrderId=0, string contractNo='')
+              int A_NextQueueOrderNo(string userNo, int localOrderId=0, string contractNo='')
 
         【参数】
+              userNo  指定的交易账户
               localOrderId 定单号，默认为0，
               contractNo 合约代码，默认为遍历所有合约。
 
@@ -3446,17 +3472,18 @@ class BaseApi(object):
         【示例】
               无
          '''
-        return self._dataModel.getNextQueueOrderNo(localOrderId, contractNo1, contractNo2)
+        return self._dataModel.getNextQueueOrderNo(userNo, localOrderId, contractNo1, contractNo2)
 
-    def A_AllQueueOrderNo(self, contractNo):
+    def A_AllQueueOrderNo(self, userNo, contractNo):
         '''
         【说明】
-              返回当前账户所有排队(可撤)订单号。
+              返回指定账户所有排队(可撤)订单号。
 
         【语法】
-              list A_AllQueueOrderNo(string contractNo='')
+              list A_AllQueueOrderNo(string userNo, string contractNo='')
 
         【参数】
+              userNo  指定的交易账户
               contractNo 合约代码，默认为遍历所有合约，指定后只遍历指定合约。
 
         【备注】
@@ -3465,17 +3492,18 @@ class BaseApi(object):
         【示例】
               无
          '''
-        return self._dataModel.getAllQueueOrderNo(contractNo)
+        return self._dataModel.getAllQueueOrderNo(userNo, contractNo)
 
-    def A_LatestFilledTime(self, contractNo):
+    def A_LatestFilledTime(self, userNo, contractNo):
         '''
         【说明】
-              返回当前账户最新一笔完全成交委托单对应的时间。
+              返回指定账户最新一笔完全成交委托单对应的时间。
 
         【语法】
-              float A_LatestFilledTime(string contractNo='')
+              float A_LatestFilledTime(string userNo, string contractNo='')
 
         【参数】
+              userNo  指定的交易账户
               contractNo 合约代码，默认为遍历所有合约，指定后只遍历指定合约。
 
         【备注】
@@ -3484,17 +3512,18 @@ class BaseApi(object):
         【示例】
               无
          '''
-        return self._dataModel.getALatestFilledTime(contractNo)
+        return self._dataModel.getALatestFilledTime(userNo, contractNo)
 
-    def A_OrderContractNo(self, localOrderId):
+    def A_OrderContractNo(self, userNo, localOrderId):
         '''
         【说明】
               返回订单的合约号。
 
         【语法】
-              string A_OrderContractNo(int|string localOrderId=0)
+              string A_OrderContractNo(string userNo, int|string localOrderId=0)
 
         【参数】
+              userNo  指定的交易账户
               localOrderId 定单号，或者使用A_SendOrder返回的下单编号。
 
         【备注】
@@ -3504,7 +3533,7 @@ class BaseApi(object):
         【示例】
               无
          '''
-        return self._dataModel.getOrderContractNo(localOrderId)
+        return self._dataModel.getOrderContractNo(userNo, localOrderId)
 
     def A_SendOrder(self, userNo, contractNo, orderDirct, entryOrExit, orderQty, orderPrice, orderType, validType, hedge, triggerType, triggerMode, triggerCondition, triggerPrice):
         '''
@@ -3590,19 +3619,20 @@ class BaseApi(object):
         return self._dataModel.sendOrder(userNo, contractNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty, \
                                                       triggerType, triggerMode, triggerCondition, triggerPrice, aFunc=True)
 
-    def A_DeleteOrder(self, localOrderId):
+    def A_DeleteOrder(self, userNo, localOrderId):
         '''
         【说明】
-              针对当前公式应用的帐户、商品发送撤单指令。
+              针对指定帐户、商品发送撤单指令。
 
         【语法】
-              bool A_DeleteOrder(int|string localOrderId)
+              bool A_DeleteOrder(string userNo, int|string localOrderId)
 
         【参数】
+              userNo  指定的交易账户
               localOrderId 定单号，或者使用A_SendOrder返回的下单编号。
 
         【备注】
-              针对当前公式应用的帐户、商品发送撤单指令，发送成功返回True, 发送失败返回False。
+              针对指定帐户、商品发送撤单指令，发送成功返回True, 发送失败返回False。
               该函数直接发单，不经过任何确认，并会在每次公式计算时发送，一般需要配合着仓位头寸进行条件处理，在不清楚运行机制的情况下，请慎用。
               注：不能使用于历史测试，仅适用于实时行情交易。
 
@@ -3611,15 +3641,16 @@ class BaseApi(object):
          '''
         return self._dataModel.deleteOrder(localOrderId)
 
-    def A_GetOrderNo(self, localOrderId):
+    def A_GetOrderNo(self, userNo, localOrderId):
         '''
         【说明】
-              针对当前公式应用的帐户获取下单编号对应的定单号和委托号。
+              针对指定帐户获取下单编号对应的定单号和委托号。
 
         【语法】
-              string, string A_GetOrderNo(string localOrderId)
+              string, string A_GetOrderNo(string userNo, string localOrderId)
 
         【参数】
+              userNo  指定的交易账户
               localOrderId 使用A_SendOrder返回的下单编号。
 
         【备注】
@@ -3636,26 +3667,27 @@ class BaseApi(object):
               if retCode == 0:
                 sessionId, orderNo =  A_GetOrderNo(retMsg)
          '''
-        return self._dataModel.getAOrderNo(localOrderId)
+        return self._dataModel.getAOrderNo(userNo, localOrderId)
 
-    def DeleteAllOrders(self, contractNo):
+    def DeleteAllOrders(self, userNo, contractNo):
         '''
         【说明】
               批量撤单函数。
 
         【语法】
-              bool DeleteAllOrders(string contractNo='')
+              bool DeleteAllOrders(string userNo, string contractNo='')
 
         【参数】
+              userNo  指定的交易账户
               contractNo 合约代码，默认为所有合约，指定后只撤指定合约。
 
         【备注】
-              本函数将检查当前账户下所有处于排队状态的订单，并依次发送撤单指令
+              本函数将检查指定账户下所有处于排队状态的订单，并依次发送撤单指令
 
         【示例】
               无
          '''
-        return self._dataModel.deleteAllOrders(contractNo)
+        return self._dataModel.deleteAllOrders(userNo, contractNo)
 
     #/////////////////////////////枚举函数/////////////////
     def Enum_Buy(self):
@@ -6592,128 +6624,128 @@ def A_AccountID():
 def A_AllAccountID():
     return baseApi.A_AllAccountID()
 
-def A_GetAllPositionSymbol():
-    return baseApi.A_GetAllPositionSymbol()
+def A_GetAllPositionSymbol(userNo):
+    return baseApi.A_GetAllPositionSymbol(userNo)
 
-def A_Cost():
-    return baseApi.A_Cost()
+def A_Cost(userNo):
+    return baseApi.A_Cost(userNo)
 
-def A_Assets():
-    return baseApi.A_Assets()
+def A_Assets(userNo):
+    return baseApi.A_Assets(userNo)
 
-def A_Available():
-    return baseApi.A_Available()
+def A_Available(userNo):
+    return baseApi.A_Available(userNo)
 
-def A_Margin():
-    return baseApi.A_Margin()
+def A_Margin(userNo):
+    return baseApi.A_Margin(userNo)
 
-def A_ProfitLoss():
-    return baseApi.A_ProfitLoss()
+def A_ProfitLoss(userNo):
+    return baseApi.A_ProfitLoss(userNo)
 
-def A_CoverProfit():
-    return baseApi.A_CoverProfit()
+def A_CoverProfit(userNo):
+    return baseApi.A_CoverProfit(userNo)
 
-def A_TotalFreeze():
-    return baseApi.A_TotalFreeze()
+def A_TotalFreeze(userNo):
+    return baseApi.A_TotalFreeze(userNo)
 
-def A_BuyAvgPrice(contractNo=''):
-    return baseApi.A_BuyAvgPrice(contractNo)
+def A_BuyAvgPrice(userNo, contractNo=''):
+    return baseApi.A_BuyAvgPrice(userNo, contractNo)
 
-def A_BuyPosition(contractNo=''):
-    return baseApi.A_BuyPosition(contractNo)
+def A_BuyPosition(userNo, contractNo=''):
+    return baseApi.A_BuyPosition(userNo, contractNo)
 
-def A_BuyPositionCanCover(contractNo=''):
-    return baseApi.A_BuyPositionCanCover(contractNo)
+def A_BuyPositionCanCover(userNo, contractNo=''):
+    return baseApi.A_BuyPositionCanCover(userNo, contractNo)
 
-def A_BuyProfitLoss(contractNo=''):
-    return baseApi.A_BuyProfitLoss(contractNo)
+def A_BuyProfitLoss(userNo, contractNo=''):
+    return baseApi.A_BuyProfitLoss(userNo, contractNo)
 
-def A_SellAvgPrice(contractNo=''):
-    return baseApi.A_SellAvgPrice(contractNo)
+def A_SellAvgPrice(userNo, contractNo=''):
+    return baseApi.A_SellAvgPrice(userNo, contractNo)
 
-def A_SellPosition(contractNo=''):
-    return baseApi.A_SellPosition(contractNo)
+def A_SellPosition(userNo, contractNo=''):
+    return baseApi.A_SellPosition(userNo, contractNo)
 
-def A_SellPositionCanCover(contractNo=''):
-    return baseApi.A_SellPositionCanCover(contractNo)
+def A_SellPositionCanCover(userNo, contractNo=''):
+    return baseApi.A_SellPositionCanCover(userNo, contractNo)
 
-def A_SellProfitLoss(contractNo=''):
-    return baseApi.A_SellProfitLoss(contractNo)
+def A_SellProfitLoss(userNo, contractNo=''):
+    return baseApi.A_SellProfitLoss(userNo, contractNo)
 
-def A_TotalAvgPrice(contractNo=''):
-    return baseApi.A_TotalAvgPrice(contractNo)
+def A_TotalAvgPrice(userNo, contractNo=''):
+    return baseApi.A_TotalAvgPrice(userNo, contractNo)
 
-def A_TotalPosition(contractNo=''):
-    return baseApi.A_TotalPosition(contractNo)
+def A_TotalPosition(userNo, contractNo=''):
+    return baseApi.A_TotalPosition(userNo, contractNo)
 
-def A_TotalProfitLoss(contractNo=''):
-    return baseApi.A_TotalProfitLoss(contractNo)
+def A_TotalProfitLoss(userNo, contractNo=''):
+    return baseApi.A_TotalProfitLoss(userNo, contractNo)
 
-def A_TodayBuyPosition(contractNo=''):
-    return baseApi.A_TodayBuyPosition(contractNo)
+def A_TodayBuyPosition(userNo, contractNo=''):
+    return baseApi.A_TodayBuyPosition(userNo, contractNo)
 
-def A_TodaySellPosition(contractNo=''):
-    return baseApi.A_TodaySellPosition(contractNo)
+def A_TodaySellPosition(userNo, contractNo=''):
+    return baseApi.A_TodaySellPosition(userNo, contractNo)
 
-def A_OrderBuyOrSell(localOrderId=''):
-    return baseApi.A_OrderBuyOrSell(localOrderId)
+def A_OrderBuyOrSell(userNo, localOrderId=''):
+    return baseApi.A_OrderBuyOrSell(userNo, localOrderId)
 
-def A_OrderEntryOrExit(localOrderId=''):
-    return baseApi.A_OrderEntryOrExit(localOrderId)
+def A_OrderEntryOrExit(userNo, localOrderId=''):
+    return baseApi.A_OrderEntryOrExit(userNo, localOrderId)
 
-def A_OrderFilledLot(localOrderId=''):
-    return baseApi.A_OrderFilledLot(localOrderId)
+def A_OrderFilledLot(userNo, localOrderId=''):
+    return baseApi.A_OrderFilledLot(userNo, localOrderId)
 
-def A_OrderFilledPrice(localOrderId=''):
-    return baseApi.A_OrderFilledPrice(localOrderId)
+def A_OrderFilledPrice(userNo, localOrderId=''):
+    return baseApi.A_OrderFilledPrice(userNo, localOrderId)
 
-def A_OrderLot(localOrderId=''):
-    return baseApi.A_OrderLot(localOrderId)
+def A_OrderLot(userNo, localOrderId=''):
+    return baseApi.A_OrderLot(userNo, localOrderId)
 
-def A_OrderPrice(localOrderId=''):
-    return baseApi.A_OrderPrice(localOrderId)
+def A_OrderPrice(userNo, localOrderId=''):
+    return baseApi.A_OrderPrice(userNo, localOrderId)
 
-def A_OrderStatus(localOrderId=''):
-    return baseApi.A_OrderStatus(localOrderId)
+def A_OrderStatus(userNo, localOrderId=''):
+    return baseApi.A_OrderStatus(userNo, localOrderId)
 
-def A_OrderTime(localOrderId=''):
-    return baseApi.A_OrderTime(localOrderId)
+def A_OrderTime(userNo, localOrderId=''):
+    return baseApi.A_OrderTime(userNo, localOrderId)
 
-def A_FirstOrderNo(contractNo1='', contractNo2=''):
-    return baseApi.A_FirstOrderNo(contractNo1, contractNo2)
+def A_FirstOrderNo(userNo, contractNo1='', contractNo2=''):
+    return baseApi.A_FirstOrderNo(userNo, contractNo1, contractNo2)
 
-def A_NextOrderNo(localOrderId=0, contractNo1='', contractNo2=''):
-    return baseApi.A_NextOrderNo(localOrderId, contractNo1, contractNo2)
+def A_NextOrderNo(userNo, localOrderId=0, contractNo1='', contractNo2=''):
+    return baseApi.A_NextOrderNo(userNo, localOrderId, contractNo1, contractNo2)
 
-def A_LastOrderNo(contractNo1='', contractNo2=''):
-    return baseApi.A_LastOrderNo(contractNo1, contractNo2)
+def A_LastOrderNo(userNo, contractNo1='', contractNo2=''):
+    return baseApi.A_LastOrderNo(userNo, contractNo1, contractNo2)
 
-def A_FirstQueueOrderNo(contractNo1='', contractNo2=''):
-    return baseApi.A_FirstQueueOrderNo(contractNo1, contractNo2)
+def A_FirstQueueOrderNo(userNo, contractNo1='', contractNo2=''):
+    return baseApi.A_FirstQueueOrderNo(userNo, contractNo1, contractNo2)
 
-def A_NextQueueOrderNo(localOrderId=0, contractNo1='', contractNo2=''):
-    return baseApi.A_NextQueueOrderNo(localOrderId, contractNo1, contractNo2)
+def A_NextQueueOrderNo(userNo, localOrderId=0, contractNo1='', contractNo2=''):
+    return baseApi.A_NextQueueOrderNo(userNo, localOrderId, contractNo1, contractNo2)
 
-def A_AllQueueOrderNo(contractNo=''):
-    return baseApi.A_AllQueueOrderNo(contractNo)
+def A_AllQueueOrderNo(userNo, contractNo=''):
+    return baseApi.A_AllQueueOrderNo(userNo, contractNo)
 
-def A_LatestFilledTime(contractNo=''):
-    return baseApi.A_LatestFilledTime(contractNo)
+def A_LatestFilledTime(userNo, contractNo=''):
+    return baseApi.A_LatestFilledTime(userNo, contractNo)
 
-def A_OrderContractNo(localOrderId=0):
-    return baseApi.A_OrderContractNo(localOrderId)
+def A_OrderContractNo(userNo, localOrderId=0):
+    return baseApi.A_OrderContractNo(userNo, localOrderId)
 
 def A_SendOrder(orderDirct, entryOrExit, orderQty, orderPrice, contractNo='', userNo='', orderType='2', validType='0', hedge='T', triggerType='N', triggerMode='N', triggerCondition='N', triggerPrice=0):
     return baseApi.A_SendOrder(userNo, contractNo, orderDirct, entryOrExit, orderQty, orderPrice, orderType, validType, hedge, triggerType, triggerMode, triggerCondition, triggerPrice)
 
-def A_DeleteOrder(localOrderId):
-    return baseApi.A_DeleteOrder(localOrderId)
+def A_DeleteOrder(userNo, localOrderId=''):
+    return baseApi.A_DeleteOrder(userNo, localOrderId)
 
-def A_GetOrderNo(localOrderId):
-    return baseApi.A_GetOrderNo(localOrderId)
+def A_GetOrderNo(userNo, localOrderId=''):
+    return baseApi.A_GetOrderNo(userNo, localOrderId)
 
-def DeleteAllOrders(contractNo=''):
-    return baseApi.DeleteAllOrders(contractNo)
+def DeleteAllOrders(userNo, contractNo=''):
+    return baseApi.DeleteAllOrders(userNo, contractNo)
 
 #策略交易
 def Buy(share=0, price=0, contractNo=None, needCover=True, userNo=''):

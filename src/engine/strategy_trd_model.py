@@ -41,14 +41,14 @@ class StrategyTrade(TradeModel):
             accList.append(k)
         return accList
 
-    def getAllPositionSymbol(self):
+    def getAllPositionSymbol(self, userNo):
         '''
         :return:所有持仓合约
         '''
-        if len(self._userInfo) == 0 or self._selectedUserNo not in self._userInfo:
+        if len(self._userInfo) == 0 or userNo not in self._userInfo:
             raise Exception("请确保您的账号已经在客户端登录")
 
-        tUserInfoModel = self._userInfo[self._selectedUserNo]
+        tUserInfoModel = self._userInfo[userNo]
         if len(tUserInfoModel._position) == 0:
             return []
 
@@ -60,16 +60,16 @@ class StrategyTrade(TradeModel):
                 contList.append(contNo)
         return contList
 
-    def getDataFromTMoneyModel(self, key):
+    def getDataFromTMoneyModel(self, userNo, key):
         '''
         获取self._userInfo中当前账户指定的资金信息
         :param key:需要的资金信息的key
         :return:资金信息
         '''
-        if len(self._userInfo) == 0 or self._selectedUserNo not in self._userInfo:
+        if len(self._userInfo) == 0 or userNo not in self._userInfo:
             raise Exception("请确保您的账号已经在客户端登录")
 
-        tUserInfoModel = self._userInfo[self._selectedUserNo]
+        tUserInfoModel = self._userInfo[userNo]
         if len(tUserInfoModel._money) == 0:
             return 0
 
@@ -95,43 +95,43 @@ class StrategyTrade(TradeModel):
             return None
         return userInfo.getSign()
 
-    def getCost(self):
+    def getCost(self, userNo):
         '''
         :return: 当前公式应用的交易帐户的手续费
         '''
-        return self.getDataFromTMoneyModel('Fee')
+        return self.getDataFromTMoneyModel(userNo, 'Fee')
 
-    def getCurrentEquity(self):
+    def getCurrentEquity(self, userNo):
         '''
         :return:当前公式应用的交易帐户的动态权益
         '''
-        return self.getDataFromTMoneyModel('Equity')
+        return self.getDataFromTMoneyModel(userNo, 'Equity')
 
-    def getFreeMargin(self):
+    def getFreeMargin(self, userNo):
         '''
         :return:当前公式应用的交易帐户的可用资金
         '''
-        return self.getDataFromTMoneyModel('Available')
+        return self.getDataFromTMoneyModel(userNo, 'Available')
 
-    def getAMargin(self):
-        return self.getDataFromTMoneyModel('Deposit')
+    def getAMargin(self, userNo):
+        return self.getDataFromTMoneyModel(userNo, 'Deposit')
 
-    def getProfitLoss(self):
+    def getProfitLoss(self, userNo):
         '''
         :return:当前公式应用的交易帐户的浮动盈亏
         '''
-        return self.getDataFromTMoneyModel('FloatProfitTBT')
+        return self.getDataFromTMoneyModel(userNo, 'FloatProfitTBT')
 
-    def getCoverProfit(self):
-        return self.getDataFromTMoneyModel('CoverProfitTBT')
+    def getCoverProfit(self, userNo):
+        return self.getDataFromTMoneyModel(userNo, 'CoverProfitTBT')
 
-    def getTotalFreeze(self):
+    def getTotalFreeze(self, userNo):
         '''
         :return:当前公式应用的交易帐户的冻结资金
         '''
-        return self.getDataFromTMoneyModel('FrozenFee') + self.getDataFromTMoneyModel('FrozenDeposit')
+        return self.getDataFromTMoneyModel(userNo, 'FrozenFee') + self.getDataFromTMoneyModel(userNo, 'FrozenDeposit')
 
-    def getItemSumFromPositionModel(self, direct, contNo, key):
+    def getItemSumFromPositionModel(self, userNo, direct, contNo, key):
         '''
         获取某个账户下所有指定方向、指定合约的指标之和
         :param direct: 买卖方向，为空时表示所有方向
@@ -139,12 +139,12 @@ class StrategyTrade(TradeModel):
         :param key: 指标名称
         :return:
         '''
-        if len(self._userInfo) == 0 or self._selectedUserNo not in self._userInfo:
+        if len(self._userInfo) == 0 or userNo not in self._userInfo:
             #raise Exception("请确保您的账号已经在客户端登录")
             # self.logger.error("User not login")
             return 0
 
-        tUserInfoModel = self._userInfo[self._selectedUserNo]
+        tUserInfoModel = self._userInfo[userNo]
         if len(tUserInfoModel._position) == 0:
             return 0
 
@@ -158,14 +158,14 @@ class StrategyTrade(TradeModel):
 
         return itemSum
 
-    def getBuyAvgPrice(self, contNo):
+    def getBuyAvgPrice(self, userNo, contNo):
         '''
         :return:当前公式应用的帐户下当前商品的买入持仓均价
         '''
-        if len(self._userInfo) == 0 or self._selectedUserNo not in self._userInfo:
+        if len(self._userInfo) == 0 or userNo not in self._userInfo:
             raise Exception("请确保您的账号已经在客户端登录")
 
-        tUserInfoModel = self._userInfo[self._selectedUserNo]
+        tUserInfoModel = self._userInfo[userNo]
         if len(tUserInfoModel._position) == 0:
             return 0
 
@@ -180,23 +180,23 @@ class StrategyTrade(TradeModel):
 
         return priceSum / posSum if posSum > 0 else 0.0
 
-    def getBuyPosition(self, contNo):
+    def getBuyPosition(self, userNo, contNo):
         '''
         :return:当前公式应用的帐户下当前商品的买入持仓
         '''
-        return int(self.getItemSumFromPositionModel('B', contNo, 'PositionQty'))
+        return int(self.getItemSumFromPositionModel('B', userNo, contNo,  'PositionQty'))
 
-    def getBuyPositionCanCover(self, contNo):
+    def getBuyPositionCanCover(self, userNo, contNo):
         '''买仓可平数量'''
         if not contNo:
             contNo = self._config.getBenchmark()
-        buyPos = self.getBuyPosition(contNo) - self.getQueueSumFromOrderModel('S', contNo, ('C', 'T'))
+        buyPos = self.getBuyPosition(userNo, contNo) - self.getQueueSumFromOrderModel(userNo, 'S', contNo, ('C', 'T'))
         return int(buyPos)
 
-    def getQueueSumFromOrderModel(self, direct, contNo, offset):
-        if len(self._userInfo) == 0 or self._selectedUserNo not in self._userInfo:
+    def getQueueSumFromOrderModel(self, userNo, direct, contNo, offset):
+        if len(self._userInfo) == 0 or userNo not in self._userInfo:
             raise Exception("请确保您的账号已经在客户端登录")
-        tUserInfoModel = self._userInfo[self._selectedUserNo]
+        tUserInfoModel = self._userInfo[userNo]
 
         if len(tUserInfoModel._order) == 0:
             return 0
@@ -214,20 +214,20 @@ class StrategyTrade(TradeModel):
 
         return queueSum
 
-    def getBuyProfitLoss(self, contNo):
+    def getBuyProfitLoss(self, userNo, contNo):
         '''
         :return:当前公式应用的帐户下当前商品的买入持仓盈亏
         '''
-        return self.getItemSumFromPositionModel('B', contNo, 'FloatProfitTBT')
+        return self.getItemSumFromPositionModel('B', userNo, contNo, 'FloatProfitTBT')
 
-    def getSellAvgPrice(self, contNo):
+    def getSellAvgPrice(self, userNo, contNo):
         '''
         :return: 当前公式应用的帐户下当前商品的卖出持仓均价
         '''
-        if len(self._userInfo) == 0 or self._selectedUserNo not in self._userInfo:
+        if len(self._userInfo) == 0 or userNo not in self._userInfo:
             raise Exception("请确保您的账号已经在客户端登录")
 
-        tUserInfoModel = self._userInfo[self._selectedUserNo]
+        tUserInfoModel = self._userInfo[userNo]
         if len(tUserInfoModel._position) == 0:
             return 0
 
@@ -242,34 +242,34 @@ class StrategyTrade(TradeModel):
 
         return priceSum / posSum if posSum > 0 else 0.0
 
-    def getSellPosition(self, contNo):
+    def getSellPosition(self, userNo, contNo):
         '''
         :return: 当前公式应用的帐户下当前商品的卖出持仓
         '''
-        return int(self.getItemSumFromPositionModel('S', contNo, 'PositionQty'))
+        return int(self.getItemSumFromPositionModel(userNo, 'S', contNo, 'PositionQty'))
 
-    def getSellPositionCanCover(self, contNo):
+    def getSellPositionCanCover(self, userNo, contNo):
         '''卖仓可平数量'''
         if not contNo:
             contNo = self._config.getBenchmark()
-        sellPos = self.getSellPosition(contNo) - self.getQueueSumFromOrderModel('B', contNo, ('C', 'T'))
+        sellPos = self.getSellPosition(userNo, contNo) - self.getQueueSumFromOrderModel(userNo, 'B', contNo, ('C', 'T'))
         return int(sellPos)
 
 
-    def getSellProfitLoss(self, contNo):
+    def getSellProfitLoss(self, userNo, contNo):
         '''
         :return: 当前公式应用的帐户下当前商品的卖出持仓盈亏
         '''
-        return self.getItemSumFromPositionModel('S', contNo, 'FloatProfitTBT')
+        return self.getItemSumFromPositionModel(userNo, 'S', contNo, 'FloatProfitTBT')
 
-    def getTotalAvgPrice(self, contNo):
+    def getTotalAvgPrice(self, userNo, contNo):
         '''
         :return: 当前公式应用的帐户下当前商品的持仓均价
         '''
-        if len(self._userInfo) == 0 or self._selectedUserNo not in self._userInfo:
+        if len(self._userInfo) == 0 or userNo not in self._userInfo:
             raise Exception("请确保您的账号已经在客户端登录")
 
-        tUserInfoModel = self._userInfo[self._selectedUserNo]
+        tUserInfoModel = self._userInfo[userNo]
         if len(tUserInfoModel._position) == 0:
             return 0
 
@@ -284,43 +284,43 @@ class StrategyTrade(TradeModel):
 
         return priceSum / posSum if posSum > 0 else 0.0
 
-    def getTotalPosition(self, contNo):
+    def getTotalPosition(self, userNo, contNo):
         '''
         :return: 当前公式应用的帐户下当前商品的总持仓
         '''
-        totalPos = int(self.getItemSumFromPositionModel('B', contNo, 'PositionQty')) - int(self.getItemSumFromPositionModel('S', contNo, 'PositionQty'))
+        totalPos = int(self.getItemSumFromPositionModel(userNo, 'B', contNo, 'PositionQty')) - int(self.getItemSumFromPositionModel(userNo, 'S', contNo, 'PositionQty'))
         return totalPos
 
-    def getTotalProfitLoss(self, contNo):
+    def getTotalProfitLoss(self, userNo, contNo):
         '''
         :return: 当前公式应用的帐户下当前商品的总持仓盈亏
         '''
-        return self.getItemSumFromPositionModel('', contNo, 'FloatProfit')
+        return self.getItemSumFromPositionModel(userNo, '', contNo, 'FloatProfit')
 
-    def getTodayBuyPosition(self, contNo):
+    def getTodayBuyPosition(self, userNo, contNo):
         '''
         :return: 当前公式应用的帐户下当前商品的当日买入持仓
         '''
-        todayBuyPos = self.getItemSumFromPositionModel('B', contNo, 'PositionQty') - self.getItemSumFromPositionModel('B', contNo, 'PrePositionQty')
+        todayBuyPos = self.getItemSumFromPositionModel(userNo, 'B', contNo, 'PositionQty') - self.getItemSumFromPositionModel(userNo, 'B', contNo, 'PrePositionQty')
         return int(todayBuyPos)
 
-    def getTodaySellPosition(self, contNo):
+    def getTodaySellPosition(self, userNo, contNo):
         '''
         :return: 当前公式应用的帐户下当前商品的当日卖出持仓
         '''
-        todaySellPos = self.getItemSumFromPositionModel('S', contNo, 'PositionQty') - self.getItemSumFromPositionModel('S', contNo, 'PrePositionQty')
+        todaySellPos = self.getItemSumFromPositionModel(userNo, 'S', contNo, 'PositionQty') - self.getItemSumFromPositionModel(userNo, 'S', contNo, 'PrePositionQty')
         return int(todaySellPos)
 
-    def getOrderBuyOrSell(self, eSession):
+    def getOrderBuyOrSell(self, userNo, eSession):
         '''
         返回当前公式应用的帐户下当前商品的某个委托单的买卖类型。
         :param orderNo: 委托单号
         :return: 当前公式应用的帐户下当前商品的某个委托单的买卖类型
         '''
-        if len(self._userInfo) == 0 or self._selectedUserNo not in self._userInfo:
+        if len(self._userInfo) == 0 or userNo not in self._userInfo:
             raise Exception("请确保您的账号已经在客户端登录")
 
-        tUserInfoModel = self._userInfo[self._selectedUserNo]
+        tUserInfoModel = self._userInfo[userNo]
 
         tOrderModel = None
         if isinstance(eSession, str) and '-' in eSession:
@@ -333,15 +333,15 @@ class StrategyTrade(TradeModel):
         return tOrderModel._metaData['Direct'] if tOrderModel else 'N'
 
 
-    def getOrderEntryOrExit(self, eSession):
+    def getOrderEntryOrExit(self, userNo, eSession):
         '''
         返回当前公式应用的帐户下当前商品的某个委托单的开平仓状态
         :param orderNo: 委托单号
         :return: 当前公式应用的帐户下当前商品的某个委托单的开平仓状态
         '''
-        if len(self._userInfo) == 0 or self._selectedUserNo not in self._userInfo:
+        if len(self._userInfo) == 0 or userNo not in self._userInfo:
             raise Exception("请确保您的账号已经在客户端登录")
-        tUserInfoModel = self._userInfo[self._selectedUserNo]
+        tUserInfoModel = self._userInfo[userNo]
 
         tOrderModel = None
         if isinstance(eSession, str) and '-' in eSession:
@@ -353,15 +353,15 @@ class StrategyTrade(TradeModel):
                 tOrderModel = tUserInfoModel._order[eSession]
         return tOrderModel._metaData['Offset'] if tOrderModel else'N'
 
-    def getOrderFilledLot(self, eSession):
+    def getOrderFilledLot(self, userNo, eSession):
         '''
         返回当前公式应用的帐户下当前商品的某个委托单的成交数量
         :param orderNo: 委托单号
         :return: 当前公式应用的帐户下当前商品的某个委托单的成交数量
         '''
-        if len(self._userInfo) == 0 or self._selectedUserNo not in self._userInfo:
+        if len(self._userInfo) == 0 or userNo not in self._userInfo:
             raise Exception("请确保您的账号已经在客户端登录")
-        tUserInfoModel = self._userInfo[self._selectedUserNo]
+        tUserInfoModel = self._userInfo[userNo]
 
         tOrderModel = None
         if isinstance(eSession, str) and '-' in eSession:
@@ -373,15 +373,15 @@ class StrategyTrade(TradeModel):
                 tOrderModel = tUserInfoModel._order[eSession]
         return tOrderModel._metaData['MatchQty'] if tOrderModel else 0
 
-    def getOrderFilledPrice(self, eSession):
+    def getOrderFilledPrice(self, userNo, eSession):
         '''
         返回当前公式应用的帐户下当前商品的某个委托单的成交价格
         :param orderNo: 委托单号
         :return: 当前公式应用的帐户下当前商品的某个委托单的成交价格
         '''
-        if len(self._userInfo) == 0 or self._selectedUserNo not in self._userInfo:
+        if len(self._userInfo) == 0 or userNo not in self._userInfo:
             raise Exception("请确保您的账号已经在客户端登录")
-        tUserInfoModel = self._userInfo[self._selectedUserNo]
+        tUserInfoModel = self._userInfo[userNo]
 
         tOrderModel = None
         if isinstance(eSession, str) and '-' in eSession:
@@ -394,15 +394,15 @@ class StrategyTrade(TradeModel):
         return tOrderModel._metaData['MatchPrice'] if tOrderModel else 0
 
 
-    def getOrderLot(self, eSession):
+    def getOrderLot(self, userNo, eSession):
         '''
         返回当前公式应用的帐户下当前商品的某个委托单的委托数量
         :param orderNo: 委托单号
         :return: 当前公式应用的帐户下当前商品的某个委托单的委托数量
         '''
-        if len(self._userInfo) == 0 or self._selectedUserNo not in self._userInfo:
+        if len(self._userInfo) == 0 or userNo not in self._userInfo:
             raise Exception("请确保您的账号已经在客户端登录")
-        tUserInfoModel = self._userInfo[self._selectedUserNo]
+        tUserInfoModel = self._userInfo[userNo]
 
         tOrderModel = None
         if isinstance(eSession, str) and '-' in eSession:
@@ -414,15 +414,15 @@ class StrategyTrade(TradeModel):
                 tOrderModel = tUserInfoModel._order[eSession]
         return tOrderModel._metaData['OrderQty'] if tOrderModel else 0
 
-    def getOrderPrice(self, eSession):
+    def getOrderPrice(self, userNo, eSession):
         '''
         返回当前公式应用的帐户下当前商品的某个委托单的委托价格
         :param orderNo: 委托单号
         :return: 当前公式应用的帐户下当前商品的某个委托单的委托价格
         '''
-        if len(self._userInfo) == 0 or self._selectedUserNo not in self._userInfo:
+        if len(self._userInfo) == 0 or userNo not in self._userInfo:
             raise Exception("请确保您的账号已经在客户端登录")
-        tUserInfoModel = self._userInfo[self._selectedUserNo]
+        tUserInfoModel = self._userInfo[userNo]
 
         tOrderModel = None
         if isinstance(eSession, str) and '-' in eSession:
@@ -434,15 +434,15 @@ class StrategyTrade(TradeModel):
                 tOrderModel = tUserInfoModel._order[eSession]
         return tOrderModel._metaData['OrderPrice'] if tOrderModel else 0
 
-    def getOrderStatus(self, eSession):
+    def getOrderStatus(self, userNo, eSession):
         '''
         返回当前公式应用的帐户下当前商品的某个委托单的状态
         :param orderNo: 委托单号
         :return: 当前公式应用的帐户下当前商品的某个委托单的状态
         '''
-        if len(self._userInfo) == 0 or self._selectedUserNo not in self._userInfo:
+        if len(self._userInfo) == 0 or userNo not in self._userInfo:
             raise Exception("请确保您的账号已经在客户端登录")
-        tUserInfoModel = self._userInfo[self._selectedUserNo]
+        tUserInfoModel = self._userInfo[userNo]
 
         tOrderModel = None
         if isinstance(eSession, str) and '-' in eSession:
@@ -454,15 +454,15 @@ class StrategyTrade(TradeModel):
                 tOrderModel = tUserInfoModel._order[eSession]
         return tOrderModel._metaData['OrderState'] if tOrderModel else 'N'
 
-    def getOrderTime(self, eSession):
+    def getOrderTime(self, userNo, eSession):
         '''
         返回当前公式应用的帐户下当前商品的某个委托单的委托时间
         :param orderNo: 委托单号
         :return: 当前公式应用的帐户下当前商品的某个委托单的委托时间
         '''
-        if len(self._userInfo) == 0 or self._selectedUserNo not in self._userInfo:
+        if len(self._userInfo) == 0 or userNo not in self._userInfo:
             raise Exception("请确保您的账号已经在客户端登录")
-        tUserInfoModel = self._userInfo[self._selectedUserNo]
+        tUserInfoModel = self._userInfo[userNo]
 
         tOrderModel = None
         if isinstance(eSession, str) and '-' in eSession:
@@ -483,11 +483,11 @@ class StrategyTrade(TradeModel):
         timeStamp = time.strftime("%Y%m%d.%H%M%S", struct_time)
         return float(timeStamp)
 
-    def getFirstOrderNo(self, contNo1, contNo2):
-        if self._selectedUserNo not in self._userInfo:
+    def getFirstOrderNo(self, userNo, contNo1, contNo2):
+        if userNo not in self._userInfo:
             raise Exception("请先在极星客户端登录您的交易账号")
 
-        tUserInfoModel = self._userInfo[self._selectedUserNo]
+        tUserInfoModel = self._userInfo[userNo]
         if len(tUserInfoModel._order) == 0:
             return -1
 
@@ -500,11 +500,11 @@ class StrategyTrade(TradeModel):
 
         return orderId
 
-    def getNextOrderNo(self, orderId, contNo1, contNo2):
-        if self._selectedUserNo not in self._userInfo:
+    def getNextOrderNo(self, userNo, orderId, contNo1, contNo2):
+        if userNo not in self._userInfo:
             raise Exception("请先在极星客户端登录您的交易账号")
 
-        tUserInfoModel = self._userInfo[self._selectedUserNo]
+        tUserInfoModel = self._userInfo[userNo]
         if len(tUserInfoModel._order) == 0:
             return -1
 
@@ -523,11 +523,11 @@ class StrategyTrade(TradeModel):
 
         return minOrderId
 
-    def getLastOrderNo(self, contNo1, contNo2):
-        if self._selectedUserNo not in self._userInfo:
+    def getLastOrderNo(self, userNo, contNo1, contNo2):
+        if userNo not in self._userInfo:
             raise Exception("请先在极星客户端登录您的交易账号")
 
-        tUserInfoModel = self._userInfo[self._selectedUserNo]
+        tUserInfoModel = self._userInfo[userNo]
         if len(tUserInfoModel._order) == 0:
             return -1
 
@@ -544,11 +544,11 @@ class StrategyTrade(TradeModel):
 
         return orderId
 
-    def getFirstQueueOrderNo(self, contNo1, contNo2):
-        if self._selectedUserNo not in self._userInfo:
+    def getFirstQueueOrderNo(self, userNo, contNo1, contNo2):
+        if userNo not in self._userInfo:
             raise Exception("请先在极星客户端登录您的交易账号")
 
-        tUserInfoModel = self._userInfo[self._selectedUserNo]
+        tUserInfoModel = self._userInfo[userNo]
         if len(tUserInfoModel._order) == 0:
             return -1
 
@@ -564,11 +564,11 @@ class StrategyTrade(TradeModel):
 
         return orderId
 
-    def getNextQueueOrderNo(self, orderId, contNo1, contNo2):
-        if self._selectedUserNo not in self._userInfo:
+    def getNextQueueOrderNo(self, userNo, orderId, contNo1, contNo2):
+        if userNo not in self._userInfo:
             raise Exception("请先在极星客户端登录您的交易账号")
 
-        tUserInfoModel = self._userInfo[self._selectedUserNo]
+        tUserInfoModel = self._userInfo[userNo]
         if len(tUserInfoModel._order) == 0:
             return -1
 
@@ -590,11 +590,11 @@ class StrategyTrade(TradeModel):
 
         return minOrderId
 
-    def getALatestFilledTime(self, contNo):
-        if self._selectedUserNo not in self._userInfo:
+    def getALatestFilledTime(self, userNo, contNo):
+        if userNo not in self._userInfo:
             raise Exception("请先在极星客户端登录您的交易账号")
 
-        tUserInfoModel = self._userInfo[self._selectedUserNo]
+        tUserInfoModel = self._userInfo[userNo]
         latestTime = -1
         for orderId in list(tUserInfoModel._order.keys()):
             tOrderModel = tUserInfoModel._order[orderId]
@@ -607,10 +607,10 @@ class StrategyTrade(TradeModel):
                         latestTime = float(timeStamp)
         return latestTime
 
-    def getOrderContractNo(self, eSession):
-        if self._selectedUserNo not in self._userInfo:
+    def getOrderContractNo(self, userNo, eSession):
+        if userNo not in self._userInfo:
             raise Exception("请先在极星客户端登录您的交易账号")
-        tUserInfoModel = self._userInfo[self._selectedUserNo]
+        tUserInfoModel = self._userInfo[userNo]
 
         if isinstance(eSession, str) and '-' in eSession:
             return self._strategy.getContNo(eSession)
@@ -620,7 +620,7 @@ class StrategyTrade(TradeModel):
                 return orderModel._metaData['Cont'] if orderModel else ''
         return ''
 
-    def deleteOrder(self, eSession):
+    def deleteOrder(self, userNo, eSession):
         '''
         针对当前公式应用的帐户、商品发送撤单指令。
         :param orderId: 所要撤委托单的定单号
@@ -634,13 +634,13 @@ class StrategyTrade(TradeModel):
         else:
             orderId = eSession
 
-        return self.deleteOrderByOrderId(orderId)
+        return self.deleteOrderByOrderId(userNo, orderId)
 
-    def deleteOrderByOrderId(self, orderId):
-        if self._selectedUserNo not in self._userInfo:
+    def deleteOrderByOrderId(self, userNo, orderId):
+        if userNo not in self._userInfo:
             raise Exception("请先在极星客户端登录您的交易账号")
 
-        userInfoModel = self._userInfo[self._selectedUserNo]
+        userInfoModel = self._userInfo[userNo]
         if orderId not in userInfoModel._order:
             return False
 

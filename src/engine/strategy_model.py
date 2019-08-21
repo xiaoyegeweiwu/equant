@@ -776,107 +776,107 @@ class StrategyModel(object):
     def getAllAccountId(self):
         return self._trdModel.getAllAccountId()
 
-    def getAllPositionSymbol(self):
-        return self._trdModel.getAllPositionSymbol()
+    def getAllPositionSymbol(self, userNo):
+        return self._trdModel.getAllPositionSymbol(userNo)
 
-    def getCost(self):
-        return self._trdModel.getCost()
+    def getCost(self, userNo):
+        return self._trdModel.getCost(userNo)
 
-    def getCurrentEquity(self):
-        return self._trdModel.getCurrentEquity()
+    def getCurrentEquity(self, userNo):
+        return self._trdModel.getCurrentEquity(userNo)
 
-    def getFreeMargin(self):
-        return self._trdModel.getFreeMargin()
+    def getFreeMargin(self, userNo):
+        return self._trdModel.getFreeMargin(userNo)
 
-    def getAMargin(self):
-        return self._trdModel.getAMargin()
+    def getAMargin(self, userNo):
+        return self._trdModel.getAMargin(userNo)
 
-    def getProfitLoss(self):
-        return self._trdModel.getProfitLoss()
+    def getProfitLoss(self, userNo):
+        return self._trdModel.getProfitLoss(userNo)
 
-    def getCoverProfit(self):
-        return self._trdModel.getCoverProfit()
+    def getCoverProfit(self, userNo):
+        return self._trdModel.getCoverProfit(userNo)
 
-    def getTotalFreeze(self):
-        return self._trdModel.getTotalFreeze()
+    def getTotalFreeze(self, userNo):
+        return self._trdModel.getTotalFreeze(userNo)
 
-    def getBuyAvgPrice(self, contNo):
+    def getBuyAvgPrice(self, userNo, contNo):
         contNo = self.getIndexMap(contNo)
-        return self._trdModel.getBuyAvgPrice(contNo)
+        return self._trdModel.getBuyAvgPrice(userNo, contNo)
 
-    def getBuyPosition(self, contNo):
+    def getBuyPosition(self, userNo, contNo):
         contNo = self.getIndexMap(contNo)
-        return self._trdModel.getBuyPosition(contNo)
+        return self._trdModel.getBuyPosition(userNo, contNo)
 
-    def getBuyPositionCanCover(self, contNo):
+    def getBuyPositionCanCover(self, userNo, contNo):
         contNo = self.getIndexMap(contNo)
-        return self._trdModel.getBuyPositionCanCover(contNo)
+        return self._trdModel.getBuyPositionCanCover(userNo, contNo)
 
-    def getBuyProfitLoss(self, contNo):
+    def getBuyProfitLoss(self, userNo, contNo):
         contNo = self.getIndexMap(contNo)
-        return self._trdModel.getBuyProfitLoss(contNo)
+        return self._trdModel.getBuyProfitLoss(userNo, contNo)
 
-    def getSellAvgPrice(self, contNo):
+    def getSellAvgPrice(self, userNo, contNo):
         contNo = self.getIndexMap(contNo)
-        return self._trdModel.getSellAvgPrice(contNo)
+        return self._trdModel.getSellAvgPrice(userNo, contNo)
 
-    def getSellPosition(self, contNo):
+    def getSellPosition(self, userNo, contNo):
         contNo = self.getIndexMap(contNo)
-        return self._trdModel.getSellPosition(contNo)
+        return self._trdModel.getSellPosition(userNo, contNo)
 
-    def getSellPositionCanCover(self, contNo):
+    def getSellPositionCanCover(self, userNo, contNo):
         contNo = self.getIndexMap(contNo)
-        return self._trdModel.getSellPositionCanCover(contNo)
+        return self._trdModel.getSellPositionCanCover(userNo, contNo)
 
-    def getSellProfitLoss(self, contNo):
+    def getSellProfitLoss(self, userNo, contNo):
         contNo = self.getIndexMap(contNo)
-        return self._trdModel.getSellProfitLoss(contNo)
+        return self._trdModel.getSellProfitLoss(userNo, contNo)
 
-    def getTotalAvgPrice(self, contNo):
+    def getTotalAvgPrice(self, userNo, contNo):
         contNo = self.getIndexMap(contNo)
-        return self._trdModel.getTotalAvgPrice(contNo)
+        return self._trdModel.getTotalAvgPrice(userNo, contNo)
 
-    def getTotalPosition(self, contNo):
+    def getTotalPosition(self, userNo, contNo):
         contNo = self.getIndexMap(contNo)
-        return self._trdModel.getTotalPosition(contNo)
+        return self._trdModel.getTotalPosition(userNo, contNo)
 
-    def getTotalProfitLoss(self, contNo):
+    def getTotalProfitLoss(self, userNo, contNo):
         contNo = self.getIndexMap(contNo)
-        return self._trdModel.getTotalProfitLoss(contNo)
+        return self._trdModel.getTotalProfitLoss(userNo, contNo)
 
-    def getTodayBuyPosition(self, contNo):
+    def getTodayBuyPosition(self, userNo, contNo):
         contNo = self.getIndexMap(contNo)
-        return self._trdModel.getTodayBuyPosition(contNo)
+        return self._trdModel.getTodayBuyPosition(userNo, contNo)
 
-    def getTodaySellPosition(self, contNo):
+    def getTodaySellPosition(self, userNo, contNo):
         contNo = self.getIndexMap(contNo)
-        return self._trdModel.getTodaySellPosition(contNo)
+        return self._trdModel.getTodaySellPosition(userNo, contNo)
 
-    def getOrderBuyOrSell(self, eSession):
-        return self._trdModel.getOrderBuyOrSell(eSession)
+    def getOrderBuyOrSell(self, userNo, eSession):
+        return self._trdModel.getOrderBuyOrSell(userNo, eSession)
 
-    def getOrderEntryOrExit(self, eSession):
-        return self._trdModel.getOrderEntryOrExit(eSession)
+    def getOrderEntryOrExit(self, userNo, eSession):
+        return self._trdModel.getOrderEntryOrExit(userNo, eSession)
 
-    def getOrderFilledLot(self, eSession):
-        return self._trdModel.getOrderFilledLot(eSession)
+    def getOrderFilledLot(self, userNo, eSession):
+        return self._trdModel.getOrderFilledLot(userNo, eSession)
 
-    def getOrderFilledPrice(self, eSession):
-        return self._trdModel.getOrderFilledPrice(eSession)
+    def getOrderFilledPrice(self, userNo, eSession):
+        return self._trdModel.getOrderFilledPrice(userNo, eSession)
 
-    def getOrderLot(self, eSession):
-        return self._trdModel.getOrderLot(eSession)
+    def getOrderLot(self, userNo, eSession):
+        return self._trdModel.getOrderLot(userNo, eSession)
 
-    def getOrderPrice(self, eSession):
-        return self._trdModel.getOrderPrice(eSession)
+    def getOrderPrice(self, userNo, eSession):
+        return self._trdModel.getOrderPrice(userNo, eSession)
 
-    def getOrderStatus(self, eSession):
-        return self._trdModel.getOrderStatus(eSession)
+    def getOrderStatus(self, userNo, eSession):
+        return self._trdModel.getOrderStatus(userNo, eSession)
 
-    def getOrderTime(self, eSession):
-        return self._trdModel.getOrderTime(eSession)
+    def getOrderTime(self, userNo, eSession):
+        return self._trdModel.getOrderTime(userNo, eSession)
 
-    def getFirstOrderNo(self, contNo1, contNo2):
+    def getFirstOrderNo(self, userNo, contNo1, contNo2):
         underlayCont1 = self._qteModel.getUnderlayContractNo(contNo1)
         if len(underlayCont1) > 0:
             contNo1 = underlayCont1
@@ -884,9 +884,9 @@ class StrategyModel(object):
         if len(underlayCont2) > 0:
             contNo2 = underlayCont2
 
-        return self._trdModel.getFirstOrderNo(contNo1, contNo2)
+        return self._trdModel.getFirstOrderNo(userNo, contNo1, contNo2)
 
-    def getNextOrderNo(self, orderId, contNo1, contNo2):
+    def getNextOrderNo(self, userNo, orderId, contNo1, contNo2):
         underlayCont1 = self._qteModel.getUnderlayContractNo(contNo1)
         if len(underlayCont1) > 0:
             contNo1 = underlayCont1
@@ -894,9 +894,9 @@ class StrategyModel(object):
         if len(underlayCont2) > 0:
             contNo2 = underlayCont2
 
-        return self._trdModel.getNextOrderNo(orderId, contNo1, contNo2)
+        return self._trdModel.getNextOrderNo(orderId, userNo, contNo1, contNo2)
 
-    def getLastOrderNo(self, contNo1, contNo2):
+    def getLastOrderNo(self, userNo, contNo1, contNo2):
         underlayCont1 = self._qteModel.getUnderlayContractNo(contNo1)
         if len(underlayCont1) > 0:
             contNo1 = underlayCont1
@@ -904,9 +904,9 @@ class StrategyModel(object):
         if len(underlayCont2) > 0:
             contNo2 = underlayCont2
 
-        return self._trdModel.getLastOrderNo(contNo1, contNo2)
+        return self._trdModel.getLastOrderNo(userNo, contNo1, contNo2)
 
-    def getFirstQueueOrderNo(self, contNo1, contNo2=''):
+    def getFirstQueueOrderNo(self, userNo, contNo1, contNo2=''):
         underlayCont1 = self._qteModel.getUnderlayContractNo(contNo1)
         if len(underlayCont1) > 0:
             contNo1 = underlayCont1
@@ -914,9 +914,9 @@ class StrategyModel(object):
         if len(underlayCont2) > 0:
             contNo2 = underlayCont2
 
-        return self._trdModel.getFirstQueueOrderNo(contNo1, contNo2)
+        return self._trdModel.getFirstQueueOrderNo(userNo, contNo1, contNo2)
 
-    def getNextQueueOrderNo(self, orderId, contNo1, contNo2=''):
+    def getNextQueueOrderNo(self, userNo, orderId, contNo1, contNo2=''):
         underlayCont1 = self._qteModel.getUnderlayContractNo(contNo1)
         if len(underlayCont1) > 0:
             contNo1 = underlayCont1
@@ -924,7 +924,7 @@ class StrategyModel(object):
         if len(underlayCont2) > 0:
             contNo2 = underlayCont2
 
-        return self._trdModel.getNextQueueOrderNo(orderId, contNo1, contNo2)
+        return self._trdModel.getNextQueueOrderNo(userNo, orderId, contNo1, contNo2)
 
     def getAllQueueOrderNo(self, contNo):
         underlayCont = self._qteModel.getUnderlayContractNo(contNo)
@@ -941,17 +941,17 @@ class StrategyModel(object):
                 orderIdList.append(orderId)
         return orderIdList
 
-    def getALatestFilledTime(self, contNo):
+    def getALatestFilledTime(self, userNo, contNo):
         underlayCont = self._qteModel.getUnderlayContractNo(contNo)
         if len(underlayCont) > 0:
             contNo = underlayCont
-        return self._trdModel.getALatestFilledTime(contNo)
+        return self._trdModel.getALatestFilledTime(userNo, contNo)
 
-    def getOrderContractNo(self, orderId):
-        return self._trdModel.getOrderContractNo(orderId)
+    def getOrderContractNo(self, userNo, orderId):
+        return self._trdModel.getOrderContractNo(userNo, orderId)
 
-    def deleteOrder(self, eSession):
-        return self._trdModel.deleteOrder(eSession)
+    def deleteOrder(self, userNo, eSession):
+        return self._trdModel.deleteOrder(userNo, eSession)
 
     def buySellOrder(self, userNo, contNo, orderType, validType, orderDirct, \
                      entryOrExit, hedge, orderPrice, orderQty, curBar, isPriceZero = False, signal=True):
@@ -1159,17 +1159,17 @@ class StrategyModel(object):
             orderNo = ''
         return orderId, orderNo
 
-    def deleteAllOrders(self, contNo):
+    def deleteAllOrders(self, userNo, contNo):
         underlayCont = self._qteModel.getUnderlayContractNo(contNo)
         if len(underlayCont) > 0:
             contNo = underlayCont
 
-        orderList = self.getAllQueueOrderNo(contNo)
+        orderList = self.getAllQueueOrderNo(userNo, contNo)
         if len(orderList) == 0:
             return True
 
         for orderId in orderList:
-            self._trdModel.deleteOrderByOrderId(orderId)
+            self._trdModel.deleteOrderByOrderId(userNo, orderId)
 
         return True
 
