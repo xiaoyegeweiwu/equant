@@ -1437,7 +1437,11 @@ class RunWin(QuantToplevel, QuantFrame):
         params = {}
         for item in self.paramTree.get_children():
             paramValues = self.paramTree.item(item)['values']
-            params[paramValues[0]] = (paramValues[1], paramValues[3])
+            # Treeview会自动转换item的值为str类型
+            try:
+                params[paramValues[0]] = (eval(paramValues[1]), paramValues[3])
+            except:
+                params[paramValues[0]] = (paramValues[1], paramValues[3])
 
         self._strConfig.setParams(params)
 
@@ -1718,6 +1722,7 @@ class SelectContractWin(QuantToplevel, QuantFrame):
                 # 将F和Z合并到一个节点下
                 commodityNoZ = commodityNo[0]
                 temp = commodityNo[0].split("|")
+
                 if temp[1] == "F":
                     temp[1] = "Z"
                     commodityNoZ = "|".join(temp)
