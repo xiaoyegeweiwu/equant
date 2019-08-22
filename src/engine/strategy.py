@@ -2,7 +2,6 @@
 
 from multiprocessing import Process, Queue
 from threading import Thread
-from .thread import QuantThread
 import time, os, sys
 from capi.com_types import *
 from api import base_api
