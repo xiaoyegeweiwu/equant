@@ -572,8 +572,6 @@ class RunWin(QuantToplevel, QuantFrame):
         for key in self._userParam:
             self.paramTree.insert("", tk.END, values=tuple(
                 [key, self._userParam[key][0], type(self._userParam[key][0]).__name__, self._userParam[key][1]]), tags=key)
-            # self.paramTree.insert("", tk.END, values=tuple(
-            #     [key, self._userParam[key][0], type(self._userParam[key]), self._userParam[key][1]]), tags=key)
 
     def insertContInfo(self):
         """恢复配置文件中用户选择的多合约信息"""
@@ -1437,11 +1435,8 @@ class RunWin(QuantToplevel, QuantFrame):
         params = {}
         for item in self.paramTree.get_children():
             paramValues = self.paramTree.item(item)['values']
-            # Treeview会自动转换item的值为str类型
-            try:
-                params[paramValues[0]] = (eval(paramValues[1]), paramValues[3])
-            except:
-                params[paramValues[0]] = (paramValues[1], paramValues[3])
+            # Treeview会自动转换item的值
+            params[paramValues[0]] = (eval(paramValues[2])(paramValues[1]), paramValues[3])
 
         self._strConfig.setParams(params)
 
