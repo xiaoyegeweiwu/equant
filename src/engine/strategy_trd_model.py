@@ -195,8 +195,6 @@ class StrategyTrade(TradeModel):
             userNo = self._selectedUserNo
             
         if len(self._userInfo) == 0 or userNo not in self._userInfo:
-            #raise Exception("请确保您的账号已经在客户端登录")
-            # self.logger.error("User not login")
             return 0
 
         tUserInfoModel = self._userInfo[userNo]
@@ -247,7 +245,7 @@ class StrategyTrade(TradeModel):
         if not userNo:
             userNo = self._selectedUserNo
             
-        return int(self.getItemSumFromPositionModel('B', userNo, contNo,  'PositionQty'))
+        return int(self.getItemSumFromPositionModel(userNo, 'B', contNo,  'PositionQty'))
 
     def getBuyPositionCanCover(self, userNo, contNo):
         '''买仓可平数量'''
@@ -293,7 +291,7 @@ class StrategyTrade(TradeModel):
         if not userNo:
             userNo = self._selectedUserNo
             
-        return self.getItemSumFromPositionModel('B', userNo, contNo, 'FloatProfitTBT')
+        return self.getItemSumFromPositionModel(userNo, 'B', contNo, 'FloatProfitTBT')
 
     def getSellAvgPrice(self, userNo, contNo):
         '''
