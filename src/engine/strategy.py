@@ -836,18 +836,21 @@ class Strategy:
         self._reqOrder()
         
     def _onOrderInfo(self, event):
+        #self.logger.debug("_onOrderInfo:%s"%event.getData())
         self._onTradeOrderQry(event)
         #委托信息可能会有很多笔，最后一笔查询下一个数据
         if event.isChainEnd():
             self._reqMatch()
         
     def _onMatchInfo(self, event):
+        #self.logger.debug("_onMatchInfo:%s"%event.getData())
         self._onTradeMatch(event)
         #委托信息可能会有很多笔，最后一笔查询下一个数据
         if event.isChainEnd():
             self._reqPosition()
         
     def _onPositionInfo(self, event):
+        #self.logger.debug("_onPositionInfo:%s"%event.getData())
         self._onTradePosition(event)
         #委托信息可能会有很多笔，最后一笔查询下一个数据
         if event.isChainEnd():

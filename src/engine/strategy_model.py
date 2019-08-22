@@ -249,6 +249,13 @@ class StrategyModel(object):
         return count
 
     # ////////////////////////即时行情////////////////////////////
+    def subQuoteList(self, contNoList):
+        self._qteModel.subQuoteList(contNoList)
+
+    def unsubQuoteList(self, contNoList):
+        # TODO: 退订即使行情时，是否需要删除已经得到的即时行情信息
+        self._qteModel.unsubQuoteList(contNoList)
+    
     def getQUpdateTime(self, symbol):
         return self._qteModel.getQUpdateTime(symbol)
 

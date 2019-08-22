@@ -362,6 +362,7 @@ class TradeModel:
     # 更新登录信息
     def updateLoginInfo(self, apiEvent):
         dataList = apiEvent.getData()
+        #self.logger.debug("updateLoginInfo:%s"%dataList)
         for data in dataList:
             loginNo = data['LoginNo']
             if loginNo not in self._loginInfo:
@@ -372,6 +373,7 @@ class TradeModel:
 
     def updateUserInfo(self, apiEvent):
         dataList = apiEvent.getData()
+        #self.logger.debug("updateUserInfo:%s"%dataList)
         for data in dataList:
             loginNo = data['LoginNo']
             if loginNo not in self._loginInfo:
@@ -388,7 +390,7 @@ class TradeModel:
 
     def updateMoney(self, apiEvent):
         dataList = apiEvent.getData()
-
+        #self.logger.debug("updateMoney:%s"%dataList)
         for data in dataList:
             userNo = data['UserNo']
             if userNo not in self._userInfo:
@@ -400,35 +402,30 @@ class TradeModel:
         
     def updateOrderData(self, apiEvent):
         dataList = apiEvent.getData()
-
-        unLoginAccount = []
+        #self.logger.debug("updateOrderData:%s"%dataList)
         for data in dataList:
             userNo = data['UserNo']
-            if userNo in self._userInfo:
-                self._userInfo[userNo].updateOrder(data)
-            elif userNo not in unLoginAccount:
-                unLoginAccount.append(userNo)
-
-        if len(unLoginAccount) > 0:
-            self.logger.error("[updateOrderData]The user account%s doesn't login!"%unLoginAccount)
+            if userNo not in self._userInfo:
+                self.logger.error("[updateOrderData]The user account(%s) doesn't login!"%userNo)
+                continue
+            #self.logger.debug('[ORDER]%s'%data)
+            self._userInfo[userNo].updateOrder(data)
 
             
     def updateMatchData(self, apiEvent):
         dataList = apiEvent.getData()
-        
+        #self.logger.debug("updateMatchData:%s"%dataList)
         for data in dataList:
             userNo = data['UserNo']
             if userNo not in self._userInfo:
                 self.logger.error("[updateMatchData]The user account(%s) doesn't login!"%userNo)
                 continue
-            
             #self.logger.debug('[MATCH]%s'%data)
-        
             self._userInfo[userNo].updateMatch(data)
             
     def updatePosData(self, apiEvent):
         dataList = apiEvent.getData()
-        
+        #self.logger.debug("updatePosData:%s"%dataList)
         for data in dataList:
             userNo = data['UserNo']
             if userNo not in self._userInfo:
