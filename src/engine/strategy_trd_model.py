@@ -30,6 +30,10 @@ class StrategyTrade(TradeModel):
         '''
         :return:当前公式应用的交易帐户ID
         '''
+        user = self._userInfo[self._selectedUserNo]
+        if not user.isReady():
+            return ''
+        
         return self._selectedUserNo
         
     def getAllAccountId(self):
@@ -37,7 +41,9 @@ class StrategyTrade(TradeModel):
         获取所有登录账号ID
         '''
         accList = []
-        for k in self._userInfo:
+        for k, v in self._userInfo.items():
+            if not v.isReady():
+                continue
             accList.append(k)
         return accList
 
@@ -53,6 +59,9 @@ class StrategyTrade(TradeModel):
             raise Exception("请确保您的账号已经在客户端登录")
 
         tUserInfoModel = self._userInfo[userNo]
+        if not tUserInfoModel.isReady():
+            return []
+        
         if len(tUserInfoModel._position) == 0:
             return []
 
@@ -78,6 +87,9 @@ class StrategyTrade(TradeModel):
             raise Exception("请确保您的账号已经在客户端登录")
 
         tUserInfoModel = self._userInfo[userNo]
+        if not tUserInfoModel.isReady():
+            return 0
+        
         if len(tUserInfoModel._money) == 0:
             return 0
 
@@ -101,11 +113,10 @@ class StrategyTrade(TradeModel):
         # 默认usrNo为空字符串（''），此时取当前用户
         if not userNo:
             userNo = self._selectedUserNo
-        
-        userInfo = self.getUserModel(userNo)
-        if not userInfo:
+
+        if userNo not in self._userInfo:
             return None
-        return userInfo.getSign()
+        return self._userInfo[userNo].getSign()
 
     def getCost(self, userNo):
         '''

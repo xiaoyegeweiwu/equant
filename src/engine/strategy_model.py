@@ -125,57 +125,6 @@ class StrategyModel(object):
         else:
             self._hisModel.runRealTime(context, handle_data, event)
 
-    # ///////////////////////即时行情接口//////////////////////////
-    def reqExchange(self):
-        self._qteModel.reqExchange()
-
-    def reqCommodity(self):
-        self._qteModel.reqCommodity()
-
-    def reqContract(self):
-        self._qteModel.reqContract()
-
-    def reqUnderlayMap(self):
-        self._qteModel.reqUnderlayMap()
-
-    def subQuote(self):
-        self._qteModel.subQuote()
-
-    def subQuoteList(self, contNoList):
-        self._qteModel.subQuoteList(contNoList)
-
-    def unsubQuoteList(self, contNoList):
-        # TODO: 退订即使行情时，是否需要删除已经得到的即时行情信息
-        self._qteModel.unsubQuoteList(contNoList)
-
-    def onExchange(self, event):
-        self._qteModel.onExchange(event)
-
-    def onCommodity(self, event):
-        self._qteModel.onCommodity(event)
-
-    def onContract(self, event):
-        self._qteModel.onContract(event)
-
-    def onUnderlayMap(self, event):
-        self._qteModel.onUnderlayMap(event)
-
-    def onExchangeStatus(self, event):
-        self._qteModel.onExchangeStatus(event)
-
-    def onQuoteRsp(self, event):
-        self._qteModel.onQuoteRsp(event)
-
-    def onQuoteNotice(self, event):
-        self._qteModel.onQuoteNotice(event)
-
-    def onDepthNotice(self, event):
-        self._qteModel.onDepthNotice(event)
-
-    # ///////////////////////交易数据接口/////////////////////////
-    def reqTradeData(self):
-        self._trdModel.reqTradeData()
-
     # ////////////////////////配置接口////////////////////////////
     def continueTrigger(self):
         return self._cfgModel.continues()

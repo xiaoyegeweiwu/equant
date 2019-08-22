@@ -7,8 +7,8 @@ p2=20
 
 def initialize(context): 
     SetActual()
-    #SetUserNo('Q437104345')
-    SetBarInterval("NYMEX|F|CL|1909", 'M', 1, 2000)
+    SetUserNo('Q466899416')
+    #SetBarInterval("NYMEX|F|CL|1910", 'M', 1, 2000)
     pass
 
 def handle_data(context):

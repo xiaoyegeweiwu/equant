@@ -262,7 +262,7 @@ class QuantMonitor(object):
         strategyId = dataDict["StrategyId"]
         try:
             if self.executeListTree.exists(strategyId):
-                self.updateStatus(strategyId, dataDict["StrategyState"])
+                self.updateStatus(strategyId, dataDict[5])
                 return
         except Exception as e:
             self._logger.warn("addExecute exception")
@@ -275,7 +275,7 @@ class QuantMonitor(object):
         self.errText.createScrollbar()
         self.errText.pack(fill=BOTH, expand=YES)
 
-    def updateSysText(self):
+    def updateLogText(self):
         guiQueue = self._controller.get_logger().getGuiQ()
         data = ""
         flag = True
