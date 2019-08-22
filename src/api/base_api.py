@@ -2743,7 +2743,7 @@ class BaseApi(object):
               list A_GetAllPositionSymbol(string userNo)
 
         【参数】
-              userNo  指定的交易账户
+              userNo  指定的交易账户，默认当前账户
 
         【备注】
               该参数返回类型为字符串列表，列表内容为账户所有持仓合约列表。
@@ -2762,7 +2762,7 @@ class BaseApi(object):
               string A_Cost(string userNo)
 
         【参数】
-              userNo  指定的交易账户
+              userNo  指定的交易账户，默认当前账户
 
         【备注】
               返回指定交易帐户的手续费，返回值为浮点数。
@@ -2781,7 +2781,7 @@ class BaseApi(object):
               float A_Assets(string userNo)
 
         【参数】
-              userNo  指定的交易账户
+              userNo  指定的交易账户，默认当前账户
 
         【备注】
               返回指定交易帐户的动态权益，返回值为浮点数。
@@ -2800,7 +2800,7 @@ class BaseApi(object):
               float A_Available(string userNo)
 
         【参数】
-              userNo  指定的交易账户
+              userNo  指定的交易账户，默认当前账户
 
         【备注】
               返回指定交易帐户的可用资金，返回值为浮点数。
@@ -2820,7 +2820,7 @@ class BaseApi(object):
               float A_Margin(string userNo)
 
         【参数】
-              userNo  指定的交易账户
+              userNo  指定的交易账户，默认当前账户
 
         【备注】
               返回指定交易帐户的持仓保证金，返回值为浮点数。
@@ -2840,7 +2840,7 @@ class BaseApi(object):
               float A_ProfitLoss(string userNo)
 
         【参数】
-              userNo  指定的交易账户
+              userNo  指定的交易账户，默认当前账户
 
         【备注】
               返回指定交易帐户的浮动盈亏，返回值为浮点数。
@@ -2860,7 +2860,7 @@ class BaseApi(object):
               float A_CoverProfit(string userNo)
 
         【参数】
-              userNo  指定的交易账户
+              userNo  指定的交易账户，默认当前账户
 
         【备注】
               返回指定交易帐户的平仓盈亏，返回值为浮点数。
@@ -2880,7 +2880,7 @@ class BaseApi(object):
               float A_TotalFreeze(string userNo)
 
         【参数】
-              userNo  指定的交易账户
+              userNo  指定的交易账户，默认当前账户
 
         【备注】
               返回指定交易帐户的冻结资金，返回值为浮点数。
@@ -2900,7 +2900,7 @@ class BaseApi(object):
               float A_BuyAvgPrice(string userNo, string contractNo='')
 
         【参数】
-              userNo  指定的交易账户
+              userNo  指定的交易账户，默认当前账户
               contractNo，指定商品的合约编号，为空时采用基准合约编号。
 
         【备注】
@@ -2921,7 +2921,7 @@ class BaseApi(object):
               float A_BuyPosition(string userNo, string contractNo='')
 
         【参数】
-              userNo  指定的交易账户
+              userNo  指定的交易账户，默认当前账户
               contractNo，指定商品的合约编号，为空时采用基准合约编号。
 
         【备注】
@@ -2942,7 +2942,7 @@ class BaseApi(object):
               int A_BuyPositionCanCover(string userNo, string contractNo='')
 
         【参数】
-              userNo  指定的交易账户
+              userNo  指定的交易账户，默认当前账户
               contractNo，指定商品的合约编号，为空时采用基准合约编号。
 
         【备注】
@@ -2962,7 +2962,7 @@ class BaseApi(object):
               float A_BuyProfitLoss(string userNo, string contractNo='')
 
         【参数】
-              userNo  指定的交易账户
+              userNo  指定的交易账户，默认当前账户
               contractNo，指定商品的合约编号，为空时采用基准合约编号。
 
         【备注】
@@ -2983,7 +2983,7 @@ class BaseApi(object):
               float A_SellAvgPrice(string userNo, string contractNo='')
 
         【参数】
-              userNo  指定的交易账户
+              userNo  指定的交易账户，默认当前账户
               contractNo，指定商品的合约编号，为空时采用基准合约编号。
 
         【备注】
@@ -3004,7 +3004,7 @@ class BaseApi(object):
               float A_SellPosition(string userNo, string contractNo='')
 
         【参数】
-              userNo  指定的交易账户
+              userNo  指定的交易账户，默认当前账户
               contractNo，指定商品的合约编号，为空时采用基准合约编号。
 
         【备注】
@@ -3025,7 +3025,7 @@ class BaseApi(object):
               int A_SellPositionCanCover(string userNo, string contractNo='')
 
         【参数】
-              userNo  指定的交易账户
+              userNo  指定的交易账户，默认当前账户
               contractNo，指定商品的合约编号，为空时采用基准合约编号。
 
         【备注】
@@ -3045,7 +3045,7 @@ class BaseApi(object):
               float A_SellProfitLoss(string userNo, string contractNo='')
 
         【参数】
-              userNo  指定的交易账户
+              userNo  指定的交易账户，默认当前账户
               contractNo，指定商品的合约编号，为空时采用基准合约编号。
 
         【备注】
@@ -3066,7 +3066,7 @@ class BaseApi(object):
               float A_TotalAvgPrice(string userNo, string contractNo='')
 
         【参数】
-              userNo  指定的交易账户
+              userNo  指定的交易账户，默认当前账户
               contractNo，指定商品的合约编号，为空时采用基准合约编号。
 
         【备注】
@@ -3087,7 +3087,7 @@ class BaseApi(object):
               int A_TotalPosition(string userNo, string contractNo='')
 
         【参数】
-              userNo  指定的交易账户
+              userNo  指定的交易账户，默认当前账户
               contractNo，指定商品的合约编号，为空时采用基准合约编号。
 
         【备注】
@@ -3109,7 +3109,7 @@ class BaseApi(object):
               float A_TotalProfitLoss(string userNo, string contractNo='')
 
         【参数】
-              userNo  指定的交易账户
+              userNo  指定的交易账户，默认当前账户
               contractNo，指定商品的合约编号，为空时采用基准合约编号。
 
         【备注】
@@ -3130,7 +3130,7 @@ class BaseApi(object):
               float A_TodayBuyPosition(string userNo, string contractNo='')
 
         【参数】
-              userNo  指定的交易账户
+              userNo  指定的交易账户，默认当前账户
               contractNo，指定商品的合约编号，为空时采用基准合约编号。
 
         【备注】
@@ -3151,7 +3151,7 @@ class BaseApi(object):
               float A_TodaySellPosition(string userNo, string contractNo='')
 
         【参数】
-              userNo  指定的交易账户
+              userNo  指定的交易账户，默认当前账户
               contractNo，指定商品的合约编号，为空时采用基准合约编号。
 
         【备注】
@@ -3172,7 +3172,7 @@ class BaseApi(object):
               char A_OrderBuyOrSell(string userNo, int|string localOrderId='')
 
         【参数】
-              userNo  指定的交易账户
+              userNo  指定的交易账户，默认当前账户
               localOrderId 定单号，或者使用A_SendOrder返回的下单编号。
 
         【备注】
@@ -3199,7 +3199,7 @@ class BaseApi(object):
               char A_OrderEntryOrExit(string userNo, int|string localOrderId='')
 
         【参数】
-              userNo  指定的交易账户
+              userNo  指定的交易账户，默认当前账户
               localOrderId 定单号，或者使用A_SendOrder返回的下单编号。
 
         【备注】
@@ -3229,7 +3229,7 @@ class BaseApi(object):
               float A_OrderFilledLot(string userNo, int|string localOrderId='')
 
         【参数】
-              userNo  指定的交易账户
+              userNo  指定的交易账户，默认当前账户
               localOrderId 定单号，或者使用A_SendOrder返回的下单编号。
 
         【备注】
@@ -3250,7 +3250,7 @@ class BaseApi(object):
               float A_OrderFilledPrice(string userNo, int|string localOrderId='')
 
         【参数】
-              userNo  指定的交易账户
+              userNo  指定的交易账户，默认当前账户
               localOrderId 定单号，或者使用A_SendOrder返回的下单编号。
 
         【备注】
@@ -3272,7 +3272,7 @@ class BaseApi(object):
               float A_OrderLot(string userNo, int|string localOrderId='')
 
         【参数】
-              userNo  指定的交易账户
+              userNo  指定的交易账户，默认当前账户
               localOrderId 定单号，或者使用A_SendOrder返回的下单编号。
 
         【备注】
@@ -3293,7 +3293,7 @@ class BaseApi(object):
               float A_OrderPrice(string userNo, int|string localOrderId='')
 
         【参数】
-              userNo  指定的交易账户
+              userNo  指定的交易账户，默认当前账户
               localOrderId 定单号，或者使用A_SendOrder返回的下单编号。
 
         【备注】
@@ -3314,7 +3314,7 @@ class BaseApi(object):
               char A_OrderStatus(string userNo, int|string localOrderId='')
 
         【参数】
-              userNo  指定的交易账户
+              userNo  指定的交易账户，默认当前账户
               localOrderId 定单号，或者使用A_SendOrder返回的下单编号。
 
         【备注】
@@ -3356,7 +3356,7 @@ class BaseApi(object):
               struct_time A_OrderTime(string userNo, int|string localOrderId='')
 
         【参数】
-              userNo  指定的交易账户
+              userNo  指定的交易账户，默认当前账户
               localOrderId 定单号，或者使用A_SendOrder返回的下单编号。
 
         【备注】
@@ -3377,7 +3377,7 @@ class BaseApi(object):
               int A_FirstOrderNo(string userNo, string contractNo='')
 
         【参数】
-              userNo  指定的交易账户
+              userNo  指定的交易账户，默认当前账户
               contractNo 合约代码，默认为遍历所有合约。
 
         【备注】
@@ -3398,7 +3398,7 @@ class BaseApi(object):
               int A_NextOrderNo(string userNo, int localOrderId=0, string contractNo='')
 
         【参数】
-              userNo  指定的交易账户
+              userNo  指定的交易账户，默认当前账户
               localOrderId 定单号，默认为0，
               contractNo 合约代码，默认为遍历所有合约。
 
@@ -3420,7 +3420,7 @@ class BaseApi(object):
               int A_LastOrderNo(string userNo, string contractNo='')
 
         【参数】
-              userNo  指定的交易账户
+              userNo  指定的交易账户，默认当前账户
               contractNo 合约代码，默认为遍历所有合约。
 
         【备注】
@@ -3440,7 +3440,7 @@ class BaseApi(object):
               int A_FirstQueueOrderNo(string userNo, string contractNo='')
 
         【参数】
-              userNo  指定的交易账户
+              userNo  指定的交易账户，默认当前账户
               contractNo 合约代码，默认为遍历所有合约。
 
         【备注】
@@ -3461,7 +3461,7 @@ class BaseApi(object):
               int A_NextQueueOrderNo(string userNo, int localOrderId=0, string contractNo='')
 
         【参数】
-              userNo  指定的交易账户
+              userNo  指定的交易账户，默认当前账户
               localOrderId 定单号，默认为0，
               contractNo 合约代码，默认为遍历所有合约。
 
@@ -3483,7 +3483,7 @@ class BaseApi(object):
               list A_AllQueueOrderNo(string userNo, string contractNo='')
 
         【参数】
-              userNo  指定的交易账户
+              userNo  指定的交易账户，默认当前账户
               contractNo 合约代码，默认为遍历所有合约，指定后只遍历指定合约。
 
         【备注】
@@ -3503,7 +3503,7 @@ class BaseApi(object):
               float A_LatestFilledTime(string userNo, string contractNo='')
 
         【参数】
-              userNo  指定的交易账户
+              userNo  指定的交易账户，默认当前账户
               contractNo 合约代码，默认为遍历所有合约，指定后只遍历指定合约。
 
         【备注】
@@ -3523,7 +3523,7 @@ class BaseApi(object):
               string A_OrderContractNo(string userNo, int|string localOrderId=0)
 
         【参数】
-              userNo  指定的交易账户
+              userNo  指定的交易账户，默认当前账户
               localOrderId 定单号，或者使用A_SendOrder返回的下单编号。
 
         【备注】
@@ -3628,7 +3628,7 @@ class BaseApi(object):
               bool A_DeleteOrder(string userNo, int|string localOrderId)
 
         【参数】
-              userNo  指定的交易账户
+              userNo  指定的交易账户，默认当前账户
               localOrderId 定单号，或者使用A_SendOrder返回的下单编号。
 
         【备注】
@@ -3650,7 +3650,7 @@ class BaseApi(object):
               string, string A_GetOrderNo(string userNo, string localOrderId)
 
         【参数】
-              userNo  指定的交易账户
+              userNo  指定的交易账户，默认当前账户
               localOrderId 使用A_SendOrder返回的下单编号。
 
         【备注】
@@ -3678,7 +3678,7 @@ class BaseApi(object):
               bool DeleteAllOrders(string userNo, string contractNo='')
 
         【参数】
-              userNo  指定的交易账户
+              userNo  指定的交易账户，默认当前账户
               contractNo 合约代码，默认为所有合约，指定后只撤指定合约。
 
         【备注】
@@ -6624,127 +6624,127 @@ def A_AccountID():
 def A_AllAccountID():
     return baseApi.A_AllAccountID()
 
-def A_GetAllPositionSymbol(userNo):
+def A_GetAllPositionSymbol(userNo=''):
     return baseApi.A_GetAllPositionSymbol(userNo)
 
-def A_Cost(userNo):
+def A_Cost(userNo=''):
     return baseApi.A_Cost(userNo)
 
-def A_Assets(userNo):
+def A_Assets(userNo=''):
     return baseApi.A_Assets(userNo)
 
-def A_Available(userNo):
+def A_Available(userNo=''):
     return baseApi.A_Available(userNo)
 
-def A_Margin(userNo):
+def A_Margin(userNo=''):
     return baseApi.A_Margin(userNo)
 
-def A_ProfitLoss(userNo):
+def A_ProfitLoss(userNo=''):
     return baseApi.A_ProfitLoss(userNo)
 
-def A_CoverProfit(userNo):
+def A_CoverProfit(userNo=''):
     return baseApi.A_CoverProfit(userNo)
 
-def A_TotalFreeze(userNo):
+def A_TotalFreeze(userNo=''):
     return baseApi.A_TotalFreeze(userNo)
 
-def A_BuyAvgPrice(userNo, contractNo=''):
+def A_BuyAvgPrice(userNo='', contractNo=''):
     return baseApi.A_BuyAvgPrice(userNo, contractNo)
 
-def A_BuyPosition(userNo, contractNo=''):
+def A_BuyPosition(userNo='', contractNo=''):
     return baseApi.A_BuyPosition(userNo, contractNo)
 
-def A_BuyPositionCanCover(userNo, contractNo=''):
+def A_BuyPositionCanCover(userNo='', contractNo=''):
     return baseApi.A_BuyPositionCanCover(userNo, contractNo)
 
-def A_BuyProfitLoss(userNo, contractNo=''):
+def A_BuyProfitLoss(userNo='', contractNo=''):
     return baseApi.A_BuyProfitLoss(userNo, contractNo)
 
-def A_SellAvgPrice(userNo, contractNo=''):
+def A_SellAvgPrice(userNo='', contractNo=''):
     return baseApi.A_SellAvgPrice(userNo, contractNo)
 
-def A_SellPosition(userNo, contractNo=''):
+def A_SellPosition(userNo='', contractNo=''):
     return baseApi.A_SellPosition(userNo, contractNo)
 
-def A_SellPositionCanCover(userNo, contractNo=''):
+def A_SellPositionCanCover(userNo='', contractNo=''):
     return baseApi.A_SellPositionCanCover(userNo, contractNo)
 
-def A_SellProfitLoss(userNo, contractNo=''):
+def A_SellProfitLoss(userNo='', contractNo=''):
     return baseApi.A_SellProfitLoss(userNo, contractNo)
 
-def A_TotalAvgPrice(userNo, contractNo=''):
+def A_TotalAvgPrice(userNo='', contractNo=''):
     return baseApi.A_TotalAvgPrice(userNo, contractNo)
 
-def A_TotalPosition(userNo, contractNo=''):
+def A_TotalPosition(userNo='', contractNo=''):
     return baseApi.A_TotalPosition(userNo, contractNo)
 
-def A_TotalProfitLoss(userNo, contractNo=''):
+def A_TotalProfitLoss(userNo='', contractNo=''):
     return baseApi.A_TotalProfitLoss(userNo, contractNo)
 
-def A_TodayBuyPosition(userNo, contractNo=''):
+def A_TodayBuyPosition(userNo='', contractNo=''):
     return baseApi.A_TodayBuyPosition(userNo, contractNo)
 
-def A_TodaySellPosition(userNo, contractNo=''):
+def A_TodaySellPosition(userNo='', contractNo=''):
     return baseApi.A_TodaySellPosition(userNo, contractNo)
 
-def A_OrderBuyOrSell(userNo, localOrderId=''):
+def A_OrderBuyOrSell(userNo='', localOrderId=''):
     return baseApi.A_OrderBuyOrSell(userNo, localOrderId)
 
-def A_OrderEntryOrExit(userNo, localOrderId=''):
+def A_OrderEntryOrExit(userNo='', localOrderId=''):
     return baseApi.A_OrderEntryOrExit(userNo, localOrderId)
 
-def A_OrderFilledLot(userNo, localOrderId=''):
+def A_OrderFilledLot(userNo='', localOrderId=''):
     return baseApi.A_OrderFilledLot(userNo, localOrderId)
 
-def A_OrderFilledPrice(userNo, localOrderId=''):
+def A_OrderFilledPrice(userNo='', localOrderId=''):
     return baseApi.A_OrderFilledPrice(userNo, localOrderId)
 
-def A_OrderLot(userNo, localOrderId=''):
+def A_OrderLot(userNo='', localOrderId=''):
     return baseApi.A_OrderLot(userNo, localOrderId)
 
-def A_OrderPrice(userNo, localOrderId=''):
+def A_OrderPrice(userNo='', localOrderId=''):
     return baseApi.A_OrderPrice(userNo, localOrderId)
 
-def A_OrderStatus(userNo, localOrderId=''):
+def A_OrderStatus(userNo='', localOrderId=''):
     return baseApi.A_OrderStatus(userNo, localOrderId)
 
-def A_OrderTime(userNo, localOrderId=''):
+def A_OrderTime(userNo='', localOrderId=''):
     return baseApi.A_OrderTime(userNo, localOrderId)
 
-def A_FirstOrderNo(userNo, contractNo1='', contractNo2=''):
+def A_FirstOrderNo(userNo='', contractNo1='', contractNo2=''):
     return baseApi.A_FirstOrderNo(userNo, contractNo1, contractNo2)
 
-def A_NextOrderNo(userNo, localOrderId=0, contractNo1='', contractNo2=''):
+def A_NextOrderNo(userNo='', localOrderId=0, contractNo1='', contractNo2=''):
     return baseApi.A_NextOrderNo(userNo, localOrderId, contractNo1, contractNo2)
 
-def A_LastOrderNo(userNo, contractNo1='', contractNo2=''):
+def A_LastOrderNo(userNo='', contractNo1='', contractNo2=''):
     return baseApi.A_LastOrderNo(userNo, contractNo1, contractNo2)
 
-def A_FirstQueueOrderNo(userNo, contractNo1='', contractNo2=''):
+def A_FirstQueueOrderNo(userNo='', contractNo1='', contractNo2=''):
     return baseApi.A_FirstQueueOrderNo(userNo, contractNo1, contractNo2)
 
-def A_NextQueueOrderNo(userNo, localOrderId=0, contractNo1='', contractNo2=''):
+def A_NextQueueOrderNo(userNo='', localOrderId=0, contractNo1='', contractNo2=''):
     return baseApi.A_NextQueueOrderNo(userNo, localOrderId, contractNo1, contractNo2)
 
-def A_AllQueueOrderNo(userNo, contractNo=''):
+def A_AllQueueOrderNo(userNo='', contractNo=''):
     return baseApi.A_AllQueueOrderNo(userNo, contractNo)
 
-def A_LatestFilledTime(userNo, contractNo=''):
+def A_LatestFilledTime(userNo='', contractNo=''):
     return baseApi.A_LatestFilledTime(userNo, contractNo)
 
-def A_OrderContractNo(userNo, localOrderId=0):
+def A_OrderContractNo(userNo='', localOrderId=0):
     return baseApi.A_OrderContractNo(userNo, localOrderId)
 
 def A_SendOrder(orderDirct, entryOrExit, orderQty, orderPrice, contractNo='', userNo='', orderType='2', validType='0', hedge='T', triggerType='N', triggerMode='N', triggerCondition='N', triggerPrice=0):
     return baseApi.A_SendOrder(userNo, contractNo, orderDirct, entryOrExit, orderQty, orderPrice, orderType, validType, hedge, triggerType, triggerMode, triggerCondition, triggerPrice)
 
-def A_DeleteOrder(userNo, localOrderId=''):
+def A_DeleteOrder(userNo='', localOrderId=''):
     return baseApi.A_DeleteOrder(userNo, localOrderId)
 
-def A_GetOrderNo(userNo, localOrderId=''):
+def A_GetOrderNo(userNo='', localOrderId=''):
     return baseApi.A_GetOrderNo(userNo, localOrderId)
 
-def DeleteAllOrders(userNo, contractNo=''):
+def DeleteAllOrders(userNo='', contractNo=''):
     return baseApi.DeleteAllOrders(userNo, contractNo)
 
 #策略交易
