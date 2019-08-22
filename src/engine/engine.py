@@ -91,10 +91,15 @@ class StrategyEngine(object):
             'SPD', 'DCE', 'SHFE', 'CFFEX', 'INE', 'LME',
             'ZCE|F', 'ZCE|O', 'ZCE|M', 'ZCE|S', 'ZCE|Z',
             'CBOT|F|YM', 'CBOT|F|S', 'CBOT|F|ZM', 'CBOT|F|C',
+            'CBOT|Z|YM', 'CBOT|Z|S', 'CBOT|Z|ZM', 'CBOT|Z|C',
             'CME|F|ES', 'CME|F|NQ', 'COMEX|F|HG', 'COMEX|F|GC',
+            'CME|Z|ES', 'CME|Z|NQ', 'COMEX|Z|HG', 'COMEX|Z|GC',
             'NYMEX|F|CL', 'ICUS|F|SB', 'ICUS|F|CT',
+            'NYMEX|Z|CL', 'ICUS|Z|SB', 'ICUS|Z|CT',
             'ICEU|F|B', 'ICEU|F|Z', 'SGX|F|CN',
+            'ICEU|Z|B', 'ICEU|Z|Z', 'SGX|Z|CN',
             'HKEX|F|HSI','HKEX|F|MHI','HKEX|F|HHI','HKEX|F|ICUS','HKEX|F|MCH',
+            'HKEX|Z|HSI','HKEX|Z|MHI','HKEX|Z|HHI','HKEX|Z|ICUS','HKEX|Z|MCH',
         ]
         
         self.logger.debug('Initialize strategy engine ok!')

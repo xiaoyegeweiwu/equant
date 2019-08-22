@@ -875,17 +875,17 @@ class StrategyModel(object):
 
         return self._trdModel.getNextQueueOrderNo(userNo, orderId, contNo1, contNo2)
 
-    def getAllQueueOrderNo(self, contNo):
+    def getAllQueueOrderNo(self, userNo, contNo):
         underlayCont = self._qteModel.getUnderlayContractNo(contNo)
         if len(underlayCont) > 0:
             contNo = underlayCont
 
         orderIdList = []
-        orderId = self.getFirstQueueOrderNo(contNo)
+        orderId = self.getFirstQueueOrderNo(userNo, contNo)
         if orderId != -1:
             orderIdList.append(orderId)
         while (orderId != -1):
-            orderId = self.getNextQueueOrderNo(orderId, contNo)
+            orderId = self.getNextQueueOrderNo(userNo, orderId, contNo)
             if orderId != -1:
                 orderIdList.append(orderId)
         return orderIdList
