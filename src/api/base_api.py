@@ -3374,11 +3374,12 @@ class BaseApi(object):
               返回指定账户第一个订单号。
 
         【语法】
-              int A_FirstOrderNo(string userNo, string contractNo='')
+              int A_FirstOrderNo(string userNo, string contractNo1='', string contractNo2='')
 
         【参数】
               userNo  指定的交易账户，默认当前账户
-              contractNo 合约代码，默认为遍历所有合约。
+              contractNo1 合约代码，默认为遍历所有合约。
+              contractNo2 合约代码，默认为遍历所有合约。
 
         【备注】
               若返回值为-1，表示没有任何订单，否则，返回第一个订单的索引值，
@@ -3395,12 +3396,13 @@ class BaseApi(object):
               返回指定账户下一个订单号。
 
         【语法】
-              int A_NextOrderNo(string userNo, int localOrderId=0, string contractNo='')
+              int A_NextOrderNo(string userNo, int localOrderId=0, string contractNo1='', string contractNo2='')
 
         【参数】
               userNo  指定的交易账户，默认当前账户
               localOrderId 定单号，默认为0，
-              contractNo 合约代码，默认为遍历所有合约。
+              contractNo1 合约代码，默认为遍历所有合约。
+              contractNo2 合约代码，默认为遍历所有合约。
 
         【备注】
               若返回值为-1，表示没有任何订单，否则，返回处在OrderNo后面的订单索引值，
@@ -3417,11 +3419,12 @@ class BaseApi(object):
               返回指定账户最近发送的订单号。
 
         【语法】
-              int A_LastOrderNo(string userNo, string contractNo='')
+              int A_LastOrderNo(string userNo, string contractNo1='', string contractNo2='')
 
         【参数】
               userNo  指定的交易账户，默认当前账户
-              contractNo 合约代码，默认为遍历所有合约。
+              contractNo1 合约代码，默认为遍历所有合约。
+              contractNo2 合约代码，默认为遍历所有合约。
 
         【备注】
               若返回值为-1，表示没有任何订单，否则，返回最后一个订单的索引值。
@@ -3437,11 +3440,12 @@ class BaseApi(object):
               返回指定账户第一个排队(可撤)订单号。
 
         【语法】
-              int A_FirstQueueOrderNo(string userNo, string contractNo='')
+              int A_FirstQueueOrderNo(string userNo, string contractNo1='', string contractNo2='')
 
         【参数】
               userNo  指定的交易账户，默认当前账户
-              contractNo 合约代码，默认为遍历所有合约。
+              contractNo1 合约代码，默认为遍历所有合约。
+              contractNo2 合约代码，默认为遍历所有合约。
 
         【备注】
               若返回值为-1，表示没有任何可撤排队订单，否则，返回第一个订单的索引值。，
@@ -3458,12 +3462,13 @@ class BaseApi(object):
               返回指定账户下一个排队(可撤)订单号。
 
         【语法】
-              int A_NextQueueOrderNo(string userNo, int localOrderId=0, string contractNo='')
+              int A_NextQueueOrderNo(string userNo, int localOrderId=0, string contractNo1='', string contractNo2='')
 
         【参数】
               userNo  指定的交易账户，默认当前账户
               localOrderId 定单号，默认为0，
-              contractNo 合约代码，默认为遍历所有合约。
+              contractNo1 合约代码，默认为遍历所有合约。
+              contractNo2 合约代码，默认为遍历所有合约。
 
         【备注】
               若返回值为-1，表示没有任何排队订单，否则，返回处在OrderNo后面的订单索引值，
