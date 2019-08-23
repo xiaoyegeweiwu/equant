@@ -265,7 +265,8 @@ class GetEgData(object):
     def _onEgLoadAnswer(self, event):
         """获取引擎加载应答数据"""
         self._curStId = event.getStrategyId()
-        self._stManager.addStrategy(event.getData())
+        data = event.getData()
+        self._stManager.addStrategy(data)
         self._logger.info(f"[UI][{self._curStId}]: Receiveing running answer successfully!")
 
     def _onEgReportAnswer(self, event):
@@ -388,8 +389,8 @@ class GetEgData(object):
     def handlerEgEvent(self):
         try:
             # 如果不给出超时则会导致线程退出时阻塞
-            # event = self._eg2uiQueue.get(timeout=0.1)
-            event = self._eg2uiQueue.get_nowait()
+            event = self._eg2uiQueue.get(timeout=0.01)
+            # event = self._eg2uiQueue.get_nowait()
             eventCode = event.getEventCode()
 
             if eventCode not in self._egAskCallbackDict:

@@ -569,9 +569,10 @@ class RunWin(QuantToplevel, QuantFrame):
 
     def insertParams(self):
         """恢复用户选择的参数信息"""
+        # print("22222222: ", self._userParam)
         for key in self._userParam:
             self.paramTree.insert("", tk.END, values=tuple(
-                [key, self._userParam[key][0], type(self._userParam[key][0]).__name__, self._userParam[key][1]]), tags=key)
+                [key, str(self._userParam[key][0]), type(self._userParam[key][0]).__name__, self._userParam[key][1]]), tags=key)
 
     def insertContInfo(self):
         """恢复配置文件中用户选择的多合约信息"""
@@ -1444,14 +1445,19 @@ class RunWin(QuantToplevel, QuantFrame):
                 elif paramValues[1] == "False":
                     temp = False
 
-            # params[paramValues[0]] = (eval(paramValues[2])(paramValues[1]), paramValues[3])
-            params[paramValues[0]] = (eval(paramValues[2])(temp), paramValues[3])
+            # TODO: 字符串转换时很麻烦
+            if paramValues[2] == "str" or paramValues[2] == "bool" or paramValues[2] == "int":
+                params[paramValues[0]] = (eval(paramValues[2])(temp), paramValues[3])
+                continue
+            else:
+                params[paramValues[0]] = (eval(paramValues[2])(eval(temp)), paramValues[3])
+
+
 
         self._strConfig.setParams(params)
 
         self.config = self._strConfig.getConfig()
         # print("-----------: ", self.config)
-
 
         # -------------保存用户配置--------------------------
         # strategyPath = self._control.getEditorText()["path"]
