@@ -1435,8 +1435,17 @@ class RunWin(QuantToplevel, QuantFrame):
         params = {}
         for item in self.paramTree.get_children():
             paramValues = self.paramTree.item(item)['values']
-            # Treeview会自动转换item的值
-            params[paramValues[0]] = (eval(paramValues[2])(paramValues[1]), paramValues[3])
+            # Treeview会将字面值为int型的变量(eg: '1')转换为int型
+            # bool类型的判断
+            temp = paramValues[1]
+            if paramValues[2] == "bool":
+                if paramValues[1] == "True":
+                    temp = True
+                elif paramValues[1] == "False":
+                    temp = False
+
+            # params[paramValues[0]] = (eval(paramValues[2])(paramValues[1]), paramValues[3])
+            params[paramValues[0]] = (eval(paramValues[2])(temp), paramValues[3])
 
         self._strConfig.setParams(params)
 
