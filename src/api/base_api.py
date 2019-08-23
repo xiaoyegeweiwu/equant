@@ -3641,16 +3641,15 @@ class BaseApi(object):
          '''
         return self._dataModel.deleteOrder(localOrderId)
 
-    def A_GetOrderNo(self, userNo, localOrderId):
+    def A_GetOrderNo(self, localOrderId):
         '''
         【说明】
-              针对指定帐户获取下单编号对应的定单号和委托号。
+              获取下单编号对应的定单号和委托号。
 
         【语法】
-              string, string A_GetOrderNo(string userNo, string localOrderId)
+              string, string A_GetOrderNo(string localOrderId)
 
         【参数】
-              userNo  指定的交易账户，默认当前账户
               localOrderId 使用A_SendOrder返回的下单编号。
 
         【备注】
@@ -3667,7 +3666,7 @@ class BaseApi(object):
               if retCode == 0:
                 sessionId, orderNo =  A_GetOrderNo(retMsg)
          '''
-        return self._dataModel.getAOrderNo(userNo, localOrderId)
+        return self._dataModel.getAOrderNo(localOrderId)
 
     def DeleteAllOrders(self, userNo, contractNo):
         '''
@@ -6741,8 +6740,8 @@ def A_SendOrder(orderDirct, entryOrExit, orderQty, orderPrice, contractNo='', us
 def A_DeleteOrder(userNo='', localOrderId=''):
     return baseApi.A_DeleteOrder(userNo, localOrderId)
 
-def A_GetOrderNo(userNo='', localOrderId=''):
-    return baseApi.A_GetOrderNo(userNo, localOrderId)
+def A_GetOrderNo(localOrderId=''):
+    return baseApi.A_GetOrderNo(localOrderId)
 
 def DeleteAllOrders(userNo='', contractNo=''):
     return baseApi.DeleteAllOrders(userNo, contractNo)
