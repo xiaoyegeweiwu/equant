@@ -3644,7 +3644,7 @@ class BaseApi(object):
         【示例】
               无
          '''
-        return self._dataModel.deleteOrder(localOrderId)
+        return self._dataModel.deleteOrder(userNo, localOrderId)
 
     def A_GetOrderNo(self, localOrderId):
         '''
