@@ -742,21 +742,15 @@ class StrategyEngine(object):
         self._reqMatch(allMatchReqEvent)
         
     def _onApiOrderDataNotice(self, apiEvent):
-        # print("in engine ********", repr(apiEvent.getData()[0]["OrderState"]))
-        # 订单信息
         self._trdModel.updateOrderData(apiEvent)
         self._engineOrderModel.updateEpoleStarOrder(apiEvent)
         contractNo = apiEvent.getContractNo()
         # 客户端手动开仓平仓
-        # self.logger.debug(f"sun --------------- engine notice : ")
-        # self.logger.debug(f"sun ------ contNo :  {apiEvent.getContractNo()} , cont : {apiEvent.getData()[0]['Cont']}")
         if not contractNo:
             contractNo = apiEvent.getData()[0]["Cont"]
         if not contractNo:
             return
         apiEvent.setContractNo(contractNo)
-        # for dataDict in apiEvent.getData():
-        #     self.logger.debug(f"sun ------ OrderId :  {dataDict['OrderId']} , OrderState : {dataDict['OrderState']}")
         self._sendEvent2AllStrategy(apiEvent)
 
     def _onApiMatchDataQry(self, apiEvent):

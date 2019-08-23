@@ -877,8 +877,15 @@ class Strategy:
         self._trdModel.updateOrderData(apiEvent)
         
     def _onTradeOrder(self, apiEvent):
-        self._trdModel.updateOrderData(apiEvent)
         
+        self._trdModel.updateOrderData(apiEvent)
+
+        # 更新本地订单信息
+        dataList = apiEvent.getData()
+        eSessionId = apiEvent.getESessionId()
+        for data in dataList:
+            self.updateLocalOrder(eSessionId, data)
+            
         if self.isRealTimeStatus():
             self._tradeTriggerOrder(apiEvent)
         
@@ -927,6 +934,7 @@ class Strategy:
 
     def updateLocalOrder(self, eSesnId, data):
         # 更新本地订单信息
+        #self.logger.debug("AAAAA:%s,%s"%(eSesnId, data))
         if eSesnId in self._localOrder:
             tradeRecode = self._localOrder[eSesnId]
             tradeRecode.updateOrderInfo(eSesnId, data)
