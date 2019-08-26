@@ -779,12 +779,12 @@ class StrategyEngine(object):
             
         
     def _onApiOrderDataQry(self, apiEvent):
-        self.logger.debug("_onApiOrderDataQry:%s"%apiEvent.getData())
+        #self.logger.debug("_onApiOrderDataQry:%s"%apiEvent.getData())
         self._trdModel.updateOrderData(apiEvent)
         self._sendEvent2AllStrategy(apiEvent)
         
     def _onApiOrderDataNotice(self, apiEvent):
-        self.logger.debug("_onApiOrderDataNotice:%s"%apiEvent.getData())
+        #self.logger.debug("_onApiOrderDataNotice:%s"%apiEvent.getData())
         self._trdModel.updateOrderData(apiEvent)
         contractNo = apiEvent.getContractNo()
         # 客户端手动开仓平仓
@@ -796,26 +796,26 @@ class StrategyEngine(object):
         self._sendEvent2AllStrategy(apiEvent)
 
     def _onApiMatchDataQry(self, apiEvent):
-        self.logger.debug("_onApiMatchDataQry:%s"%apiEvent.getData())
+        #self.logger.debug("_onApiMatchDataQry:%s"%apiEvent.getData())
         self._trdModel.updateMatchData(apiEvent)
         self._sendEvent2AllStrategy(apiEvent)
             
     def _onApiMatchData(self, apiEvent):
         # 成交信息
-        self.logger.debug("_onApiMatchData:%s"%apiEvent.getData())
+        #self.logger.debug("_onApiMatchData:%s"%apiEvent.getData())
         self._trdModel.updateMatchData(apiEvent)
         # print("++++++ 成交信息 引擎 变化 ++++++", apiEvent.getData())
         # TODO: 分块传递
         self._sendEvent2AllStrategy(apiEvent)
         
     def _onApiPosDataQry(self, apiEvent):
-        self.logger.debug("_onApiPosDataQry:%s"%apiEvent.getData())
+        #self.logger.debug("_onApiPosDataQry:%s"%apiEvent.getData())
         self._trdModel.updatePosData(apiEvent)
         # print("++++++ 持仓信息 引擎 查询 ++++++", apiEvent.getData())
         self._sendEvent2AllStrategy(apiEvent)
 
     def _onApiPosData(self, apiEvent):
-        self.logger.debug("_onApiPosData:%s"%apiEvent.getData())
+        #self.logger.debug("_onApiPosData:%s"%apiEvent.getData())
         # 持仓信息
         self._trdModel.updatePosData(apiEvent)
         # print("++++++ 持仓信息 引擎 变化 ++++++", apiEvent.getData())
@@ -824,7 +824,7 @@ class StrategyEngine(object):
 
     def _onApiMoney(self, apiEvent):
         # 资金信息
-        self.logger.debug("_onApiMoney:%s"%apiEvent.getData())
+        #self.logger.debug("_onApiMoney:%s"%apiEvent.getData())
         self._trdModel.updateMoney(apiEvent)
         # print("++++++ 资金信息 引擎 ++++++", apiEvent.getData())
         self._sendEvent2AllStrategy(apiEvent)
