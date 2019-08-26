@@ -275,7 +275,7 @@ class QuantMonitor(object):
         self.errText.createScrollbar()
         self.errText.pack(fill=BOTH, expand=YES)
 
-    def updateLogText(self):
+    def updateSysText(self):
         guiQueue = self._controller.get_logger().getGuiQ()
         data = ""
         flag = True
