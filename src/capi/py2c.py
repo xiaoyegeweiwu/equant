@@ -1504,6 +1504,8 @@ class PyAPI(object):
         for i in range(len(dataList)):
             dataList[i]["StrategyId"] = apiEvent.getStrategyId()
             dataList[i]["StrategyOrderId"] = apiEvent.getESessionId()
+            
+            # self.logger.debug('UNo:%s,stId:%d,StOId:%s,OId:%s,ONo:%s' %(dataList[i]["UserNo"],dataList[i]["StrategyId"],dataList[i]["StrategyOrderId"],dataList[i]["OrderId"],dataList[i]["OrderNo"]))
 
         # 发送到引擎
         apiEvent.setData(dataList)
