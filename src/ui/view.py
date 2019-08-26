@@ -120,8 +120,8 @@ class QuantApplication(object):
         self.quant_monitor.createErr()
         self.quant_monitor.createPos()
 
-    def updateLogText(self):
-        self.quant_monitor.updateLogText()
+    def updateSysLogText(self):
+        self.quant_monitor.updateSysText()
 
     def updateSigText(self):
         self.quant_monitor.updateSigText()

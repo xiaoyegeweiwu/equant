@@ -50,7 +50,7 @@ class TkinterController(object):
         # 创建策略信息更新线程
         self.monitorThread = ChildThread(self.updateMonitor, 1)
         # 创建接收引擎数据线程
-        self.receiveEgThread = ChildThread(self.model.receiveEgEvent, 0.01)
+        self.receiveEgThread = ChildThread(self.model.receiveEgEvent)
         # 信号记录线程
         self.sigThread = ChildThread(self.updateSig, 0.01)
         # 用户日志线程
@@ -64,8 +64,7 @@ class TkinterController(object):
 
     def update_log(self):
         try:
-            self.app.updateLogText()
-            # self.app.updateSigText()
+            self.app.updateSysLogText()
             self.app.updateErrText()
 
             self.top.after(10, self.update_log)
@@ -81,17 +80,21 @@ class TkinterController(object):
 
     def updateMonitor(self):
         # 更新监控界面策略信息
-        strategyDict = self.strategyManager.getStrategyDict()
-        #TODO: strategyDict的异常策略应该怎么处理?
-        for stId in strategyDict:
-            if "RunningData" not in strategyDict[stId]:
-                continue
-            if strategyDict[stId]["StrategyState"] == ST_STATUS_PAUSE or strategyDict[stId][
-                  "StrategyState"] == ST_STATUS_QUIT or strategyDict[stId][
-                  "StrategyState"] == ST_STATUS_EXCEPTION:
-                continue
+        try:
+            strategyDict = self.strategyManager.getStrategyDict()
+            #TODO: strategyDict的异常策略应该怎么处理?
+            for stId in strategyDict:
+                if "RunningData" not in strategyDict[stId]:
+                    continue
+                if strategyDict[stId]["StrategyState"] == ST_STATUS_PAUSE or strategyDict[stId][
+                      "StrategyState"] == ST_STATUS_QUIT or strategyDict[stId][
+                      "StrategyState"] == ST_STATUS_EXCEPTION:
+                    continue
 
-            self.app.updateValue(stId, strategyDict[stId]["RunningData"])
+                self.app.updateValue(stId, strategyDict[stId]["RunningData"])
+        except PermissionError as e:
+            self.logger.error("更新监控信息时出错")
+
 
     def quitThread(self):
         self.logger.info("quitThread exit")
@@ -153,12 +156,16 @@ class TkinterController(object):
         with open(strategyPath, 'r', encoding="utf-8") as f:
             content = [line.strip() for line in f]
             for c in content:
-                #regex = re.compile(r"\s*g_params[\[][\"\'](.*)[\"\'][\]]\s*=[\s]*([^\s]*)[\s]*(#[\s]*(.*))?")
-                regex = re.compile(r"^g_params[\[][\"\'](.*)[\"\'][\]]\s*=[\s]*([^\s]*)[\s]*(#[\s]*(.*))?")
-                reg = regex.search(c)
-                if reg:
-                    ret = [reg.groups()[1], reg.groups()[3]]
-                    if ret[1] is None: ret[1] = ""
+                # regex = re.compile(r"^g_params[\[][\"\'](.*)[\"\'][\]]\s*=[\s]*([^\s]*)[\s]*(#[\s]*(.*))?")
+                regex1 = re.compile(r"^g_params[\[][\"\'](.*)[\"\'][\]]\s*=[\s]*(.*)[\s]*#[\s]*(.*)?")
+                regex2 = re.compile(r"^g_params[\[][\"\'](.*)[\"\'][\]]\s*=[\s]*(.*)[\s]*#?[\s]*(.*)?")
+
+                reg1 = regex1.search(c)
+                reg2 = regex2.search(c)
+                if reg1 or reg2:
+                    reg = reg1 if reg1 else reg2
+                    ret = [reg.groups()[1], reg.groups()[2]]
+                    # if ret[1] is None: ret[1] = ""
                     try:
                         ret[0] = eval(ret[0])
                     except:
@@ -194,6 +201,7 @@ class TkinterController(object):
     def paramLoad(self, id):
         """用户参数修改后策略重新启动"""
         param = self.getUserParam(id)
+        print("2222222: ", param)
         strategyPath = self.strategyManager.getSingleStrategy(id)["Path"]
         self.app.createRunWin(param, strategyPath, True)
 

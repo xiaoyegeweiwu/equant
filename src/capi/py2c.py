@@ -930,9 +930,9 @@ class PyAPI(object):
         sessionId = c_uint()
         data = event.getData()
         req = EEquUserMoneyReq()
-        req.UserNo = "".encode()
-        req.Sign = "".encode()
-        req.CurrencyNo = "".encode()
+        req.UserNo = data['UserNo'].encode()
+        req.Sign = data['Sign'].encode()
+        req.CurrencyNo = data['CurrencyNo'].encode()
         self._cDll.E_ReqQryMoney(byref(sessionId), byref(req))
         
     def reqQryOrder(self, event):
