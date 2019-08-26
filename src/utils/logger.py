@@ -40,7 +40,7 @@ class MyFileHandler(logging.FileHandler):
 
 
 class MyHandlerQueue(logging.StreamHandler):
-    def __init__(self, gui_queue, sig_queue, usr_queue, err_queue, trade_log, user_log, sys_log):
+    def __init__(self, gui_queue, sig_queue, usr_queue, err_queue, trade_log, user_log):
         logging.StreamHandler.__init__(self)  # initialize parent
         self.gui_queue = gui_queue
         self.sig_queue = sig_queue
@@ -48,7 +48,6 @@ class MyHandlerQueue(logging.StreamHandler):
         self.err_queue = err_queue
         self.trade_log = trade_log
         self.user_log  = user_log
-        self.sys_log   = sys_log
 
     def emit(self, record):
         #最多等待1秒
@@ -121,7 +120,7 @@ class Logger(object):
         #用户日志
         self.user_log  = open(user_path, mode='a', encoding='utf-8')
         #系统日志
-        self.sys_log   = open(sys_path, mode='a', encoding='utf-8')
+        # self.sys_log   = open(sys_path, mode='a', encoding='utf-8')
 
         #logger config
         self.logger = logging.getLogger("equant")
@@ -189,7 +188,7 @@ class Logger(object):
         self.logger.addHandler(file_handler)
         #设置窗口句柄
         gui_handler = MyHandlerQueue(self.gui_queue, self.sig_queue, self.usr_queue, self.err_queue,
-                                     self.trade_log, self.user_log, self.sys_log)
+                                     self.trade_log, self.user_log)
         gui_handler.setLevel(logging.DEBUG)
         gui_handler.setFormatter(self.formatter)
         self.logger.addHandler(gui_handler)
