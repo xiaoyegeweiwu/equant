@@ -39,9 +39,15 @@ class TLogoinModel:
     def getLoginNo(self):
         return self._loginNo
         
+    def getLoginApi(self):
+        return self._metaData['LoginApi']
+    
+    def getLoginUser(self):
+        return self._userInfo
+        
     def updateLoginInfo(self, loginNo, data):
         self.logger.info("[LOGIN] update login info: %s"%data)
-  
+
         for k, v in data.items():
             if k == 'IsReady':
                 if v == EEQU_NOTREADY:
@@ -63,6 +69,7 @@ class TUserInfoModel:
         self.logger = logger
         self._loginInfo = loginInfo
         self._loginNo = loginInfo.getLoginNo()
+        self._loginApi = loginInfo.getLoginApi()
         self._userNo = data['UserNo']
         self._isReady = True
         
@@ -84,6 +91,9 @@ class TUserInfoModel:
             data['UserNo'], data['Sign'], data['LoginNo'], data['UserName']
         ))
         
+    def chkLoginNo(self, loginNo):
+        return self._loginNo == loginNo
+    
     def setUserStatus(self, data):
         '''根据登录信息更新用户信息'''
         if 'LoginNo' not in data:
@@ -354,13 +364,61 @@ class TradeModel:
     def getUserInfo(self):
         return self._userInfo
         
+    def getLoginUser(self, loginNo):
+        if loginNo not in self._loginInfo:
+            return {}
+        return self._loginInfo[loginNo].getLoginUser()
+        
     ###################################################################
     def setUserStatus(self, loginDict):
         for v in self._userInfo.values():
             v.setUserStatus(loginDict)
+            
+    def addLoginInfo(self, data):
+        '''增加登录信息，有则更新'''
+        loginNo = data['LoginNo']
+        if loginNo not in self._loginInfo:
+            self._loginInfo[loginNo] = TLogoinModel(self.logger, loginNo, data)
+        else:
+            self._loginInfo[loginNo].updateLoginInfo(loginNo, data)
+            
+    def delLoginInfo(self, login):
+        '''删除登录信息'''
+        loginNo = login['LoginNo']
+        if loginNo not in self._loginInfo:
+            return
+        self._loginInfo.pop(loginNo)
+        
+    def delUserInfo(self, loginNo):
+        '''删除该登录账户下的所有用户信息'''
+        popUserList = []
+        
+        for k, v in self._userInfo.items():
+            if v.chkLoginNo(loginNo):
+                popUserList.append(k)
+                
+        for user in popUserList:
+            self._userInfo.pop(user)
+            
+    def getLoginApi(self, userNo):
+        if userNo not in self._userInfo:
+            return ''
+            
+        return self._userInfo[userNo]._loginApi
+        
+    def chkTradeDate(self, data):
+        if data['LoginNo'] not in self._loginInfo:
+            return False
+            
+        login = self._loginInfo[data['LoginNo']]
+        meta  = login.getMetaData()
+        #当前的交易日和上一交易日不一样
+        return (login['TradeDate'] != meta['TradeDate'])
+              
 
     # 更新登录信息
     def updateLoginInfo(self, apiEvent):
+        ''''''
         dataList = apiEvent.getData()
         #self.logger.debug("updateLoginInfo:%s"%dataList)
         for data in dataList:

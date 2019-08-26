@@ -602,9 +602,12 @@ class StrategyModel(object):
 
     def setStartTrade(self):
         self._cfgModel.setPending(False)
+        # TODO: 通知界面策略状态发生变化
 
     def setStopTrade(self):
         self._cfgModel.setPending(True)
+        # TODO：通知界面策略状态发生变化
+        
 
     def isTradeAllowed(self):
         if self._cfgModel.isActualRun() and self._strategy.isRealTimeStatus() and not self._cfgModel.getPending():

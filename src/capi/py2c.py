@@ -908,9 +908,10 @@ class PyAPI(object):
         '''
         self.logger.info("Request query user info:%s"%event.getData())
         sessionId = c_uint()
+        data = event.getData()
         req = EEquUserInfoReq()
-        req.UserNo = "".encode()
-        req.Sign = "".encode()
+        req.UserNo = data['UserNo'].encode()
+        req.Sign = data['Sign'].encode()
         self._cDll.E_ReqQryUserInfo(byref(sessionId), byref(req))
         
     def reqQryMoney(self, event):
@@ -952,8 +953,8 @@ class PyAPI(object):
         data = event.getData()
         # self.logger.debug('Request query order:%s'%event.getData())
         req = EEquOrderQryReq()
-        req.UserNo = "".encode()
-        req.Sign = "".encode()
+        req.UserNo = data['UserNo'].encode()
+        req.Sign = data['Sign'].encode()
         self._cDll.E_ReqQryOrder(byref(sessionId), byref(req))
         self._setSessionId(sessionId.value, event.getStrategyId())
 
@@ -963,8 +964,8 @@ class PyAPI(object):
         data = event.getData()
         # self.logger.debug('Request query match:%s'%event.getData())
         req = EEquOrderQryReq()
-        req.UserNo = "".encode()
-        req.Sign = "".encode()
+        req.UserNo = data['UserNo'].encode()
+        req.Sign = data['Sign'].encode()
         self._cDll.E_ReqQryMatch(byref(sessionId), byref(req))
         self._setSessionId(sessionId.value, event.getStrategyId())
         
@@ -974,8 +975,8 @@ class PyAPI(object):
         data = event.getData()
         # self.logger.debug('Request query position:%s'%event.getData())
         req = EEquOrderQryReq()
-        req.UserNo = "".encode()
-        req.Sign = "".encode()
+        req.UserNo = data['UserNo'].encode()
+        req.Sign = data['Sign'].encode()
         self._cDll.E_ReqQryPosition(byref(sessionId), byref(req))
         self._setSessionId(sessionId.value, event.getStrategyId())
 
