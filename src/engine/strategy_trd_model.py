@@ -21,6 +21,9 @@ class StrategyTrade(TradeModel):
         '''
         :return:当前公式应用的交易帐户ID
         '''
+        if not self._selectedUserNo:
+            return ''
+        
         user = self._userInfo[self._selectedUserNo]
         if not user.isReady():
             return ''
