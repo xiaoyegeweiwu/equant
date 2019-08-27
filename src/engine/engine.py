@@ -670,17 +670,21 @@ class StrategyEngine(object):
 
     # 用户登录信息
     def _onApiLoginInfoRsp(self, apiEvent):
-        #self.logger.debug("_onApiLoginInfoRsp:%s"%apiEvent.getData())
+        self.logger.debug("_onApiLoginInfoRsp:%s"%apiEvent.getData())
         self._trdModel.updateLoginInfo(apiEvent)
         self._sendEvent2AllStrategy(apiEvent)
         
         for data in apiEvent.getData():
             self._reqUserInfoByLogin(data)
-
-        if not apiEvent.isChainEnd():
-            return       
-        if not apiEvent.isSucceed():
-            return
+        
+        #没有账号登录，先向界面发送一包用户信息
+        if len(apiEvent.getData()) == 0:
+            event = Event({
+                'StragetgyId' : 0,
+                'EventCode': EEQU_SRVEVENT_TRADE_USERQRY,
+                'Data' : ''
+            })
+            self._send2uiQueue(event)
         
     def _reqUserInfoByLogin(self, login):
         event = Event({
@@ -723,12 +727,16 @@ class StrategyEngine(object):
             loginNo = data['LoginNo']
             if loginNo not in loginInfo:
                 self._trdModel.addLoginInfo(data)
+                #TODO： 通知界面账号登录
+                
                 #查询账户信息
                 self._reqUserInfoByLogin(data)
             #登出，清理登录账号和资金账号
             elif data['IsReady'] == EEQU_NOTREADY:
                 self._trdModel.delLoginInfo(data)
                 self._trdModel.delUserInfo(loginNo)
+                #TODO：通知界面账号登出
+                
             #交易日切换，清理所有资金账号及本地委托数据
             elif self._trdModel.chkTradeDate(data):
                 self._trdModel.delUserInfo(loginNo)
@@ -739,7 +747,7 @@ class StrategyEngine(object):
     # 账户信息
     def _onApiUserInfo(self, apiEvent): 
         #分用户 分批次请求交易数据，否则队列会阻塞
-        #self.logger.debug("_onApiUserInfo:%s"%apiEvent.getData())
+        self.logger.debug("_onApiUserInfo:%s"%apiEvent.getData())
         self._trdModel.updateUserInfo(apiEvent)
         self._send2uiQueue(apiEvent)
         # print("++++++ 账户信息 引擎 ++++++", apiEvent.getData())
