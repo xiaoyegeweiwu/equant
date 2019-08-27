@@ -17,19 +17,13 @@ class StrategyTrade(TradeModel):
     def initialize(self):
         self._selectedUserNo = self._config.getUserNo()
 
-    def reqTradeData(self):
-        event = Event({
-            'EventCode': EV_ST2EG_STRATEGYTRADEINFO,
-            'StrategyId': self._strategy.getStrategyId(),
-            'Data': '',
-        })
-
-        self._strategy.sendEvent2Engine(event)
-
     def getAccountId(self):
         '''
         :return:当前公式应用的交易帐户ID
         '''
+        if not self._selectedUserNo:
+            return ''
+        
         user = self._userInfo[self._selectedUserNo]
         if not user.isReady():
             return ''

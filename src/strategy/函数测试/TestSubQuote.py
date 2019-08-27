@@ -1,10 +1,10 @@
 import talib
 
 g_CommNo1 = "NYMEX|F|CL"
-g_ContNo1 = "NYMEX|F|CL|1908"
+g_ContNo1 = "NYMEX|F|CL|1910"
 
 g_CommNo2 = "HKEX|F|HSI"
-g_ContNo2 = "HKEX|F|HSI|1907"
+g_ContNo2 = "HKEX|F|HSI|1908"
 
 g_60count = 0
 g_60times = 60
