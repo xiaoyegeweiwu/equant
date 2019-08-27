@@ -413,7 +413,7 @@ class TradeModel:
         login = self._loginInfo[data['LoginNo']]
         meta  = login.getMetaData()
         #当前的交易日和上一交易日不一样
-        return (login['TradeDate'] != meta['TradeDate'])
+        return (data['TradeDate'] != meta['TradeDate'])
               
 
     # 更新登录信息

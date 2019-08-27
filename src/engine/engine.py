@@ -736,6 +736,7 @@ class StrategyEngine(object):
                 
             #交易日切换，清理所有资金账号及本地委托数据
             elif self._trdModel.chkTradeDate(data):
+                self.logger.info("Change trade date:%s"%data)
                 self._trdModel.delUserInfo(loginNo)
                 self._reqUserInfoByLogin(data)
             else:
