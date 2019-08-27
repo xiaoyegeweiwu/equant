@@ -870,8 +870,8 @@ class Strategy:
                 self._trdModel.delLoginInfo(data)
                 self._trdModel.delUserInfo(loginNo)
             #交易日切换，清理所有资金账号及本地委托数据
-            elif self._trdMode.chkTradeDate(loginNo):
-                userDict = self._trdMode.getLoginUser(loginNo)
+            elif self._trdModel.chkTradeDate(data):
+                userDict = self._trdModel.getLoginUser(loginNo)
                 self.delLocalOrder(userDict)
                 self._trdModel.delUserInfo(loginNo)
             else:
