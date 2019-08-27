@@ -4,7 +4,7 @@ sentOrder = True
 localIdList = []
 
 def initialize(context): 
-    SetBarInterval("NYMEX|F|CL|1908", 'M', 1, 200)
+    SetBarInterval("NYMEX|F|CL|1910", 'M', 1, 200)
     SetActual()
 
 
