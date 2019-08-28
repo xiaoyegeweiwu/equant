@@ -244,21 +244,23 @@ class GetEgData(object):
 
     def _regAskCallback(self):
         self._egAskCallbackDict = {
-            EV_EG2UI_LOADSTRATEGY_RESPONSE: self._onEgLoadAnswer,
-            EV_EG2UI_REPORT_RESPONSE:       self._onEgReportAnswer,
-            EV_EG2UI_CHECK_RESULT:          self._onEgDebugInfo,
-            EV_EG2ST_MONITOR_INFO:          self._onEgMonitorInfo,
-            EV_EG2UI_STRATEGY_STATUS:       self._onEgStrategyStatus,
-            EV_EG2UI_POSITION_NOTICE:       self._onEgPositionNotice,
-            EEQU_SRVEVENT_EXCHANGE:         self._onEgExchangeInfo,
-            EEQU_SRVEVENT_COMMODITY:        self._onEgCommodityInfo,
-            EEQU_SRVEVENT_CONTRACT:         self._onEgContractInfo,
-            EEQU_SRVEVENT_TRADE_USERQRY:    self._onEgUserInfo,
-            EEQU_SRVEVENT_TRADE_EXCSTATEQRY:self._onEgExchangeStatus,
-            EEQU_SRVEVENT_TRADE_EXCSTATE:   self._onEgExchangeStatus,
+            EV_EG2UI_LOADSTRATEGY_RESPONSE:   self._onEgLoadAnswer,
+            EV_EG2UI_REPORT_RESPONSE:         self._onEgReportAnswer,
+            EV_EG2UI_CHECK_RESULT:            self._onEgDebugInfo,
+            EV_EG2ST_MONITOR_INFO:            self._onEgMonitorInfo,
+            EV_EG2UI_STRATEGY_STATUS:         self._onEgStrategyStatus,
+            EV_EG2UI_POSITION_NOTICE:         self._onEgPositionNotice,
+            EV_EG2UI_RUNMODE_SWITCH:          self._onEgRunmodeSwitch,
+            EV_EG2UI_USER_LOGOUT_NOTICE:      self._onEgLogoutUser,
+            EEQU_SRVEVENT_EXCHANGE:           self._onEgExchangeInfo,
+            EEQU_SRVEVENT_COMMODITY:          self._onEgCommodityInfo,
+            EEQU_SRVEVENT_CONTRACT:           self._onEgContractInfo,
+            EEQU_SRVEVENT_TRADE_USERQRY:      self._onEgUserInfo,
+            EEQU_SRVEVENT_TRADE_EXCSTATEQRY:  self._onEgExchangeStatus,
+            EEQU_SRVEVENT_TRADE_EXCSTATE:     self._onEgExchangeStatus,
 
-            EEQU_SRVEVENT_CONNECT:          self._onEgConnect,
-            EEQU_SRVEVENT_DISCONNECT:       self._onEgDisconnect
+            EEQU_SRVEVENT_CONNECT:            self._onEgConnect,
+            EEQU_SRVEVENT_DISCONNECT:         self._onEgDisconnect
         }
 
     # TODO: event.getChian()的类型为字符串：'1', '0'
@@ -336,6 +338,33 @@ class GetEgData(object):
         #TODO: 接收exchange、commodity、contract、user信息一起打印
         self._logger.info(f"[UI]: Receiving exchange, commodity, contract and user info successfully!")
 
+    def _onEgLogoutUser(self, event):
+        """Update self._userNo when user logouts"""
+        logoutUser = event.getData()
+        for userNo in logoutUser:
+            for uInfo in self._userNo:
+                if uInfo["UserNo"] == userNo:
+                    self._userNo.remove(uInfo)
+                    self._logger.info(f"[UI]: 账号{uInfo}登出")
+                    # 账号列表中可能存在重复账号
+                    if uInfo not in self._userNo:
+                        break
+
+    def _onEgRunmodeSwitch(self, event):
+        """update Running Actual/Virtual status"""
+        id = event.getStrategyId()
+        runStatus = event.getData()["Status"]
+
+        if id not in self._stManager.getStrategyDict():
+            return
+
+        # 策略状态改变后要通知监控界面
+        self._stManager.updateStrategyRunMode(id, runStatus)
+        # 更新策略Id的运行状态
+        self._app.updateRunMode(id, runStatus)
+
+        self._logger.info(f"[UI][{id}]: Receiving Runmode Switch {runStatus} successfully!")
+
     def _onEgStrategyStatus(self, event):
         """接收引擎推送策略状态改变信息"""
         id = event.getStrategyId()
@@ -354,7 +383,7 @@ class GetEgData(object):
             # 策略状态改变后要通知监控界面
             self._stManager.updateStrategyStatus(id, sStatus)
             # 更新策略Id的运行状态
-            self._app.updateStatus(id, sStatus)
+            self._app.updateRunStage(id, sStatus)
             if sStatus == ST_STATUS_QUIT:
                 # 策略停止时接收策略数据
                 self._stManager.addResultData(id, event.getData()["Result"])
@@ -485,6 +514,11 @@ class StrategyManager(object):
     def updateStrategyStatus(self, id, status):
         if id in self._strategyDict:
             self._strategyDict[id]["StrategyState"] = status
+
+    def updateStrategyRunMode(self, id, status):
+        """运行模式更新"""
+        if id in self._strategyDict:
+            self._strategyDict[id]["IsActualRun"] = status
 
     def getStrategyConfigData(self, id):
         """获取运行设置信息"""
