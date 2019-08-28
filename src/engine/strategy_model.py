@@ -1792,13 +1792,19 @@ class StrategyModel(object):
         for index in range(0, sessionCount):
             startTime = self.getGetSessionStartTime(contNo, index)
             endTime = self.getSessionEndTime(contNo, index)
-
+            
+            #eg1. 0.21, 0.023, 0.142854
+            #eg1. 0.1330, 0.1500, 0.142854
+            #eg2. 0.06, 0.05, 0.03
+            #eg3. 0.06, 0.05, 0.052
+            delta = 0.0
             if startTime >= endTime:
                 endTime += 0.24
                 if currentTime <= startTime:
-                    currentTime += 0.24
-            if currentTime >= startTime and currentTime < endTime:
+                     delta = 0.24
+            if currentTime + delta >= startTime and currentTime + delta < endTime:
                 return True
+
         return False
 
     def getMarginRatio(self, contNo):

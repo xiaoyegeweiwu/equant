@@ -70,9 +70,9 @@ class StrategyEngine(object):
         
         self._lastMoneyTime = 0  #资金查询时间
         self._lastPosTime   = 0  #持仓同步时间
-
-        # 恢复上次推出时保存的结构
-        self._strategyOrder = {}
+        
+        #恢复策略
+        self._resumeStrategy()
 
         # 创建主处理线程, 从api和策略进程收数据处理
         self._startMainThread()
@@ -109,9 +109,6 @@ class StrategyEngine(object):
                 elif k == "StrategyConfig":
                     self.resumeAllStrategyConfig(v)
                     self.logger.debug("恢复策略配置成功")
-                elif k == "StrategyOrder":
-                    self._resumeStrategyOrder(v)
-                    self.logger.debug("恢复策略订单成功")
                 else:
                     pass
 
@@ -739,6 +736,7 @@ class StrategyEngine(object):
                 
             #交易日切换，清理所有资金账号及本地委托数据
             elif self._trdModel.chkTradeDate(data):
+                self.logger.info("Change trade date:%s"%data)
                 self._trdModel.delUserInfo(loginNo)
                 self._reqUserInfoByLogin(data)
             else:
