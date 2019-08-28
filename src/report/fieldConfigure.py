@@ -71,7 +71,7 @@ FrequencyDict = {
 StrategyStatus = {
     'N':  '初始',
     'H':  '历史',
-    'C':  '实盘',
+    'C':  '实时',
 
     'P':  '暂停',
     'Q':  '停止',

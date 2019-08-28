@@ -171,6 +171,7 @@ EEQU_SRVEVENT_TRADE_FUNDQRY       = 0x68            #交易资金查询
 EEQU_SRVEVENT_TRADE_USERQRY       = 0x6B            #资金账号查询
 EEQU_SRVEVENT_TRADE_EXCSTATEQRY   = 0x6C            #交易所状态查询
 EEQU_SRVEVENT_TRADE_EXCSTATE      = 0x6D            #交易所状态变化通知
+EEQU_SRVEVENT_TRADE_LOGOUTNOTICE  = 0x6E            #账号登出通知
 
 #////////////////////内部协议定义/////////////////////////////////
 # 模块定义

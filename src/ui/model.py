@@ -244,21 +244,23 @@ class GetEgData(object):
 
     def _regAskCallback(self):
         self._egAskCallbackDict = {
-            EV_EG2UI_LOADSTRATEGY_RESPONSE: self._onEgLoadAnswer,
-            EV_EG2UI_REPORT_RESPONSE:       self._onEgReportAnswer,
-            EV_EG2UI_CHECK_RESULT:          self._onEgDebugInfo,
-            EV_EG2ST_MONITOR_INFO:          self._onEgMonitorInfo,
-            EV_EG2UI_STRATEGY_STATUS:       self._onEgStrategyStatus,
-            EV_EG2UI_POSITION_NOTICE:       self._onEgPositionNotice,
-            EEQU_SRVEVENT_EXCHANGE:         self._onEgExchangeInfo,
-            EEQU_SRVEVENT_COMMODITY:        self._onEgCommodityInfo,
-            EEQU_SRVEVENT_CONTRACT:         self._onEgContractInfo,
-            EEQU_SRVEVENT_TRADE_USERQRY:    self._onEgUserInfo,
-            EEQU_SRVEVENT_TRADE_EXCSTATEQRY:self._onEgExchangeStatus,
-            EEQU_SRVEVENT_TRADE_EXCSTATE:   self._onEgExchangeStatus,
+            EV_EG2UI_LOADSTRATEGY_RESPONSE:   self._onEgLoadAnswer,
+            EV_EG2UI_REPORT_RESPONSE:         self._onEgReportAnswer,
+            EV_EG2UI_CHECK_RESULT:            self._onEgDebugInfo,
+            EV_EG2ST_MONITOR_INFO:            self._onEgMonitorInfo,
+            EV_EG2UI_STRATEGY_STATUS:         self._onEgStrategyStatus,
+            EV_EG2UI_POSITION_NOTICE:         self._onEgPositionNotice,
+            EV_EG2UI_RUNMODE_SWITCH:          self._onEgActualStatus,
+            EV_EG2UI_USER_LOGOUT_NOTICE:      self._onEgLogoutUser,
+            EEQU_SRVEVENT_EXCHANGE:           self._onEgExchangeInfo,
+            EEQU_SRVEVENT_COMMODITY:          self._onEgCommodityInfo,
+            EEQU_SRVEVENT_CONTRACT:           self._onEgContractInfo,
+            EEQU_SRVEVENT_TRADE_USERQRY:      self._onEgUserInfo,
+            EEQU_SRVEVENT_TRADE_EXCSTATEQRY:  self._onEgExchangeStatus,
+            EEQU_SRVEVENT_TRADE_EXCSTATE:     self._onEgExchangeStatus,
 
-            EEQU_SRVEVENT_CONNECT:          self._onEgConnect,
-            EEQU_SRVEVENT_DISCONNECT:       self._onEgDisconnect
+            EEQU_SRVEVENT_CONNECT:            self._onEgConnect,
+            EEQU_SRVEVENT_DISCONNECT:         self._onEgDisconnect
         }
 
     # TODO: event.getChian()的类型为字符串：'1', '0'
@@ -335,6 +337,26 @@ class GetEgData(object):
         self._app.setLoadState("normal")
         #TODO: 接收exchange、commodity、contract、user信息一起打印
         self._logger.info(f"[UI]: Receiving exchange, commodity, contract and user info successfully!")
+
+    def _onEgLogoutUser(self, event):
+        """Update self._userNo when user logouts"""
+        logoutUser = event.getData()
+        for userNo in logoutUser:
+            for uInfo in self._userNo:
+                if uInfo["UserNo"] == userNo:
+                    self._userNo.remove(uInfo)
+                    self._logger.info(f"[UI]: 账号{uInfo}登出")
+                    # 账号列表中可能存在重复账号
+                    if uInfo not in self._userNo:
+                        break
+
+    def _onEgActualStatus(self, event):
+        """update Running Actual/Virtual status"""
+        id = event.getStrategyId()
+        aStatus = event.getData()["Status"]
+
+        self._logger.info(f"[UI][{id}]: Receiving Actual/Virtual status{aStatus} successfully!")
+        #TODO: update Actual/Virtual status
 
     def _onEgStrategyStatus(self, event):
         """接收引擎推送策略状态改变信息"""
