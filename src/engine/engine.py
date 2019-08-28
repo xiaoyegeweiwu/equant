@@ -667,7 +667,7 @@ class StrategyEngine(object):
 
     # 用户登录信息
     def _onApiLoginInfoRsp(self, apiEvent):
-        self.logger.debug("_onApiLoginInfoRsp:%s"%apiEvent.getData())
+        #self.logger.debug("_onApiLoginInfoRsp:%s"%apiEvent.getData())
         self._trdModel.updateLoginInfo(apiEvent)
         self._sendEvent2AllStrategy(apiEvent)
         
@@ -722,6 +722,17 @@ class StrategyEngine(object):
             #登出，清理登录账号和资金账号
             loginNo = data['LoginNo']
             if data['IsReady'] == EEQU_NOTREADY:
+                #通知UI，登出所有账号
+                loginUser = self._trdModel.getLoginUser(loginNo)
+                
+                event = Event({
+                    'StragetgyId' : 0,
+                    'EventCode'   : EV_EG2UI_USER_LOGOUT_NOTICE,
+                    'Data' : loginUser
+                })
+            
+                self._send2uiQueue(event)
+            
                 self._trdModel.delLoginInfo(data)
                 self._trdModel.delUserInfo(loginNo)
             
