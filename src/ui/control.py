@@ -237,7 +237,8 @@ class TkinterController(object):
             f.write('import talib\n'
                     '\n\n'
                     'def initialize(context): \n    pass\n\n\n'
-                    'def handle_data(context):\n    pass')
+                    'def handle_data(context):\n    pass\n\n\n'
+                    'def exit_callback(context):\n    pass')
             f.close()
 
         self.app.updateEditorModifyTime(os.path.getmtime(path))
