@@ -667,7 +667,7 @@ class StrategyEngine(object):
 
     # 用户登录信息
     def _onApiLoginInfoRsp(self, apiEvent):
-        self.logger.debug("_onApiLoginInfoRsp:%s"%apiEvent.getData())
+        #self.logger.debug("_onApiLoginInfoRsp:%s"%apiEvent.getData())
         self._trdModel.updateLoginInfo(apiEvent)
         self._sendEvent2AllStrategy(apiEvent)
         
@@ -712,7 +712,6 @@ class StrategyEngine(object):
           (2) 本地委托信息清空
           (3) 重新查询登录账号下，所有用户的交易数据
         '''
-    
         #self.logger.debug("_onApiLoginInfoNotice:%s"%apiEvent.getData())
         self._sendEvent2AllStrategy(apiEvent)
         #ret = self._trdModel.updateLoginInfoEg(apiEvent)
@@ -720,24 +719,33 @@ class StrategyEngine(object):
         loginInfo = self._trdModel.getLoginInfo() 
         
         for data in dataList:
-            #新登录账号，查询用户、交易数据吧
-            loginNo = data['LoginNo']
-            if loginNo not in loginInfo:
-                self._trdModel.addLoginInfo(data)
-                #TODO： 通知界面账号登录
-                
-                #查询账户信息
-                self._reqUserInfoByLogin(data)
             #登出，清理登录账号和资金账号
-            elif data['IsReady'] == EEQU_NOTREADY:
+            loginNo = data['LoginNo']
+            if data['IsReady'] == EEQU_NOTREADY:
+                #通知UI，登出所有账号
+                loginUser = self._trdModel.getLoginUser(loginNo)
+                
+                event = Event({
+                    'StragetgyId' : 0,
+                    'EventCode'   : EV_EG2UI_USER_LOGOUT_NOTICE,
+                    'Data' : loginUser
+                })
+            
+                self._send2uiQueue(event)
+            
                 self._trdModel.delLoginInfo(data)
                 self._trdModel.delUserInfo(loginNo)
-                #TODO：通知界面账号登出
-                
+            
             #交易日切换，清理所有资金账号及本地委托数据
             elif self._trdModel.chkTradeDate(data):
                 self.logger.info("Change trade date:%s"%data)
                 self._trdModel.delUserInfo(loginNo)
+                self._reqUserInfoByLogin(data)
+             
+            #新账号登录
+            elif loginNo not in loginInfo:
+                self._trdModel.addLoginInfo(data)
+                #查询账户信息
                 self._reqUserInfoByLogin(data)
             else:
                 self.logger.warn("Unknown login status: %s"%data)
@@ -745,7 +753,7 @@ class StrategyEngine(object):
     # 账户信息
     def _onApiUserInfo(self, apiEvent): 
         #分用户 分批次请求交易数据，否则队列会阻塞
-        self.logger.debug("_onApiUserInfo:%s"%apiEvent.getData())
+        #self.logger.debug("_onApiUserInfo:%s"%apiEvent.getData())
         self._trdModel.updateUserInfo(apiEvent)
         self._send2uiQueue(apiEvent)
         # print("++++++ 账户信息 引擎 ++++++", apiEvent.getData())
@@ -1324,7 +1332,7 @@ class StrategyEngine(object):
         self._loadStrategy(loadEvent, strategyId)
 
     def saveStrategyContext2File(self):
-        self.logger.debug("保存到文件")
+        self.logger.debug("save strategy context to file")
         jsonFile = open('config/StrategyContext.json', 'w', encoding='utf-8')
         result = {}
         result["StrategyConfig"] = self._strategyMgr.getStrategyConfig()
@@ -1337,7 +1345,7 @@ class StrategyEngine(object):
                 child.join(timeout=0.5)
             except Exception as e:
                 pass
-        self.logger.debug("engine和各策略完整退出")
+        self.logger.debug("saveStrategyContext2File exit")
 
     def sendErrorMsg(self, errorCode, errorText):
         event = Event({

@@ -73,6 +73,8 @@ EV_EG2UI_CHECK_RESULT             = 0x183           # 检测结果
 EV_EG2ST_MONITOR_INFO             = 0x184           # 监控信息
 EV_EG2UI_STRATEGY_STATUS          = 0x185           # 策略变化事件 
 EV_EG2UI_POSITION_NOTICE          = 0x186           # 持仓同步信息
+EV_EG2UI_USER_LOGOUT_NOTICE       = 0x187           # 资金账号登出消息
+EV_EG2UI_RUNMODE_SWITCH           = 0x188           # 策略运行模式切换，实盘/虚拟
 
 #////////////////////策略->引擎事件定义////////////////////////
 EV_ST2EG_EXCHANGE_REQ             = 0x201           #查询交易所信息

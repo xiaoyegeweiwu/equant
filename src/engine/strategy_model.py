@@ -603,10 +603,26 @@ class StrategyModel(object):
     def setStartTrade(self):
         self._cfgModel.setPending(False)
         # TODO: 通知界面策略状态发生变化
-
+        event = Event({
+            'StrategyId' : self._strategy.getStrategyId(),
+            'EventCode'  : EV_EG2UI_RUNMODE_SWITCH,
+            'Data'       : {
+                'Status' : 1     #表示实盘运行
+            }
+        })
+        self._strategy.sendEvent2UI(event)
+        
     def setStopTrade(self):
         self._cfgModel.setPending(True)
         # TODO：通知界面策略状态发生变化
+        event = Event({
+            'StrategyId' : self._strategy.getStrategyId(),
+            'EventCode'  : EV_EG2UI_RUNMODE_SWITCH,
+            'Data'       : {
+                'Status' : 0     #表示虚拟运行
+            }
+        })
+        self._strategy.sendEvent2UI(event)
         
 
     def isTradeAllowed(self):

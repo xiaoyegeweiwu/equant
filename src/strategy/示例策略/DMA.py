@@ -7,8 +7,8 @@ p2 = 10
 p3 = 20
 p4 = 40
 
-code="ZCE|F|TA|909"
-#code = "NYMEX|F|CL|1906"
+#code="ZCE|F|TA|909"
+code = "NYMEX|F|CL|1910"
 usr ="DDY"
 qty = 1
 
