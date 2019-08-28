@@ -33,5 +33,5 @@ def handle_data(context):
         return
     
     for lid in localIdList:
-        LogInfo("ORDER", lid, A_GetOrderNo(lid), A_OrderStatus(localOrderId=lid), A_FirstOrderNo())
+        LogInfo("ORDER", lid, A_GetOrderNo(lid), A_OrderStatus(lid), A_FirstOrderNo())
     

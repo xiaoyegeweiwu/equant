@@ -27,6 +27,7 @@ class StrategyEngine(object):
         self._eg2uiQueue = eg2uiQueue
         # Ui->Engine, 包括策略加载等
         self._ui2egQueue = ui2egQueue
+        self._commdityFilter = []
         
     def _initialize(self):
         '''进程中初始化函数'''
@@ -697,7 +698,7 @@ class StrategyEngine(object):
         '''
         1. 账号登出，推送账号登录状态变化， IsReady = 0
           (1) 清理该登录账号下，所有资金账号的数据
-	      (2) 委托、资金、委托、持仓清空
+          (2) 委托、资金、委托、持仓清空
           (3) 本地委托信息保留
           (4) 不定时查询资金信息
           

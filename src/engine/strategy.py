@@ -281,6 +281,15 @@ class TradeRecord(object):
         self._matchPrice = orderData['MatchPrice'] if 'MatchPrice' in orderData else None
         # 委托成交量
         self._matchQty = orderData['MatchQty'] if 'MatchQty' in orderData else None
+        # 委托价
+        self._orderPrice = orderData['OrderPrice'] if 'OrderPrice' in orderData else None
+        # 委托订单量
+        self._orderQty = orderData['OrderQty'] if 'OrderQty' in orderData else None
+        # 下单时间
+        self._insertTime = orderData['InsertTime'] if 'InsertTime' in orderData else None
+        # 订单更新时间
+        self._updateTime = orderData['UpdateTime'] if 'UpdateTime' in orderData else None
+
 
     def updateOrderInfo(self, eSessionId, orderData):
         if eSessionId != self._eSessionId:
@@ -307,6 +316,14 @@ class TradeRecord(object):
             self._matchPrice = orderData['MatchPrice']
         if 'MatchQty' in orderData:
             self._matchQty = orderData['MatchQty']
+        if 'OrderPrice' in orderData:
+            self._orderPrice = orderData['OrderPrice']
+        if 'OrderQty' in orderData:
+            self._orderQty = orderData['OrderQty']
+        if 'InsertTime' in orderData:
+            self._insertTime = orderData['InsertTime']
+        if 'UpdateTime' in orderData:
+            self._updateTime = orderData['UpdateTime']    
 
     def getBarInfo(self):
         return self._barInfo
@@ -978,6 +995,98 @@ class Strategy:
         tradeRecode = self._localOrder[eSessionId]
         tradeRecode._barInfo = barInfo
 
+    def getOrderBuyOrSell(self, eSessionId):
+        if eSessionId not in self._localOrder:
+            return 'N'
+        tradeRecord = self._localOrder[eSessionId]
+        return tradeRecord._direct
+
+    def getOrderEntryOrExit(self, eSessionId):
+        if eSessionId not in self._localOrder:
+            return 'N'
+        tradeRecord = self._localOrder[eSessionId]
+        return tradeRecord._offset
+        
+    def getOrderFilledLot(self, eSessionId):
+        if eSessionId not in self._localOrder:
+            return 0
+        tradeRecord = self._localOrder[eSessionId]
+        return tradeRecord._matchQty
+        
+    def getOrderFilledPrice(self, eSessionId):
+        if eSessionId not in self._localOrder:
+            return 0
+        tradeRecord = self._localOrder[eSessionId]
+        return tradeRecord._matchPrice
+
+    def getOrderLot(self, eSessionId):
+        if eSessionId not in self._localOrder:
+            return 0
+        tradeRecord = self._localOrder[eSessionId]
+        return tradeRecord._orderQty
+        
+    def getOrderPrice(self, eSessionId):
+        if eSessionId not in self._localOrder:
+            return 0
+        tradeRecord = self._localOrder[eSessionId]
+        return tradeRecord._orderPrice    
+    
+    def getOrderStatus(self, eSessionId):
+        if eSessionId not in self._localOrder:
+            return 'N'
+        tradeRecord = self._localOrder[eSessionId]
+        return tradeRecord._orderState
+
+    def getOrderTime(self, eSessionId):
+        if eSessionId not in self._localOrder:
+            return 0
+        tradeRecord = self._localOrder[eSessionId]
+
+        insertTime =  tradeRecord._insertTime
+        if not insertTime:
+            return 0
+
+        struct_time = time.strptime(insertTime, "%Y-%m-%d %H:%M:%S")
+        timeStamp = time.strftime("%Y%m%d.%H%M%S", struct_time)
+        return float(timeStamp)        
+
+    def getOrderUpdateTime(self, eSessionId):
+        if eSessionId not in self._localOrder:
+            return 0
+        tradeRecord = self._localOrder[eSessionId]
+
+        updateTime =  tradeRecord._updateTime
+        if not updateTime:
+            return 0
+
+        struct_time = time.strptime(updateTime, "%Y-%m-%d %H:%M:%S")
+        timeStamp = time.strftime("%Y%m%d.%H%M%S", struct_time)
+        return float(timeStamp)
+        
+    def deleteOrder(self, eSessionId):
+        orderId = ''
+        if isinstance(eSessionId, str) and '-' in eSessionId:
+            orderId = self.getOrderId(eSessionId)
+            if not orderId:
+                return False
+        else:
+            orderId = eSessionId
+            
+        return self.deleteOrderByOrderId(orderId)        
+        
+    def deleteOrderByOrderId(self, orderId):
+        aOrder = {
+            "OrderId": orderId,
+        }
+        aOrderEvent = Event({
+            "EventCode": EV_ST2EG_ACTUAL_CANCEL_ORDER,
+            "StrategyId": self.getStrategyId(),
+            "Data": aOrder
+        })
+        self.sendEvent2Engine(aOrderEvent)
+        
+        return True
+        
     def getContNo(self, eSessionId):
         if eSessionId not in self._localOrder:
             return ''
