@@ -1,4 +1,4 @@
-# 套利的布林带策略 历史回测
+# 套利的布林带策略
 
 import talib
 import numpy as np
@@ -12,13 +12,13 @@ qty=1
 bt = 'M' 	#barType
 bi = 1	  #barInterval
 
-spds = []
 
 def initialize(context):
     SetBarInterval(code1, bt, bi, 2000)
     SetBarInterval(code2, bt, bi, 2000)
     SetOrderWay(2)
     
+spds = []
 def handle_data(context):
     prc_lst1 = Close(code1, bt, bi)
     prc_lst2 = Close(code2, bt, bi)
