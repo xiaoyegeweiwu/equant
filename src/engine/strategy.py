@@ -1092,6 +1092,14 @@ class Strategy:
             return ''
         tradeRecord = self._localOrder[eSessionId]
         return tradeRecord._contNo
+        
+    def getContNoByOrderId(self, orderId):
+        self.logger.debug('2 enter orderid: %s, %d' %(str(orderId), len(self._localOrder)))
+        for k, v in self._localOrder.items():
+            if v._orderId == orderId:
+                return v._contNo
+        
+        return ''
 
     def getOrderNo(self, eSessionId):
         if eSessionId not in self._localOrder:

@@ -925,8 +925,11 @@ class StrategyModel(object):
             contNo = underlayCont
         return self._trdModel.getALatestFilledTime(contNo, userNo)
 
-    def getOrderContractNo(self, orderId):
-        return self._strategy.getContNo(orderId)
+    def getOrderContractNo(self, eSession):
+        if isinstance(eSession, str) and '-' in eSession:
+            return self._strategy.getContNo(eSession)
+        else:
+            return self._strategy.getContNoByOrderId(eSession)
 
     def deleteOrder(self, eSession):
         return self._strategy.deleteOrder(eSession)

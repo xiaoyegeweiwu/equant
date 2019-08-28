@@ -20,7 +20,7 @@ def handle_data(context):
 
     if sentOrder:
     #if cnt < 100:
-        for i in range(50):
+        for i in range(10):
             ret, localId = A_SendOrder(Enum_Buy(), Enum_Entry(), 1, Q_Last())
             if ret == 0: 
                 localIdList.append(localId)
@@ -33,5 +33,5 @@ def handle_data(context):
         return
     
     for lid in localIdList:
-        LogInfo("ORDER", lid, A_GetOrderNo(lid), A_OrderStatus(lid), A_FirstOrderNo())
+        LogInfo("ORDER", lid, A_GetOrderNo(lid), A_OrderContractNo( A_GetOrderNo(lid)[0]), A_OrderStatus(lid), A_FirstOrderNo())
     
