@@ -250,7 +250,7 @@ class GetEgData(object):
             EV_EG2ST_MONITOR_INFO:            self._onEgMonitorInfo,
             EV_EG2UI_STRATEGY_STATUS:         self._onEgStrategyStatus,
             EV_EG2UI_POSITION_NOTICE:         self._onEgPositionNotice,
-            EV_EG2UI_RUNMODE_SWITCH:          self._onEgActualStatus,
+            EV_EG2UI_RUNMODE_SWITCH:          self._onEgRunmodeSwitch,
             EV_EG2UI_USER_LOGOUT_NOTICE:      self._onEgLogoutUser,
             EEQU_SRVEVENT_EXCHANGE:           self._onEgExchangeInfo,
             EEQU_SRVEVENT_COMMODITY:          self._onEgCommodityInfo,
@@ -350,13 +350,20 @@ class GetEgData(object):
                     if uInfo not in self._userNo:
                         break
 
-    def _onEgActualStatus(self, event):
+    def _onEgRunmodeSwitch(self, event):
         """update Running Actual/Virtual status"""
         id = event.getStrategyId()
-        aStatus = event.getData()["Status"]
+        runStatus = event.getData()["Status"]
 
-        self._logger.info(f"[UI][{id}]: Receiving Actual/Virtual status{aStatus} successfully!")
-        #TODO: update Actual/Virtual status
+        if id not in self._stManager.getStrategyDict():
+            return
+
+        # 策略状态改变后要通知监控界面
+        self._stManager.updateStrategyRunMode(id, runStatus)
+        # 更新策略Id的运行状态
+        self._app.updateRunMode(id, runStatus)
+
+        self._logger.info(f"[UI][{id}]: Receiving Runmode Switch {runStatus} successfully!")
 
     def _onEgStrategyStatus(self, event):
         """接收引擎推送策略状态改变信息"""
@@ -376,7 +383,7 @@ class GetEgData(object):
             # 策略状态改变后要通知监控界面
             self._stManager.updateStrategyStatus(id, sStatus)
             # 更新策略Id的运行状态
-            self._app.updateStatus(id, sStatus)
+            self._app.updateRunStage(id, sStatus)
             if sStatus == ST_STATUS_QUIT:
                 # 策略停止时接收策略数据
                 self._stManager.addResultData(id, event.getData()["Result"])
@@ -507,6 +514,11 @@ class StrategyManager(object):
     def updateStrategyStatus(self, id, status):
         if id in self._strategyDict:
             self._strategyDict[id]["StrategyState"] = status
+
+    def updateStrategyRunMode(self, id, status):
+        """运行模式更新"""
+        if id in self._strategyDict:
+            self._strategyDict[id]["IsActualRun"] = status
 
     def getStrategyConfigData(self, id):
         """获取运行设置信息"""
