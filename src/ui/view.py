@@ -213,14 +213,23 @@ class QuantApplication(object):
         # self.hisTop.protocol("WM_DELETE_WINDOW", test)
         self.hisTop.display_()
 
-    def updateStatus(self, strategyId, status):
+    def updateRunStage(self, strategyId, status):
         """
-        更新策略状态
+        更新策略运行阶段
         :param strategyId: 策略Id
         :param dataDict: strategeId对应的策略状态信息
         :return:
         """
-        self.quant_monitor.updateStatus(strategyId, status)
+        self.quant_monitor.updateRunStage(strategyId, status)
+
+    def updateRunMode(self, strategyId, status):
+        """
+        更新策略运行状态
+        :param strategy:
+        :param status:
+        :return:
+        """
+        self.quant_monitor.updateRunMode(strategyId, status)
 
     def updateValue(self, strategyId, values):
         """

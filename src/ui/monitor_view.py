@@ -8,7 +8,7 @@ from utils.utils import *
 from .editor import MonitorText, LogText, ErrorText
 from .menu import RunMenu
 from capi.com_types import *
-from report.fieldConfigure import StrategyStatus, FrequencyDict
+from report.fieldConfigure import StrategyStatus, FrequencyDict, RunMode
 
 
 class QuantMonitor(object):
@@ -186,7 +186,7 @@ class QuantMonitor(object):
         subCheck.pack(side=LEFT, padx=5)
 
     def createExecute(self):
-        headList  = ["编号", "账号", "策略名称", "基准合约", "频率", "运行状态", "实盘运行",
+        headList  = ["编号", "账号", "策略名称", "基准合约", "频率", "运行阶段", "运行模式",
                     "初始资金", "可用资金", "最大回撤", "累计收益", "胜率"]
         widthList = [5, 50, 50, 50, 5, 10, 5, 20, 10, 20, 20, 5]
 
@@ -225,7 +225,8 @@ class QuantMonitor(object):
 
             Frequency   = str(kLineSlice) + kLineType
 
-            RunType     = "是" if dataDict['IsActualRun'] else "否"
+            # RunType     = "是" if dataDict['IsActualRun'] else "否"
+            RunType     = RunMode[dataDict["IsActualRun"]]
             Status      = StrategyStatus[dataDict["StrategyState"]]
             InitFund    = dataDict['InitialFund']
 
@@ -262,7 +263,7 @@ class QuantMonitor(object):
         strategyId = dataDict["StrategyId"]
         try:
             if self.executeListTree.exists(strategyId):
-                self.updateStatus(strategyId, dataDict[5])
+                self.updateRunStage(strategyId, dataDict[5])
                 return
         except Exception as e:
             self._logger.warn("addExecute exception")
@@ -505,10 +506,15 @@ class QuantMonitor(object):
             for k, v in colValues.items():
                 self.executeListTree.set(strategyId, column=k, value=v)
 
-    def updateStatus(self, strategyId, status):
-        """更新策略状态"""
+    def updateRunStage(self, strategyId, status):
+        """更新策略运行阶段"""
         if str(strategyId) in self.executeListTree.get_children():
             self.executeListTree.set(strategyId, column="#6", value=StrategyStatus[status])
+
+    def updateRunMode(self, strategyId, status):
+        """更新策略运行模式"""
+        if str(strategyId) in self.executeListTree.get_children():
+            self.executeListTree.set(strategyId, column="#7", value=RunMode[status])
 
     def updatePos(self, positions):
         for itemId in self.posTree.get_children():

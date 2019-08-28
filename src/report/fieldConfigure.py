@@ -79,3 +79,8 @@ StrategyStatus = {
 
     'E':  '异常'
 }
+
+RunMode = {
+    0:  "虚拟",
+    1:  "实盘"
+}
