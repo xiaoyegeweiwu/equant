@@ -38,14 +38,14 @@ def handle_data(context):
     upp, mid, low = talib.BBANDS(np.array(spds), p1, 2, 2)     
 
     # 突破追单
-    if spd_c > upp:
+    if spd_c > upp[-1]:
         if MarketPosition(code1) == 0:
             Buy(qty, prc_lst1[-1], code1)
             SellShort(qty, prc_lst2[-1], code2)
         elif MarketPosition(code1) < 0:
             Sell(qty, prc_lst1[-1], code1)
             BuyToCover(qty, prc_lst2[-1], code2)
-    elif spd_c < low:
+    elif spd_c < low[-1]:
         if MarketPosition(code1) == 0:
             SellShort(qty, prc_lst1[-1], code1)
             Buy(qty, prc_lst2[-1], code2)

@@ -19,8 +19,8 @@ spds = []
 def initialize(context):
     SetBarInterval(code1, bt, bi, 1)
     SetBarInterval(code2, bt, bi, 1)
-    SetTriggerType(code1, 1)
-    SetTriggerType(code2, 1)
+    SetTriggerType(1)
+    SetTriggerType(1)
     SetOrderWay(2)
     SetActual()
 
@@ -49,12 +49,12 @@ def handle_data(context):
 
     # 根据两根ma的交叉关系下单
     offset = Enum_Entry()
-    if sma1 > sma2 + dot * PriceTick() and A_TotalPosition() <= 0: # 不允许多笔多仓
+    if sma1[-1] > sma2[-1] + dot * PriceTick() and A_TotalPosition() <= 0: # 不允许多笔多仓
         if A_SellPosition(code1) > 0 or A_SellPosition(code2) > 0:
             offset = Enum_ExitToday()
         A_SendOrder(Enum_Buy() , offset, qty, Q_BidPrice(code1) + PriceTick(code1), code1)
         A_SendOrder(Enum_Sell(), offset, qty, Q_AskPrice(code2) - PriceTick(code2), code2)
-    elif sma1 < sma2 - dot * PriceTick() and A_TotalPosition() = 0: # 不允许多笔空仓
+    elif sma1[-1] < sma2[-1] - dot * PriceTick() and A_TotalPosition() >= 0: # 不允许多笔空仓
         if A_BuyPosition(code1) > 0 or A_BuyPosition(code2) > 0:
             offset = Enum_ExitToday()
         A_SendOrder(Enum_Sell(), offset, qty, Q_AskPrice(code1) - PriceTick(code1), code1)
