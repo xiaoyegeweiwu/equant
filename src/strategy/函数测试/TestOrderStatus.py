@@ -7,8 +7,7 @@ cnt = 0
 
 def initialize(context): 
     SetBarInterval("NYMEX|F|CL|1910", 'M', 1, 200)
-    #SetBarInterval("ZCE|F|CF|001", 'M', 1, 200)
-    SetActual()
+    #SetBarInterval("ZCE|F|CF|001", 'M', 1, 200)    SetActual()
 
 
 def handle_data(context):

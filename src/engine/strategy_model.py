@@ -602,9 +602,12 @@ class StrategyModel(object):
 
     def setStartTrade(self):
         self._cfgModel.setPending(False)
+        # TODO: 通知界面策略状态发生变化
 
     def setStopTrade(self):
         self._cfgModel.setPending(True)
+        # TODO：通知界面策略状态发生变化
+        
 
     def isTradeAllowed(self):
         if self._cfgModel.isActualRun() and self._strategy.isRealTimeStatus() and not self._cfgModel.getPending():
@@ -1014,46 +1017,7 @@ class StrategyModel(object):
 
         eId = str(self._strategy.getStrategyId()) + '-' + str(self._strategy.getESessionId())
         # 上期所特殊处理, 只对buy/sell函数生效
-        if "SHFE|" in contNo and entryOrExit == oCover and not aFunc:
-            if orderDirct == dBuy:
-                positionInfo = self._trdModel.getUserModel(userNo).getPositionInfo(contNo, dSell)
-            elif orderDirct == dSell:
-                positionInfo = self._trdModel.getUserModel(userNo).getPositionInfo(contNo, dBuy)
-
-            if positionInfo is None:
-                self.logger.warn(f"持仓查询没有查询到对应方向的持仓, 无法平仓")
-                return -6, "持仓查询没有查询到对应方向的持仓, 无法平仓"
-            entryOrExitToday = oCoverT
-            orderQtyToday = positionInfo["TodayPos"]
-            aOrder = {
-                'UserNo': userNo,
-                'Sign': self._trdModel.getSign(userNo),
-                'Cont': contNo,
-                'OrderType': orderType,
-                'ValidType': validType,
-                'ValidTime': '0',
-                'Direct': orderDirct,
-                'Offset': entryOrExitToday,
-                'Hedge': hedge,
-                'OrderPrice': orderPrice,
-                'TriggerPrice': 0,
-                'TriggerMode': tmNone,
-                'TriggerCondition': tcNone,
-                'OrderQty': orderQtyToday,
-                'StrategyType': stNone,
-                'Remark': '',
-                'AddOneIsValid': tsDay,
-            }
-            self.sendActualOrder2Engine(userNo, aOrder, eId, self._strategy.getStrategyId(), aFunc)
-            if orderQty > positionInfo["TodayPos"]:
-                orderQty = orderQty - positionInfo["TodayPos"]
-                entryOrExit = oCover
-            else:
-                self._strategy.setESessionId(self._strategy.getESessionId() + 1)
-                self._strategy.updateLocalOrder(eId, aOrder)
-                # 新的eId
-                eId = str(self._strategy.getStrategyId()) + '-' + str(self._strategy.getESessionId())
-                return 0, eId
+        # 暂时屏蔽buysell函数上期平今和平昨自适应逻辑
 
         # 发送定单到实盘
         aOrder = {
@@ -1819,18 +1783,28 @@ class StrategyModel(object):
         if len(contNoInfo) >= 4 and (contNoInfo[1] == 'S' or contNoInfo[1] == 's'):
             contNo = contNoInfo[0] + '|F|' + contNoInfo[2] + '|' + contNoInfo[3]
 
-        currentTime = float(datetime.now().strftime('0.%H%M%S'))
+        # TODO：使用交易时间
+        #currentTime = float(datetime.now().strftime('0.%H%M%S'))
+        exgTime = datetime.strptime(self.getExchangeTime(contNoInfo[0]), "%Y-%m-%d %H:%M:%S")
+        currentTime = float(exgTime.strftime('0.%H%M%S'))
+        
         sessionCount = self.getGetSessionCount(contNo)
         for index in range(0, sessionCount):
             startTime = self.getGetSessionStartTime(contNo, index)
             endTime = self.getSessionEndTime(contNo, index)
-
+            
+            #eg1. 0.21, 0.023, 0.142854
+            #eg1. 0.1330, 0.1500, 0.142854
+            #eg2. 0.06, 0.05, 0.03
+            #eg3. 0.06, 0.05, 0.052
+            delta = 0.0
             if startTime >= endTime:
                 endTime += 0.24
                 if currentTime <= startTime:
-                    currentTime += 0.24
-            if currentTime >= startTime and currentTime < endTime:
+                     delta = 0.24
+            if currentTime + delta >= startTime and currentTime + delta < endTime:
                 return True
+
         return False
 
     def getMarginRatio(self, contNo):

@@ -2,6 +2,7 @@ import talib
 
 
 def initialize(context): 
+    SetUserNo('Q437104345')
     SetBarInterval("SHFE|F|AL|1908", 'M', 1, 200)
 
 

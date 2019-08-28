@@ -262,6 +262,9 @@ class TradeRecord(object):
         self._barInfo = None # 触发的Bar信息
         # SessionId
         self._sessionId = orderData['SessionId'] if 'SessionId' in orderData else None
+        
+        #用户编号
+        self._userNo = orderData['UserNo'] if 'UserNo' in orderData else None
         # 合约编号
         self._contNo = orderData['Cont'] if 'Cont' in orderData else None
         # 定单号
@@ -282,6 +285,9 @@ class TradeRecord(object):
     def updateOrderInfo(self, eSessionId, orderData):
         if eSessionId != self._eSessionId:
             return
+            
+        if 'UserNo' in orderData:
+            self._userNo = orderData['UserNo']
 
         if 'SessionId' in orderData:
             self._sessionId = orderData['SessionId']
@@ -474,7 +480,6 @@ class Strategy:
             # 3. 请求历史行情
             self._reqHisQuote()
             # 4. 查询交易数据
-            #self._reqTradeData()
             self._reqLoginInfo()
             # 5. 数据处理
             self._mainLoop()
@@ -529,13 +534,6 @@ class Strategy:
             # runReport中会有等待
 
             self._dataModel.runReport(self._context, self._userModule.handle_data)
-
-            # 持续运行阶段
-            # 1. 中间阶段, 实际上还是作为历史回测
-            # 2. 真正的实时阶段
-            # self._runStatus = ST_STATUS_HISTORY
-            # self._send2UIStatus(self._runStatus)
-            #
             
             if not self._dataModel.getConfigModel().isActualRun():
                 self.logger.warn(f"未选择实盘运行，如果需要请在设置界面勾选'实盘运行'，或者在策略代码中调用SetActual()")
@@ -718,10 +716,6 @@ class Strategy:
     def _reqHisQuote(self):
         #暂时先不修改
         self._hisModel.reqAndSubKLine()
-
-    # 查询交易数据
-    def _reqTradeData(self):
-        self._dataModel.reqTradeData()
         
     # 查询登录账号
     def _reqLoginInfo(self):
@@ -861,7 +855,29 @@ class Strategy:
         self._trdModel.updateLoginInfo(apiEvent)
 
     def _onTradeLoginNotice(self, apiEvent):
-        self._trdModel.updateLoginInfo(apiEvent)
+        #ret = self._trdModel.updateLoginInfoEg(apiEvent)
+        dataList  = apiEvent.getData()
+        loginInfo = self._trdModel.getLoginInfo() 
+        
+        #不用重新查询交易数据，引擎会推送
+        for data in dataList:
+            #新登录账号
+            loginNo = data['LoginNo']
+            if loginNo not in loginInfo:
+                self._trdModel.addLoginInfo(data)
+            #登出，清理登录账号和资金账号
+            elif data['IsReady'] == EEQU_NOTREADY:
+                self._trdModel.delLoginInfo(data)
+                self._trdModel.delUserInfo(loginNo)
+            #交易日切换，清理所有资金账号及本地委托数据
+            elif self._trdModel.chkTradeDate(data):
+                userDict = self._trdModel.getLoginUser(loginNo)
+                self.delLocalOrder(userDict)
+                self._trdModel.delUserInfo(loginNo)
+            else:
+                self.logger.warn("Unknown login status: %s"%data)
+    
+        #self._trdModel.updateLoginInfo(apiEvent)
 
     def _onTradeUserQry(self, apiEvent):
         self._trdModel.updateUserInfo(apiEvent)
@@ -941,6 +957,18 @@ class Strategy:
         else:
             self._localOrder[eSesnId] = TradeRecord(eSesnId, data)
             self._eSessionIdList.append(eSesnId)
+            
+    def delLocalOrder(self, userDict):
+    
+        popSessionList  = []
+        
+        for k, v in self._localOrder.items():
+            if v_userNo in userDict:
+                popSessionList.append(k)
+                    
+        for eid in popSessionList:
+            self._localOrder.pop(eid)
+            
 
     def updateBarInfoInLocalOrder(self, eSessionId, barInfo):
         if not barInfo:
@@ -988,7 +1016,7 @@ class Strategy:
                     break
                 except queue.Full:
                     time.sleep(0.1)
-                    self.logger.error(f"策略{self._strategyId}向引擎传递事件{event.getEventCode()}时卡住")
+                    #self.logger.error(f"策略{self._strategyId}向引擎传递事件{event.getEventCode()}时卡住")
 
     def sendEvent2EngineForce(self, event):
         while True:
@@ -997,7 +1025,7 @@ class Strategy:
                 break
             except queue.Full:
                 time.sleep(0.1)
-                self.logger.error(f"策略{self._strategyId}强制向引擎传递事件{event.getEventCode()}时阻塞")
+                #self.logger.error(f"策略{self._strategyId}强制向引擎传递事件{event.getEventCode()}时阻塞")
 
     def sendEvent2UI(self, event):
         while True:
@@ -1006,7 +1034,7 @@ class Strategy:
                 break
             except queue.Full:
                 time.sleep(0.1)
-                self.logger.error(f"策略{self._strategyId}制向UI传递事件{event.getEventCode()}时阻塞")
+                #self.logger.error(f"策略{self._strategyId}制向UI传递事件{event.getEventCode()}时阻塞")
 
     def sendTriggerQueue(self, event):
         self._triggerQueue.put(event)
