@@ -39,12 +39,8 @@ def initialize(context):
     set_stop()
 
 def handle_data(context):    
-    #LogInfo('========', g_params)
-    #set_stop()
-    if CurrentBar() < 20:
-        SetStopPoint(1)
-    else:
-        SetStopPoint(5)
+    LogInfo('========', g_params)
+    set_stop()
 
     if g_params['single']:
         single_test()
