@@ -388,7 +388,7 @@ class StrategyTrade(TradeModel):
         if not userNo:
             userNo = self._selectedUserNo
             
-        totalPos = int(self.getItemSumFromPositionModel('B', contNo, 'PositionQty'), userNo) - int(self.getItemSumFromPositionModel('S', contNo, 'PositionQty', userNo))
+        totalPos = int(self.getItemSumFromPositionModel('B', contNo, 'PositionQty', userNo)) - int(self.getItemSumFromPositionModel('S', contNo, 'PositionQty', userNo))
         return totalPos
 
     def getTotalProfitLoss(self, contNo, userNo):
