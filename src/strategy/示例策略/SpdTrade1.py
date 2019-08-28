@@ -1,6 +1,7 @@
 # 套利策略 历史回测
 
 import talib
+import numpy as np
 
 code1="ZCE|F|TA|909"
 code2="ZCE|F|TA|001"
@@ -8,76 +9,54 @@ p1=20
 dot=2
 qty=1
 
-bar=0
+bt = 'M' 	#barType
+bi = 1	  #barInterval
+
+spds = []
 
 def initialize(context):
-    SetBarInterval(code1, 'M', 1, 1000)
-    SetBarInterval(code2, 'M', 1, 2000)
+    SetBarInterval(code1, bt, bi, 1000)
+    SetBarInterval(code2, bt, bi, 1000)
+    SetOrderWay(2)
     
 def handle_data(context):
-    if len(Close(code1, 'M', 1)) < p1 or len(Close(code2, 'M', 1)) < p1:
+    prc_lst1 = Close(code1, bt, bi)
+    prc_lst2 = Close(code2, bt, bi)
+	
+    if len(prc_lst1) < p1 or len(prc_lst2) < p1:
         return
 
-    ma1 = talib.MA(Close(code1, 'M', 1), timeperiod=p1, matype=0)
-    ma2 = talib.MA(Close(code2, 'M', 1), timeperiod=p1, matype=0)    
-    LogInfo('ma1', Close(code1, 'M', 1)[-1], '  ma2', Close(code2, 'M', 1)[-1])
+    # 生成价差序列
+    spd_c = prc_lst1[-1] - prc_lst2[-1];
+    global spds
+    if len(prc_lst1) > len(spds):
+        spds.append(spd_c)
+    else:
+        spds[-1] = spd_c
     
-    print("ma1:", ma1[-1], "ma2:",ma2[-1]) 
-    ma= ma1[-1] - ma2[-1]
-    prc = Close(code1, 'M', 1)[-1] - Close(code2, 'M', 1)[-1]       
-    
-    PlotNumeric("ma1", ma1[-1], color=0xFF00FF)
-    PlotNumeric("ma2", ma2[-1], color=0x0008FF)
-    
-    PlotNumeric("prc", prc, 0xFF0000, False)
-    PlotNumeric("high", ma + dot * PriceTick(code1), 0x00aa00, False)
-    PlotNumeric("low", ma - dot * PriceTick(code1), 0x0000FF, False)    
-    PlotNumeric("fit", NetProfit(), 0xFF0000, False)
-    
-    global bar    
-    #同一根K线上只做一笔交易
-    print("bar is ", bar)
-    if bar == CurrentBar(code1, 'M', 1):
-        return
+    # 计算价差布林通道
+    upp, mid, low = talib.BBANDS(np.array(spds), p1, 2, 2)     
 
-    if prc > ma + dot * PriceTick(code1):
+    # 突破追单
+    if spd_c > upp:
         if MarketPosition(code1) == 0:
-            Buy(qty, Close(code1, 'M', 1)[-1], code1)
-            Buy(qty, Close(code2, 'M', 1)[-1], code2)
-        elif MarketPosition() < 0:
-            BuyToCover(qty, Close(code1, 'M', 1)[-1], code1)
-            BuyToCover(qty, Close(code2, 'M', 1)[-1], code2)
-        else:
-            return
-    elif prc < ma - dot * PriceTick(code1):
+            Buy(qty, prc_lst1[-1], code1)
+            SellShort(qty, prc_lst2[-1], code2)
+        elif MarketPosition(code1) < 0:
+            Sell(qty, prc_lst1[-1], code1)
+            BuyToCover(qty, prc_lst2[-1], code2)
+    elif spd_c < low:
         if MarketPosition(code1) == 0:
-            SellShort(qty, Close(code1, 'M', 1)[-1], code1)
-            SellShort(qty, Close(code2, 'M', 1)[-1], code2)
+            SellShort(qty, prc_lst1[-1], code1)
+            Buy(qty, prc_lst2[-1], code2)
         elif MarketPosition(code1) > 0:
-            Sell(qty, Close(code1, 'M', 1)[-1], code1)
-            Sell(qty, Close(code2, 'M', 1)[-1], code2)
-        else:
-            return
-        
-    bar = CurrentBar(code1, 'M', 1)
+            BuyToCover(qty, prc_lst1[-1], code1)
+            Sell(qty, prc_lst2[-1], code2)
     
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    # 绘制指标线
+    PlotNumeric("prc", spd_c, 0x000000, False)
+    PlotNumeric('upp', upp[-1], RGB_Red(), False)
+    PlotNumeric('mid', mid[-1], RGB_Blue(), False)
+    PlotNumeric('low', low[-1], RGB_Green(), False) 
+    PlotNumeric("fit", NetProfit(), RGB_Purple(), False, True)   
 
