@@ -1,5 +1,4 @@
 # 套利的双均线策略
-
 import talib
 import numpy as np
 
@@ -52,4 +51,4 @@ def handle_data(context):
     # 绘制指标线   
     PlotNumeric("sma1", sma1[-1], 0x0000FF, False)
     PlotNumeric("sma2", sma2[-1], 0xFF0000, False)
-    PlotNumeric("fit", NetProfit() + FloatProfit() - TradeCost(), RGB_Purple(), False, True)   
+    PlotNumeric("fit", NetProfit() - TradeCost(), RGB_Purple(), False, True)   
