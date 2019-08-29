@@ -2740,7 +2740,7 @@ class BaseApi(object):
               获得指定账户所有持仓合约。
 
         【语法】
-              list A_GetAllPositionSymbol(string userNo)
+              list A_GetAllPositionSymbol(string userNo='')
 
         【参数】
               userNo  指定的交易账户，默认当前账户
@@ -2759,7 +2759,7 @@ class BaseApi(object):
               返回指定交易帐户的手续费。
 
         【语法】
-              string A_Cost(string userNo)
+              string A_Cost(string userNo='')
 
         【参数】
               userNo  指定的交易账户，默认当前账户
@@ -2778,7 +2778,7 @@ class BaseApi(object):
               返回指定交易帐户的动态权益。
 
         【语法】
-              float A_Assets(string userNo)
+              float A_Assets(string userNo='')
 
         【参数】
               userNo  指定的交易账户，默认当前账户
@@ -2797,7 +2797,7 @@ class BaseApi(object):
               返回指定交易帐户的可用资金。
 
         【语法】
-              float A_Available(string userNo)
+              float A_Available(string userNo='')
 
         【参数】
               userNo  指定的交易账户，默认当前账户
@@ -2817,7 +2817,7 @@ class BaseApi(object):
               返回指定交易帐户的持仓保证金。
 
         【语法】
-              float A_Margin(string userNo)
+              float A_Margin(string userNo='')
 
         【参数】
               userNo  指定的交易账户，默认当前账户
@@ -2837,7 +2837,7 @@ class BaseApi(object):
               返回指定交易帐户的浮动盈亏。
 
         【语法】
-              float A_ProfitLoss(string userNo)
+              float A_ProfitLoss(string userNo='')
 
         【参数】
               userNo  指定的交易账户，默认当前账户
@@ -2857,7 +2857,7 @@ class BaseApi(object):
               返回当前账户的平仓盈亏。
 
         【语法】
-              float A_CoverProfit(string userNo)
+              float A_CoverProfit(string userNo='')
 
         【参数】
               userNo  指定的交易账户，默认当前账户
@@ -2877,7 +2877,7 @@ class BaseApi(object):
               返回指定交易帐户的冻结资金。
 
         【语法】
-              float A_TotalFreeze(string userNo)
+              float A_TotalFreeze(string userNo='')
 
         【参数】
               userNo  指定的交易账户，默认当前账户
@@ -2897,7 +2897,7 @@ class BaseApi(object):
               返回指定帐户下当前商品的买入持仓均价。
 
         【语法】
-              float A_BuyAvgPrice(string userNo, string contractNo='')
+              float A_BuyAvgPrice(string contractNo='', string userNo='')
 
         【参数】
               userNo  指定的交易账户，默认当前账户
@@ -2918,7 +2918,7 @@ class BaseApi(object):
               返回指定帐户下当前商品的买入持仓。
 
         【语法】
-              float A_BuyPosition(string userNo, string contractNo='')
+              float A_BuyPosition(string contractNo='', string userNo='')
 
         【参数】
               userNo  指定的交易账户，默认当前账户
@@ -2939,7 +2939,7 @@ class BaseApi(object):
               返回指定帐户下买仓可平数量。
 
         【语法】
-              int A_BuyPositionCanCover(string userNo, string contractNo='')
+              int A_BuyPositionCanCover(string contractNo='', string userNo='')
 
         【参数】
               userNo  指定的交易账户，默认当前账户
@@ -2959,7 +2959,7 @@ class BaseApi(object):
               返回指定帐户下当前商品的买入持仓盈亏。
 
         【语法】
-              float A_BuyProfitLoss(string userNo, string contractNo='')
+              float A_BuyProfitLoss(string contractNo='', string userNo='')
 
         【参数】
               userNo  指定的交易账户，默认当前账户
@@ -2980,7 +2980,7 @@ class BaseApi(object):
               返回指定帐户下当前商品的卖出持仓均价。
 
         【语法】
-              float A_SellAvgPrice(string userNo, string contractNo='')
+              float A_SellAvgPrice(string contractNo='', string userNo='')
 
         【参数】
               userNo  指定的交易账户，默认当前账户
@@ -3001,7 +3001,7 @@ class BaseApi(object):
               返回指定帐户下当前商品的卖出持仓。
 
         【语法】
-              float A_SellPosition(string userNo, string contractNo='')
+              float A_SellPosition(string contractNo='', string userNo='')
 
         【参数】
               userNo  指定的交易账户，默认当前账户
@@ -3022,7 +3022,7 @@ class BaseApi(object):
               返回指定帐户下卖仓可平数量。
 
         【语法】
-              int A_SellPositionCanCover(string userNo, string contractNo='')
+              int A_SellPositionCanCover(string contractNo='', string userNo='')
 
         【参数】
               userNo  指定的交易账户，默认当前账户
@@ -3042,7 +3042,7 @@ class BaseApi(object):
               返回指定帐户下当前商品的卖出持仓盈亏。
 
         【语法】
-              float A_SellProfitLoss(string userNo, string contractNo='')
+              float A_SellProfitLoss(string contractNo='', string userNo='')
 
         【参数】
               userNo  指定的交易账户，默认当前账户
@@ -3063,7 +3063,7 @@ class BaseApi(object):
               返回指定帐户下当前商品的持仓均价。
 
         【语法】
-              float A_TotalAvgPrice(string userNo, string contractNo='')
+              float A_TotalAvgPrice(string contractNo='', string userNo='')
 
         【参数】
               userNo  指定的交易账户，默认当前账户
@@ -3084,7 +3084,7 @@ class BaseApi(object):
               返回指定帐户下当前商品的总持仓。
 
         【语法】
-              int A_TotalPosition(string userNo, string contractNo='')
+              int A_TotalPosition(string contractNo='', string userNo='')
 
         【参数】
               userNo  指定的交易账户，默认当前账户
@@ -3106,7 +3106,7 @@ class BaseApi(object):
               返回指定帐户下当前商品的总持仓盈亏。
 
         【语法】
-              float A_TotalProfitLoss(string userNo, string contractNo='')
+              float A_TotalProfitLoss(string contractNo='', string userNo='')
 
         【参数】
               userNo  指定的交易账户，默认当前账户
@@ -3127,7 +3127,7 @@ class BaseApi(object):
               返回指定帐户下当前商品的当日买入持仓。
 
         【语法】
-              float A_TodayBuyPosition(string userNo, string contractNo='')
+              float A_TodayBuyPosition(string contractNo='', string userNo='')
 
         【参数】
               userNo  指定的交易账户，默认当前账户
@@ -3148,7 +3148,7 @@ class BaseApi(object):
               返回指定帐户下当前商品的当日卖出持仓。
 
         【语法】
-              float A_TodaySellPosition(string userNo, string contractNo='')
+              float A_TodaySellPosition(string contractNo='', string userNo='')
 
         【参数】
               userNo  指定的交易账户，默认当前账户
@@ -3366,7 +3366,7 @@ class BaseApi(object):
               返回指定账户第一个订单号。
 
         【语法】
-              int A_FirstOrderNo(string userNo, string contractNo1='', string contractNo2='')
+              int A_FirstOrderNo(string contractNo1='', string contractNo2='', string userNo='')
 
         【参数】
               userNo  指定的交易账户，默认当前账户
@@ -3388,7 +3388,7 @@ class BaseApi(object):
               返回指定账户下一个订单号。
 
         【语法】
-              int A_NextOrderNo(string userNo, int localOrderId=0, string contractNo1='', string contractNo2='')
+              int A_NextOrderNo(int localOrderId=0, string contractNo1='', string contractNo2='', string userNo='')
 
         【参数】
               userNo  指定的交易账户，默认当前账户
@@ -3411,7 +3411,7 @@ class BaseApi(object):
               返回指定账户最近发送的订单号。
 
         【语法】
-              int A_LastOrderNo(string userNo, string contractNo1='', string contractNo2='')
+              int A_LastOrderNo(string contractNo1='', string contractNo2='', string userNo='')
 
         【参数】
               userNo  指定的交易账户，默认当前账户
@@ -3432,7 +3432,7 @@ class BaseApi(object):
               返回指定账户第一个排队(可撤)订单号。
 
         【语法】
-              int A_FirstQueueOrderNo(string userNo, string contractNo1='', string contractNo2='')
+              int A_FirstQueueOrderNo(string contractNo1='', string contractNo2='', string userNo='')
 
         【参数】
               userNo  指定的交易账户，默认当前账户
@@ -3454,7 +3454,7 @@ class BaseApi(object):
               返回指定账户下一个排队(可撤)订单号。
 
         【语法】
-              int A_NextQueueOrderNo(string userNo, int localOrderId=0, string contractNo1='', string contractNo2='')
+              int A_NextQueueOrderNo(int localOrderId=0, string contractNo1='', string contractNo2='', string userNo='')
 
         【参数】
               userNo  指定的交易账户，默认当前账户
@@ -3477,7 +3477,7 @@ class BaseApi(object):
               返回指定账户所有排队(可撤)订单号。
 
         【语法】
-              list A_AllQueueOrderNo(string userNo, string contractNo='')
+              list A_AllQueueOrderNo(string contractNo='', string userNo='')
 
         【参数】
               userNo  指定的交易账户，默认当前账户
@@ -3497,7 +3497,7 @@ class BaseApi(object):
               返回指定账户最新一笔完全成交委托单对应的时间。
 
         【语法】
-              float A_LatestFilledTime(string userNo, string contractNo='')
+              float A_LatestFilledTime(string contractNo='', string userNo='')
 
         【参数】
               userNo  指定的交易账户，默认当前账户
@@ -3669,7 +3669,7 @@ class BaseApi(object):
               批量撤单函数。
 
         【语法】
-              bool DeleteAllOrders(string userNo, string contractNo='')
+              bool DeleteAllOrders(string contractNo='', string userNo='')
 
         【参数】
               userNo  指定的交易账户，默认当前账户
