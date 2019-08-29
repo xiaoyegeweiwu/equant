@@ -480,7 +480,6 @@ class CalcCenter(object):
         self._logger.trade_info(f"发送虚拟订单，策略Id:{ftOrder['StrategyId']}, 运行阶段：{ftOrder['StrategyStage']}，"
                                 f"本地订单号：{ftOrder['OrderId']},订单数据：{repr(order)}")
 
-
         contPrice = {
             "Cont": order["Cont"],
             "Price": order["OrderPrice"],
@@ -721,6 +720,7 @@ class CalcCenter(object):
         # 持仓盈亏（浮动盈亏）
         pInfo["HoldProfit"] = ((lastPrice - pInfo["BuyPrice"]) * pInfo["TotalBuy"]
                                + (pInfo["SellPrice"] - lastPrice) * pInfo["TotalSell"]) * cost["TradeDot"]
+        print("00000000000000 : ", pInfo["HoldProfit"])
 
         charge = 0
 
@@ -938,6 +938,7 @@ class CalcCenter(object):
         :return: 持仓盈亏
         """
         positions = self.getPositionInfo(contract)
+        # print("3333333333: ", positions)
         if not contract:
             profit = 0
             for pInfo in positions.values():
@@ -965,7 +966,7 @@ class CalcCenter(object):
         :param contract: 合约
         :return: 持仓保证金
         """
-        positions = self.getPositionInfo(contract)
+        positions = self.getPositionInfo()
         if not contract:  # 全部合约
             margin = 0
             for pInfo in positions.values():
@@ -1085,6 +1086,7 @@ class CalcCenter(object):
         """
         self._profit["Margin"] = self._getHoldMargin()
         self._profit["HoldProfit"] = self._getHoldProfit()
+        # print("444444444: ", self._profit["HoldProfit"])
         #####################################################################
         # Available计算方法是不是有问题，是不是应该将浮动盈亏也计算进去才对呢
         #####################################################################
@@ -1201,6 +1203,8 @@ class CalcCenter(object):
     # 这个函数是不是有问题
     # ######################
     def _updatePosition(self, contPrices):
+        # print("111111111111 : ", self._positions)
+        # print("1111111111Extra: ", contPrices)
         for user in self._positions:
             for contract in self._positions[user]:
                 pInfo = self._positions[user][contract]
@@ -1208,6 +1212,7 @@ class CalcCenter(object):
                 for contPrice in contPrices:
                     if contract == contPrice["Cont"]:
                         lastPrice = contPrice["Price"]
+                #TODO: LastPrice 为0
 
                 pInfo = self._updateTodayPosition(pInfo)
 
@@ -1217,16 +1222,21 @@ class CalcCenter(object):
                 pInfo["HoldProfit"] = ((lastPrice - pInfo["BuyPrice"])
                                        * pInfo["TotalBuy"] + (pInfo["SellPrice"] - lastPrice)
                                        * pInfo["TotalSell"]) * cost["TradeDot"]
+                # print("22222222222: ", lastPrice, pInfo["BuyPrice"], pInfo["TotalBuy"], pInfo["SellPrice"], lastPrice,
+                #       pInfo["TotalSell"], cost["TradeDot"])
 
                 charge = 0
                 pInfo["Cost"] = 0
 
+                # 多头平仓手续费
                 if cost["CloseRatio"]:
                     charge = lastPrice * pInfo["TotalBuy"] * cost["TradeDot"] * cost["CloseRatio"]
                 else:
                     charge = pInfo["TotalBuy"] * cost["CloseFixed"]
                 #self._positions[contract]["Cost"] += charge
+                pInfo["Cost"] += charge
 
+                # 空头平仓手续费
                 if cost["CloseRatio"]:
                     charge = lastPrice * pInfo["TotalSell"] * cost["TradeDot"] * cost["CloseRatio"]
                 else:
@@ -1317,12 +1327,80 @@ class CalcCenter(object):
         :param bOrderReport:
         :return:
         """
+        """
+        "UserNo":         # 用户编号
+        "OrderType":      # 定单类型
+        "ValidType":      # 有效类型
+        "ValidTime":      # 有效日期时间(GTD情况下使用)
+        "Cont":           # 合约
+        "Direct":         # 买卖方向
+        "Offset":         # 开仓平仓 或 应价买入开平
+        "Hedge":          # 投机套保
+        "OrderPrice":     # 委托价格 或 期权应价买入价格
+        "OrderQty" :      # 委托数量 或 期权应价数量
+        "DateTimeStamp":  # 时间戳（基准合约）
+        "TradeDate":      # 交易日（基准合约）
+        "TriggerType":    # 触发方式
+        "CurBar":         # K线信息
+        "CurBarIndex":    # K线索引
+        "StrategyId":     # 策略Id
+        "StrategyName":   # 策略名称
+        "StrategyStage":  # 策略运行阶段
+        }
+        """
         orderList = []
         lastTime = 0
-        positions = self.getPositionInfo()
+        positions = self.getUsersPosition()
 
         if self._fundRecords:
             lastTime = self._fundRecords[-1]["Time"]
+
+        # for user in positions:
+        #     for pInfo in positions[user].values():
+        #         if pInfo["TotalBuy"] > 0:
+        #             order = dict()
+        #             order["UserNo"]        = user
+        #             order["OrderType"]     = otLimit                                       # 定单类型
+        #             order["ValidType"]     = vtGFD                                         # 有效类型
+        #             order["ValidTime"]     = '0'                                           # 有效日期时间(GTD情况下使用)
+        #             order["Cont"]          = pInfo["Cont"]                                 # 合约
+        #             order["Direct"]        = dSell                                         # 买卖方向
+        #             order["Offset"]        = oCover                                        # 开仓平仓 或 应价买入开平
+        #             order["Hedge"]         = hSpeculate                                    # 投机套保
+        #             order["OrderPrice"]    = None                                          # 委托价格 或 期权应价买入价格
+        #             order["OrderQty"]      = pInfo["TotalBuy"]                             # 委托数量 或 期权应价数量
+        #             order["DateTimeStamp"] = None                                          # 时间戳（基准合约）
+        #             order["TradeDate"]     = None                                          # 交易日（基准合约）
+        #             #order["TriggerType"]   = None                                          # 触发方式
+        #             #order["CurBar"]        = None                                          # K线信息
+        #             order["CurBarIndex"]   = None                                          # K线索引
+        #             order["StrategyId"]    = None                                          # 策略Id
+        #             order["StrategyName"]  = self._strategy["StrategyName"]                # 策略名称
+        #             order["StrategyStage"] = ST_STATUS_HISTORY                             # 策略运行阶段
+        #             orderList.append(order)
+        #         if pInfo["TotalSell"] > 0:
+        #             order = dict()
+        #             order["UserNo"] = user
+        #             order["OrderType"]     = otLimit                                        # 定单类型
+        #             order["ValidType"]     = vtGFD                                          # 有效类型
+        #             order["ValidTime"]     = '0'                                            # 有效日期时间(GTD情况下使用)
+        #             order["Cont"]          = pInfo["Cont"]                                  # 合约
+        #             order["Direct"]        = dBuy                                           # 买卖方向
+        #             order["Offset"]        = oCover                                         # 开仓平仓 或 应价买入开平
+        #             order["Hedge"]         = hSpeculate                                     # 投机套保
+        #             order["OrderPrice"]    = None                                           # 委托价格 或 期权应价买入价格
+        #             order["OrderQty"]      = pInfo["TotalBuy"]                              # 委托数量 或 期权应价数量
+        #             order["DateTimeStamp"] = None                                           # 时间戳（基准合约）
+        #             order["TradeDate"]     = None                                           # 交易日（基准合约）
+        #             # order["TriggerType"]   = None                                           # 触发方式
+        #             # order["CurBar"]        = None                                           # K线信息
+        #             order["CurBarIndex"]   = None                                           # K线索引
+        #             order["StrategyId"]    = None                                           # 策略Id
+        #             order["StrategyName"]  = self._strategy["StrategyName"]                 # 策略名称
+        #             order["StrategyStage"] = ST_STATUS_HISTORY                              # 策略运行阶段
+        #             orderList.append(order)
+
+
 
         for pInfo in positions.values():
             if pInfo["TotalBuy"] > 0:  # 有持买
@@ -1359,12 +1437,7 @@ class CalcCenter(object):
                 self._runSet["EndTime"] = lastTime
 
         # 将最后一个阶段的数据计算出来
-        self.calcLastStaticInfo()
-        # self._calcStageStaticInfo(self._dailyStatis)
-        # self._calcStageStaticInfo(self._weekStatis)
-        # self._calcStageStaticInfo(self._monthStatis)
-        # self._calcStageStaticInfo(self._quarterStatis)
-        # self._calcStageStaticInfo(self._yearStatis)
+        # self.calcLastStaticInfo()
 
     def calcLastStaticInfo(self):
         # 计算最后一个阶段总结数据
