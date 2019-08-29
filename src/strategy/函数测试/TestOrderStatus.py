@@ -20,7 +20,7 @@ def handle_data(context):
 
     if sentOrder:
     #if cnt < 100:
-        for i in range(10):
+        for i in range(100):
             ret, localId = A_SendOrder(Enum_Buy(), Enum_Entry(), 1, Q_Last())
             if ret == 0: 
                 localIdList.append(localId)
