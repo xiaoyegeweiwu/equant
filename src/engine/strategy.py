@@ -976,7 +976,6 @@ class Strategy:
             self._eSessionIdList.append(eSesnId)
             
     def delLocalOrder(self, userDict):
-    
         popSessionList  = []
         
         for k, v in self._localOrder.items():
@@ -1094,7 +1093,6 @@ class Strategy:
         return tradeRecord._contNo
         
     def getContNoByOrderId(self, orderId):
-        self.logger.debug('2 enter orderid: %s, %d' %(str(orderId), len(self._localOrder)))
         for k, v in self._localOrder.items():
             if v._orderId == orderId:
                 return v._contNo
