@@ -2740,7 +2740,7 @@ class BaseApi(object):
               获得指定账户所有持仓合约。
 
         【语法】
-              list A_GetAllPositionSymbol(string userNo)
+              list A_GetAllPositionSymbol(string userNo='')
 
         【参数】
               userNo  指定的交易账户，默认当前账户
@@ -2759,7 +2759,7 @@ class BaseApi(object):
               返回指定交易帐户的手续费。
 
         【语法】
-              string A_Cost(string userNo)
+              string A_Cost(string userNo='')
 
         【参数】
               userNo  指定的交易账户，默认当前账户
@@ -2778,7 +2778,7 @@ class BaseApi(object):
               返回指定交易帐户的动态权益。
 
         【语法】
-              float A_Assets(string userNo)
+              float A_Assets(string userNo='')
 
         【参数】
               userNo  指定的交易账户，默认当前账户
@@ -2797,7 +2797,7 @@ class BaseApi(object):
               返回指定交易帐户的可用资金。
 
         【语法】
-              float A_Available(string userNo)
+              float A_Available(string userNo='')
 
         【参数】
               userNo  指定的交易账户，默认当前账户
@@ -2817,7 +2817,7 @@ class BaseApi(object):
               返回指定交易帐户的持仓保证金。
 
         【语法】
-              float A_Margin(string userNo)
+              float A_Margin(string userNo='')
 
         【参数】
               userNo  指定的交易账户，默认当前账户
@@ -2837,7 +2837,7 @@ class BaseApi(object):
               返回指定交易帐户的浮动盈亏。
 
         【语法】
-              float A_ProfitLoss(string userNo)
+              float A_ProfitLoss(string userNo='')
 
         【参数】
               userNo  指定的交易账户，默认当前账户
@@ -2857,7 +2857,7 @@ class BaseApi(object):
               返回当前账户的平仓盈亏。
 
         【语法】
-              float A_CoverProfit(string userNo)
+              float A_CoverProfit(string userNo='')
 
         【参数】
               userNo  指定的交易账户，默认当前账户
@@ -2877,7 +2877,7 @@ class BaseApi(object):
               返回指定交易帐户的冻结资金。
 
         【语法】
-              float A_TotalFreeze(string userNo)
+              float A_TotalFreeze(string userNo='')
 
         【参数】
               userNo  指定的交易账户，默认当前账户
