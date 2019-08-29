@@ -6,8 +6,11 @@ localIdList = []
 cnt = 0
 
 def initialize(context): 
-    SetBarInterval("NYMEX|F|CL|1910", 'M', 1, 200)
-    #SetBarInterval("ZCE|F|CF|001", 'M', 1, 200)    SetActual()
+    #SetBarInterval("NYMEX|F|CL|1910", 'M', 1, 200)
+    SetBarInterval("NYMEX|F|CL|1910", 'D', 50, 200)
+    #SetBarInterval("ZCE|F|CF|001", 'M', 1, 200)   
+    #SetBarInterval("DCE|F|J|2001", 'D', 30, 10)  
+    SetActual()
 
 
 def handle_data(context):
@@ -20,7 +23,7 @@ def handle_data(context):
 
     if sentOrder:
     #if cnt < 100:
-        for i in range(100):
+        for i in range(2):
             ret, localId = A_SendOrder(Enum_Buy(), Enum_Entry(), 1, Q_Last())
             if ret == 0: 
                 localIdList.append(localId)

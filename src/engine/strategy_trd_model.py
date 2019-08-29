@@ -425,7 +425,7 @@ class StrategyTrade(TradeModel):
             
         realUserNo = self.getUserNoByOrderId(orderId)
         if realUserNo not in self._userInfo:
-            self.logger.error('user not login!'%realUserNo)
+            self.logger.error('user(%s) not login!'%realUserNo)
             return ret
 
         order = self._userInfo[realUserNo].getOrderDict()
