@@ -869,7 +869,7 @@ class StrategyModel(object):
         if len(underlayCont2) > 0:
             contNo2 = underlayCont2
 
-        return self._trdModel.getNextOrderNo(orderId, userNo, contNo1, contNo2)
+        return self._trdModel.getNextOrderNo(userNo, orderId, contNo1, contNo2)
 
     def getLastOrderNo(self, userNo, contNo1, contNo2):
         underlayCont1 = self._qteModel.getUnderlayContractNo(contNo1)

@@ -1,9 +1,10 @@
 import talib
 
+userNo = 'Q912526205'
 
 def initialize(context): 
-    SetUserNo('Q437104345')
-    SetBarInterval("SHFE|F|AL|1908", 'M', 1, 200)
+    SetUserNo(userNo)
+    SetBarInterval("SHFE|F|AL|1910", 'M', 1, 200)
 
 
 def handle_data(context):

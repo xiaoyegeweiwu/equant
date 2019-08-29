@@ -3169,10 +3169,9 @@ class BaseApi(object):
               返回指定帐户下当前商品的某个委托单的买卖类型。
 
         【语法】
-              char A_OrderBuyOrSell(string userNo, int|string localOrderId='')
+              char A_OrderBuyOrSell(int|string localOrderId='')
 
         【参数】
-              userNo  指定的交易账户，默认当前账户
               localOrderId 定单号，或者使用A_SendOrder返回的下单编号。
 
         【备注】
@@ -3196,10 +3195,9 @@ class BaseApi(object):
               返回指定帐户下当前商品的某个委托单的开平仓状态。
 
         【语法】
-              char A_OrderEntryOrExit(string userNo, int|string localOrderId='')
+              char A_OrderEntryOrExit(int|string localOrderId='')
 
         【参数】
-              userNo  指定的交易账户，默认当前账户
               localOrderId 定单号，或者使用A_SendOrder返回的下单编号。
 
         【备注】
@@ -3226,10 +3224,9 @@ class BaseApi(object):
               返回指定帐户下当前商品的某个委托单的成交数量。
 
         【语法】
-              float A_OrderFilledLot(string userNo, int|string localOrderId='')
+              float A_OrderFilledLot(int|string localOrderId='')
 
         【参数】
-              userNo  指定的交易账户，默认当前账户
               localOrderId 定单号，或者使用A_SendOrder返回的下单编号。
 
         【备注】
@@ -3247,10 +3244,9 @@ class BaseApi(object):
               返回指定帐户下当前商品的某个委托单的成交价格。
 
         【语法】
-              float A_OrderFilledPrice(string userNo, int|string localOrderId='')
+              float A_OrderFilledPrice(int|string localOrderId='')
 
         【参数】
-              userNo  指定的交易账户，默认当前账户
               localOrderId 定单号，或者使用A_SendOrder返回的下单编号。
 
         【备注】
@@ -3269,10 +3265,9 @@ class BaseApi(object):
               返回指定帐户下当前商品的某个委托单的委托数量。
 
         【语法】
-              float A_OrderLot(string userNo, int|string localOrderId='')
+              float A_OrderLot(int|string localOrderId='')
 
         【参数】
-              userNo  指定的交易账户，默认当前账户
               localOrderId 定单号，或者使用A_SendOrder返回的下单编号。
 
         【备注】
@@ -3290,10 +3285,9 @@ class BaseApi(object):
               返回指定帐户下当前商品的某个委托单的委托价格。
 
         【语法】
-              float A_OrderPrice(string userNo, int|string localOrderId='')
+              float A_OrderPrice(int|string localOrderId='')
 
         【参数】
-              userNo  指定的交易账户，默认当前账户
               localOrderId 定单号，或者使用A_SendOrder返回的下单编号。
 
         【备注】
@@ -3311,10 +3305,9 @@ class BaseApi(object):
               返回指定帐户下当前商品的某个委托单的状态。
 
         【语法】
-              char A_OrderStatus(string userNo, int|string localOrderId='')
+              char A_OrderStatus(int|string localOrderId='')
 
         【参数】
-              userNo  指定的交易账户，默认当前账户
               localOrderId 定单号，或者使用A_SendOrder返回的下单编号。
 
         【备注】
@@ -3353,10 +3346,9 @@ class BaseApi(object):
               返回指定公式应用的帐户下当前商品的某个委托单的委托时间。
 
         【语法】
-              struct_time A_OrderTime(string userNo, int|string localOrderId='')
+              struct_time A_OrderTime(int|string localOrderId='')
 
         【参数】
-              userNo  指定的交易账户，默认当前账户
               localOrderId 定单号，或者使用A_SendOrder返回的下单编号。
 
         【备注】
@@ -3525,10 +3517,9 @@ class BaseApi(object):
               返回订单的合约号。
 
         【语法】
-              string A_OrderContractNo(string userNo, int|string localOrderId=0)
+              string A_OrderContractNo(int|string localOrderId=0)
 
         【参数】
-              userNo  指定的交易账户，默认当前账户
               localOrderId 定单号，或者使用A_SendOrder返回的下单编号。
 
         【备注】
@@ -3630,10 +3621,9 @@ class BaseApi(object):
               针对指定帐户、商品发送撤单指令。
 
         【语法】
-              bool A_DeleteOrder(string userNo, int|string localOrderId)
+              bool A_DeleteOrder(int|string localOrderId)
 
         【参数】
-              userNo  指定的交易账户，默认当前账户
               localOrderId 定单号，或者使用A_SendOrder返回的下单编号。
 
         【备注】
@@ -6652,103 +6642,103 @@ def A_CoverProfit(userNo=''):
 def A_TotalFreeze(userNo=''):
     return baseApi.A_TotalFreeze(userNo)
 
-def A_BuyAvgPrice(userNo='', contractNo=''):
+def A_BuyAvgPrice(contractNo='', userNo=''):
     return baseApi.A_BuyAvgPrice(userNo, contractNo)
 
-def A_BuyPosition(userNo='', contractNo=''):
+def A_BuyPosition(contractNo='', userNo=''):
     return baseApi.A_BuyPosition(userNo, contractNo)
 
-def A_BuyPositionCanCover(userNo='', contractNo=''):
+def A_BuyPositionCanCover(contractNo='',userNo=''):
     return baseApi.A_BuyPositionCanCover(userNo, contractNo)
 
-def A_BuyProfitLoss(userNo='', contractNo=''):
+def A_BuyProfitLoss(contractNo='', userNo=''):
     return baseApi.A_BuyProfitLoss(userNo, contractNo)
 
-def A_SellAvgPrice(userNo='', contractNo=''):
+def A_SellAvgPrice(contractNo='', userNo=''):
     return baseApi.A_SellAvgPrice(userNo, contractNo)
 
-def A_SellPosition(userNo='', contractNo=''):
+def A_SellPosition(contractNo='', userNo=''):
     return baseApi.A_SellPosition(userNo, contractNo)
 
-def A_SellPositionCanCover(userNo='', contractNo=''):
+def A_SellPositionCanCover(contractNo='', userNo=''):
     return baseApi.A_SellPositionCanCover(userNo, contractNo)
 
-def A_SellProfitLoss(userNo='', contractNo=''):
+def A_SellProfitLoss(contractNo='', userNo=''):
     return baseApi.A_SellProfitLoss(userNo, contractNo)
 
-def A_TotalAvgPrice(userNo='', contractNo=''):
+def A_TotalAvgPrice(contractNo='', userNo=''):
     return baseApi.A_TotalAvgPrice(userNo, contractNo)
 
-def A_TotalPosition(userNo='', contractNo=''):
+def A_TotalPosition(contractNo='', userNo=''):
     return baseApi.A_TotalPosition(userNo, contractNo)
 
-def A_TotalProfitLoss(userNo='', contractNo=''):
+def A_TotalProfitLoss(contractNo='', userNo=''):
     return baseApi.A_TotalProfitLoss(userNo, contractNo)
 
-def A_TodayBuyPosition(userNo='', contractNo=''):
+def A_TodayBuyPosition(contractNo='', userNo=''):
     return baseApi.A_TodayBuyPosition(userNo, contractNo)
 
-def A_TodaySellPosition(userNo='', contractNo=''):
+def A_TodaySellPosition(contractNo='', userNo=''):
     return baseApi.A_TodaySellPosition(userNo, contractNo)
 
-def A_OrderBuyOrSell(userNo='', localOrderId=''):
-    return baseApi.A_OrderBuyOrSell(userNo, localOrderId)
+def A_OrderBuyOrSell(localOrderId):
+    return baseApi.A_OrderBuyOrSell('', localOrderId)
 
-def A_OrderEntryOrExit(userNo='', localOrderId=''):
-    return baseApi.A_OrderEntryOrExit(userNo, localOrderId)
+def A_OrderEntryOrExit(localOrderId):
+    return baseApi.A_OrderEntryOrExit('', localOrderId)
 
-def A_OrderFilledLot(userNo='', localOrderId=''):
-    return baseApi.A_OrderFilledLot(userNo, localOrderId)
+def A_OrderFilledLot(localOrderId):
+    return baseApi.A_OrderFilledLot('', localOrderId)
 
-def A_OrderFilledPrice(userNo='', localOrderId=''):
-    return baseApi.A_OrderFilledPrice(userNo, localOrderId)
+def A_OrderFilledPrice(localOrderId):
+    return baseApi.A_OrderFilledPrice('', localOrderId)
 
-def A_OrderLot(userNo='', localOrderId=''):
-    return baseApi.A_OrderLot(userNo, localOrderId)
+def A_OrderLot(localOrderId):
+    return baseApi.A_OrderLot('', localOrderId)
 
-def A_OrderPrice(userNo='', localOrderId=''):
-    return baseApi.A_OrderPrice(userNo, localOrderId)
+def A_OrderPrice(localOrderId):
+    return baseApi.A_OrderPrice('', localOrderId)
 
-def A_OrderStatus(userNo='', localOrderId=''):
-    return baseApi.A_OrderStatus(userNo, localOrderId)
+def A_OrderStatus(localOrderId):
+    return baseApi.A_OrderStatus('', localOrderId)
 
-def A_OrderTime(userNo='', localOrderId=''):
-    return baseApi.A_OrderTime(userNo, localOrderId)
+def A_OrderTime(localOrderId):
+    return baseApi.A_OrderTime('', localOrderId)
 
-def A_FirstOrderNo(userNo='', contractNo1='', contractNo2=''):
+def A_FirstOrderNo(contractNo1='', contractNo2='', userNo=''):
     return baseApi.A_FirstOrderNo(userNo, contractNo1, contractNo2)
 
-def A_NextOrderNo(userNo='', localOrderId=0, contractNo1='', contractNo2=''):
+def A_NextOrderNo(localOrderId=0, contractNo1='', contractNo2='', userNo=''):
     return baseApi.A_NextOrderNo(userNo, localOrderId, contractNo1, contractNo2)
 
-def A_LastOrderNo(userNo='', contractNo1='', contractNo2=''):
+def A_LastOrderNo(contractNo1='', contractNo2='', userNo=''):
     return baseApi.A_LastOrderNo(userNo, contractNo1, contractNo2)
 
-def A_FirstQueueOrderNo(userNo='', contractNo1='', contractNo2=''):
+def A_FirstQueueOrderNo(contractNo1='', contractNo2='', userNo=''):
     return baseApi.A_FirstQueueOrderNo(userNo, contractNo1, contractNo2)
 
-def A_NextQueueOrderNo(userNo='', localOrderId=0, contractNo1='', contractNo2=''):
+def A_NextQueueOrderNo(localOrderId=0, contractNo1='', contractNo2='', userNo=''):
     return baseApi.A_NextQueueOrderNo(userNo, localOrderId, contractNo1, contractNo2)
 
-def A_AllQueueOrderNo(userNo='', contractNo=''):
+def A_AllQueueOrderNo(contractNo='', userNo=''):
     return baseApi.A_AllQueueOrderNo(userNo, contractNo)
 
-def A_LatestFilledTime(userNo='', contractNo=''):
+def A_LatestFilledTime(contractNo='', userNo=''):
     return baseApi.A_LatestFilledTime(userNo, contractNo)
 
-def A_OrderContractNo(userNo='', localOrderId=0):
+def A_OrderContractNo(localOrderId=0, userNo=''):
     return baseApi.A_OrderContractNo(userNo, localOrderId)
 
 def A_SendOrder(orderDirct, entryOrExit, orderQty, orderPrice, contractNo='', userNo='', orderType='2', validType='0', hedge='T', triggerType='N', triggerMode='N', triggerCondition='N', triggerPrice=0):
     return baseApi.A_SendOrder(userNo, contractNo, orderDirct, entryOrExit, orderQty, orderPrice, orderType, validType, hedge, triggerType, triggerMode, triggerCondition, triggerPrice)
 
-def A_DeleteOrder(userNo='', localOrderId=''):
-    return baseApi.A_DeleteOrder(userNo, localOrderId)
+def A_DeleteOrder(localOrderId):
+    return baseApi.A_DeleteOrder('', localOrderId)
 
-def A_GetOrderNo(localOrderId=''):
+def A_GetOrderNo(localOrderId):
     return baseApi.A_GetOrderNo(localOrderId)
 
-def DeleteAllOrders(userNo='', contractNo=''):
+def DeleteAllOrders(contractNo='', userNo=''):
     return baseApi.DeleteAllOrders(userNo, contractNo)
 
 #策略交易

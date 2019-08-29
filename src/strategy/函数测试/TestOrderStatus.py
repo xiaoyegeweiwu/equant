@@ -6,6 +6,7 @@ localIdList = []
 cnt = 0
 
 def initialize(context): 
+    SetActual()
     SetBarInterval("NYMEX|F|CL|1910", 'M', 1, 200)
     #SetBarInterval("ZCE|F|CF|001", 'M', 1, 200)    SetActual()
 
@@ -33,5 +34,5 @@ def handle_data(context):
         return
     
     for lid in localIdList:
-        LogInfo("ORDER", lid, A_GetOrderNo(lid), A_OrderStatus(localOrderId=lid), A_FirstOrderNo())
+        LogInfo("ORDER", lid, A_GetOrderNo(lid), A_OrderStatus(lid), A_FirstOrderNo())
     
