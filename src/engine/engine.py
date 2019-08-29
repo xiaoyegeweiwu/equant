@@ -61,6 +61,9 @@ class StrategyEngine(object):
         self._isEffective = {}
         self._isSt2EngineDataEffective= {}
         
+        # 查询sessionId和账号对应关系
+        self._SessionUserMap = {}
+        
         # 策略虚拟持仓
         self._strategyPosDict = {}
         
@@ -786,17 +789,34 @@ class StrategyEngine(object):
                 }
             })
             
-            self._reqOrder(event)
-            
-            self._reqMatch(event)
-            
-            self._reqPosition(event)
-            
+            sid = self._reqOrder(event)
+            self._SessionUserMap[sid] = data
         
     def _onApiOrderDataQry(self, apiEvent):
-        #self.logger.debug("_onApiOrderDataQry:%s"%apiEvent.getData())
+        #userNo = self._SessionUserMap[apiEvent.getSessionId()]
+        #self.logger.debug("_onApiOrderDataQry:%d,%s,%s"%(apiEvent.getSessionId(), userNo, apiEvent.getData()))
         self._trdModel.updateOrderData(apiEvent)
         self._sendEvent2AllStrategy(apiEvent)
+        
+        if apiEvent.isChainEnd():
+            sid = apiEvent.getSessionId()
+            if sid not in self._SessionUserMap:
+                self.logger.error('_onApiOrderDataQry: session id error!')
+                return
+                
+            data = self._SessionUserMap[sid]
+            
+            event = Event({
+                'StrategyId' : 0,
+                'Data'       : {
+                    'UserNo'      : data['UserNo'],
+                    'Sign'        : data['Sign'],
+                }
+            })
+            
+            sid = self._reqMatch(event)
+            self._SessionUserMap[sid] = data
+        
         
     def _onApiOrderDataNotice(self, apiEvent):
         #self.logger.debug("_onApiOrderDataNotice:%s"%apiEvent.getData())
@@ -811,9 +831,29 @@ class StrategyEngine(object):
         self._sendEvent2AllStrategy(apiEvent)
 
     def _onApiMatchDataQry(self, apiEvent):
-        #self.logger.debug("_onApiMatchDataQry:%s"%apiEvent.getData())
+        #userNo = self._SessionUserMap[apiEvent.getSessionId()]
+        #self.logger.debug("_onApiMatchDataQry:%d,%s,%s"%(apiEvent.getSessionId(), userNo, apiEvent.getData()))
         self._trdModel.updateMatchData(apiEvent)
         self._sendEvent2AllStrategy(apiEvent)
+        
+        if apiEvent.isChainEnd():
+            sid = apiEvent.getSessionId()
+            if sid not in self._SessionUserMap:
+                self.logger.error('_onApiMatchDataQry: session id error!')
+                return
+                
+            data = self._SessionUserMap[sid]
+            
+            event = Event({
+                'StrategyId' : 0,
+                'Data'       : {
+                    'UserNo'      : data['UserNo'],
+                    'Sign'        : data['Sign'],
+                }
+            })
+            
+            sid = self._reqPosition(event)
+            self._SessionUserMap[sid] = data
             
     def _onApiMatchData(self, apiEvent):
         # 成交信息
@@ -824,10 +864,19 @@ class StrategyEngine(object):
         self._sendEvent2AllStrategy(apiEvent)
         
     def _onApiPosDataQry(self, apiEvent):
-        #self.logger.debug("_onApiPosDataQry:%s"%apiEvent.getData())
+        #userNo = self._SessionUserMap[apiEvent.getSessionId()]
+        #self.logger.debug("_onApiPosDataQry:%d,%s,%s"%(apiEvent.getSessionId(), userNo, apiEvent.getData()))
         self._trdModel.updatePosData(apiEvent)
         # print("++++++ 持仓信息 引擎 查询 ++++++", apiEvent.getData())
         self._sendEvent2AllStrategy(apiEvent)
+        
+        if apiEvent.isChainEnd():
+            sid = apiEvent.getSessionId()
+            if sid not in self._SessionUserMap:
+                self.logger.error('_onApiOrderDataQry: session id error!')
+                return
+            data = self._SessionUserMap[sid]
+            self._trdModel.setDataReady(data['UserNo'])
 
     def _onApiPosData(self, apiEvent):
         #self.logger.debug("_onApiPosData:%s"%apiEvent.getData())
@@ -1037,7 +1086,10 @@ class StrategyEngine(object):
         
         self._sendData2Strategy(event.getStrategyId(), EV_EG2ST_MONEY_RSP, dataList)
 
-    def _onOrderReq(self, event):
+    def _onOrderReq(self, event):  
+        if not self._trdModel.isAllDataReady():
+            self.logger.warn("_onOrderReq: data not ready")
+            
         #委托信息可能较多，分批次发送，最后发一个空包结束
         dataDict = self._trdModel.getUserInfo()
         for v in dataDict.values():
@@ -1053,11 +1105,11 @@ class StrategyEngine(object):
                 sendCount += 1
                 if sendCount >= 20:
                     sendCount = 0
-                    self._sendData2Strategy(event.getStrategyId(), EV_EG2ST_ORDER_RSP, dataList, EEQU_SRVCHAIN_NOTEND)
+                    self._sendData2Strategy(event.getStrategyId(), EV_EG2ST_ORDER_RSP, dataList[:], EEQU_SRVCHAIN_NOTEND)
                     dataList.clear()
                     
             if sendCount > 0:
-                self._sendData2Strategy(event.getStrategyId(), EV_EG2ST_ORDER_RSP, dataList, EEQU_SRVCHAIN_NOTEND)
+                self._sendData2Strategy(event.getStrategyId(), EV_EG2ST_ORDER_RSP, dataList[:], EEQU_SRVCHAIN_NOTEND)
                 
         #多发一个空结束包
         self._sendData2Strategy(event.getStrategyId(), EV_EG2ST_ORDER_RSP, [])
@@ -1077,11 +1129,11 @@ class StrategyEngine(object):
                 sendCount += 1
                 if sendCount >= 20:
                     sendCount = 0
-                    self._sendData2Strategy(event.getStrategyId(), EV_EG2ST_MATCH_RSP, dataList, EEQU_SRVCHAIN_NOTEND)
+                    self._sendData2Strategy(event.getStrategyId(), EV_EG2ST_MATCH_RSP, dataList[:], EEQU_SRVCHAIN_NOTEND)
                     dataList.clear()
                     
             if sendCount > 0:
-                self._sendData2Strategy(event.getStrategyId(), EV_EG2ST_MATCH_RSP, dataList, EEQU_SRVCHAIN_NOTEND)
+                self._sendData2Strategy(event.getStrategyId(), EV_EG2ST_MATCH_RSP, dataList[:], EEQU_SRVCHAIN_NOTEND)
                 
         #多发一个空结束包
         self._sendData2Strategy(event.getStrategyId(), EV_EG2ST_MATCH_RSP, [])
@@ -1101,11 +1153,11 @@ class StrategyEngine(object):
                 sendCount += 1
                 if sendCount >= 20:
                     sendCount = 0
-                    self._sendData2Strategy(event.getStrategyId(), EV_EG2ST_POSITION_RSP, dataList, EEQU_SRVCHAIN_NOTEND)
+                    self._sendData2Strategy(event.getStrategyId(), EV_EG2ST_POSITION_RSP, dataList[:], EEQU_SRVCHAIN_NOTEND)
                     dataList.clear()
                     
             if sendCount > 0:
-                self._sendData2Strategy(event.getStrategyId(), EV_EG2ST_POSITION_RSP, dataList, EEQU_SRVCHAIN_NOTEND)
+                self._sendData2Strategy(event.getStrategyId(), EV_EG2ST_POSITION_RSP, dataList[:], EEQU_SRVCHAIN_NOTEND)
                 
         #多发一个空结束包
         self._sendData2Strategy(event.getStrategyId(), EV_EG2ST_POSITION_RSP, [])
@@ -1159,19 +1211,19 @@ class StrategyEngine(object):
     ################################交易请求#########################
     
     def _reqUserInfo(self, event):
-        self._pyApi.reqQryUserInfo(event)
+        return self._pyApi.reqQryUserInfo(event)
         
     def _reqOrder(self, event):
         self.logger.info("request order:%s"%event.getData())
-        self._pyApi.reqQryOrder(event)
+        return self._pyApi.reqQryOrder(event)
         
     def _reqMatch(self, event):
         #self.logger.info("request match")
-        self._pyApi.reqQryMatch(event)
+        return self._pyApi.reqQryMatch(event)
         
     def _reqPosition(self, event):
         #self.logger.info("request position")
-        self._pyApi.reqQryPosition(event)
+        return self._pyApi.reqQryPosition(event)
         
     def _reqUserMoney(self):
         userDict = self._trdModel.getUserInfo()
@@ -1191,7 +1243,7 @@ class StrategyEngine(object):
             self._reqMoney(event)
          
     def _reqMoney(self, event):
-        self._pyApi.reqQryMoney(event)
+        return self._pyApi.reqQryMoney(event)
 
     def _sendOrder(self, event):
         # 委托下单，发送委托单

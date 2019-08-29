@@ -17,15 +17,6 @@ class StrategyTrade(TradeModel):
     def initialize(self):
         self._selectedUserNo = self._config.getUserNo()
 
-    def reqTradeData(self):
-        event = Event({
-            'EventCode': EV_ST2EG_STRATEGYTRADEINFO,
-            'StrategyId': self._strategy.getStrategyId(),
-            'Data': '',
-        })
-
-        self._strategy.sendEvent2Engine(event)
-
     def getAccountId(self):
         '''
         :return:当前公式应用的交易帐户ID
@@ -76,7 +67,7 @@ class StrategyTrade(TradeModel):
                 contList.append(contNo)
         return contList
 
-    def getDataFromTMoneyModel(self, key, userNo):
+    def getDataFromTMoneyModel(self, userNo, key):
         '''
         获取self._userInfo中当前账户指定的资金信息
         :param key:需要的资金信息的key
@@ -129,7 +120,7 @@ class StrategyTrade(TradeModel):
         if not userNo:
             userNo = self._selectedUserNo
         
-        return self.getDataFromTMoneyModel('Fee', userNo)
+        return self.getDataFromTMoneyModel(userNo, 'Fee')
 
     def getCurrentEquity(self, userNo):
         '''
@@ -139,7 +130,7 @@ class StrategyTrade(TradeModel):
         if not userNo:
             userNo = self._selectedUserNo
             
-        return self.getDataFromTMoneyModel('Equity', userNo)
+        return self.getDataFromTMoneyModel(userNo, 'Equity')
 
     def getFreeMargin(self, userNo):
         '''
@@ -149,14 +140,14 @@ class StrategyTrade(TradeModel):
         if not userNo:
             userNo = self._selectedUserNo
             
-        return self.getDataFromTMoneyModel('Available', userNo)
+        return self.getDataFromTMoneyModel(userNo, 'Available')
 
     def getAMargin(self, userNo):
         # 默认usrNo为空字符串（''），此时取当前用户
         if not userNo:
             userNo = self._selectedUserNo
             
-        return self.getDataFromTMoneyModel('Deposit', userNo)
+        return self.getDataFromTMoneyModel(userNo, 'Deposit')
 
     def getProfitLoss(self, userNo):
         '''
@@ -166,14 +157,14 @@ class StrategyTrade(TradeModel):
         if not userNo:
             userNo = self._selectedUserNo
             
-        return self.getDataFromTMoneyModel('FloatProfitTBT', userNo)
+        return self.getDataFromTMoneyModel(userNo, 'FloatProfitTBT')
 
     def getCoverProfit(self, userNo):
         # 默认usrNo为空字符串（''），此时取当前用户
         if not userNo:
             userNo = self._selectedUserNo
             
-        return self.getDataFromTMoneyModel('CoverProfitTBT', userNo)
+        return self.getDataFromTMoneyModel(userNo, 'CoverProfitTBT')
 
     def getTotalFreeze(self, userNo):
         '''
@@ -183,9 +174,9 @@ class StrategyTrade(TradeModel):
         if not userNo:
             userNo = self._selectedUserNo
             
-        return self.getDataFromTMoneyModel('FrozenFee', userNo) + self.getDataFromTMoneyModel('FrozenDeposit', userNo)
+        return self.getDataFromTMoneyModel(userNo, 'FrozenFee') + self.getDataFromTMoneyModel(userNo, 'FrozenDeposit')
 
-    def getItemSumFromPositionModel(self, direct, contNo, key, userNo):
+    def getItemSumFromPositionModel(self, userNo, direct, contNo, key):
         '''
         获取某个账户下所有指定方向、指定合约的指标之和
         :param direct: 买卖方向，为空时表示所有方向
@@ -214,7 +205,7 @@ class StrategyTrade(TradeModel):
 
         return itemSum
 
-    def getBuyAvgPrice(self, contNo, userNo):
+    def getBuyAvgPrice(self, userNo, contNo):
         '''
         :return:当前公式应用的帐户下当前商品的买入持仓均价
         '''
@@ -240,7 +231,7 @@ class StrategyTrade(TradeModel):
 
         return priceSum / posSum if posSum > 0 else 0.0
 
-    def getBuyPosition(self, contNo, userNo):
+    def getBuyPosition(self, userNo, contNo):
         '''
         :return:当前公式应用的帐户下当前商品的买入持仓
         '''
@@ -248,9 +239,9 @@ class StrategyTrade(TradeModel):
         if not userNo:
             userNo = self._selectedUserNo
             
-        return int(self.getItemSumFromPositionModel('B', contNo,  'PositionQty', userNo))
+        return int(self.getItemSumFromPositionModel(userNo, 'B', contNo,  'PositionQty'))
 
-    def getBuyPositionCanCover(self, contNo, userNo):
+    def getBuyPositionCanCover(self, userNo, contNo):
         '''买仓可平数量'''
         # 默认usrNo为空字符串（''），此时取当前用户
         if not userNo:
@@ -258,10 +249,10 @@ class StrategyTrade(TradeModel):
             
         if not contNo:
             contNo = self._config.getBenchmark()
-        buyPos = self.getBuyPosition(contNo, userNo) - self.getQueueSumFromOrderModel( 'S', contNo, ('C', 'T'), userNo)
+        buyPos = self.getBuyPosition(userNo, contNo) - self.getQueueSumFromOrderModel(userNo, 'S', contNo, ('C', 'T'))
         return int(buyPos)
 
-    def getQueueSumFromOrderModel(self, direct, contNo, offset, userNo):
+    def getQueueSumFromOrderModel(self, userNo, direct, contNo, offset):
         # 默认usrNo为空字符串（''），此时取当前用户
         if not userNo:
             userNo = self._selectedUserNo
@@ -286,7 +277,7 @@ class StrategyTrade(TradeModel):
 
         return queueSum
 
-    def getBuyProfitLoss(self, contNo, userNo):
+    def getBuyProfitLoss(self, userNo, contNo):
         '''
         :return:当前公式应用的帐户下当前商品的买入持仓盈亏
         '''
@@ -294,9 +285,9 @@ class StrategyTrade(TradeModel):
         if not userNo:
             userNo = self._selectedUserNo
             
-        return self.getItemSumFromPositionModel('B', contNo, 'FloatProfitTBT', userNo)
+        return self.getItemSumFromPositionModel(userNo, 'B', contNo, 'FloatProfitTBT')
 
-    def getSellAvgPrice(self, contNo, userNo):
+    def getSellAvgPrice(self, userNo, contNo):
         '''
         :return: 当前公式应用的帐户下当前商品的卖出持仓均价
         '''
@@ -322,7 +313,7 @@ class StrategyTrade(TradeModel):
 
         return priceSum / posSum if posSum > 0 else 0.0
 
-    def getSellPosition(self, contNo, userNo):
+    def getSellPosition(self, userNo, contNo):
         '''
         :return: 当前公式应用的帐户下当前商品的卖出持仓
         '''
@@ -330,9 +321,9 @@ class StrategyTrade(TradeModel):
         if not userNo:
             userNo = self._selectedUserNo
             
-        return int(self.getItemSumFromPositionModel('S', contNo, 'PositionQty', userNo))
+        return int(self.getItemSumFromPositionModel(userNo, 'S', contNo, 'PositionQty'))
 
-    def getSellPositionCanCover(self, contNo, userNo):
+    def getSellPositionCanCover(self, userNo, contNo):
         '''卖仓可平数量'''
         # 默认usrNo为空字符串（''），此时取当前用户
         if not userNo:
@@ -340,11 +331,11 @@ class StrategyTrade(TradeModel):
             
         if not contNo:
             contNo = self._config.getBenchmark()
-        sellPos = self.getSellPosition(contNo, userNo) - self.getQueueSumFromOrderModel('B', contNo, ('C', 'T'), userNo)
+        sellPos = self.getSellPosition(userNo, contNo) - self.getQueueSumFromOrderModel(userNo, 'B', contNo, ('C', 'T'))
         return int(sellPos)
 
 
-    def getSellProfitLoss(self, contNo, userNo):
+    def getSellProfitLoss(self, userNo, contNo):
         '''
         :return: 当前公式应用的帐户下当前商品的卖出持仓盈亏
         '''
@@ -352,9 +343,9 @@ class StrategyTrade(TradeModel):
         if not userNo:
             userNo = self._selectedUserNo
             
-        return self.getItemSumFromPositionModel('S', contNo, 'FloatProfitTBT', userNo)
+        return self.getItemSumFromPositionModel(userNo, 'S', contNo, 'FloatProfitTBT')
 
-    def getTotalAvgPrice(self, contNo, userNo):
+    def getTotalAvgPrice(self, userNo, contNo):
         '''
         :return: 当前公式应用的帐户下当前商品的持仓均价
         '''
@@ -380,7 +371,7 @@ class StrategyTrade(TradeModel):
 
         return priceSum / posSum if posSum > 0 else 0.0
 
-    def getTotalPosition(self, contNo, userNo):
+    def getTotalPosition(self, userNo, contNo):
         '''
         :return: 当前公式应用的帐户下当前商品的总持仓
         '''
@@ -388,10 +379,10 @@ class StrategyTrade(TradeModel):
         if not userNo:
             userNo = self._selectedUserNo
             
-        totalPos = int(self.getItemSumFromPositionModel('B', contNo, 'PositionQty', userNo)) - int(self.getItemSumFromPositionModel('S', contNo, 'PositionQty', userNo))
+        totalPos = int(self.getItemSumFromPositionModel(userNo, 'B', contNo, 'PositionQty')) - int(self.getItemSumFromPositionModel(userNo, 'S', contNo, 'PositionQty'))
         return totalPos
 
-    def getTotalProfitLoss(self, contNo, userNo):
+    def getTotalProfitLoss(self, userNo, contNo):
         '''
         :return: 当前公式应用的帐户下当前商品的总持仓盈亏
         '''
@@ -399,9 +390,9 @@ class StrategyTrade(TradeModel):
         if not userNo:
             userNo = self._selectedUserNo
             
-        return self.getItemSumFromPositionModel('', contNo, 'FloatProfit', userNo)
+        return self.getItemSumFromPositionModel(userNo, '', contNo, 'FloatProfit')
 
-    def getTodayBuyPosition(self, contNo, userNo):
+    def getTodayBuyPosition(self, userNo, contNo):
         '''
         :return: 当前公式应用的帐户下当前商品的当日买入持仓
         '''
@@ -409,10 +400,10 @@ class StrategyTrade(TradeModel):
         if not userNo:
             userNo = self._selectedUserNo
             
-        todayBuyPos = self.getItemSumFromPositionModel('B', contNo, 'PositionQty', userNo) - self.getItemSumFromPositionModel('B', contNo, 'PrePositionQty', userNo)
+        todayBuyPos = self.getItemSumFromPositionModel(userNo, 'B', contNo, 'PositionQty') - self.getItemSumFromPositionModel(userNo, 'B', contNo, 'PrePositionQty')
         return int(todayBuyPos)
 
-    def getTodaySellPosition(self, contNo, userNo):
+    def getTodaySellPosition(self, userNo, contNo):
         '''
         :return: 当前公式应用的帐户下当前商品的当日卖出持仓
         '''
@@ -420,11 +411,102 @@ class StrategyTrade(TradeModel):
         if not userNo:
             userNo = self._selectedUserNo
             
-        todaySellPos = self.getItemSumFromPositionModel('S', contNo, 'PositionQty', userNo) - self.getItemSumFromPositionModel('S', contNo, 'PrePositionQty', userNo)
+        todaySellPos = self.getItemSumFromPositionModel(userNo, 'S', contNo, 'PositionQty') - self.getItemSumFromPositionModel(userNo, 'S', contNo, 'PrePositionQty')
         return int(todaySellPos)
+        
+    def getDataByOrderId(self, eSession, key, ret):
+        if isinstance(eSession, str) and '-' in eSession:
+            orderId = self._strategy.getOrderId(eSession)
+        else:
+            orderId = eSession
+        
+        if not orderId:
+            return ret
+            
+        realUserNo = self.getUserNoByOrderId(orderId)
+        if realUserNo not in self._userInfo:
+            self.logger.error('user not login!'%realUserNo)
+            return ret
+
+        order = self._userInfo[realUserNo].getOrderDict()
+        if orderId in order:
+            return order[orderId].getMetaData()[key] 
+        else:
+            return ret
+
+    def getOrderBuyOrSell(self, userNo, eSession):
+        '''
+        返回当前公式应用的帐户下当前商品的某个委托单的买卖类型。
+        :param orderNo: 委托单号
+        :return: 当前公式应用的帐户下当前商品的某个委托单的买卖类型
+        '''
+        # userNo不使用
+        return self.getDataByOrderId(eSession, 'Direct', 'N')
+
+    def getOrderEntryOrExit(self, userNo, eSession):
+        '''
+        返回当前公式应用的帐户下当前商品的某个委托单的开平仓状态
+        :param orderNo: 委托单号
+        :return: 当前公式应用的帐户下当前商品的某个委托单的开平仓状态
+        '''
+        return self.getDataByOrderId(eSession, 'Offset', 'N')
+
+    def getOrderFilledLot(self, userNo, eSession):
+        '''
+        返回当前公式应用的帐户下当前商品的某个委托单的成交数量
+        :param orderNo: 委托单号
+        :return: 当前公式应用的帐户下当前商品的某个委托单的成交数量
+        '''
+        return self.getDataByOrderId(eSession, 'MatchQty', 0)
+
+    def getOrderFilledPrice(self, userNo, eSession):
+        '''
+        返回当前公式应用的帐户下当前商品的某个委托单的成交价格
+        :param orderNo: 委托单号
+        :return: 当前公式应用的帐户下当前商品的某个委托单的成交价格
+        '''
+        return self.getDataByOrderId(eSession, 'MatchPrice', 0.0)
 
 
-    def getFirstOrderNo(self, contNo1, contNo2, userNo):
+    def getOrderLot(self, userNo, eSession):
+        '''
+        返回当前公式应用的帐户下当前商品的某个委托单的委托数量
+        :param orderNo: 委托单号
+        :return: 当前公式应用的帐户下当前商品的某个委托单的委托数量
+        '''
+        return self.getDataByOrderId(eSession, 'OrderQty', 0)
+
+    def getOrderPrice(self, userNo, eSession):
+        '''
+        返回当前公式应用的帐户下当前商品的某个委托单的委托价格
+        :param orderNo: 委托单号
+        :return: 当前公式应用的帐户下当前商品的某个委托单的委托价格
+        '''
+        return self.getDataByOrderId(eSession, 'OrderPrice', 0.0)
+
+    def getOrderStatus(self, userNo, eSession):
+        '''
+        返回当前公式应用的帐户下当前商品的某个委托单的状态
+        :param orderNo: 委托单号
+        :return: 当前公式应用的帐户下当前商品的某个委托单的状态
+        '''
+        return self.getDataByOrderId(eSession, 'OrderState', 'N')
+
+    def getOrderTime(self, userNo, eSession):
+        '''
+        返回当前公式应用的帐户下当前商品的某个委托单的委托时间
+        :param orderNo: 委托单号
+        :return: 当前公式应用的帐户下当前商品的某个委托单的委托时间
+        '''
+        insertTime = self.getDataByOrderId(eSession, 'InsertTime', 0)
+        if 0 == insertTime:
+            return 0.0
+
+        struct_time = time.strptime(insertTime, "%Y-%m-%d %H:%M:%S")
+        timeStamp = time.strftime("%Y%m%d.%H%M%S", struct_time)
+        return float(timeStamp)
+
+    def getFirstOrderNo(self, userNo, contNo1, contNo2):
         # 默认usrNo为空字符串（''），此时取当前用户
         if not userNo:
             userNo = self._selectedUserNo
@@ -445,8 +527,7 @@ class StrategyTrade(TradeModel):
 
         return orderId
 
-    def getNextOrderNo(self, orderId, contNo1, contNo2, userNo):
-        # 默认usrNo为空字符串（''），此时取当前用户
+    def getNextOrderNo(self, userNo, orderId, contNo1, contNo2):
         if not userNo:
             userNo = self._selectedUserNo
             
@@ -472,7 +553,7 @@ class StrategyTrade(TradeModel):
 
         return minOrderId
 
-    def getLastOrderNo(self, contNo1, contNo2, userNo):
+    def getLastOrderNo(self, userNo, contNo1, contNo2):
         # 默认usrNo为空字符串（''），此时取当前用户
         if not userNo:
             userNo = self._selectedUserNo
@@ -497,7 +578,7 @@ class StrategyTrade(TradeModel):
 
         return orderId
 
-    def getFirstQueueOrderNo(self, contNo1, contNo2, userNo):
+    def getFirstQueueOrderNo(self, userNo, contNo1, contNo2):
         # 默认usrNo为空字符串（''），此时取当前用户
         if not userNo:
             userNo = self._selectedUserNo
@@ -521,7 +602,7 @@ class StrategyTrade(TradeModel):
 
         return orderId
 
-    def getNextQueueOrderNo(self, orderId, contNo1, contNo2, userNo):
+    def getNextQueueOrderNo(self, userNo, orderId, contNo1, contNo2):
         # 默认usrNo为空字符串（''），此时取当前用户
         if not userNo:
             userNo = self._selectedUserNo
@@ -551,7 +632,7 @@ class StrategyTrade(TradeModel):
 
         return minOrderId
 
-    def getALatestFilledTime(self, contNo, userNo):
+    def getALatestFilledTime(self, userNo, contNo):
         # 默认usrNo为空字符串（''），此时取当前用户
         if not userNo:
             userNo = self._selectedUserNo
@@ -572,3 +653,49 @@ class StrategyTrade(TradeModel):
                         latestTime = float(timeStamp)
         return latestTime
 
+    def getOrderContractNo(self, userNo, eSession):
+        return self.getDataByOrderId(eSession, 'Cont', '')
+
+    def deleteOrder(self, userNo, eSession):
+        '''
+        针对当前公式应用的帐户、商品发送撤单指令。
+        :param orderId: 所要撤委托单的定单号
+        :return: 发送成功返回True, 发送失败返回False
+        '''
+        orderId = ''
+        if isinstance(eSession, str) and '-' in eSession:
+            orderId = self._strategy.getOrderId(eSession)
+            if not orderId:
+                return False
+        else:
+            orderId = eSession
+            
+        realUserNo = self.getUserNoByOrderId(orderId)
+        if realUserNo not in self._userInfo:
+            self.logger.error('user(%s) not login!'%realUserNo)
+            return False
+
+        return self.deleteOrderByOrderId(realUserNo, orderId)
+
+    def deleteOrderByOrderId(self, userNo, orderId):
+        # 默认usrNo为空字符串（''），此时取当前用户
+        if not userNo:
+            userNo = self._selectedUserNo
+            
+        if userNo not in self._userInfo:
+            raise Exception("请先在极星客户端登录您的交易账号")
+
+        userInfoModel = self._userInfo[userNo]
+        if orderId not in userInfoModel._order:
+            return False
+
+        aOrder = {
+            "OrderId": orderId,
+        }
+        aOrderEvent = Event({
+            "EventCode": EV_ST2EG_ACTUAL_CANCEL_ORDER,
+            "StrategyId": self._strategy.getStrategyId(),
+            "Data": aOrder
+        })
+        self._strategy.sendEvent2Engine(aOrderEvent)
+        return True

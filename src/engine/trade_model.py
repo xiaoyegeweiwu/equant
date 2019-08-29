@@ -72,6 +72,7 @@ class TUserInfoModel:
         self._loginApi = loginInfo.getLoginApi()
         self._userNo = data['UserNo']
         self._isReady = True
+        self._isDataReady = False
         
         #print("TUserInfoModel", data)
         
@@ -93,6 +94,12 @@ class TUserInfoModel:
         
     def chkLoginNo(self, loginNo):
         return self._loginNo == loginNo
+        
+    def setDataReady(self):
+        self._isDataReady = True
+        
+    def isDataReady(self):
+        return self._isDataReady
     
     def setUserStatus(self, data):
         '''根据登录信息更新用户信息'''
@@ -356,6 +363,7 @@ class TradeModel:
         
         self._loginInfo = {} #登录账号{'LoginNo': {:}}
         self._userInfo = {}  #资金账号{'UserNo' : {:}}
+        self._orderUserMap = {}
         
     ###################################################################
     def getLoginInfo(self):
@@ -368,6 +376,25 @@ class TradeModel:
         if loginNo not in self._loginInfo:
             return {}
         return self._loginInfo[loginNo].getLoginUser()
+        
+    def setDataReady(self, userNo):
+        if userNo in self._userInfo:
+            self._userInfo[userNo].setDataReady()
+            
+    def isAllDataReady(self):
+        if not self._userInfo:
+            return False
+            
+        for v in self._userInfo.values():
+            if not v.isDataReady():
+                return False
+                
+        return True
+        
+    def getUserNoByOrderId(self, orderId):
+        if orderId not in self._orderUserMap:
+            return ''
+        return self._orderUserMap[orderId]
         
     ###################################################################
     def setUserStatus(self, loginDict):
@@ -466,6 +493,7 @@ class TradeModel:
             if userNo not in self._userInfo:
                 self.logger.error("[updateOrderData]The user account(%s) doesn't login!"%userNo)
                 continue
+            self._orderUserMap[data['OrderId']] = userNo
             #self.logger.debug('[ORDER]%s'%data)
             self._userInfo[userNo].updateOrder(data)
 

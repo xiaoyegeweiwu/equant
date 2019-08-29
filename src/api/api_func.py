@@ -188,7 +188,7 @@ _all_func_ = {
                     ['A_OrderPrice'        , '委托价格'],
                     ['A_OrderStatus'       , '定单状态'],
                     ['A_OrderTime'         , '下单时间'],
-					['A_OrderUpdateTime'   , '定单更新时间'],
+                    #['A_OrderUpdateTime'   , '定单更新时间'],
                     ['A_FirstOrderNo'      , '当前账户第一个订单号'],
                     ['A_NextOrderNo'       , '当前账户下一个订单号'],
                     ['A_LastOrderNo'       , '当前账户最后一个订单号'],
