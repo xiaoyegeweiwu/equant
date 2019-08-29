@@ -31,13 +31,13 @@ def min2float(val):
 
 def handle_data(context):    
     global hi, lo, curr_date
-    #换日时初始化最高最低函数
+    #换日时初始化最高最低数值
     if curr_date != TradeDate():
         hi = 0
         lo = 100000000
         curr_date = TradeDate()
 
-    # 获得当前时间和合约开闭市时间
+    # 获得当前时间及合约的开闭市时间
     mid_tim = split_tim
     tim = Time()
     count = GetSessionCount()
@@ -47,14 +47,14 @@ def handle_data(context):
     op_tim = GetSessionStartTime(index = 0)
     cl_tim = GetSessionEndTime(index = count - 1) 
     if op_tim > cl_tim:
-        if tim < cl_tim:
+        if tim <= cl_tim:
             tim += 0.24
-        if mid_tim < cl_tim:
+        if mid_tim <= cl_tim:
             mid_tim += 0.24
         cl_tim += 0.24  
         
     # 尾盘清仓
-    if cl_tim - min2float(cover_min) <= tim < cl_tim:       
+    if cl_tim - min2float(cover_min) <= tim <= cl_tim:       
         b_qty = BuyPosition()
         s_qty = SellPosition()
         if b_qty > 0:
@@ -67,10 +67,10 @@ def handle_data(context):
             DeleteAllOrders()
             b_qty = A_BuyPosition()
             s_qty = A_SellPosition()
-            if b_qty > 0:
-                A_SendOrder(A_AccountID(), context.contractNo(), Enum_Order_Limit(), Enum_GFD(), Enum_Sell(), Enum_ExitToday(), Enum_Speculate(), Q_AskPrice() - PriceTick(), b_qty)
+          if b_qty > 0:
+                A_SendOrder(Enum_Sell(), Enum_ExitToday(), b_qty, Q_BidPrice())
             if s_qty > 0:
-                A_SendOrder(A_AccountID(), context.contractNo(), Enum_Order_Limit(), Enum_GFD(), Enum_Buy(), Enum_ExitToday(), Enum_Speculate(), Q_BidPrice() + PriceTick(), s_qty)
+                A_SendOrder(Enum_Buy(), Enum_ExitToday(), s_qty, Q_AskPrice())
     
     # 忽略其他时段的定时器消息
     elif context.triggerType() == 'C': 
@@ -82,16 +82,17 @@ def handle_data(context):
         lo = min(lo, Low()[-1])
 
     # 时间分割点之后，突破下单, 并设置止损
-    else:
+    elif hi != 0:
         if Close()[-1] > hi:
             Buy(qty, Open()[-1], context.contractNo(), False)
         elif Close()[-1] < lo:
             SellShort(qty, Open()[-1], context.contractNo(), False)  
 
-
+    if hi == 0:
+        return
     # 绘制最高最低曲线
     PlotNumeric('hi', hi, RGB_Red())
     PlotNumeric('lo', lo, RGB_Blue())
     # 绘制盈亏曲线
-    PlotNumeric("profit", NetProfit() + FloatProfit(), 0xFF00FF, False)         
+    PlotNumeric("profit", NetProfit() + FloatProfit() - TradeCost(), 0xFF00FF, False)         
     
