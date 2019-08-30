@@ -1167,19 +1167,20 @@ class BaseApi(object):
         '''
         return self._dataModel.setBuy(userNo, contractNo, share, price, needCover)
 
-    def BuyToCover(self, share=0, price=0, contractNo='', userNo=''):
+    def BuyToCover(self, share, price, contractNo, userNo, coverFlag):
         '''
         【说明】
               产生一个空头平仓操作
 
         【语法】
-              Bool BuyToCover(int share=0, float price=0, string contractNo=None, string userNo='')
+              Bool BuyToCover(int share=0, float price=0, string contractNo=None, string userNo='', char coverFlag = 'Y')
 
         【参数】
               share 买入数量，为整型值，默认为0；
               price 买入价格，为浮点数，默认为0；
               contract 合约代码，为字符串，默认使用基准合约；
               userNo 用户编号，为字符串，默认使用界面选定用户编号。
+              coverFlag 平今平昨标志，默认先平昨再平今, 需要优先平今时可设置为'T'
 
         【备注】
               产生一个空头平仓操作，返回值为布尔型，执行成功返回True，否则返回False。
@@ -1197,21 +1198,22 @@ class BaseApi(object):
               BuyToCover(5,0) 表示用现价空头买入5张合约)，马上发送委托。
               BuyToCover(0,0) 表示用现价按交易设置中的设置,马上发送委托。
         '''
-        return self._dataModel.setBuyToCover(userNo, contractNo, share, price)
+        return self._dataModel.setBuyToCover(userNo, contractNo, share, price, coverFlag)
 
-    def Sell(self, share, price, contractNo, userNo):
+    def Sell(self, share, price, contractNo, userNo, coverFlag):
         '''
         【说明】
               产生一个多头平仓操作
 
         【语法】
-              Bool Sell(int share=0, float price=0, string contractNo=None, string userNo='')
+              Bool Sell(int share=0, float price=0, string contractNo=None, string userNo='', char coverFlag = 'Y')
 
         【参数】
               share 买入数量，为整型值，默认为0；
               price 买入价格，为浮点数，默认为0；
               contract 合约代码，为字符串，默认使用基准合约；
               userNo 用户编号，为字符串，默认使用界面选定用户编号。
+              coverFlag 平今平昨标志，默认先平昨再平今, 需要优先平今时可设置为'T'
 
         【备注】
               产生一个多头平仓操作，返回值为布尔型，执行成功返回True，否则返回False。
@@ -1229,7 +1231,7 @@ class BaseApi(object):
               Sell(5,0) 表示用现价卖出5张合约，马上发送委托。
               Sell(0,0) 表示用现价按交易设置中的设置,马上发送委托。
         '''
-        return self._dataModel.setSell(userNo, contractNo, share, price)
+        return self._dataModel.setSell(userNo, contractNo, share, price, coverFlag)
 
     def SellShort(self, share, price, contractNo, needCover, userNo):
         '''
@@ -6774,11 +6776,11 @@ def DeleteAllOrders(contractNo='', userNo=''):
 def Buy(share=0, price=0, contractNo=None, needCover=True, userNo=''):
     return baseApi.Buy(share, price, contractNo, needCover, userNo)
 
-def BuyToCover(share=0, price=0, contractNo=None, userNo=''):
-    return baseApi.BuyToCover(share, price, contractNo, userNo)
+def BuyToCover(share=0, price=0, contractNo=None, userNo='', coverFlag = 'Y'):
+    return baseApi.BuyToCover(share, price, contractNo, userNo, coverFlag)
 
-def Sell(share=0, price=0, contractNo=None, userNo=''):
-    return baseApi.Sell(share, price, contractNo, userNo)
+def Sell(share=0, price=0, contractNo=None, userNo='', coverFlag = 'Y'):
+    return baseApi.Sell(share, price, contractNo, userNo, coverFlag)
 
 def SellShort(share=0, price=0, contractNo=None, needCover=True, userNo=''):
     return baseApi.SellShort(share, price, contractNo, needCover, userNo)

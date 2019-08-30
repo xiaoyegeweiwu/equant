@@ -372,8 +372,10 @@ oNone                            = 'N'          # 无
 oOpen                            = 'O'          # 开仓
 oCover                           = 'C'          # 平仓
 oCoverT                          = 'T'          # 平今
+oCoverY                          = 'Y'          # 平昨
 oOpenCover                       = '1'          # 开平，应价时有效, 本地套利也可以
 oCoverOpen                       = '2'          # 平开，应价时有效, 本地套利也可以
+
 
 # 订单类型
 otUnDefine                      = 'U'
