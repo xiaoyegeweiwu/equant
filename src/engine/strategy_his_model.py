@@ -915,6 +915,22 @@ class StrategyHisQuote(object):
             key = (record["ContractNo"], record["KLineType"], record["KLineSlice"])
             print(record["ContractNo"], self._kLineRspData[key]["KLineReady"])
 
+    # 30天月线和255天年线日期无效处理
+    def replaceDateStr(self, datestr):
+        if len(datestr) != 17:
+            return datestr
+            
+        sl = list(datestr)
+        
+        # 处理无效月
+        if sl[4] == '0' and sl[5] == '0':
+            sl[5] = '1'
+        # 处理无效日
+        if sl[6] == '0' and sl[7] == '0':
+            sl[7] = '1'
+            
+        return ''.join(sl)
+
     def runReport(self, context, handle_data):
         # 不使用历史K线，也需要切换
         # 切换K线
@@ -944,7 +960,7 @@ class StrategyHisQuote(object):
         test = newDF[["DateTimeStamp", "KLineType", "KLineSlice"]].values
         effectiveDTS = []
         for i, record in enumerate(test):
-            curBarDTS = datetime.strptime(str(record[0]), "%Y%m%d%H%M%S%f")
+            curBarDTS = datetime.strptime(self.replaceDateStr(str(record[0])), "%Y%m%d%H%M%S%f")
             if record[1] == EEQU_KLINE_MINUTE:
                 curEffectiveDTS = curBarDTS-relativedelta(minutes=record[2])
             elif record[1] == EEQU_KLINE_DAY:

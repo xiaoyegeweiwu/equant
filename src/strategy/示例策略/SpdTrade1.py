@@ -1,5 +1,4 @@
 # 套利的布林带策略
-
 import talib
 import numpy as np
 
@@ -9,9 +8,8 @@ p1=20
 dot=2
 qty=1
 
-bt = 'M' 	#barType
-bi = 1	  #barInterval
-
+bt = 'M'    #barType
+bi = 1      #barInterval
 
 def initialize(context):
     SetBarInterval(code1, bt, bi, 2000)
@@ -52,5 +50,4 @@ def handle_data(context):
     PlotNumeric('upp', upp[-1], RGB_Red(), False)
     PlotNumeric('mid', mid[-1], RGB_Blue(), False)
     PlotNumeric('low', low[-1], RGB_Green(), False) 
-    PlotNumeric("fit", NetProfit() + FloatProfit(), RGB_Purple(), False, True)   
-
+    PlotNumeric("fit", NetProfit() - TradeCost(), RGB_Purple(), False, True)   

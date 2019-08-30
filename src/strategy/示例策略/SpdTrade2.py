@@ -1,5 +1,4 @@
 # 套利的双均线策略
-
 import talib
 import numpy as np
 
@@ -14,14 +13,10 @@ qty=1
 bt = 'M'    #barType
 bi = 1      #barLength
 
-
 def initialize(context):
     SetBarInterval(code1, bt, bi, 2000)
     SetBarInterval(code2, bt, bi, 2000)
-    SetTriggerType(1)
-    SetTriggerType(1)
     SetOrderWay(2)
-    SetActual()
 
 spds = []
 def handle_data(context):
@@ -56,5 +51,4 @@ def handle_data(context):
     # 绘制指标线   
     PlotNumeric("sma1", sma1[-1], 0x0000FF, False)
     PlotNumeric("sma2", sma2[-1], 0xFF0000, False)
-    PlotNumeric("fit", NetProfit() + FloatProfit(), RGB_Purple(), False, True)   
-
+    PlotNumeric("fit", NetProfit() - TradeCost(), RGB_Purple(), False, True)   
