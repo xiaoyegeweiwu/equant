@@ -103,8 +103,8 @@ class StrategyModel(object):
             "CloseFixed": self._cfgModel.getCloseFixed(),
             "CloseTodayRatio": self._cfgModel.getCloseTodayRatio(),
             "CloseTodayFixed": self._cfgModel.getCloseTodayFixed(),
-            "KLineType": "M",  # todo
-            "KLineSlice": 1,   # todo
+            "KLineType": self._hisModel._getKLineType(),
+            "KLineSlice": self._hisModel._getKLineSlice(),
             "TradeDot": self.getContractUnit(contNo),  # 每手乘数
             "PriceTick": self.getPriceScale(contNo),  # 最小变动价位
             "Limit": self._config.getLimit(),
