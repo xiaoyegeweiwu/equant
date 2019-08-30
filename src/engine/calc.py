@@ -720,7 +720,7 @@ class CalcCenter(object):
         # 持仓盈亏（浮动盈亏）
         pInfo["HoldProfit"] = ((lastPrice - pInfo["BuyPrice"]) * pInfo["TotalBuy"]
                                + (pInfo["SellPrice"] - lastPrice) * pInfo["TotalSell"]) * cost["TradeDot"]
-        print("00000000000000 : ", pInfo["HoldProfit"])
+        # print("00000000000000 : ", pInfo["HoldProfit"])
 
         charge = 0
 
