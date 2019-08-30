@@ -15,7 +15,5 @@ def handle_data(context):
     elif MarketPosition() != -1:
         SellShort(1, ask) 
 
-    PlotNumeric("margin", Margin(), 0xff0000, False) 
-    PlotNumeric("using", Available(), 0x8000ff, False) 
-    PlotNumeric("profit", NetProfit() + FloatProfit() - TradeCost(), 0xFF00FF, False, True)
+    PlotNumeric("profit", NetProfit() + FloatProfit() - TradeCost(), 0xFF00FF, False)
 	

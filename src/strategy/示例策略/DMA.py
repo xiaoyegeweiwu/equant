@@ -36,18 +36,16 @@ def handle_data(context):
         return;
         
     ma1 = talib.MA(Close(), p1)
-    ma2 = talib.MA(Close(), p2)            
+    ma2 = talib.MA(Close(), p2)  
     
-    if BarStatus() == 2:
-        tim_trigger(ma1, ma2)
-    else:
-        his_trigger(ma1, ma2)   
+    his = True  # BarStatus() != 2
+    if his:
+        his_trigger(ma1, ma2) 
+    else: 
+        tim_trigger(ma1, ma2) 
     
     PlotNumeric("ma1", ma1[-1], 0xFF0000)
     PlotNumeric("ma2", ma2[-1], 0x00aa00) 
-    # 绘制盈亏曲线
-    if BarStatus() == 2:
-        PlotNumeric("fit", A_CoverProfit() + A_ProfitLoss() - A_Cost(), 0xFF0000, False) 
-    else:
-        PlotNumeric("fit", NetProfit() + FloatProfit() - TradeCost(), 0x0000FF, False)
+    fit = NetProfit() + FloatProfit() - TradeCost() if his else A_CoverProfit() + A_ProfitLoss() - A_Cost()
+    PlotNumeric("fit", fit, 0x0000FF, False)
 
