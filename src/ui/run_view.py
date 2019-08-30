@@ -1549,13 +1549,21 @@ class RunWin(QuantToplevel, QuantFrame):
 class SelectContractWin(QuantToplevel, QuantFrame):
 
     # exchangeList = ["CFFEX", "CME", "DCE", "SGE", "SHFE", "ZCE", "SPD", "INE", "NYMEX", "SSE", "SZSE"]
-    exchangeList = ["SPD", "ZCE", "DCE", "SHFE", "INE", "CFFEX", "SSE", "SZSE", "SGE", "CME", "COMEX", "NYMEX", "HKEX"]
+    exchangeList = ["SPD", "ZCE", "DCE", "SHFE", "INE", "CFFEX",
+                    "CME", "COMEX", "LEM", "NYMEX", "HKEX", "CBOT", "ICUS", "ICEU", "SGX"]
     commodityType = {"P": "现货", "Y": "现货", "F": "期货", "O": "期权",
                      "S": "跨期套利", "M": "品种套利", "s": "", "m": "",
                      "y": "", "T": "股票", "X": "外汇",
                      "I": "外汇", "C": "外汇"}
     # 外盘保留品种
-    FCommodity = {"NYMEX": ["美原油"], "COMEX": ["美黄金"], "HKEX": ["恒指", "小恒指", "H股指"], "CME": ["小标普"]}
+    FCommodity = {"NYMEX": ["美原油"],
+                  "COMEX": ["美铜", "美黄金"],
+                  "HKEX": ["恒指", "小恒指", "H股指", "美元兑人民币", "小H股指"],
+                  "CME": ["小标普", "小纳指"],
+                  "CBOT": ["小道指", "美黄豆", "美豆粕", "美玉米"],
+                  "ICUS": ["糖11号", "美棉花"],
+                  "ICEU": ["布伦特原油", "富时指数"],
+                  "SGX":  ["A50指数"]}
 
     def __init__(self, master, exchange, commodity, contract):
         super().__init__(master)
