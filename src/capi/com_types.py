@@ -496,6 +496,11 @@ EEQU_TRADESTATE_UNKNOWN         = 'N'   # 未知状态
 EEQU_TRADESTATE_INITIALIZE      = 'I'   # 正初始化
 EEQU_TRADESTATE_READY           = 'R'   # 准备就绪
 
+# 日期标记
+EEQU_DATEFLAG_PRE               = '0'   #前一日
+EEQU_DATEFLAG_CUR               = '1'   #当日
+EEQU_DATEFLAG_NEXT              = '2'   #下一日
+
 # 品种类型
 EEQU_COMMODITYTYPE_NONE         = 'N'   # 无
 EEQU_COMMODITYTYPE_SPOT         = 'P'   # 现货

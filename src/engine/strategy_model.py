@@ -13,7 +13,7 @@ from .statistics_model import StatisticsModel
 import copy
 
 from engine.calc import CalcCenter
-from datetime import datetime
+from datetime import datetime, timedelta
 from .popup_win import *
 import winsound
 
@@ -103,8 +103,8 @@ class StrategyModel(object):
             "CloseFixed": self._cfgModel.getCloseFixed(),
             "CloseTodayRatio": self._cfgModel.getCloseTodayRatio(),
             "CloseTodayFixed": self._cfgModel.getCloseTodayFixed(),
-            "KLineType": "M",  # todo
-            "KLineSlice": 1,   # todo
+            "KLineType": self._hisModel._getKLineType(),
+            "KLineSlice": self._hisModel._getKLineSlice(),
             "TradeDot": self.getContractUnit(contNo),  # 每手乘数
             "PriceTick": self.getPriceScale(contNo),  # 最小变动价位
             "Limit": self._config.getLimit(),
@@ -518,7 +518,7 @@ class StrategyModel(object):
             else:
                 if fixCapital < price * defaultShare:
                     raise Exception(f"您当前的可用资金 {fixCapital} 小于您设置的价格 {price} 与您设置的默认下单量 {defaultShare} 的乘积！")
-            return defaultPrice
+            return defaultShare
         elif defaultOrderType == '2':
             # 按固定资金
             fixCapital = self._cfgModel.getOrderQtyCount()
@@ -1789,6 +1789,67 @@ class StrategyModel(object):
             delta = -(mtime1 - mtime2).seconds
 
         return delta
+    
+    def _addDay(self, dt, n):
+        x = datetime.strptime(str(dt), "%Y%m%d")
+        while True:
+            x = x + timedelta(days=n)
+            if x.isoweekday() != 6 and x.isoweekday() != 7:
+                break
+
+        return int(x.strftime("%Y%m%d"))
+    
+    def _testAndAddDay(self, dt):
+        x = datetime.strptime(str(dt), "%Y%m%d")
+        while x.isoweekday() == 6 or x.isoweekday() == 7:
+            x = x + timedelta(days=1)
+
+        return int(x.strftime("%Y%m%d"))
+    
+    def _calTradeDate(self, dt, tf):
+        self.logger.debug('dt:%d, tbflag:%c' %(dt, tf))
+        if tf == EEQU_DATEFLAG_PRE:
+            return self._addDay(dt, 1)
+        elif tf == EEQU_DATEFLAG_NEXT:
+            return self._addDay(dt, -1)
+        else:
+            return self._testAndAddDay(dt)
+    
+    def getTradeDate(self, contNo, dateTimeStamp):
+        contNo = self._config.getBenchmark() if not contNo else contNo
+        commodity = self.getCommodityInfoFromContNo(contNo)['CommodityCode']
+        if commodity not in self._qteModel._commodityData:
+            # commodity not found
+            return -1
+        
+        dt = dateTimeStamp % 1000000000
+        currentTime = dt*1.0/1000000000
+        
+        idx = -1
+        
+        sessionCount = self.getGetSessionCount(contNo)
+        for index in range(0, sessionCount):
+            startTime = self.getGetSessionStartTime(contNo, index)
+            endTime = self.getSessionEndTime(contNo, index)
+            
+            delta = 0.0
+            if startTime >= endTime:
+                endTime += 0.24
+                if currentTime <= startTime:
+                     delta = 0.24
+            if currentTime + delta >= startTime and currentTime + delta < endTime:
+                idx = index
+        
+        if idx == -1:
+            # not in trade period
+            return -2
+        
+        timeBucket = self._qteModel._commodityData[commodity]._metaData['TimeBucket']
+        
+        tbflag = timeBucket[2 * idx]["DateFlag"]
+        
+        return self._calTradeDate(int(dateTimeStamp/1000000000), tbflag)
+        
 
     def isInSession(self, contNo):
         if not contNo:

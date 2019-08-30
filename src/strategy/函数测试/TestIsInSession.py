@@ -27,6 +27,7 @@ def handle_data(context):
     LogInfo('It is not in Session', code6, IsInSession(code6), CurrentTime(), ExchangeTime('DCE'), ExchangeStatus('DCE'))
     LogInfo('It is not in Session', code7, IsInSession(code7), CurrentTime(), ExchangeTime('CFFEX'), ExchangeStatus('CFFEX'))
     LogInfo('It is not in Session', code8, IsInSession(code8), CurrentTime(), ExchangeTime('INE'), ExchangeStatus('INE'))
+    LogInfo('Tradedate:', CalcTradeDate('ZCE|F|SR|001', 20190830110000000))
 
     if IsInSession(code1):
         #Sell(1, Close()[-1])
