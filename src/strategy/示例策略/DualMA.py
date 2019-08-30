@@ -23,5 +23,5 @@ def handle_data(context):
     # 绘制指标图形
     PlotNumeric("ma1", ma1[-1], RGB_Red())
     PlotNumeric("ma2", ma2[-1], RGB_Green())    
-    PlotNumeric("fit", NetProfit() + FloatProfit() - TradeCost(), RGB_Red(), False) 
+    PlotNumeric("fit", NetProfit() + FloatProfit() - TradeCost(), RGB_Red(), False)
 
