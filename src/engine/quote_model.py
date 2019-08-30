@@ -230,6 +230,7 @@ class CommodityModel:
 
     def updateTimeBucket(self, dataList):
         self._metaData['TimeBucket'] = dataList
+        #self.logger.debug("commd:%s, len:%d, tblist:%s" %(self._metaData['CommodityNo'], len(dataList), str(dataList)))
 
 class QuoteDataModel:
     '''

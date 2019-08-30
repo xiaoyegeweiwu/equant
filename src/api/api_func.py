@@ -60,6 +60,7 @@ _all_func_ = {
                     ['Q_TurnOver'          , '当日成交金额'],
                     ['Q_UpperLimit'        , '当日涨停价'],
                     ['QuoteDataExist'      , '行情数据是否有效'],
+                    ['CalcTradeDate'      , '计算所属交易日'],
                 ],
                 
     '策略交易': [

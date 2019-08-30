@@ -1106,6 +1106,29 @@ class BaseApi(object):
               无
         '''
         return self._dataModel.getQuoteDataExist(contractNo)
+        
+    def CalcTradeDate(self, contractNo='', dateTimeStamp=0):
+        '''
+        【说明】
+              计算指定合约，指定时间戳所属的交易日
+
+        【语法】
+              int CalcTradeDate(string contractNo='', int dateTimeStamp=0)
+
+        【参数】
+              contractNo 合约编号，默认基准合约
+              dateTimeStamp  时间戳，默认0
+
+        【备注】
+              正常情况，返回指定合约指定时间戳所属的交易日
+              当返回值为-1时，表示合约参数有误
+              当返回值为-2时，表示时间戳参数有误，比如传入非交易时段时间戳
+
+        【示例】
+              CalcTradeDate(dateTimeStamp=20190830110000000)
+              CalcTradeDate('ZCE|F|SR|001', 20190830110000000)
+        '''
+        return self._dataModel.getTradeDate(contractNo, dateTimeStamp)
 
     #/////////////////////////策略交易/////////////////////////////
     def Buy(self, share, price, contractNo, needCover, userNo):
@@ -6494,6 +6517,9 @@ def Q_UpperLimit(contractNo=''):
 
 def QuoteDataExist(contractNo=''):
     return baseApi.QuoteDataExist(contractNo)
+
+def CalcTradeDate(contractNo='', dateTimeStamp=0):
+    return baseApi.CalcTradeDate(contractNo, dateTimeStamp)
 
 #策略状态
 def AvgEntryPrice(contractNo=''):
