@@ -518,7 +518,7 @@ class StrategyModel(object):
             else:
                 if fixCapital < price * defaultShare:
                     raise Exception(f"您当前的可用资金 {fixCapital} 小于您设置的价格 {price} 与您设置的默认下单量 {defaultShare} 的乘积！")
-            return defaultPrice
+            return defaultShare
         elif defaultOrderType == '2':
             # 按固定资金
             fixCapital = self._cfgModel.getOrderQtyCount()
