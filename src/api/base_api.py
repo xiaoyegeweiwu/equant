@@ -1173,7 +1173,7 @@ class BaseApi(object):
               产生一个空头平仓操作
 
         【语法】
-              Bool BuyToCover(int share=0, float price=0, string contractNo=None, string userNo='', char coverFlag = 'Y')
+              Bool BuyToCover(int share=0, float price=0, string contractNo=None, string userNo='', char coverFlag = 'C')
 
         【参数】
               share 买入数量，为整型值，默认为0；
@@ -1206,7 +1206,7 @@ class BaseApi(object):
               产生一个多头平仓操作
 
         【语法】
-              Bool Sell(int share=0, float price=0, string contractNo=None, string userNo='', char coverFlag = 'Y')
+              Bool Sell(int share=0, float price=0, string contractNo=None, string userNo='', char coverFlag = 'C')
 
         【参数】
               share 买入数量，为整型值，默认为0；
@@ -6776,10 +6776,10 @@ def DeleteAllOrders(contractNo='', userNo=''):
 def Buy(share=0, price=0, contractNo=None, needCover=True, userNo=''):
     return baseApi.Buy(share, price, contractNo, needCover, userNo)
 
-def BuyToCover(share=0, price=0, contractNo=None, userNo='', coverFlag = 'Y'):
+def BuyToCover(share=0, price=0, contractNo=None, userNo='', coverFlag = 'C'):
     return baseApi.BuyToCover(share, price, contractNo, userNo, coverFlag)
 
-def Sell(share=0, price=0, contractNo=None, userNo='', coverFlag = 'Y'):
+def Sell(share=0, price=0, contractNo=None, userNo='', coverFlag = 'C'):
     return baseApi.Sell(share, price, contractNo, userNo, coverFlag)
 
 def SellShort(share=0, price=0, contractNo=None, needCover=True, userNo=''):

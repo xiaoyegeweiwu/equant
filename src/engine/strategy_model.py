@@ -476,7 +476,7 @@ class StrategyModel(object):
                 if eSessionId != "": self._strategy.updateBarInfoInLocalOrder(eSessionId, curBar)
             # cover yestoday
             if coverYs > 0:
-                eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtGFD, dBuy, oCoverY, hSpeculate, price, coverYs, curBar, (defaultPrice > 0))
+                eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtGFD, dBuy, oCover, hSpeculate, price, coverYs, curBar, (defaultPrice > 0))
                 if eSessionId != "": self._strategy.updateBarInfoInLocalOrder(eSessionId, curBar)
             # cover remaining
             if coverOt > 0:
@@ -551,7 +551,7 @@ class StrategyModel(object):
                 if eSessionId != "": self._strategy.updateBarInfoInLocalOrder(eSessionId, curBar)
             # cover yestoday
             if coverYs > 0:
-                eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtGFD, dSell, oCoverY, hSpeculate, price, coverYs, curBar, (defaultPrice > 0))
+                eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtGFD, dSell, oCover, hSpeculate, price, coverYs, curBar, (defaultPrice > 0))
                 if eSessionId != "": self._strategy.updateBarInfoInLocalOrder(eSessionId, curBar)
             # cover remaining
             if coverOt > 0:
