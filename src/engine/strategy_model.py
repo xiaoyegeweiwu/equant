@@ -1807,7 +1807,7 @@ class StrategyModel(object):
         return int(x.strftime("%Y%m%d"))
     
     def _calTradeDate(self, dt, tf):
-        self.logger.debug('dt:%d, tbflag:%c' %(dt, tf))
+        #self.logger.debug('dt:%d, tbflag:%c' %(dt, tf))
         if tf == EEQU_DATEFLAG_PRE:
             return self._addDay(dt, 1)
         elif tf == EEQU_DATEFLAG_NEXT:

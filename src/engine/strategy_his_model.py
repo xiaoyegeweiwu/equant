@@ -1210,22 +1210,26 @@ class StrategyHisQuote(object):
 
     def _calcProfitByQuote(self, event):
         #
+        contNo = event.getContractNo()
         data = event.getData()
         lv1Data = data["Data"]
         dateTimeStamp = data["DateTimeStamp"]
-        tradeDate = data["TradeDate"]
+        #tradeDate = data["TradeDate"]
+        tradeDate = self._dataModel.getTradeDate(contNo, dateTimeStamp)
         isLastPriceChanged = data["IsLastPriceChanged"]
 
         if not isLastPriceChanged:
             return
 
         priceInfos = {}
-        priceInfos[event.getContractNo()] = {
+        priceInfos[contNo] = {
             "LastPrice": lv1Data[4],
             "TradeDate": tradeDate,
             "DateTimeStamp" : dateTimeStamp,
             "LastPriceSource": LastPriceFromQuote
         }
+        
+        #self.logger.debug("_calcProfitByQuote:%s"%priceInfos)
         self._calc.calcProfit([event.getContractNo()], priceInfos)
 
     #
