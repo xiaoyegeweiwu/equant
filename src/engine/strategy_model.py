@@ -1022,11 +1022,11 @@ class StrategyModel(object):
 
                 isVaildOrder = self._calcCenter.coverJudge(orderParam)
                 if isVaildOrder < 0:
-                    return ""  
+                    continue   
 
             canAdded = self._calcCenter.addOrder(orderParam)
             if canAdded < 1:
-                return ""
+                continue 
 
             '''buy/sell 信号，
             历史阶段：一定没有委托
