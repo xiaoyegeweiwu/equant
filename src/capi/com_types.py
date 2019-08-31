@@ -370,8 +370,9 @@ dBoth                            = 'A'          # 双边
 # 开平
 oNone                            = 'N'          # 无
 oOpen                            = 'O'          # 开仓
-oCover                           = 'C'          # 平仓
+oCover                           = 'C'          # 平仓,平昨
 oCoverT                          = 'T'          # 平今
+oCoverA                          = 'A'          # 自适应，拆分成平今平昨，优先平昨
 oOpenCover                       = '1'          # 开平，应价时有效, 本地套利也可以
 oCoverOpen                       = '2'          # 平开，应价时有效, 本地套利也可以
 

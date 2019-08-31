@@ -378,7 +378,7 @@ class StrategyModel(object):
         return self._qteModel.getQuoteDataExist(symbol)
 
     # ////////////////////////策略函数////////////////////////////
-    def setBuy(self, userNo, contractNo, share, price, needCover=True):
+    def setBuy(self, userNo, contractNo, share, price, needCover, coverFlag):
         contNo = contractNo if contractNo else self._cfgModel.getBenchmark()
         
         if contNo not in self._cfgModel.getContract():
@@ -405,11 +405,9 @@ class StrategyModel(object):
         # 对于开仓，需要平掉反向持仓
         qty = self._calcCenter.needCover(userNo, contNo, dBuy, share, price)
         if qty > 0 and needCover:
-            eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtGFD, dBuy, oCover, hSpeculate, price, qty, curBar, (defaultPrice > 0))
-            if eSessionId != "": self._strategy.updateBarInfoInLocalOrder(eSessionId, curBar)
+            eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtGFD, dBuy, coverFlag, hSpeculate, price, qty, curBar, (defaultPrice > 0))
 
         eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtGFD, dBuy, oOpen, hSpeculate, price, share, curBar, (defaultPrice > 0))
-        if eSessionId != "": self._strategy.updateBarInfoInLocalOrder(eSessionId, curBar)
 
     def setBuyToCover(self, userNo, contractNo, share, price, coverFlag):
         contNo = contractNo if contractNo is not None else self._cfgModel.getBenchmark()
@@ -436,55 +434,9 @@ class StrategyModel(object):
         if not userNo:
             userNo = "Default"
         # 交易计算、生成回测报告
-        
-        tflag = self.isTradeAllowed()
-        exchg = contNo.split('|')[0]
-        if tflag and (exchg in ['SHFE', 'INE']):
-            holdTd = self.getTodaySellPosition()
-            holdYs = self.getSellPosition() - holdTd
-            holdCC = self.getSellPositionCanCover()
-            
-            # prior cover today
-            if coverFlag == oCoverT:
-                if share <= min(holdTd, holdCC):
-                    # cover today quantity
-                    coverTd = share
-                    # cover yestoday quantity
-                    coverYs = 0
-                else:
-                    # cover today quantity
-                    coverTd = holdTd
-                    # cover yestoday quantity
-                    coverYs = min(holdYs, holdCC - coverTd)
-            # prior cover yestoday
-            else:
-                if share <= min(holdYs, holdCC):
-                    # cover yestoday quantity
-                    coverYs = share
-                    # cover today quantity
-                    coverTd = 0
-                else:
-                    # cover yestoday quantity
-                    coverYs = holdYs
-                    # cover today quantity
-                    coverTd = min(holdTd, holdCC - coverYs)
-            # cover remaining quantity
-            coverOt = share - coverYs - coverTd
-            # cover today
-            if coverTd > 0:
-                eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtGFD, dBuy, oCoverT, hSpeculate, price, coverTd, curBar, (defaultPrice > 0))
-                if eSessionId != "": self._strategy.updateBarInfoInLocalOrder(eSessionId, curBar)
-            # cover yestoday
-            if coverYs > 0:
-                eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtGFD, dBuy, oCover, hSpeculate, price, coverYs, curBar, (defaultPrice > 0))
-                if eSessionId != "": self._strategy.updateBarInfoInLocalOrder(eSessionId, curBar)
-            # cover remaining
-            if coverOt > 0:
-                eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtGFD, dBuy, oCover, hSpeculate, price, coverOt, curBar, (defaultPrice > 0))
-                if eSessionId != "": self._strategy.updateBarInfoInLocalOrder(eSessionId, curBar)
-        else:
-            eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtGFD, dBuy, oCover, hSpeculate, price, share, curBar, (defaultPrice > 0))
-            if eSessionId != "": self._strategy.updateBarInfoInLocalOrder(eSessionId, curBar)
+
+        eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtGFD, dBuy, coverFlag, hSpeculate,price, share, curBar, (defaultPrice > 0))
+
 
     def setSell(self, userNo, contractNo, share, price, coverFlag):
         contNo = contractNo if contractNo is not None else self._cfgModel.getBenchmark()
@@ -512,56 +464,9 @@ class StrategyModel(object):
             userNo = "Default"
         # 交易计算、生成回测报告
         
-        tflag = self.isTradeAllowed()
-        exchg = contNo.split('|')[0]
-        if tflag and (exchg in ['SHFE', 'INE']):
-            holdTd = self.getTodayBuyPosition()
-            holdYs = self.getBuyPosition() - holdTd
-            holdCC = self.getBuyPositionCanCover()
-            
-            # prior cover today
-            if coverFlag == oCoverT:
-                if share <= min(holdTd, holdCC):
-                    # cover today quantity
-                    coverTd = share
-                    # cover yestoday quantity
-                    coverYs = 0
-                else:
-                    # cover today quantity
-                    coverTd = holdTd
-                    # cover yestoday quantity
-                    coverYs = min(holdYs, holdCC - coverTd)
-            # prior cover yestoday
-            else:
-                if share <= min(holdYs, holdCC):
-                    # cover yestoday quantity
-                    coverYs = share
-                    # cover today quantity
-                    coverTd = 0
-                else:
-                    # cover yestoday quantity
-                    coverYs = holdYs
-                    # cover today quantity
-                    coverTd = min(holdTd, holdCC - coverYs)
-            # cover remaining quantity
-            coverOt = share - coverYs - coverTd
-            # cover today
-            if coverTd > 0:
-                eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtGFD, dSell, oCoverT, hSpeculate, price, coverTd, curBar, (defaultPrice > 0))
-                if eSessionId != "": self._strategy.updateBarInfoInLocalOrder(eSessionId, curBar)
-            # cover yestoday
-            if coverYs > 0:
-                eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtGFD, dSell, oCover, hSpeculate, price, coverYs, curBar, (defaultPrice > 0))
-                if eSessionId != "": self._strategy.updateBarInfoInLocalOrder(eSessionId, curBar)
-            # cover remaining
-            if coverOt > 0:
-                eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtGFD, dSell, oCover, hSpeculate, price, coverOt, curBar, (defaultPrice > 0))
-                if eSessionId != "": self._strategy.updateBarInfoInLocalOrder(eSessionId, curBar)
-        else:
-            eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtGFD, dSell, oCover, hSpeculate, price, share, curBar, (defaultPrice > 0))
-            if eSessionId != "": self._strategy.updateBarInfoInLocalOrder(eSessionId, curBar)
+        eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtGFD, dSell, coverFlag, hSpeculate, price, share, curBar, (defaultPrice > 0))
 
-    def setSellShort(self, userNo, contractNo, share, price, needCover=True):
+    def setSellShort(self, userNo, contractNo, share, price, needCover, coverFlag):
         contNo = contractNo if contractNo is not None else self._cfgModel.getBenchmark()
 
         if contNo not in self._cfgModel.getContract():
@@ -587,12 +492,10 @@ class StrategyModel(object):
             userNo = "Default"
         qty = self._calcCenter.needCover(userNo, contNo, dSell, share, price)
         if qty > 0 and needCover:
-            eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtGFD, dSell, oCover, hSpeculate, price, qty, curBar, (defaultPrice > 0))
-            if eSessionId != "": self._strategy.updateBarInfoInLocalOrder(eSessionId, curBar)
+            eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtGFD, dSell, coverFlag, hSpeculate, price, qty, curBar, (defaultPrice > 0))
 
         # 交易计算、生成回测报告
-        eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtGFD, dSell, oOpen, hSpeculate, price, share, curBar, (defaultPrice > 0))
-        if eSessionId != "": self._strategy.updateBarInfoInLocalOrder(eSessionId, curBar)
+        eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtGFD, dSell, oOpen, hSpeculate,price, share, curBar, (defaultPrice > 0))
 
     def getDefaultShare(self, contNo, price):
         defaultPrice = self._qteModel.getQLast(contNo)
@@ -1064,28 +967,80 @@ class StrategyModel(object):
             "StrategyStage": self._strategy.getStatus()
         }
 
-        # if entryOrExit in (oCover, oCoverT):
-        if entryOrExit in (oCover, oCoverT):
-            isVaildOrder = self._calcCenter.coverJudge(orderParam)
-            if isVaildOrder < 0:
+        coverMap = [(orderQty, entryOrExit)]
+        
+        tflag = self._strategy.isRealTimeStatus()
+        exchg = contNo.split('|')[0]
+        if tflag and entryOrExit == oCoverA  and (exchg in ['SHFE', 'INE']):
+            if orderDirct == dBuy:
+                holdTd = self.getTodaySellPosition()
+                holdYs = self.getSellPosition() - holdTd
+                holdCC = self.getSellPositionCanCover()
+            else:
+                holdTd = self.getTodayBuyPosition()
+                holdYs = self.getBuyPosition() - holdTd
+                holdCC = self.getBuyPositionCanCover()
+            
+            # prior cover today
+            if coverFlag == oCoverT:
+                if orderQty <= min(holdTd, holdCC):
+                    # cover today quantity
+                    coverTd = orderQty
+                    # cover yestoday quantity
+                    coverYs = 0
+                else:
+                    # cover today quantity
+                    coverTd = holdTd
+                    # cover yestoday quantity
+                    coverYs = min(holdYs, holdCC - coverTd)
+            # prior cover yestoday
+            else:
+                if orderQty <= min(holdYs, holdCC):
+                    # cover yestoday quantity
+                    coverYs = orderQty
+                    # cover today quantity
+                    coverTd = 0
+                else:
+                    # cover yestoday quantity
+                    coverYs = holdYs
+                    # cover today quantity
+                    coverTd = min(holdTd, holdCC - coverYs)
+            # cover remaining quantity
+            coverOt = orderQty - coverYs - coverTd
+            coverMap = [(CoverTd, oCoverT), (CoverYs, oCover), (CoverOt, oCover)]
+            
+        for qtyCoverPair in coverMap:
+            kOrderQty = qtyCoverPair[0]
+            vCoverFlag = qtyCoverPair[1]
+            
+            if kOrderQty <= 0:
+                continue
+            
+            if vCoverFlag in (oCover, oCoverT):
+                orderParam['OrderQty'] = kOrderQty
+                orderParam['Offset'] = vCoverFlag
+
+                isVaildOrder = self._calcCenter.coverJudge(orderParam)
+                if isVaildOrder < 0:
+                    return ""  
+
+            canAdded = self._calcCenter.addOrder(orderParam)
+            if canAdded < 1:
                 return ""
 
-        canAdded = self._calcCenter.addOrder(orderParam)
-        if canAdded < 1:
-            return ""
+            '''buy/sell 信号，
+            历史阶段：一定没有委托
+            实时数据：不一定有委托发
+            '''
+            curBar = self.getHisQuoteModel().getCurBar(self._config.getKLineShowInfoSimple())
+            if self._config.hasKLineTrigger() and curBar:
+                self.sendSignalEvent(self._signalName, userNo, contNo, orderDirct, vCoverFlag, orderPrice, kOrderQty, curBar)
 
-        '''buy/sell 信号，
-        历史阶段：一定没有委托
-        实时数据：不一定有委托发
-        '''
-        curBar = self.getHisQuoteModel().getCurBar(self._config.getKLineShowInfoSimple())
-        if self._config.hasKLineTrigger() and curBar:
-            self.sendSignalEvent(self._signalName, userNo, contNo, orderDirct, entryOrExit, orderPrice, orderQty, curBar)
-
-        realPrice = 0 if isPriceZero else orderPrice
-        retCode, eSessionId = self.sendOrder(userNo, contNo, orderType, validType, orderDirct, entryOrExit, hedge,
-                                             realPrice, orderQty)
-        return eSessionId if retCode == 0 else ""
+            realPrice = 0 if isPriceZero else orderPrice
+            retCode, eSessionId = self.sendOrder(userNo, contNo, orderType, validType, orderDirct, vCoverFlag, hedge, realPrice, kOrderQty)
+            
+            if retCode == 0:
+                self._strategy.updateBarInfoInLocalOrder(eSessionId, curBar)
 
     def sendOrder(self, userNo, contNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty, \
                   triggerType=stNone, triggerMode=tmNone, triggerCondition=tcNone, triggerPrice=0, aFunc=False):
