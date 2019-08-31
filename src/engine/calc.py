@@ -462,7 +462,7 @@ class CalcCenter(object):
             self._logger.error(f"订单手数不大于0，订单数据：{ftOrder}")
             return 0
 
-        self._logger.sig_info("[%3s] [%4s] [%5s], %s, %s, %s, %s, %s, %s, %s, %s, %s, %s" % (
+        self._logger.trade_info("[%3s] [%4s] [%5s], %s, %s, %s, %s, %s, %s, %s, %s, %s, %s" % (
             ftOrder["StrategyId"],
             ftOrder["StrategyStage"],
             ftOrder["OrderId"],
@@ -477,8 +477,8 @@ class CalcCenter(object):
             ftOrder["OrderType"],
             ftOrder["Hedge"]))
 
-        self._logger.trade_info(f"发送虚拟订单，策略Id:{ftOrder['StrategyId']}, 运行阶段：{ftOrder['StrategyStage']}，"
-                                f"本地订单号：{ftOrder['OrderId']},订单数据：{repr(order)}")
+        # self._logger.trade_info(f"发送虚拟订单，策略Id:{ftOrder['StrategyId']}, 运行阶段：{ftOrder['StrategyStage']}，"
+        #                         f"本地订单号：{ftOrder['OrderId']},订单数据：{repr(order)}")
 
         contPrice = {
             "Cont": order["Cont"],
@@ -1084,9 +1084,10 @@ class CalcCenter(object):
         :param time:
         :return:
         """
+        #记录上一个LastAssets
+        preAssets = self._profit["LastAssets"]
         self._profit["Margin"] = self._getHoldMargin()
         self._profit["HoldProfit"] = self._getHoldProfit()
-        # print("444444444: ", self._profit["HoldProfit"])
         #####################################################################
         # Available计算方法是不是有问题，是不是应该将浮动盈亏也计算进去才对呢
         #####################################################################
@@ -1122,7 +1123,7 @@ class CalcCenter(object):
 
         self._profit["EmptyAssets"] = self._profit["LastAsset"] - totalCost
         temp = self._profit["LastAssets"]
-        # self._logger.info(f"============: {self._profit['LastAssets']}, {self._profit['StartFund']}， {self._profit['MaxAssets']}", )
+
         if temp >= self._profit["StartFund"]:
             if temp > self._profit["MaxAssets"]:
                 self._profit["MaxAssets"] = temp
@@ -1131,22 +1132,38 @@ class CalcCenter(object):
             if temp < self._profit["MinAssets"]:
                 self._profit["MinAssets"] = temp
                 self._profit["Risky"] = 1 - self._profit["MinAssets"] / self._profit["StartFund"] if self._profit[
-                                                                                                         "StartFund"] != 0 else 0  # 风险率
+                                                                                "StartFund"] != 0 else 0  # 风险率
+                # # TODO
+                # diff = self._profit["MaxAssets"] - self._profit["MinAssets"]
+                # if diff > self._profit["MaxRetracement"]:
+                #     print("AAAAAAAAAAA: ", self._profit["MaxAssets"], self._profit["MinAssets"], diff)
+                #     self._profit["MaxRetracement"] = diff
+                #     self._profit["MaxRetracementEndTm"] = time
+                #     self._profit["MaxRetracementStartTm"] = self._profit["MinAssetsTm"]
+                #     # 权益最大回撤比
+                #
+                #     tempAssetRetraceRate = diff / self._profit["MaxAssets"]
+                #     if tempAssetRetraceRate > self._profit["MaxRetracementRate"]:
+                #         try:
+                #             self._profit["MaxRetracementRate"] = tempAssetRetraceRate
+                #         except ZeroDivisionError:
+                #             raise ZeroDivisionError
+                #         self._profit["MaxRetracementRateTm"] = time
+        if preAssets < self._profit["LastAssets"]:
+            diff = self._profit["MaxAssets"] - preAssets
+            if diff > self._profit["MaxRetracement"]:
+                self._profit["MaxRetracement"] = diff
+                self._profit["MaxRetracementEndTm"] = time
+                self._profit["MaxRetracementStartTm"] = self._profit["MinAssetsTm"]
+                # 权益最大回撤比
 
-                diff = self._profit["MaxAssets"] - self._profit["MinAssets"]
-                if diff > self._profit["MaxRetracement"]:
-                    self._profit["MaxRetracement"] = diff
-                    self._profit["MaxRetracementEndTm"] = time
-                    self._profit["MaxRetracementStartTm"] = self._profit["MinAssetsTm"]
-                    # 权益最大回撤比
-
-                    tempAssetRetraceRate = diff/self._profit["MaxAssets"]
-                    if tempAssetRetraceRate > self._profit["MaxRetracementRate"]:
-                        try:
-                            self._profit["MaxRetracementRate"] = tempAssetRetraceRate
-                        except ZeroDivisionError:
-                            raise ZeroDivisionError
-                        self._profit["MaxRetracementRateTm"] = time
+                tempAssetRetraceRate = diff / self._profit["MaxAssets"]
+                if tempAssetRetraceRate > self._profit["MaxRetracementRate"]:
+                    try:
+                        self._profit["MaxRetracementRate"] = tempAssetRetraceRate
+                    except ZeroDivisionError:
+                        raise ZeroDivisionError
+                    self._profit["MaxRetracementRateTm"] = time
 
     def calcProfit(self, contractList, barInfo):
         """
@@ -1155,7 +1172,7 @@ class CalcCenter(object):
         :param barInfo: 合约的bar信息，类型为字典类型，键值是合约代码
         :return:
         """
-        if contractList is None or barInfo is None:
+        if not contractList or not barInfo:
             self._logger.error("calcProfit(): contractList error")
             raise ImportError("args error")
 
@@ -1167,7 +1184,7 @@ class CalcCenter(object):
         self._calcEmptyPositionPeriod()
 
         t = None
-        contPrices = []
+        contPrices = {}
 
         benchmarkNo = contractList[0]
 
@@ -1186,7 +1203,7 @@ class CalcCenter(object):
                 # "CurrentBarIndex": barInfo[contract]["KLineIndex"],  # 基准合约的bar索引
                 "TradeDate": barInfo[contract]["TradeDate"],
             }
-            contPrices.append(contPrice)
+            contPrices[contract] = contPrice
 
             if not contPrice["Price"] == 0:
                 self._prices[contract] = contPrice
@@ -1203,47 +1220,40 @@ class CalcCenter(object):
     # 这个函数是不是有问题
     # ######################
     def _updatePosition(self, contPrices):
-        # print("111111111111 : ", self._positions)
-        # print("1111111111Extra: ", contPrices)
         for user in self._positions:
             for contract in self._positions[user]:
-                pInfo = self._positions[user][contract]
-                lastPrice = 0
-                for contPrice in contPrices:
-                    if contract == contPrice["Cont"]:
-                        lastPrice = contPrice["Price"]
-                #TODO: LastPrice 为0
+                if contPrices.get(contract):
+                    pInfo = self._positions[user][contract]
+                    lastPrice = contPrices.get(contract)["Price"]
 
-                pInfo = self._updateTodayPosition(pInfo)
+                    pInfo = self._updateTodayPosition(pInfo)
 
-                cost = self.getCostRate(contract)
-                pInfo["LongMargin"] = lastPrice * cost["TradeDot"] * pInfo["TotalBuy"] * cost["Margin"]
-                pInfo["ShortMargin"] = lastPrice * cost["TradeDot"] * pInfo["TotalSell"] * cost["Margin"]
-                pInfo["HoldProfit"] = ((lastPrice - pInfo["BuyPrice"])
-                                       * pInfo["TotalBuy"] + (pInfo["SellPrice"] - lastPrice)
-                                       * pInfo["TotalSell"]) * cost["TradeDot"]
-                # print("22222222222: ", lastPrice, pInfo["BuyPrice"], pInfo["TotalBuy"], pInfo["SellPrice"], lastPrice,
-                #       pInfo["TotalSell"], cost["TradeDot"])
+                    cost = self.getCostRate(contract)
+                    pInfo["LongMargin"] = lastPrice * cost["TradeDot"] * pInfo["TotalBuy"] * cost["Margin"]
+                    pInfo["ShortMargin"] = lastPrice * cost["TradeDot"] * pInfo["TotalSell"] * cost["Margin"]
+                    pInfo["HoldProfit"] = ((lastPrice - pInfo["BuyPrice"])
+                                           * pInfo["TotalBuy"] + (pInfo["SellPrice"] - lastPrice)
+                                           * pInfo["TotalSell"]) * cost["TradeDot"]
 
-                charge = 0
-                pInfo["Cost"] = 0
+                    charge = 0
+                    pInfo["Cost"] = 0
 
-                # 多头平仓手续费
-                if cost["CloseRatio"]:
-                    charge = lastPrice * pInfo["TotalBuy"] * cost["TradeDot"] * cost["CloseRatio"]
-                else:
-                    charge = pInfo["TotalBuy"] * cost["CloseFixed"]
-                #self._positions[contract]["Cost"] += charge
-                pInfo["Cost"] += charge
+                    # 多头平仓手续费
+                    if cost["CloseRatio"]:
+                        charge = lastPrice * pInfo["TotalBuy"] * cost["TradeDot"] * cost["CloseRatio"]
+                    else:
+                        charge = pInfo["TotalBuy"] * cost["CloseFixed"]
+                    #self._positions[contract]["Cost"] += charge
+                    pInfo["Cost"] += charge
 
-                # 空头平仓手续费
-                if cost["CloseRatio"]:
-                    charge = lastPrice * pInfo["TotalSell"] * cost["TradeDot"] * cost["CloseRatio"]
-                else:
-                    charge = pInfo["TotalSell"] * cost["CloseFixed"]
-                pInfo["Cost"] += charge
+                    # 空头平仓手续费
+                    if cost["CloseRatio"]:
+                        charge = lastPrice * pInfo["TotalSell"] * cost["TradeDot"] * cost["CloseRatio"]
+                    else:
+                        charge = pInfo["TotalSell"] * cost["CloseFixed"]
+                    pInfo["Cost"] += charge
 
-                self._positions[user][contract] = pInfo
+                    self._positions[user][contract] = pInfo
 
     def _updateFundRecord(self, time, profit, cost):
         """
