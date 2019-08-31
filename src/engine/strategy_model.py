@@ -981,34 +981,22 @@ class StrategyModel(object):
                 holdTd = self.getTodayBuyPosition()
                 holdYs = self.getBuyPosition() - holdTd
                 holdCC = self.getBuyPositionCanCover()
-            
-            # prior cover today
-            if coverFlag == oCoverT:
-                if orderQty <= min(holdTd, holdCC):
-                    # cover today quantity
-                    coverTd = orderQty
-                    # cover yestoday quantity
-                    coverYs = 0
-                else:
-                    # cover today quantity
-                    coverTd = holdTd
-                    # cover yestoday quantity
-                    coverYs = min(holdYs, holdCC - coverTd)
+                
             # prior cover yestoday
+            if orderQty <= min(holdYs, holdCC):
+                # cover yestoday quantity
+                coverYs = orderQty
+                # cover today quantity
+                coverTd = 0
             else:
-                if orderQty <= min(holdYs, holdCC):
-                    # cover yestoday quantity
-                    coverYs = orderQty
-                    # cover today quantity
-                    coverTd = 0
-                else:
-                    # cover yestoday quantity
-                    coverYs = holdYs
-                    # cover today quantity
-                    coverTd = min(holdTd, holdCC - coverYs)
+                # cover yestoday quantity
+                coverYs = holdYs
+                # cover today quantity
+                coverTd = min(holdTd, holdCC - coverYs)
+                
             # cover remaining quantity
             coverOt = orderQty - coverYs - coverTd
-            coverMap = [(CoverTd, oCoverT), (CoverYs, oCover), (CoverOt, oCover)]
+            coverMap = [(coverTd, oCoverT), (coverYs, oCover), (coverOt, oCover)]
             
         for qtyCoverPair in coverMap:
             kOrderQty = qtyCoverPair[0]
