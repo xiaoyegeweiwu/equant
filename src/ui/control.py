@@ -86,10 +86,14 @@ class TkinterController(object):
             for stId in strategyDict:
                 if "RunningData" not in strategyDict[stId]:
                     continue
-                if strategyDict[stId]["StrategyState"] == ST_STATUS_PAUSE or strategyDict[stId][
-                      "StrategyState"] == ST_STATUS_QUIT or strategyDict[stId][
-                      "StrategyState"] == ST_STATUS_EXCEPTION:
-                    continue
+                try:
+                    #TODO：StrategyState为什么会不存在呢？
+                    if strategyDict[stId]["StrategyState"] == ST_STATUS_PAUSE or strategyDict[stId][
+                          "StrategyState"] == ST_STATUS_QUIT or strategyDict[stId][
+                          "StrategyState"] == ST_STATUS_EXCEPTION:
+                        continue
+                except KeyError as e:
+                    self.logger.warn(f"策略数据错误: {stId}, {strategyDict[stId]}")
 
                 self.app.updateValue(stId, strategyDict[stId]["RunningData"])
         except PermissionError as e:

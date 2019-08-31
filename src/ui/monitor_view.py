@@ -504,7 +504,10 @@ class QuantMonitor(object):
 
         if str(strategyId) in self.executeListTree.get_children():
             for k, v in colValues.items():
-                self.executeListTree.set(strategyId, column=k, value=v)
+                try:
+                    self.executeListTree.set(strategyId, column=k, value=v)
+                except TclError as e:
+                    self._logger.error(f"[UI][{strategyId}]: 更新策略执行数据时出错，执行列表中该策略已删除！")
 
     def updateRunStage(self, strategyId, status):
         """更新策略运行阶段"""

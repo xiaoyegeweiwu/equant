@@ -32,6 +32,7 @@ class RunWin(QuantToplevel, QuantFrame):
     def __init__(self, control, path, flag=False, master=None, param={}):
         # flag: 是否是从策略右键弹出的标志位
         super().__init__(master)
+
         self._control = control
         self._exchange = self._control.model.getExchange()
         self._commodity = self._control.model.getCommodity()
@@ -90,12 +91,12 @@ class RunWin(QuantToplevel, QuantFrame):
         self.createFund(self.fundFrame)
         self.createSample(self.sampleFrame)
         self.createParma(self.paramFrame)
-        self.addButton(self.topFrame)
 
-        # TODO： 如果将配置文件内容删除会报错
         self.setDefaultConfigure()
         # 根据用户设置内容初始化控件
         self.initWidget()
+        # 确定、取消按钮
+        self.addButton(self.topFrame)
 
     def initVariable(self):
         # 变量
@@ -962,6 +963,7 @@ class RunWin(QuantToplevel, QuantFrame):
 
     def setCycleEntryState(self):
         if self.isCycle.get() == 0:
+            # print("AAAAAAAAAAAAA: ", self.cycleEntry)
             self.cycleEntry.config(state="disabled", bg=rgb_to_hex(245, 245, 245))
         else:
             self.cycleEntry.config(state="normal", bg=rgb_to_hex(255, 255, 255))

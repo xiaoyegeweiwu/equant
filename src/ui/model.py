@@ -486,47 +486,114 @@ class StrategyManager(object):
 
     def addStrategy(self, dataDict):
         id = dataDict['StrategyId']
-        self._strategyDict[id] = dataDict
+        self.lock.acquire()
+        try:
+            self._strategyDict[id] = dataDict
+        except Exception as e:
+            self._logger.error("addStrategy方法出错")
+        finally:
+            self.lock.release()
         self._app.addExecute(dataDict)
 
     def add_(self, dataDict):
         #TODO: 策略状态传过来事件问题
         id = dataDict['StrategyId']
-        self._strategyDict[id] = dataDict
+        self.lock.acquire()
+        try:
+            self._strategyDict[id] = dataDict
+        except Exception as e:
+            self._logger.error("add_方法出错")
+        finally:
+            self.lock.release()
 
     def addStrategyRunData(self, id, data):
         """策略运行数据实时更新"""
-        self._strategyDict[id].update({"RunningData": data})
+        self.lock.acquire()
+        try:
+            self._strategyDict[id].update({"RunningData": data})
+        except Exception as e:
+            self._logger.error("addStrategyRunData方法出错")
+        finally:
+            self.lock.release()
 
     def removeStrategy(self, id):
-        if id in self._strategyDict:
-            self._strategyDict.pop(id)
+        self.lock.acquire()
+        try:
+            if id in self._strategyDict:
+                self._strategyDict.pop(id)
+        except Exception as e:
+            self._logger.error("removeStrategy方法出错")
+        finally:
+            self.lock.release()
 
     def queryStrategyStatus(self, id):
-        return self._strategyDict[id]["StrategyState"]
+        self.lock.acquire()
+        try:
+            return self._strategyDict[id]["StrategyState"]
+        except Exception as e:
+            self._logger.error("queryStrategyStatus方法出错")
+        finally:
+            self.lock.release()
+        # return self._strategyDict[id]["StrategyState"]
 
     def queryStrategyRunType(self, id):
-        return self._strategyDict[id]["RunType"]
+        self.lock.acquire()
+        try:
+            return self._strategyDict[id]["RunType"]
+        except Exception as e:
+            self._logger.error("queryStrategyRunType方法出错")
+        finally:
+            self.lock.release()
 
     def queryStrategyName(self, id):
-        return self._strategyDict[id]["StrategyName"]
+        self.lock.acquire()
+        try:
+            return self._strategyDict[id]["StrategyName"]
+        except Exception as e:
+            self._logger.error("queryStrategyName方法出错")
+        finally:
+            self.lock.release()
 
     def updateStrategyStatus(self, id, status):
-        if id in self._strategyDict:
-            self._strategyDict[id]["StrategyState"] = status
+        self.lock.acquire()
+        try:
+            if id in self._strategyDict:
+                self._strategyDict[id]["StrategyState"] = status
+        except Exception as e:
+            self._logger.error("updateStrategyStatus方法出错")
+        finally:
+            self.lock.release()
 
     def updateStrategyRunMode(self, id, status):
         """运行模式更新"""
-        if id in self._strategyDict:
-            self._strategyDict[id]["IsActualRun"] = status
+        self.lock.acquire()
+        try:
+            if id in self._strategyDict:
+                self._strategyDict[id]["IsActualRun"] = status
+        except Exception as e:
+            self._logger.error("updateStrategyRunMode方法出错")
+        finally:
+            self.lock.release()
 
     def getStrategyConfigData(self, id):
         """获取运行设置信息"""
-        return self._strategyDict[id]["Config"]
+        self.lock.acquire()
+        try:
+            return self._strategyDict[id]["Config"]
+        except Exception as e:
+            self._logger.error("getStrategyConfigData方法出错")
+        finally:
+            self.lock.release()
 
     def getStrategyParamData(self, id):
         """获取用户参数设置信息"""
-        return self._strategyDict[id]["Params"]
+        self.lock.acquire()
+        try:
+            return self._strategyDict[id]["Params"]
+        except Exception as e:
+            self._logger.error("getStrategyParamData方法出错")
+        finally:
+            self.lock.release()
 
     def getStrategyDict(self):
         """获取全部运行策略"""
@@ -540,8 +607,20 @@ class StrategyManager(object):
 
     def getSingleStrategy(self, id):
         """获取某个运行策略"""
-        return self._strategyDict[id]
+        self.lock.acquire()
+        try:
+            return self._strategyDict[id]
+        except Exception as e:
+            self._logger.error("getSingleStrategy方法出错")
+        finally:
+            self.lock.release()
 
     def addResultData(self, id, data):
         """用于保存策略停止时的测试数据"""
-        self._strategyDict[id].update({"ResultData": data})
+        self.lock.acquire()
+        try:
+            self._strategyDict[id].update({"ResultData": data})
+        except Exception as e:
+            self._logger.error("addResultData方法出错")
+        finally:
+            self.lock.release()
