@@ -969,21 +969,23 @@ class StrategyModel(object):
         }
 
         coverMap = [(orderQty, entryOrExit)]
-        
+
         tflag = self._strategy.isRealTimeStatus()
         exchg = contNo.split('|')[0]
+        # 针对SHFE, INE平仓单做自适应拆分，默认先平昨再平今
         if tflag and entryOrExit == oCoverA  and (exchg in ['SHFE', 'INE']):
             if orderDirct == dBuy:
                 holdTd = self.getTodaySellPosition()
                 holdYs = self.getSellPosition() - holdTd
-                holdCC = self.getSellPositionCanCover()
+                #holdCC = self.getSellPositionCanCover()
             else:
                 holdTd = self.getTodayBuyPosition()
                 holdYs = self.getBuyPosition() - holdTd
-                holdCC = self.getBuyPositionCanCover()
+                #holdCC = self.getBuyPositionCanCover()
                 
             # prior cover yestoday
-            if orderQty <= min(holdYs, holdCC):
+            #if orderQty <= min(holdYs, holdCC):
+            if orderQty <= holdYs:
                 # cover yestoday quantity
                 coverYs = orderQty
                 # cover today quantity
@@ -992,11 +994,15 @@ class StrategyModel(object):
                 # cover yestoday quantity
                 coverYs = holdYs
                 # cover today quantity
-                coverTd = min(holdTd, holdCC - coverYs)
+                #coverTd = min(holdTd, holdCC - coverYs)
+                coverTd = min(holdTd, orderQty - coverYs)
                 
             # cover remaining quantity
             coverOt = orderQty - coverYs - coverTd
             coverMap = [(coverTd, oCoverT), (coverYs, oCover), (coverOt, oCover)]
+        # 其他交易所平仓时设置为平昨
+        elif entryOrExit in (oCoverA, oCoverT):
+            coverMap = [(orderQty, oCover)]
             
         for qtyCoverPair in coverMap:
             kOrderQty = qtyCoverPair[0]
