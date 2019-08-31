@@ -405,9 +405,10 @@ class StrategyModel(object):
         # 对于开仓，需要平掉反向持仓
         qty = self._calcCenter.needCover(userNo, contNo, dBuy, share, price)
         if qty > 0 and needCover:
-            eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtGFD, dBuy, coverFlag, hSpeculate, price, qty, curBar, (defaultPrice > 0))
+            self.buySellOrder(userNo, contNo, otLimit, vtGFD, dBuy, coverFlag, hSpeculate, price, qty, curBar, (defaultPrice > 0))
 
-        eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtGFD, dBuy, oOpen, hSpeculate, price, share, curBar, (defaultPrice > 0))
+        # 交易计算、生成回测报告
+        self.buySellOrder(userNo, contNo, otLimit, vtGFD, dBuy, oOpen, hSpeculate, price, share, curBar, (defaultPrice > 0))
 
     def setBuyToCover(self, userNo, contractNo, share, price, coverFlag):
         contNo = contractNo if contractNo is not None else self._cfgModel.getBenchmark()
@@ -433,9 +434,9 @@ class StrategyModel(object):
         userNo = self._cfgModel.getUserNo() if not userNo else userNo
         if not userNo:
             userNo = "Default"
-        # 交易计算、生成回测报告
 
-        eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtGFD, dBuy, coverFlag, hSpeculate,price, share, curBar, (defaultPrice > 0))
+        # 交易计算、生成回测报告
+        self.buySellOrder(userNo, contNo, otLimit, vtGFD, dBuy, coverFlag, hSpeculate,price, share, curBar, (defaultPrice > 0))
 
 
     def setSell(self, userNo, contractNo, share, price, coverFlag):
@@ -462,9 +463,9 @@ class StrategyModel(object):
         userNo = self._cfgModel.getUserNo() if not userNo else userNo
         if not userNo:
             userNo = "Default"
+            
         # 交易计算、生成回测报告
-        
-        eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtGFD, dSell, coverFlag, hSpeculate, price, share, curBar, (defaultPrice > 0))
+        self.buySellOrder(userNo, contNo, otLimit, vtGFD, dSell, coverFlag, hSpeculate, price, share, curBar, (defaultPrice > 0))
 
     def setSellShort(self, userNo, contractNo, share, price, needCover, coverFlag):
         contNo = contractNo if contractNo is not None else self._cfgModel.getBenchmark()
@@ -492,10 +493,10 @@ class StrategyModel(object):
             userNo = "Default"
         qty = self._calcCenter.needCover(userNo, contNo, dSell, share, price)
         if qty > 0 and needCover:
-            eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtGFD, dSell, coverFlag, hSpeculate, price, qty, curBar, (defaultPrice > 0))
+            self.buySellOrder(userNo, contNo, otLimit, vtGFD, dSell, coverFlag, hSpeculate, price, qty, curBar, (defaultPrice > 0))
 
         # 交易计算、生成回测报告
-        eSessionId = self.buySellOrder(userNo, contNo, otLimit, vtGFD, dSell, oOpen, hSpeculate,price, share, curBar, (defaultPrice > 0))
+        self.buySellOrder(userNo, contNo, otLimit, vtGFD, dSell, oOpen, hSpeculate,price, share, curBar, (defaultPrice > 0))
 
     def getDefaultShare(self, contNo, price):
         defaultPrice = self._qteModel.getQLast(contNo)
