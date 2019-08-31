@@ -13,8 +13,6 @@ from .view import QuantApplication
 from .language import *
 from capi.com_types import *
 
-from engine.popup_win import createAlarmWin
-
 
 class TkinterController(object):
     '''程序化入口类'''
@@ -45,38 +43,45 @@ class TkinterController(object):
         # 策略管理器
         self.strategyManager = self.getStManager()
 
-        # 创建日志更新线程
-        # self.logThread = ChildThread(self.updateLog, 0.001)
-        # 创建策略信息更新线程
-        self.monitorThread = ChildThread(self.updateMonitor, 1)
         # 创建接收引擎数据线程
         self.receiveEgThread = ChildThread(self.model.receiveEgEvent)
-        # 信号记录线程
-        self.sigThread = ChildThread(self.updateSig, 0.01)
-        # 用户日志线程
-        self.usrThread = ChildThread(self.updateUsr, 0.01)
 
         # 设置日志更新
         self.update_log()
+        self.update_mon()
 
     def get_logger(self):
         return self.logger
 
     def update_log(self):
         try:
-            self.app.updateSysLogText()
-            self.app.updateErrText()
+            # createAlarmWin("ABCDE")
+            # self.top.after(10, self.update_log)
+            # return
+
+            self.app.updateLogText()
+            # self.app.updateSigText()
+            # self.app.updateErrText()
+            # self.updateSig()
+            # self.updateUsr()
 
             self.top.after(10, self.update_log)
         except Exception as e:
             # self.logger.warn("异常", "程序退出异常")
             pass
 
-    def updateSig(self):
-        self.app.updateSigText()
+    def update_mon(self):
+        try:
+            self.updateMonitor()
+            self.top.after(1000, self.update_mon)
+        except Exception as e:
+            pass
 
-    def updateUsr(self):
-        self.app.updateUsrText()
+    # def updateSig(self):
+    #     self.app.updateSigText()
+    #
+    # def updateUsr(self):
+    #     self.app.updateUsrText()
 
     def updateMonitor(self):
         # 更新监控界面策略信息
@@ -99,20 +104,19 @@ class TkinterController(object):
         except PermissionError as e:
             self.logger.error("更新监控信息时出错")
 
-
     def quitThread(self):
         self.logger.info("quitThread exit")
         # 停止更新界面子线程
-        self.monitorThread.stop()
-        self.monitorThread.join()
+        # self.monitorThread.stop()
+        # self.monitorThread.join()
 
         # 停止更新信号记录
-        self.sigThread.stop()
-        self.sigThread.join()
+        # self.sigThread.stop()
+        # self.sigThread.join()
 
         # 停止更新用户日志
-        self.usrThread.stop()
-        self.usrThread.join()
+        # self.usrThread.stop()
+        # self.usrThread.join()
 
         # 停止接收策略引擎队列数据
         self.receiveEgThread.stop()
@@ -125,13 +129,13 @@ class TkinterController(object):
 
     def run(self):
         #启动监控策略线程
-        self.monitorThread.start()
+        # self.monitorThread.start()
         #启动接收数据线程
         self.receiveEgThread.start()
 
-        self.sigThread.start()
+        # self.sigThread.start()
 
-        self.usrThread.start()
+        # self.usrThread.start()
 
         #启动主界面线程
         self.app.mainloop()
@@ -189,8 +193,6 @@ class TkinterController(object):
         :param param: 策略参数信息
         :return:
         """
-        # createAlarmWin("11111111111", 1, "test")
-        # return
         # 运行策略前将用户修改保存
         self.saveStrategy()
         # 解析策略参数
@@ -205,7 +207,6 @@ class TkinterController(object):
     def paramLoad(self, id):
         """用户参数修改后策略重新启动"""
         param = self.getUserParam(id)
-        print("2222222: ", param)
         strategyPath = self.strategyManager.getSingleStrategy(id)["Path"]
         self.app.createRunWin(param, strategyPath, True)
 
