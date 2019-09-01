@@ -1726,9 +1726,9 @@ class SelectContractWin(QuantToplevel, QuantFrame):
                     temp[1] = "Z"
                     commodityNoZ = "|".join(temp)
 
-                ePattern = r"\A" + exchangeNo[0]
-                cPattern = r"\A" + "\|".join(commodityNo[0].split("|"))
-                cZPattern = r"\A" + "\|".join(commodityNoZ.split("|"))
+                ePattern = r"\A" + exchangeNo[0] + "\|"
+                cPattern = r"\A" + "\|".join(commodityNo[0].split("|")) + "\|"
+                cZPattern = r"\A" + "\|".join(commodityNoZ.split("|")) + "\|"
                 contract = self._contract.loc[
                     (self._contract.ContractNo.str.contains(ePattern))
                     & (
