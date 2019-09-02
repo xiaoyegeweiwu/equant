@@ -77,7 +77,6 @@ class CalcCenter(object):
 
     def initArgs(self, args):
         """初始化参数"""
-        print("111111: ", args)
         self._strategy = args
         self._setProfitInitialFundInfo(int(self._strategy["InitialFunds"]) - self._runSet["StartFund"])
         self._setExpertSetting()
@@ -145,7 +144,7 @@ class CalcCenter(object):
             self._costs[contract]["CloseRatio"] = self._strategy["CloseRatio"]
             self._costs[contract]["OpenFixed"] = self._strategy["OpenFixed"]
             self._costs[contract]["CloseFixed"] = self._strategy["CloseFixed"]
-            self._costs[contract]["CoseTodayRatio"] = self._strategy["CloseTodayRatio"]
+            self._costs[contract]["CloseTodayRatio"] = self._strategy["CloseTodayRatio"]
             self._costs[contract]["CloseTodayFixed"] = self._strategy["CloseTodayFixed"]
             # 新增
             self._costs[contract]["Slippage"] = self._strategy["Slippage"]  # 滑点
