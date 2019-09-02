@@ -570,10 +570,11 @@ class StrategyTrade(TradeModel):
         for orderKey in list(tUserInfoModel._order.keys()):
             orderModel = tUserInfoModel._order[orderKey]
             if not contNo1 or contNo1 == orderModel._metaData['Cont']:
-                timeDateStr = orderModel._metaData['InsertTime']
-                time1 = datetime.datetime.strptime(timeDateStr, "%Y-%m-%d %H:%M:%S")
-                seconds = float(time.mktime(time1.timetuple()))
-                if seconds >= insertSeconds and orderModel._metaData['OrderId'] > orderId:
+                #timeDateStr = orderModel._metaData['InsertTime']
+                #time1 = datetime.datetime.strptime(timeDateStr, "%Y-%m-%d %H:%M:%S")
+                #seconds = float(time.mktime(time1.timetuple()))
+                #if seconds >= insertSeconds and orderModel._metaData['OrderId'] > orderId:
+                if orderModel._metaData['OrderId'] > orderId:
                     orderId = orderModel._metaData['OrderId']
 
         return orderId

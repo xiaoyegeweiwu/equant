@@ -8,10 +8,11 @@ def initialize(context):
 
 
 def handle_data(context):
-    orderNo = A_FirstOrderNo()
+    #orderNo = A_FirstOrderNo()
+    orderNo = A_LastOrderNo()
 
-    LogInfo('Tradedate:', CalcTradeDate('ZCE|F|SR|001', 20190830093000000))
-    LogInfo('Tradedate:', CalcTradeDate('ZCE|F|SR|001', 20190830230000000))
+    #LogInfo('Tradedate:', CalcTradeDate('ZCE|F|SR|001', 20190830093000000))
+    #LogInfo('Tradedate:', CalcTradeDate('ZCE|F|SR|001', 20190830230000000))
     while orderNo != -1:
         orderStatus = A_OrderStatus(orderNo)
         contNo = A_OrderContractNo(orderNo)
