@@ -1296,6 +1296,9 @@ class StrategyHisQuote(object):
         # price 应该根据coverPosOrderType调整, todo
         price = curPrice
         # 根据超价点数买+ 卖-
+        
+        # self.logger.debug('getCoverPrice, price:%f, addPoint:%d, pricetick:%f, direct:%c' %(price, addPoint, priceTick, direction))
+        
         if direction==dBuy:
             return price+addPoint*priceTick
         elif direction==dSell:
