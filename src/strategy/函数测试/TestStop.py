@@ -7,6 +7,11 @@ g_params['float_dot'] = 5       #浮动止损点
 g_params['stop_switch'] = 3     #止损开关，1止损,2止盈,3止损+止盈,4浮动,5止损+浮动,6止盈+浮动,7全部
 g_params['single'] = True       #边单持仓
 
+userNo = 'Q912526205'
+#contNo = 'NYMEX|F|CL|1910'
+contNo = 'SHFE|F|CU|1910'
+cFlag = 'A'
+
 ################################################################
 buy = True
 def single_test(): 
@@ -35,6 +40,8 @@ def set_stop():
 
 ################################################################
 def initialize(context): 
+    SetUserNo('Q912526205')
+    SetBarInterval(contNo , 'M', 1, 200)
     LogInfo('********', g_params)
     set_stop()
 

@@ -184,6 +184,7 @@ class StrategyHisQuote(object):
         #
         self._firstRealTimeKLine = {}
         self._triggerMgr = None
+        # self.isMonitorTrigger = {}
 
     def initialize(self):
         self._contractTuple = self._config.getContract()
@@ -1277,12 +1278,10 @@ class StrategyHisQuote(object):
 
         if isStopWinTrigger:
             if allPos["TotalBuy"] >= 1:
-                coverPosPrice = self.getCoverPosPrice(latestPos["OrderPrice"], stopWinParams["CoverPosOrderType"],
-                                                         stopWinParams["AddPoint"], priceTick, dSell)
+                coverPosPrice = self.getCoverPosPrice(latestPos["OrderPrice"], stopWinParams["CoverPosOrderType"], stopWinParams["AddPoint"], priceTick, dSell)
                 self._dataModel.setSell('', contractNo, allPos["TotalBuy"], coverPosPrice)
             elif allPos["TotalSell"] >= 1:
-                coverPosPrice = self.getCoverPosPrice(latestPos["OrderPrice"], stopWinParams["CoverPosOrderType"],
-                                                         stopWinParams["AddPoint"], priceTick, dBuy)
+                coverPosPrice = self.getCoverPosPrice(latestPos["OrderPrice"], stopWinParams["CoverPosOrderType"], stopWinParams["AddPoint"], priceTick, dBuy)
                 self._dataModel.setBuyToCover('', contractNo, allPos["TotalSell"], coverPosPrice)
 
         elif isStopLoseTrigger:

@@ -378,7 +378,7 @@ class StrategyModel(object):
         return self._qteModel.getQuoteDataExist(symbol)
 
     # ////////////////////////策略函数////////////////////////////
-    def setBuy(self, userNo, contractNo, share, price, needCover, coverFlag):
+    def setBuy(self, userNo, contractNo, share, price, needCover=True, coverFlag='A'):
         contNo = contractNo if contractNo else self._cfgModel.getBenchmark()
         
         if contNo not in self._cfgModel.getContract():
@@ -410,7 +410,7 @@ class StrategyModel(object):
         # 交易计算、生成回测报告
         self.buySellOrder(userNo, contNo, otLimit, vtGFD, dBuy, oOpen, hSpeculate, price, share, curBar, (defaultPrice > 0))
 
-    def setBuyToCover(self, userNo, contractNo, share, price, coverFlag):
+    def setBuyToCover(self, userNo, contractNo, share, price, coverFlag='A'):
         contNo = contractNo if contractNo is not None else self._cfgModel.getBenchmark()
 
         if contNo not in self._cfgModel.getContract():
@@ -439,7 +439,7 @@ class StrategyModel(object):
         self.buySellOrder(userNo, contNo, otLimit, vtGFD, dBuy, coverFlag, hSpeculate,price, share, curBar, (defaultPrice > 0))
 
 
-    def setSell(self, userNo, contractNo, share, price, coverFlag):
+    def setSell(self, userNo, contractNo, share, price, coverFlag='A'):
         contNo = contractNo if contractNo is not None else self._cfgModel.getBenchmark()
 
         if contNo not in self._cfgModel.getContract():
@@ -467,7 +467,7 @@ class StrategyModel(object):
         # 交易计算、生成回测报告
         self.buySellOrder(userNo, contNo, otLimit, vtGFD, dSell, coverFlag, hSpeculate, price, share, curBar, (defaultPrice > 0))
 
-    def setSellShort(self, userNo, contractNo, share, price, needCover, coverFlag):
+    def setSellShort(self, userNo, contractNo, share, price, needCover=True, coverFlag='A'):
         contNo = contractNo if contractNo is not None else self._cfgModel.getBenchmark()
 
         if contNo not in self._cfgModel.getContract():
@@ -973,7 +973,7 @@ class StrategyModel(object):
         tflag = self._strategy.isRealTimeStatus()
         exchg = contNo.split('|')[0]
         # 针对SHFE, INE平仓单做自适应拆分，默认先平昨再平今
-        if tflag and entryOrExit == oCoverA  and (exchg in ['SHFE', 'INE']):
+        if tflag and entryOrExit == oCoverA and (exchg in ['SHFE', 'INE']):
             if orderDirct == dBuy:
                 holdTd = self.getTodaySellPosition(userNo, contNo)
                 holdYs = self.getSellPosition(userNo, contNo) - holdTd
