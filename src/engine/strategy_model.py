@@ -975,13 +975,13 @@ class StrategyModel(object):
         # 针对SHFE, INE平仓单做自适应拆分，默认先平昨再平今
         if tflag and entryOrExit == oCoverA  and (exchg in ['SHFE', 'INE']):
             if orderDirct == dBuy:
-                holdTd = self.getTodaySellPosition()
-                holdYs = self.getSellPosition() - holdTd
-                #holdCC = self.getSellPositionCanCover()
+                holdTd = self.getTodaySellPosition(userNo, contNo)
+                holdYs = self.getSellPosition(userNo, contNo) - holdTd
+                #holdCC = self.getSellPositionCanCover(userNo, contNo)
             else:
-                holdTd = self.getTodayBuyPosition()
-                holdYs = self.getBuyPosition() - holdTd
-                #holdCC = self.getBuyPositionCanCover()
+                holdTd = self.getTodayBuyPosition(userNo, contNo)
+                holdYs = self.getBuyPosition(userNo, contNo) - holdTd
+                #holdCC = self.getBuyPositionCanCover(userNo, contNo)
                 
             # prior cover yestoday
             #if orderQty <= min(holdYs, holdCC):
