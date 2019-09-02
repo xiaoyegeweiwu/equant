@@ -184,7 +184,7 @@ class StrategyHisQuote(object):
         #
         self._firstRealTimeKLine = {}
         self._triggerMgr = None
-        # self.isMonitorTrigger = {}
+        self.isMonitorTrigger = {}
 
     def initialize(self):
         self._contractTuple = self._config.getContract()
@@ -1304,7 +1304,7 @@ class StrategyHisQuote(object):
             return None
 
     # 相对于
-    isMonitorTrigger = {}
+    # isMonitorTrigger = {}
     def _stopFloatWinLose(self, contractNo, highPrice, lowPrice):
         floatStopParams = self._config.getFloatStopPoint(contractNo)
         priceTick = self._dataModel.getPriceTick(contractNo)
