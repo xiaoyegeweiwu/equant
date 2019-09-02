@@ -1008,6 +1008,8 @@ class StrategyModel(object):
             kOrderQty = qtyCoverPair[0]
             vCoverFlag = qtyCoverPair[1]
             
+            self.logger.debug("[aaaa]direct:%c, qty:%d, cover:%c" %(orderDirct, kOrderQty, vCoverFlag))
+            
             if kOrderQty <= 0:
                 continue
             
