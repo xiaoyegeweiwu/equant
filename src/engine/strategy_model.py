@@ -599,6 +599,9 @@ class StrategyModel(object):
                 createAlarmWin(alarmStr, self._strategy.getStrategyId(), self._strategy.getStrategyName())
 
     def setStartTrade(self):
+        #状态未变化不做处理
+        if not self._cfgModel.getPending():
+            return
         self._cfgModel.setPending(False)
         # TODO: 通知界面策略状态发生变化
         event = Event({
@@ -611,6 +614,9 @@ class StrategyModel(object):
         self._strategy.sendEvent2UI(event)
         
     def setStopTrade(self):
+        if self._cfgModel.getPending():
+            return
+        
         self._cfgModel.setPending(True)
         # TODO：通知界面策略状态发生变化
         event = Event({
