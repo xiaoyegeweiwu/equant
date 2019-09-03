@@ -1131,13 +1131,13 @@ class BaseApi(object):
         return self._dataModel.getTradeDate(contractNo, dateTimeStamp)
 
     #/////////////////////////策略交易/////////////////////////////
-    def Buy(self, share, price, contractNo, needCover, userNo, coverFlag):
+    def Buy(self, share, price, contractNo, needCover, userNo):
         '''
         【说明】
               产生一个多头建仓操作
 
         【语法】
-              Bool Buy(int share=0, float price=0, string contractNo=None, bool needCover = True, string userNo='', char coverFlag = 'A')
+              Bool Buy(int share=0, float price=0, string contractNo=None, bool needCover = True, string userNo='')
 
         【参数】
               share 买入数量，为整型值，默认为0；
@@ -1145,10 +1145,6 @@ class BaseApi(object):
               contract 合约代码，为字符串，默认使用基准合约；
               needCover 是否先清掉方向持仓，默认为True；
               userNo 用户编号，为字符串，默认使用界面选定用户编号。
-              coverFlag 平今平昨标志（此参数仅对SHFE和INE有效）
-                        默认设置为'A'自适应(先平昨再平今)
-                        若平昨，则需设置为'C'
-                        若平今，则需设置为'T'
 
         【备注】
               产生一个多头建仓操作，返回值为布尔型，执行成功返回True，否则返回False。
@@ -1169,7 +1165,7 @@ class BaseApi(object):
               在当前持有空头仓位的情况下：
               Buy(10,Close) 表示平掉所有空仓，并用当前Bar收盘价买入10张合约，马上发送委托。
         '''
-        return self._dataModel.setBuy(userNo, contractNo, share, price, needCover, coverFlag)
+        return self._dataModel.setBuy(userNo, contractNo, share, price, needCover)
 
     def BuyToCover(self, share, price, contractNo, userNo, coverFlag):
         '''
@@ -1243,13 +1239,13 @@ class BaseApi(object):
         '''
         return self._dataModel.setSell(userNo, contractNo, share, price, coverFlag)
 
-    def SellShort(self, share, price, contractNo, needCover, userNo, coverFlag):
+    def SellShort(self, share, price, contractNo, needCover, userNo):
         '''
         【说明】
               产生一个空头建仓操作
 
         【语法】
-              Bool SellShort(int share=0, float price=0, string contractNo=None, bool needCover = True, string userNo='', char coverFlag = 'A')
+              Bool SellShort(int share=0, float price=0, string contractNo=None, bool needCover = True, string userNo='')
 
         【参数】
               share 买入数量，为整型值，默认为0；
@@ -1257,10 +1253,6 @@ class BaseApi(object):
               contract 合约代码，为字符串，默认使用基准合约；
               needCover 是否先清掉方向持仓，默认为True；
               userNo 用户编号，为字符串，默认使用界面选定用户编号。
-              coverFlag 平今平昨标志（此参数仅对SHFE和INE有效）
-                        默认设置为'A'自适应(先平昨再平今)
-                        若平昨，则需设置为'C'
-                        若平今，则需设置为'T'
 
         【备注】
               产生一个空头建仓操作，返回值为布尔型，执行成功返回True，否则返回False。
@@ -1281,7 +1273,7 @@ class BaseApi(object):
               SellShort(10,Close) 表示平掉所有多头仓位，并用当前Bar收盘价空头卖出10张合约，马上发送委托。
 
         '''
-        return self._dataModel.setSellShort(userNo, contractNo, share, price, needCover, coverFlag)
+        return self._dataModel.setSellShort(userNo, contractNo, share, price, needCover)
 
     def StartTrade(self):
         '''
@@ -6787,8 +6779,8 @@ def DeleteAllOrders(contractNo='', userNo=''):
     return baseApi.DeleteAllOrders(contractNo, userNo)
 
 #策略交易
-def Buy(share=0, price=0, contractNo=None, needCover=True, userNo='', coverFlag = 'A'):
-    return baseApi.Buy(share, price, contractNo, needCover, userNo, coverFlag)
+def Buy(share=0, price=0, contractNo=None, needCover=True, userNo=''):
+    return baseApi.Buy(share, price, contractNo, needCover, userNo)
 
 def BuyToCover(share=0, price=0, contractNo=None, userNo='', coverFlag = 'A'):
     return baseApi.BuyToCover(share, price, contractNo, userNo, coverFlag)
@@ -6796,8 +6788,8 @@ def BuyToCover(share=0, price=0, contractNo=None, userNo='', coverFlag = 'A'):
 def Sell(share=0, price=0, contractNo=None, userNo='', coverFlag = 'A'):
     return baseApi.Sell(share, price, contractNo, userNo, coverFlag)
 
-def SellShort(share=0, price=0, contractNo=None, needCover=True, userNo='', coverFlag = 'A'):
-    return baseApi.SellShort(share, price, contractNo, needCover, userNo, coverFlag)
+def SellShort(share=0, price=0, contractNo=None, needCover=True, userNo=''):
+    return baseApi.SellShort(share, price, contractNo, needCover, userNo)
 
 def StartTrade():
     return baseApi.StartTrade()
