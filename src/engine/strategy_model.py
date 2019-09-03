@@ -374,6 +374,27 @@ class StrategyModel(object):
     def getQUpperLimit(self, symbol):
         return self._qteModel.getQUpperLimit(symbol)
 
+    def getQTheoryPrice(self, symbol):
+        return self._qteModel.getQTheoryPrice(symbol)
+
+    def getQSigma(self, symbol):
+        return self._qteModel.getQSigma(symbol)
+
+    def getQDelta(self, symbol):
+        return self._qteModel.getQDelta(symbol)
+        
+    def getQGamma(self, symbol):
+        return self._qteModel.getQGamma(symbol)
+        
+    def getQVega(self, symbol):
+        return self._qteModel.getQVega(symbol)
+        
+    def getQTheta(self, symbol):
+        return self._qteModel.getQTheta(symbol)
+    
+    def getQRho(self, symbol):
+        return self._qteModel.getQRho(symbol)
+
     def getQuoteDataExist(self, symbol):
         return self._qteModel.getQuoteDataExist(symbol)
 
