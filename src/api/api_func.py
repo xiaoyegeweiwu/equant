@@ -93,6 +93,8 @@ _all_func_ = {
                     ['GetSessionCount'     , '交易时段个数'],
                     ['GetSessionStartTime' , '交易时段起始时间'],
                     ['GetSessionEndTime'   , '交易时段结束时间'],
+                    ['TradeSessionBeginTime' , '交易时段开始时间戳'],
+                    ['TradeSessionEndTime'   , '交易时段结束时间戳'],
                     ['GetNextTimeInfo'     , '获取下一个时间点信息'],
                     ['CurrentDate'         , '获取当前日期'],
                     ['CurrentTime'         , '获取当前时间'],

@@ -1923,6 +1923,55 @@ class StrategyModel(object):
         
         return self._calTradeDate(int(dateTimeStamp/1000000000), tbflag)
         
+    def getTradeSessionBeginTime(self, contNo, tradeDate, sessionIdx):
+        contNo = self._config.getBenchmark() if not contNo else contNo
+        commodity = self.getCommodityInfoFromContNo(contNo)['CommodityCode']
+        if commodity not in self._qteModel._commodityData:
+            # commodity not found
+            return -1
+
+        sessionCount = self.getGetSessionCount(contNo)
+        if abs(sessionIdx) >= sessionCount:
+            return -2
+
+        timeBucket = self._qteModel._commodityData[commodity]._metaData['TimeBucket']
+        
+        tbflag = timeBucket[2 * sessionIdx]["DateFlag"]
+        newflag = EEQU_DATEFLAG_CUR
+        if tbflag == EEQU_DATEFLAG_PRE:
+            newflag = EEQU_DATEFLAG_NEXT
+        elif tbflag == EEQU_DATEFLAG_NEXT:
+            newflag = EEQU_DATEFLAG_PRE
+            
+        datepart = self._calTradeDate(tradeDate, newflag)
+        timepart = timeBucket[2 * sessionIdx]["BeginTime"]
+        
+        return datepart*1000000000 + timepart
+        
+    def getTradeSessionEndTime(self, contNo, tradeDate, sessionIdx):
+        contNo = self._config.getBenchmark() if not contNo else contNo
+        commodity = self.getCommodityInfoFromContNo(contNo)['CommodityCode']
+        if commodity not in self._qteModel._commodityData:
+            # commodity not found
+            return -1
+
+        sessionCount = self.getGetSessionCount(contNo)
+        if abs(sessionIdx) >= sessionCount:
+            return -2
+
+        timeBucket = self._qteModel._commodityData[commodity]._metaData['TimeBucket']
+        
+        tbflag = timeBucket[2 * sessionIdx]["DateFlag"]
+        newflag = EEQU_DATEFLAG_CUR
+        if tbflag == EEQU_DATEFLAG_PRE:
+            newflag = EEQU_DATEFLAG_NEXT
+        elif tbflag == EEQU_DATEFLAG_NEXT:
+            newflag = EEQU_DATEFLAG_PRE
+            
+        datepart = self._calTradeDate(tradeDate, newflag)
+        timepart = timeBucket[2 * sessionIdx+1]["BeginTime"]
+        
+        return datepart*1000000000 + timepart
 
     def isInSession(self, contNo):
         if not contNo:

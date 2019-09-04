@@ -1771,6 +1771,48 @@ class BaseApi(object):
         '''
         return self._dataModel.getNextTimeInfo(contractNo, timeStamp)
 
+    def TradeSessionBeginTime(self, contractNo, tradeDate, index):
+        '''
+        【说明】
+              获取指定合约指定交易日的指定交易时间段的开始时间戳。
+
+        【语法】
+              int TradeSessionBeginTime(string contractNo='', int tradeDate=0, int index=0)
+
+        【参数】
+              contractNo 合约编号，为空时，取基准合约。
+              tradeDate  指定的交易日, 默认0
+              index 交易时间段的索引值, 从0开始，默认取第一个交易时段。
+
+        【备注】
+              返回时间戳类型, 如20190904213000000
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getTradeSessionBeginTime(contractNo, tradeDate, index)
+        
+    def TradeSessionEndTime(self, contractNo, tradeDate, index):
+        '''
+        【说明】
+              获取指定合约指定交易日的指定交易时间段的结束时间戳。
+
+        【语法】
+              int TradeSessionEndTime(string contractNo='', int tradeDate=0, int index=-1)
+
+        【参数】
+              contractNo 合约编号，为空时，取基准合约。
+              tradeDate  指定的交易日, 默认0
+              index 交易时间段的索引值, 从0开始，默认取最后一个交易时段。
+
+        【备注】
+              返回时间戳类型, 如20190904213000000
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getTradeSessionEndTime(contractNo, tradeDate, index)
+
     def CurrentDate(self):
         '''
         【说明】
@@ -7271,6 +7313,12 @@ def GetSessionStartTime(contractNo='', index=0):
 
 def GetNextTimeInfo(contractNo, timeStr):
     return baseApi.GetNextTimeInfo(contractNo, timeStr)
+    
+def TradeSessionBeginTime(contractNo='', tradeDate=0, index=0):
+    return baseApi.TradeSessionBeginTime(contractNo, tradeDate, index)
+
+def TradeSessionEndTime(contractNo='', tradeDate=0, index=-1):
+    return baseApi.TradeSessionEndTime(contractNo, tradeDate, index)
 
 def CurrentTime():
     return baseApi.CurrentTime()
