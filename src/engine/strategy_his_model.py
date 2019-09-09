@@ -968,7 +968,7 @@ class StrategyHisQuote(object):
                 curEffectiveDTS = curBarDTS-relativedelta(days=record[2])
                 if curEffectiveDTS.isoweekday() == 6:
                     curEffectiveDTS = curEffectiveDTS - relativedelta(days=1)
-                if curEffectiveDTS.isoweekday() == 7:
+                elif curEffectiveDTS.isoweekday() == 7:
                     curEffectiveDTS = curEffectiveDTS - relativedelta(days=2)
             elif record[1] == EEQU_KLINE_TICK:
                 curEffectiveDTS = curBarDTS-relativedelta(seconds=record[2])
@@ -1110,6 +1110,8 @@ class StrategyHisQuote(object):
         curBar = self._curBarDict[key].getCurBar()
         priceInfos[key[0]] = {
             "LastPrice": curBar['LastPrice'],
+            "HighPrice": curBar['HighPrice'],
+            "LowPrice": curBar['LowPrice'],
             "DateTimeStamp": curBar['DateTimeStamp'],
             "TradeDate": curBar['TradeDate'],
             "LastPriceSource": KLineFromHis,
@@ -1231,6 +1233,8 @@ class StrategyHisQuote(object):
         priceInfos = {}
         priceInfos[contNo] = {
             "LastPrice": lv1Data[4],
+            "HighPrice": lv1Data[4],
+            "LowPrice": lv1Data[4],
             "TradeDate": tradeDate,
             "DateTimeStamp" : dateTimeStamp,
             "LastPriceSource": LastPriceFromQuote
