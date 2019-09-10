@@ -1264,7 +1264,8 @@ class StrategyHisQuote(object):
             return
 
         # 止损或者止盈是否触发
-        isStopWinTrigger = False; isStopLoseTrigger = False
+        isStopWinTrigger = False
+        isStopLoseTrigger = False
 
         # 买方向，价格上涨，需要止盈，价格下跌需要止损
         # 卖方向，价格下跌，需要止盈，价格上涨需要止损
@@ -1294,21 +1295,31 @@ class StrategyHisQuote(object):
 
         allPos = self._calc.getPositionInfo(contractNo)
 
+        priceStopWinType = stopWinParams["CoverPosOrderType"]
+        orderStopWinType = otLimit
+        if priceStopWinType == 3:
+            orderStopWinType = otMarket
+            
+        priceStopLoseType = stopLoseParams["CoverPosOrderType"]
+        orderStopLoseType = otLimit
+        if priceStopLoseType == 3:
+            orderStopLoseType = otMarket
+
         if isStopWinTrigger:
             if allPos["TotalBuy"] >= 1:
                 coverPosPrice = self.getCoverPosPrice(isHis, data, latestPos["OrderPrice"], stopWinParams, priceTick, dSell)
-                self._dataModel.setSell('', contractNo, allPos["TotalBuy"], coverPosPrice)
+                self._dataModel.setSell('', contractNo, allPos["TotalBuy"], coverPosPrice, oCoverA, orderStopWinType)
             elif allPos["TotalSell"] >= 1:
                 coverPosPrice = self.getCoverPosPrice(isHis, data, latestPos["OrderPrice"], stopWinParams, priceTick, dBuy)
-                self._dataModel.setBuyToCover('', contractNo, allPos["TotalSell"], coverPosPrice)
+                self._dataModel.setBuyToCover('', contractNo, allPos["TotalSell"], coverPosPrice, oCoverA, orderStopWinType)
 
-        elif isStopLoseTrigger:
+        if isStopLoseTrigger:
             if allPos["TotalBuy"] >= 1:
                 coverPosPrice = self.getCoverPosPrice(isHis, data, latestPos["OrderPrice"], stopLoseParams, priceTick, dSell)
-                self._dataModel.setSell('', contractNo, allPos["TotalBuy"], coverPosPrice)
+                self._dataModel.setSell('', contractNo, allPos["TotalBuy"], coverPosPrice, oCoverA, orderStopLoseType)
             elif allPos["TotalSell"] >= 1:
                 coverPosPrice = self.getCoverPosPrice(isHis, data, latestPos["OrderPrice"], stopLoseParams, priceTick, dBuy)
-                self._dataModel.setBuyToCover('', contractNo, allPos["TotalSell"], coverPosPrice)
+                self._dataModel.setBuyToCover('', contractNo, allPos["TotalSell"], coverPosPrice, oCoverA, orderStopLoseType)
 
     def getCoverPosPrice(self, isHis, data, orderPrice, stopParams, priceTick, direction):
         # price 应该根据coverPosOrderType调整, 0: 最新价，1：对盘价，2：挂单价，3：市价，4：停板价
@@ -1436,12 +1447,17 @@ class StrategyHisQuote(object):
         else:
             self.logger.info(f"{contractNo} 的即时行情触发了浮动止损止盈, High: {highPrice}, Low: {lowPrice}")
 
+        priceFloatStopType = floatStopParams["CoverPosOrderType"]
+        orderFloatStopType = otLimit
+        if priceFloatStopType == 3:
+            orderFloatStopType = otMarket
+
         if allPos["TotalBuy"] >= 1:
             coverPosPrice = self.getCoverPosPrice(isHis, data, latestPos["OrderPrice"], floatStopParams, priceTick, dSell)
-            self._dataModel.setSell('', contractNo, allPos["TotalBuy"], coverPosPrice)
+            self._dataModel.setSell('', contractNo, allPos["TotalBuy"], coverPosPrice, oCoverA, orderFloatStopType)
         elif allPos["TotalSell"] >= 1:
             coverPosPrice = self.getCoverPosPrice(isHis, data, latestPos["OrderPrice"], floatStopParams, priceTick, dBuy)
-            self._dataModel.setBuyToCover('', contractNo, allPos["TotalSell"], coverPosPrice)
+            self._dataModel.setBuyToCover('', contractNo, allPos["TotalSell"], coverPosPrice, oCoverA, orderFloatStopType)
         # 平仓之后取消监控
         self.isMonitorTrigger[contractNo] = False
 
