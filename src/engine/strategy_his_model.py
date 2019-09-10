@@ -1314,7 +1314,7 @@ class StrategyHisQuote(object):
         # price 应该根据coverPosOrderType调整, 0: 最新价，1：对盘价，2：挂单价，3：市价，4：停板价
         price = None
         priceType = stopParams["CoverPosOrderType"]
-        addPoint  = stopParams["CoverPosOrderType"]
+        addPoint  = stopParams["AddPoint"]
         stopPoint = stopParams["StopPoint"]
         stopType  = stopParams["StopType"]
         # 历史阶段
