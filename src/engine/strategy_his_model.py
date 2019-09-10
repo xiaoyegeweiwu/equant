@@ -1002,10 +1002,6 @@ class StrategyHisQuote(object):
             if not self._config.hasKLineTrigger():
                 continue
 
-            # 处理历史回测阶段止损止盈
-            self._stopWinOrLose(key[0], True, row)
-            self._stopFloatWinLose(key[0], True, row)
-
             if isShow or key in self._config.getKLineTriggerInfoSimple():
                 args = {
                     "Status": ST_STATUS_HISTORY,
@@ -1020,6 +1016,10 @@ class StrategyHisQuote(object):
                 self._strategy.setCurTriggerSourceInfo(args)
                 context.setCurTriggerSourceInfo(args)
                 handle_data(context)
+
+            # 处理历史回测阶段止损止盈
+            self._stopWinOrLose(key[0], True, row)
+            self._stopFloatWinLose(key[0], True, row)
 
             # # 要显示的k线
             if isShow:
@@ -1154,6 +1154,25 @@ class StrategyHisQuote(object):
         assert eventCode in [ST_TRIGGER_KLINE, ST_TRIGGER_TRADE_ORDER, ST_TRIGGER_TRADE_MATCH,\
         ST_TRIGGER_SANPSHOT_FILL, ST_TRIGGER_TIMER, ST_TRIGGER_CYCLE],  "Error "
 
+        if not self._strategy.isRealTimeStatus():
+            return
+
+        allData = event.getData()
+        args = {
+            "Status": ST_STATUS_CONTINUES,
+            "TriggerType": eventCode,
+            "ContractNo": event.getContractNo(),
+            "KLineType": event.getKLineType(),
+            "KLineSlice": event.getKLineSlice(),
+            "TradeDate": allData["TradeDate"],
+            "DateTimeStamp": allData["DateTimeStamp"],
+            "TriggerData": allData["Data"]
+        }
+        # print(args)
+        self._strategy.setCurTriggerSourceInfo(args)
+        context.setCurTriggerSourceInfo(args)
+        handle_data(context)
+        
         if eventCode == ST_TRIGGER_SANPSHOT_FILL:
             # 计算浮动盈亏
             try:
@@ -1180,25 +1199,7 @@ class StrategyHisQuote(object):
                 return
         else:
             pass
-
-        if not self._strategy.isRealTimeStatus():
-            return
-
-        allData = event.getData()
-        args = {
-            "Status": ST_STATUS_CONTINUES,
-            "TriggerType": eventCode,
-            "ContractNo": event.getContractNo(),
-            "KLineType": event.getKLineType(),
-            "KLineSlice": event.getKLineSlice(),
-            "TradeDate": allData["TradeDate"],
-            "DateTimeStamp": allData["DateTimeStamp"],
-            "TriggerData": allData["Data"]
-        }
-        # print(args)
-        self._strategy.setCurTriggerSourceInfo(args)
-        context.setCurTriggerSourceInfo(args)
-        handle_data(context)
+        
         self._sendFlushEvent()
 
     def _sendRealTimeKLine2Client(self, key, data):
