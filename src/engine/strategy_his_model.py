@@ -1422,7 +1422,7 @@ class StrategyHisQuote(object):
         floatStopParams = self._config.getFloatStopPoint(contractNo)
         #latestPos = self._calc.getLatestOpenOrder(contractNo)
         latestBuyPos = self._calc.getLatestBuyOpenOrder(contractNo)["Order"]
-        latestSellPos = self._calc.getLatestSellOpenOrder(contractNo)["Order"]       
+        latestSellPos = self._calc.getLatestSellOpenOrder(contractNo)["Order"]
     
         if not floatStopParams or (not latestBuyPos and not latestSellPos):
             return
@@ -1430,9 +1430,12 @@ class StrategyHisQuote(object):
         if isHis:
             highPrice = data["HighPrice"]
             lowPrice  = data["LowPrice"]
+            lastPrice = data["LastPrice"]
         else:
             highPrice = data[4]
             lowPrice  = data[4]
+            lastPrice = data[4]
+            
 
         priceTick = self._dataModel.getPriceTick(contractNo)
 
@@ -1446,6 +1449,14 @@ class StrategyHisQuote(object):
         highSellPrice = max(highSellPrice, highPrice)
         lowSellPrice  = min(lowSellPrice, lowPrice)
 
+        '''
+        allPos = self._calc.getPositionInfo(contractNo)
+
+        buyPrice  = latestBuyPos.get("OrderPrice", 0)
+        sellPrice = latestSellPos.get("OrderPrice", 0)
+        self.logger.debug("BuyPos:%d, SellPos:%d, buyPrice:%f, sellPrice:%f, highBuyPrice:%f, lowBuyPrice:%f, highSellPrice:%f, lowSellPrice:%f, priceTick:%f, buyPos:%s, sellPos:%s" %(allPos["TotalBuy"], allPos["TotalSell"], buyPrice, sellPrice, highBuyPrice, lowBuyPrice, highSellPrice, lowSellPrice, priceTick, latestBuyPos, latestSellPos))
+        '''
+        
         isFloatStopBuyTrigger  = False
         isFloatStopSellTrigger = False
         isContractMonitorBuyTrigger  = self.isMonitorBuyTrigger.get(contractNo, False)
@@ -1455,24 +1466,28 @@ class StrategyHisQuote(object):
         # 卖方向，达到最低点，开始监控止损，上涨到止损点时触发
         if latestBuyPos:
             if not isContractMonitorBuyTrigger:
-                if highBuyPrice-latestBuyPos["OrderPrice"]-floatStopParams["StartPoint"]*priceTick>-1e-6:
+                if highBuyPrice - latestBuyPos["OrderPrice"] >= floatStopParams["StartPoint"]*priceTick:
                     self.isMonitorBuyTrigger[contractNo] = True
+                    if highBuyPrice - lastPrice >= floatStopParams["StopPoint"]*priceTick:
+                        isFloatStopBuyTrigger = True
             else:
-                if highBuyPrice-latestBuyPos["OrderPrice"]-(floatStopParams["StartPoint"]-floatStopParams["StopPoint"])*priceTick<1e-6:
+                if highBuyPrice - lastPrice >= floatStopParams["StopPoint"]*priceTick:
                     isFloatStopBuyTrigger = True
         if latestSellPos:
             if not isContractMonitorSellTrigger:
-                if latestSellPos["OrderPrice"]-lowSellPrice-floatStopParams["StartPoint"]*priceTick>-1e-6:
+                if latestSellPos["OrderPrice"] - lowSellPrice >= floatStopParams["StartPoint"]*priceTick:
                     self.isMonitorSellTrigger[contractNo] = True
+                    if lastPrice - lowSellPrice >= floatStopParams["StopPoint"]*priceTick:
+                        isFloatStopSellTrigger = True
             else:
-                if latestSellPos["OrderPrice"]-lowSellPrice-(floatStopParams["StartPoint"]-floatStopParams["StopPoint"])*priceTick<1e-6:
+                if lastPrice - lowSellPrice >= floatStopParams["StopPoint"]*priceTick:
                     isFloatStopSellTrigger = True
                     
         if not isFloatStopBuyTrigger and not isFloatStopSellTrigger:
             return
             
         allPos = self._calc.getPositionInfo(contractNo)
-
+        
         if isFloatStopBuyTrigger:
             if self._strategy.isHisStatus():
                 self.logger.info(f"{contractNo} 的历史k线触发了BuyPos浮动止损止盈, High: {highPrice}, Low: {lowPrice}")
