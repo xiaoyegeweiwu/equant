@@ -576,6 +576,7 @@ class StrategyConfig_new(object):
             "StopPoint": winPoint,
             "AddPoint": nAddTick,
             "CoverPosOrderType": nPriceType,
+            "StopType": '0',
         }
 
     def getStopWinParams(self, contractNo=None):
@@ -599,6 +600,7 @@ class StrategyConfig_new(object):
             "StopPoint": stopPoint,
             "AddPoint": nAddTick,
             "CoverPosOrderType": nPriceType,
+            "StopType": '1',
         }
 
     def getStopLoseParams(self, contractNo=None):
@@ -624,6 +626,7 @@ class StrategyConfig_new(object):
             "StopPoint": stopPoint,
             "AddPoint": nAddTick,
             "CoverPosOrderType": nPriceType,
+            "StopType": '1', 
         }
 
     def getFloatStopPoint(self, contractNo=None):
