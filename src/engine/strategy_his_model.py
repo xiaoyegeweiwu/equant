@@ -1325,16 +1325,20 @@ class StrategyHisQuote(object):
         if isStopWinBuyTrigger:
             coverPosPrice = self.getCoverPosPrice(isHis, data, latestBuyPos["OrderPrice"], stopWinParams, priceTick, dSell)
             self._dataModel.setSell('', contractNo, allPos["TotalBuy"], coverPosPrice, oCoverA, orderStopWinType)
+            self._dataModel.setPlotText(coverPosPrice, "止盈", 0x2F4F4F, True, 0)
         if isStopWinSellTrigger:
             coverPosPrice = self.getCoverPosPrice(isHis, data, latestSellPos["OrderPrice"], stopWinParams, priceTick, dBuy)
             self._dataModel.setBuyToCover('', contractNo, allPos["TotalSell"], coverPosPrice, oCoverA, orderStopWinType)
+            self._dataModel.setPlotText(coverPosPrice, "止盈", 0x2F4F4F, True, 0)
         if isStopLoseBuyTrigger:
             coverPosPrice = self.getCoverPosPrice(isHis, data, latestBuyPos["OrderPrice"], stopLoseParams, priceTick, dSell)
             self._dataModel.setSell('', contractNo, allPos["TotalBuy"], coverPosPrice, oCoverA, orderStopLoseType)
+            self._dataModel.setPlotText(coverPosPrice, "止损", 0x2F4F4F, True, 0)
         if isStopLoseSellTrigger:
             coverPosPrice = self.getCoverPosPrice(isHis, data, latestSellPos["OrderPrice"], stopLoseParams, priceTick, dBuy)
             self._dataModel.setBuyToCover('', contractNo, allPos["TotalSell"], coverPosPrice, oCoverA, orderStopLoseType)
-
+            self._dataModel.setPlotText(coverPosPrice, "止损", 0x2F4F4F, True, 0)
+            
     def getCoverPosPrice(self, isHis, data, orderPrice, stopParams, priceTick, direction):
         # price 应该根据coverPosOrderType调整, 0: 最新价，1：对盘价，2：挂单价，3：市价，4：停板价
         price = None
@@ -1516,11 +1520,13 @@ class StrategyHisQuote(object):
         if isFloatStopBuyTrigger:
             coverPosPrice = self.getCoverPosPrice(isHis, data, highBuyPrice, floatStopParams, priceTick, dSell)
             self._dataModel.setSell('', contractNo, allPos["TotalBuy"], coverPosPrice, oCoverA, orderFloatStopType)
+            self._dataModel.setPlotText(coverPosPrice, "跟踪止损", 0x2F4F4F, True, 0)
             # 平仓之后取消监控
             self.isMonitorBuyTrigger[contractNo] = False
         if isFloatStopSellTrigger:
             coverPosPrice = self.getCoverPosPrice(isHis, data, lowSellPrice, floatStopParams, priceTick, dBuy)
             self._dataModel.setBuyToCover('', contractNo, allPos["TotalSell"], coverPosPrice, oCoverA, orderFloatStopType)
+            self._dataModel.setPlotText(coverPosPrice, "跟踪止损", 0x2F4F4F, True, 0)
             # 平仓之后取消监控
             self.isMonitorSellTrigger[contractNo] = False
 
