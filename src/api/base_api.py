@@ -2488,6 +2488,126 @@ class BaseApi(object):
         '''
         return self._dataModel.getLastEntryPrice(contractNo)
 
+    def LastBuyEntryPrice(self, contractNo):
+        '''
+        【说明】
+              获得当前Buy持仓的最后一次建仓的委托价格。
+
+        【语法】
+              float LastBuyEntryPrice(string contractNo='')
+
+        【参数】
+              contractNo 合约编号，默认为基准合约。
+
+        【备注】
+              获得当前Buy持仓的最后一个建仓价格，返回值为浮点数。
+              若策略当前Buy持仓为0，则返回0。
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getLastBuyEntryPrice(contractNo)
+
+    def LastSellEntryPrice(self, contractNo):
+        '''
+        【说明】
+              获得当前Sell持仓的最后一次建仓的委托价格。
+
+        【语法】
+              float LastSellEntryPrice(string contractNo='')
+
+        【参数】
+              contractNo 合约编号，默认为基准合约。
+
+        【备注】
+              获得当前Sell持仓的最后一个建仓价格，返回值为浮点数。
+              若策略当前Sell持仓为0，则返回0。
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getLastSellEntryPrice(contractNo)
+        
+    def HighestSinceLastBuyEntry(self, contractNo):
+        '''
+        【说明】
+              获得当前Buy持仓的最后一次建仓以来的最高价。
+
+        【语法】
+              float HighestSinceLastBuyEntry(string contractNo='')
+
+        【参数】
+              contractNo 合约编号，默认为基准合约。
+
+        【备注】
+              获得当前Buy持仓的最后一个建仓以来的最高价，返回值为浮点数。
+              若策略当前Buy持仓为0，则返回0。
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getHighestSinceLastBuyEntry(contractNo)
+        
+    def LowestSinceLastBuyEntry(self, contractNo):
+        '''
+        【说明】
+              获得当前Buy持仓的最后一次建仓以来的最低价。
+
+        【语法】
+              float LowestSinceLastBuyEntry(string contractNo='')
+
+        【参数】
+              contractNo 合约编号，默认为基准合约。
+
+        【备注】
+              获得当前Buy持仓的最后一个建仓以来的最低价，返回值为浮点数。
+              若策略当前Buy持仓为0，则返回0。
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getLowestSinceLastBuyEntry(contractNo)
+
+    def HighestSinceLastSellEntry(self, contractNo):
+        '''
+        【说明】
+              获得当前Sell持仓的最后一次建仓以来的最高价。
+
+        【语法】
+              float HighestSinceLastSellEntry(string contractNo='')
+
+        【参数】
+              contractNo 合约编号，默认为基准合约。
+
+        【备注】
+              获得当前Sell持仓的最后一个建仓以来的最高价，返回值为浮点数。
+              若策略当前Sell持仓为0，则返回0。
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getHighestSinceLastSellEntry(contractNo)
+        
+    def LowestSinceLastSellEntry(self, contractNo):
+        '''
+        【说明】
+              获得当前Sell持仓的最后一次建仓以来的最低价。
+
+        【语法】
+              float LowestSinceLastSellEntry(string contractNo='')
+
+        【参数】
+              contractNo 合约编号，默认为基准合约。
+
+        【备注】
+              获得当前Sell持仓的最后一个建仓以来的最低价，返回值为浮点数。
+              若策略当前Sell持仓为0，则返回0。
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getLowestSinceLastSellEntry(contractNo)
+
     def LastEntryTime(self, contractNo):
         '''
         【说明】
@@ -6776,6 +6896,24 @@ def LastEntryDate(contractNo=''):
 
 def LastEntryPrice(contractNo=''):
     return baseApi.LastEntryPrice(contractNo)
+
+def LastBuyEntryPrice(contractNo=''):
+    return baseApi.LastBuyEntryPrice(contractNo)
+
+def LastSellEntryPrice(contractNo=''):
+    return baseApi.LastSellEntryPrice(contractNo)
+
+def HighestSinceLastBuyEntry(contractNo=''):
+    return baseApi.HighestSinceLastBuyEntry(contractNo)
+    
+def HighestSinceLastSellEntry(contractNo=''):
+    return baseApi.HighestSinceLastSellEntry(contractNo)
+
+def LowestSinceLastBuyEntry(contractNo=''):
+    return baseApi.LowestSinceLastBuyEntry(contractNo)
+
+def LowestSinceLastSellEntry(contractNo=''):
+    return baseApi.LowestSinceLastSellEntry(contractNo)
 
 def LastEntryTime(contractNo=''):
     return baseApi.LastEntryTime(contractNo)

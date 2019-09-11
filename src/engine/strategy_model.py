@@ -2320,6 +2320,74 @@ class StrategyModel(object):
             return 0
 
         return float(orderInfo['OrderPrice'])
+    
+    def getLastBuyEntryPrice(self, contNo):
+        '''获得当前Buy持仓的最后一次建仓的委托价格'''
+        contNo = self.getIndexMap(contNo)
+
+        orderInfo = self._calcCenter.getLatestBuyOpenOrder(contNo)["Order"]
+        if not orderInfo or 'OrderPrice' not in orderInfo:
+            return 0
+
+        return float(orderInfo['OrderPrice'])
+        
+    def getLastSellEntryPrice(self, contNo):
+        '''获得当前Sell持仓的最后一次建仓的委托价格'''
+        contNo = self.getIndexMap(contNo)
+
+        orderInfo = self._calcCenter.getLatestSellOpenOrder(contNo)["Order"]
+        if not orderInfo or 'OrderPrice' not in orderInfo:
+            return 0
+
+        return float(orderInfo['OrderPrice'])
+        
+    def getHighestSinceLastBuyEntry(self, contNo):
+        '''获得当前Buy持仓的最后一次建仓以来的最高价'''
+        contNo = self.getIndexMap(contNo)
+
+        orderInfo = self._calcCenter.getLatestBuyOpenOrder(contNo)["Order"]
+        if not orderInfo or 'OrderPrice' not in orderInfo:
+            return 0
+
+        price = self._calcCenter.getLatestBuyOpenOrder(contNo)["LastEntryHPrice"]
+
+        return float(price)
+        
+    def getHighestSinceLastSellEntry(self, contNo):
+        '''获得当前Sell持仓的最后一次建仓以来的最高价'''
+        contNo = self.getIndexMap(contNo)
+
+        orderInfo = self._calcCenter.getLatestSellOpenOrder(contNo)["Order"]
+        if not orderInfo or 'OrderPrice' not in orderInfo:
+            return 0
+
+        price = self._calcCenter.getLatestSellOpenOrder(contNo)["LastEntryHPrice"]
+
+        return float(price)
+        
+    def getLowestSinceLastBuyEntry(self, contNo):
+        '''获得当前Buy持仓的最后一次建仓以来的最低价'''
+        contNo = self.getIndexMap(contNo)
+
+        orderInfo = self._calcCenter.getLatestBuyOpenOrder(contNo)["Order"]
+        if not orderInfo or 'OrderPrice' not in orderInfo:
+            return 0
+
+        price = self._calcCenter.getLatestBuyOpenOrder(contNo)["LastEntryLPrice"]
+
+        return float(price)
+        
+    def getLowestSinceLastSellEntry(self, contNo):
+        '''获得当前Sell持仓的最后一次建仓以来的最低价'''
+        contNo = self.getIndexMap(contNo)
+
+        orderInfo = self._calcCenter.getLatestSellOpenOrder(contNo)["Order"]
+        if not orderInfo or 'OrderPrice' not in orderInfo:
+            return 0
+
+        price = self._calcCenter.getLatestSellOpenOrder(contNo)["LastEntryLPrice"]
+
+        return float(price)
 
     def getLastEntryTime(self, contNo):
         '''获得当前持仓的最后一个建仓位置的时间'''
