@@ -1345,16 +1345,25 @@ class StrategyHisQuote(object):
         # 历史阶段
         if isHis:
             price = orderPrice
-            # 根据止损止盈类型调整价格
-            if stopType == '0':
-                price = price + stopPoint*priceTick
-            elif stopType == '1':
-                price = price - stopPoint*priceTick
+
             # 根据买卖方向,超价点数调整价格
             if direction == dBuy:
                 price = price + addPoint*priceTick
+                
+                # 根据止损止盈类型调整价格
+                if stopType == '0':
+                    price = price + stopPoint*priceTick
+                elif stopType == '1':
+                    price = price - stopPoint*priceTick
             elif direction == dSell:
                 price = price - addPoint*priceTick
+                
+                # 根据止损止盈类型调整价格
+                if stopType == '0':
+                    price = price - stopPoint*priceTick
+                elif stopType == '1':
+                    price = price + stopPoint*priceTick
+        
         # 即时阶段
         else:
             # 默认取最新价
