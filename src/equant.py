@@ -43,8 +43,9 @@ def checkUpdate(logger):
         if (len(lmv) == len(rmv) > 0 and rmv > lmv) or ( 0 < len(lmv) != len(rmv)):
                 logger.info("Version need update local: %s, remote: %s" %(lmv, rmv))
                 time.sleep(3)
-
-                os.system(os.path.abspath("..") + "/update.bat")
+                cmdstr = "%s %s.0" %(os.path.abspath("..") + "/update.bat ", rmv)
+                logger.info("Update cmdstr:%s" %cmdstr)
+                os.system(cmdstr)
         else:
             logger.info("Version don't need update, local:%s, remote:%s" %(lmv, rmv))
     except Exception as e:
