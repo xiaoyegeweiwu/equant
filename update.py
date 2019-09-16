@@ -171,8 +171,8 @@ def main():
             if reqRlt == 0:   # 下载失败
                  print("下载过程出错，请重新尝试！")
                  return
-				 
-		
+                 
+        
         # 解压并删除压缩包
         for name in zipname:
             zipFile(name)
