@@ -45,7 +45,10 @@ def checkUpdate(logger):
                 time.sleep(3)
                 cmdstr = '"start %s %s.0"' %(os.path.abspath("..") + "\\update.bat ", rmv)
                 logger.info("Update cmdstr:%s" %cmdstr)
+                curDir = os.getcwd()
+                os.chdir(os.path.abspath(os.path.join(curDir, "..")))
                 os.system(cmdstr)
+                os.chdir(curDir)
         else:
             logger.info("Version don't need update, local:%s, remote:%s" %(lmv, rmv))
     except Exception as e:
