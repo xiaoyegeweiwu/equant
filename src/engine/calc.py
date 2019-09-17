@@ -1038,8 +1038,7 @@ class CalcCenter(object):
         :param contract: 合约
         :return: 持仓盈亏
         """
-        positions = self.getPositionInfo(contract)
-        # print("3333333333: ", positions)
+        positions = self.getPositionInfo()
         if not contract:
             profit = 0
             for pInfo in positions.values():
