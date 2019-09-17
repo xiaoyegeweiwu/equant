@@ -663,6 +663,8 @@ class StrategyModel(object):
         self._cfgModel.setUserNo(userNo)
 
     def setBarInterval(self, contractNo, barType, barInterval, sampleConfig, trigger=True):
+        #contractNo1 = self.getIndexMap(contractNo)
+        #self.logger.debug("ContractNo:%s, %s" %(contractNo, contractNo1))
         self._cfgModel.setBarInterval(contractNo, barType, barInterval, sampleConfig, trigger)
 
     def setSample(self, sampleType, sampleValue):
@@ -2093,6 +2095,7 @@ class StrategyModel(object):
             contNo = self._config.getBenchmark()
 
         underlayCont = self._qteModel.getUnderlayContractNo(contNo)
+        #self.logger.debug("GetIndexMap----contNo:%s, underCont:%s" %(contNo, underlayCont))
         return contNo if len(underlayCont) == 0 else underlayCont
 
     # ///////////////////////策略状态///////////////////////////
@@ -2416,6 +2419,8 @@ class StrategyModel(object):
     def getPositionProfit(self, contNo):
         contNo = self.getIndexMap(contNo)
 
+        #self.logger.debug("PositionProfit1: %s, %s"  %(contNo, self._calcCenter.getPositionInfo()))
+        
         if contNo not in list(self._calcCenter.getPositionInfo()):
             return 0.0
 

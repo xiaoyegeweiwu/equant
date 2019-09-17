@@ -1039,6 +1039,7 @@ class CalcCenter(object):
         :return: 持仓盈亏
         """
         positions = self.getPositionInfo()
+        #print("HoldProfit1:%s" %str(positions))
         if not contract:
             profit = 0
             for pInfo in positions.values():

@@ -1109,7 +1109,8 @@ class StrategyHisQuote(object):
         key = (curTriggerInfo["ContractNo"], curTriggerInfo["KLineType"], curTriggerInfo["KLineSlice"])
 
         curBar = self._curBarDict[key].getCurBar()
-        priceInfos[key[0]] = {
+        contNo = self._dataModel.getIndexMap(key[0])
+        priceInfos[contNo] = {
             "LastPrice": curBar['LastPrice'],
             "HighPrice": curBar['HighPrice'],
             "LowPrice": curBar['LowPrice'],
@@ -1117,7 +1118,8 @@ class StrategyHisQuote(object):
             "TradeDate": curBar['TradeDate'],
             "LastPriceSource": KLineFromHis,
         }
-        self._calc.calcProfit([key[0]], priceInfos)
+
+        self._calc.calcProfit([contNo], priceInfos)
 
     def drawBatchHisKine(self, data):
         self.sendAllHisKLine(data)
@@ -1233,6 +1235,7 @@ class StrategyHisQuote(object):
             return
 
         priceInfos = {}
+        contNo = self._dataModel.getIndexMap(contNo)
         priceInfos[contNo] = {
             "LastPrice": lv1Data[4],
             "HighPrice": lv1Data[4],
@@ -1243,7 +1246,7 @@ class StrategyHisQuote(object):
         }
         
         #self.logger.debug("_calcProfitByQuote:%s"%priceInfos)
-        self._calc.calcProfit([event.getContractNo()], priceInfos)
+        self._calc.calcProfit([contNo], priceInfos)
 
     #
     def _stopWinOrLose(self, contractNo, isHis, data):
