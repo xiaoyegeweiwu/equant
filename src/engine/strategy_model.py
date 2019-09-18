@@ -954,6 +954,12 @@ class StrategyModel(object):
 
     def deleteOrder(self, userNo, eSession):
         return self._trdModel.deleteOrder(userNo, eSession)
+        
+    def modifyOrder(self, userNo, eSession, contNo, orderType, validType, orderDirct, entryOrExit, hedge, \
+                    orderPrice, orderQty, triggerType=stNone, triggerMode=tmNone, triggerCondition=tcNone, triggerPrice=0):
+        
+        return self._trdModel.modifyOrder(userNo, eSession, contNo, orderType, validType, orderDirct, entryOrExit, \
+                                            hedge, orderPrice, orderQty, triggerType, triggerMode, triggerCondition, triggerPrice)
 
     def buySellOrder(self, userNo, contNo, orderType, validType, orderDirct, \
                      entryOrExit, hedge, orderPrice, orderQty, curBar, isPriceZero = False, signal=True):

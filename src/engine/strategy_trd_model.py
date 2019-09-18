@@ -700,3 +700,65 @@ class StrategyTrade(TradeModel):
         })
         self._strategy.sendEvent2Engine(aOrderEvent)
         return True
+
+    def modifyOrder(self, userNo, eSession, contNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty, \
+                  triggerType, triggerMode, triggerCondition, triggerPrice):
+        '''
+        针对当前公式应用的帐户、商品发送改单指令。
+        :param eSession: 所要改委托单的定单号
+        :return: 发送成功返回True, 发送失败返回False
+        '''
+        #if not userNo:
+        #   userNo = self._selectedUserNo
+        
+        orderId = ''
+        if isinstance(eSession, str) and '-' in eSession:
+            orderId = self._strategy.getOrderId(eSession)
+            if not orderId:
+                return False
+        else:
+            orderId = eSession
+            
+        realUserNo = self.getUserNoByOrderId(orderId)
+        
+        #if userNo != realUserNo:
+        #    self.logger.warn('Order modify realUser(%s) not user(%s)!'%(realUserNo, userNo))
+        #    return False
+        
+        if realUserNo not in self._userInfo:
+            self.logger.error('user(%s) not login!'%realUserNo)
+            return False
+
+        userInfoModel = self._userInfo[realUserNo]
+        if orderId not in userInfoModel._order:
+            return False
+
+        aOrder = {
+            'UserNo': realUserNo,
+            'Sign': self.getSign(realUserNo),
+            'Cont': contNo,
+            'OrderType': orderType,
+            'ValidType': validType,
+            'ValidTime': '0',
+            'Direct': orderDirct,
+            'Offset': entryOrExit,
+            'Hedge': hedge,
+            'OrderPrice': orderPrice,
+            'TriggerPrice': triggerPrice,
+            'TriggerMode': triggerMode,
+            'TriggerCondition': triggerCondition,
+            'OrderQty': orderQty,
+            'StrategyType': triggerType,
+            'Remark': '',
+            'AddOneIsValid': tsDay,
+            "OrderId": orderId,
+        }
+        
+        aOrderEvent = Event({
+            "EventCode": EV_ST2EG_ACTUAL_MODIFY_ORDER,
+            "StrategyId": self._strategy.getStrategyId(),
+            "Data": aOrder
+        })
+        self._strategy.sendEvent2Engine(aOrderEvent)
+        
+        return True

@@ -214,6 +214,7 @@ _all_func_ = {
                     ['A_LatestFilledTime'  , '当前账户最新一笔成交委托对应的时间'],
                     ['A_OrderContractNo'   , '订单的合约号'],
                     ['A_SendOrder'         , '下单'],
+                    ['A_ModifyOrder'       , '改单'],
                     ['A_DeleteOrder'       , '撤单'],
                     ['A_GetOrderNo'        , '获取定单号和委托号'],
                     ['DeleteAllOrders'     , '批量撤单'],
