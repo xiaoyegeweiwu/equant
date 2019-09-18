@@ -1370,6 +1370,11 @@ class StrategyHisQuote(object):
                     price = price + stopPoint*priceTick
                 elif stopType == '1':
                     price = price - stopPoint*priceTick
+            
+            # 根据最高最低价调整价格
+            price = min(price, data["HighPrice"])
+            price = max(price, data["LowPrice"])
+            
         # 即时阶段
         else:
             # 默认取最新价
