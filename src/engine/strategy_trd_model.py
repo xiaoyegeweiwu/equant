@@ -512,7 +512,8 @@ class StrategyTrade(TradeModel):
             userNo = self._selectedUserNo
             
         if userNo not in self._userInfo:
-            raise Exception("请先在极星客户端登录您的交易账号")
+            self.logger.error("请先在极星客户端登录您的交易账号")
+            return -1
 
         tUserInfoModel = self._userInfo[userNo]
         if len(tUserInfoModel._order) == 0:
@@ -532,7 +533,8 @@ class StrategyTrade(TradeModel):
             userNo = self._selectedUserNo
             
         if userNo not in self._userInfo:
-            raise Exception("请先在极星客户端登录您的交易账号")
+            self.logger.error("请先在极星客户端登录您的交易账号")
+            return -1
 
         tUserInfoModel = self._userInfo[userNo]
         if len(tUserInfoModel._order) == 0:
@@ -559,7 +561,9 @@ class StrategyTrade(TradeModel):
             userNo = self._selectedUserNo
             
         if userNo not in self._userInfo:
-            raise Exception("请先在极星客户端登录您的交易账号")
+            #raise Exception("请先在极星客户端登录您的交易账号")
+            self.logger.error("请先在极星客户端登录您的交易账号")
+            return -1
 
         tUserInfoModel = self._userInfo[userNo]
         if len(tUserInfoModel._order) == 0:
@@ -585,7 +589,8 @@ class StrategyTrade(TradeModel):
             userNo = self._selectedUserNo
             
         if userNo not in self._userInfo:
-            raise Exception("请先在极星客户端登录您的交易账号")
+            self.logger.error("请先在极星客户端登录您的交易账号")
+            return -1
 
         tUserInfoModel = self._userInfo[userNo]
         if len(tUserInfoModel._order) == 0:
@@ -609,8 +614,9 @@ class StrategyTrade(TradeModel):
             userNo = self._selectedUserNo
             
         if userNo not in self._userInfo:
-            raise Exception("请先在极星客户端登录您的交易账号")
-
+            self.logger.error("请先在极星客户端登录您的交易账号")
+            return -1
+            
         tUserInfoModel = self._userInfo[userNo]
         if len(tUserInfoModel._order) == 0:
             return -1
@@ -639,7 +645,8 @@ class StrategyTrade(TradeModel):
             userNo = self._selectedUserNo
             
         if userNo not in self._userInfo:
-            raise Exception("请先在极星客户端登录您的交易账号")
+            self.logger.error("请先在极星客户端登录您的交易账号")
+            return -1
 
         tUserInfoModel = self._userInfo[userNo]
         latestTime = -1
@@ -684,7 +691,8 @@ class StrategyTrade(TradeModel):
             userNo = self._selectedUserNo
             
         if userNo not in self._userInfo:
-            raise Exception("请先在极星客户端登录您的交易账号")
+            self.logger.error("请先在极星客户端登录您的交易账号")
+            return -1
 
         userInfoModel = self._userInfo[userNo]
         if orderId not in userInfoModel._order:
