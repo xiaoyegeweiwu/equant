@@ -1069,7 +1069,11 @@ class StrategyModel(object):
                 self.sendSignalEvent(self._signalName, userNo, contNo, orderDirct, vCoverFlag, orderPrice, kOrderQty, curBar)
 
             realPrice = 0 if isPriceZero else orderPrice
-            retCode, eSessionId = self.sendOrder(userNo, contNo, orderType, validType, orderDirct, vCoverFlag, hedge, realPrice, kOrderQty)
+            
+            retCode = None
+            eSessionId = None
+            if self._strategy.isRealTimeStatus():
+                retCode, eSessionId = self.sendOrder(userNo, contNo, orderType, validType, orderDirct, vCoverFlag, hedge, realPrice, kOrderQty)
             
             if retCode == 0:
                 self._strategy.updateBarInfoInLocalOrder(eSessionId, curBar)
@@ -1079,9 +1083,20 @@ class StrategyModel(object):
         '''A账户下单函数，不经过calc模块，直接发单'''
         if not userNo:
             userNo = self._cfgModel.getUserNo()
+            
+        if not userNo:
+            userNo = "Default"
 
         if not contNo:
-            contNo = self._cfgModel.getBenchmark()
+            contNo = self._cfgModel.getBenchmark() 
+        
+        if not self._strategy.isRealTimeStatus():
+            # self.logger.warn(f"策略当前状态不是实盘运行状态， 不会产生实盘订单")
+            #return -2, "策略当前状态不是实盘运行状态， 不会产生实盘订单"
+            self.buySellOrder(userNo, contNo, orderType, validType, orderDirct, \
+                            entryOrExit, hedge, orderPrice, orderQty, None)
+
+            return -2, "当前处于历史回测阶段，将使用buySell发送模拟单"
 
         # 是否暂停实盘下单
         if self._cfgModel.getPending():
@@ -1093,10 +1108,6 @@ class StrategyModel(object):
         if not self._cfgModel.isActualRun():
             # self.logger.warn(f"未选择实盘运行，请在设置界面勾选'实盘运行'，或者在策略代码中调用SetActual()")
             return -1, '未选择实盘运行，请在设置界面勾选"实盘运行"，或者在策略代码中调用SetActual()方法选择实盘运行'
-
-        if not self._strategy.isRealTimeStatus():
-            # self.logger.warn(f"策略当前状态不是实盘运行状态， 不会产生实盘订单")
-            return -2, "策略当前状态不是实盘运行状态， 不会产生实盘订单"
 
         # 账户错误
         if not userNo or userNo == 'Default':
