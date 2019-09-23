@@ -258,7 +258,7 @@ class RunWin(QuantToplevel, QuantFrame):
             # 投保标志
             # self.hedge.set("投机")
             # 保证金率
-            self.margin.set(5)
+            self.margin.set(8)
             #TODO:直接设置界面怎么更改（有没有百分号）
             # 开仓收费方式
             self.openType.set("固定值")
@@ -1828,7 +1828,7 @@ class AddContWin(QuantToplevel, QuantFrame):
         pass
 
     def _initArgs(self):
-        self.margin.set("5")
+        self.margin.set("8")
         # K线类型
         self.kLineType.set("分钟")
         # K线周期
