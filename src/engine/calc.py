@@ -719,6 +719,7 @@ class CalcCenter(object):
                                   * order["OrderPrice"]) / (pInfo["TotalBuy"] + order["OrderQty"])
             pInfo["TodayBuy"] = 0  # 外盘不计算今持仓，将今持仓置为0
 
+        #self._logger.debug("Margin1:%.2f, %d, %d, %d, %.2f" %(lastPrice, pInfo["TotalBuy"], pInfo["TotalSell"], cost["TradeDot"], cost["Margin"]))
         pInfo["LongMargin"] = lastPrice * pInfo["TotalBuy"] * cost["TradeDot"] * cost["Margin"]
         pInfo["ShortMargin"] = lastPrice * pInfo["TotalSell"] * cost["TradeDot"] * cost["Margin"]
         # 持仓盈亏（浮动盈亏）

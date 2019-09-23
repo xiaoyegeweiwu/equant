@@ -676,6 +676,9 @@ class StrategyModel(object):
         return 0
 
     def setMargin(self, type, value, contNo):
+        if not contNo:
+            contNo =  self._cfgModel.getBenchmark()
+            
         if type not in (0, 1):
             return -1
 
@@ -2026,16 +2029,11 @@ class StrategyModel(object):
         return False
 
     def getMarginRatio(self, contNo):
-        contractNo = contNo
         if not contNo:
-            contractTuple = self._cfgModel.getContract()
-            if len(contractTuple) == 0:
-                return 0
-            else:
-                contractNo = contractTuple[0]
-
-        marginValue = self._cfgModel.getMarginValue()
-        return marginValue if not marginValue else 8
+            contNo = self._cfgModel.getBenchmark()
+        
+        marginValue = self._cfgModel.getMarginValue(contNo)
+        return marginValue if marginValue else 0.08
 
     def getMaxBarsBack(self):
         return self._hisModel.getHisLength()
