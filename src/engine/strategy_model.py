@@ -686,7 +686,7 @@ class StrategyModel(object):
 
             if value > 1:
                 return -1
-            return self._cfgModel.setMargin(EEQU_FEE_TYPE_FIXED, value, contNo)
+            return self._cfgModel.setMargin(EEQU_FEE_TYPE_RATIO, value, contNo)
 
         if type == 1:
             # 按固定值
