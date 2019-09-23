@@ -168,7 +168,7 @@ class RunWin(QuantToplevel, QuantFrame):
             self.defaultQty.set(conf[VDefaultQty]),
             self.minQty.set(conf[VMinQty]),
             # self.hedge.set(conf[VHedge]),
-            self.margin.set(conf[VMinQty]),
+            self.margin.set(conf[VMargin]),
 
             self.openType.set(conf[VOpenType]),
             self.closeType.set(conf[VCloseType]),
@@ -258,7 +258,7 @@ class RunWin(QuantToplevel, QuantFrame):
             # 投保标志
             # self.hedge.set("投机")
             # 保证金率
-            self.margin.set(8)
+            self.margin.set(5)
             #TODO:直接设置界面怎么更改（有没有百分号）
             # 开仓收费方式
             self.openType.set("固定值")
