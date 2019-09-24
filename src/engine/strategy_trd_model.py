@@ -50,7 +50,8 @@ class StrategyTrade(TradeModel):
             userNo = self._selectedUserNo
             
         if len(self._userInfo) == 0 or userNo not in self._userInfo:
-            raise Exception("请确保您的账号已经在客户端登录")
+            self.logger.error("请先在极星客户端登录您的交易账号")
+            return []
 
         tUserInfoModel = self._userInfo[userNo]
         if not tUserInfoModel.isReady():
@@ -78,7 +79,8 @@ class StrategyTrade(TradeModel):
             userNo = self._selectedUserNo       
         
         if len(self._userInfo) == 0 or userNo not in self._userInfo:
-            raise Exception("请确保您的账号已经在客户端登录")
+            self.logger.error("请先在极星客户端登录您的交易账号")
+            return 0
 
         tUserInfoModel = self._userInfo[userNo]
         if not tUserInfoModel.isReady():
@@ -214,7 +216,8 @@ class StrategyTrade(TradeModel):
             userNo = self._selectedUserNo
             
         if len(self._userInfo) == 0 or userNo not in self._userInfo:
-            raise Exception("请确保您的账号已经在客户端登录")
+            self.logger.error("请先在极星客户端登录您的交易账号")
+            return 0
 
         tUserInfoModel = self._userInfo[userNo]
         if len(tUserInfoModel._position) == 0:
@@ -258,7 +261,9 @@ class StrategyTrade(TradeModel):
             userNo = self._selectedUserNo
             
         if len(self._userInfo) == 0 or userNo not in self._userInfo:
-            raise Exception("请确保您的账号已经在客户端登录")
+            self.logger.error("请先在极星客户端登录您的交易账号")
+            return 0
+            
         tUserInfoModel = self._userInfo[userNo]
 
         if len(tUserInfoModel._order) == 0:
@@ -296,7 +301,8 @@ class StrategyTrade(TradeModel):
             userNo = self._selectedUserNo
             
         if len(self._userInfo) == 0 or userNo not in self._userInfo:
-            raise Exception("请确保您的账号已经在客户端登录")
+            self.logger.error("请先在极星客户端登录您的交易账号")
+            return 0
 
         tUserInfoModel = self._userInfo[userNo]
         if len(tUserInfoModel._position) == 0:
@@ -354,7 +360,8 @@ class StrategyTrade(TradeModel):
             userNo = self._selectedUserNo
             
         if len(self._userInfo) == 0 or userNo not in self._userInfo:
-            raise Exception("请确保您的账号已经在客户端登录")
+            self.logger.error("请先在极星客户端登录您的交易账号")
+            return 0
 
         tUserInfoModel = self._userInfo[userNo]
         if len(tUserInfoModel._position) == 0:
