@@ -1552,7 +1552,7 @@ class RunWin(QuantToplevel, QuantFrame):
 class SelectContractWin(QuantToplevel, QuantFrame):
 
     # exchangeList = ["CFFEX", "CME", "DCE", "SGE", "SHFE", "ZCE", "SPD", "INE", "NYMEX", "SSE", "SZSE"]
-    exchangeList = ["SPD", "ZCE", "DCE", "SHFE", "INE", "CFFEX",
+    exchangeList = ["SPD", "ZCE", "DCE", "SHFE", "INE", "CFFEX",  "SGE"
                     "CME", "COMEX", "LEM", "NYMEX", "HKEX", "CBOT", "ICUS", "ICEU", "SGX"]
     commodityType = {"P": "现货", "Y": "现货", "F": "期货", "O": "期权",
                      "S": "跨期套利", "M": "品种套利", "s": "", "m": "",
