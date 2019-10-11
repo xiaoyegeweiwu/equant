@@ -7,6 +7,7 @@ import zipfile
 import traceback
 import configparser
 import signal, psutil
+import subprocess
 
 VERSION = ""
 EPVERSION = ""
@@ -46,9 +47,11 @@ tempPath3 = os.path.join(dirPath, "src\\log")
 def backup(directory, des):
     if os.path.exists(directory):
         # ret = os.system(f'xcopy "{directory}" "{des}" /y /e /i /h')
-        ret = os.system(
-            f'xcopy "{directory}" "{des}" /y /e /i /h /q /exclude:..\\equant\\exclude.txt')
-        if ret == 0:
+        cmdstr = f'xcopy "{directory}" "{des}" /y /e /i /h /q /exclude:..\\equant\\exclude.txt'
+        #ret = os.system(f'xcopy "{directory}" "{des}" /y /e /i /h /q /exclude:..\\equant\\exclude.txt')
+        p = subprocess.Popen(cmdstr, shell=True)
+        p.wait()
+        if p.returncode == 0:
             print("%s 备份成功！" % directory)
         return 1
     else:
@@ -60,7 +63,12 @@ def backup(directory, des):
 def killEpProcess():
     if "epolestar v9.5.exe" in os.popen('tasklist /fi "IMAGENAME eq %s"' % "epolestar v9.5.exe").read():
         # os.system("taskkill /f /im %s" % "epolestar v9.5.exe")
-        os.system('taskkill /f /fi "IMAGENAME eq %s"' % "epolestar v9.5.exe")
+        #os.system('taskkill /f /fi "IMAGENAME eq %s"' % "epolestar v9.5.exe")
+        cmdstr = 'taskkill /f /fi "IMAGENAME eq %s"' % "epolestar v9.5.exe"
+        p = subprocess.Popen(cmdstr, shell=True)
+        p.wait()
+        if p.returncode == 0:
+            print("极星客户端进程杀死成功.")
 
 
 # 杀进程及子进程
@@ -73,7 +81,12 @@ def killProcesses(parent_pid, sig=signal.SIGTERM):
     for process in children:
         process.send_signal(sig)
     try:
-        os.system('taskkill /f /PID %d /fi "IMAGENAME eq python.exe"' % parent_pid)
+        cmdstr = 'taskkill /f /PID %d /fi "IMAGENAME eq python.exe"' % parent_pid
+        #os.system('taskkill /f /PID %d /fi "IMAGENAME eq python.exe"' % parent_pid)
+        p = subprocess.Popen(cmdstr, shell=True)
+        p.wait()
+        if p.returncode == 0:
+            print('量化终端进程杀死成功, Pid:%s.' %parent_pid)
     except:
         print("process %s doesn't exist" % parent_pid)
 
@@ -147,12 +160,22 @@ def mergeFile(src, dst):
             else:
                 #print("Copy %s ===> %s"%(sfPath, dfPath))
                 #shutil.copyfile(sfPath, dfPath)
-                os.system(f'xcopy "{sfPath}" "{dfPath}" /y /e /i /h /q')
+                #os.system(f'xcopy "{sfPath}" "{dfPath}" /y /e /i /h /q')
+                cmdstr = f'xcopy "{sfPath}" "{dfPath}" /y /e /i /h /q'
+                p = subprocess.Popen(cmdstr, shell=True)
+                p.wait()
+                if p.returncode == 0:
+                    pass
         elif os.path.isfile(sfPath):
             if os.path.exists(dfPath):
                 # shutil.copyfile(sfPath, dfPath)
-                os.system(f'xcopy "{sfPath}" "{dfPath}" /y /e /i /h /q')
+                #os.system(f'xcopy "{sfPath}" "{dfPath}" /y /e /i /h /q')
                 #print("Cover %s ===> %s" % (sfPath, dfPath))
+                cmdstr = f'xcopy "{sfPath}" "{dfPath}" /y /e /i /h /q'
+                p = subprocess.Popen(cmdstr, shell=True)
+                p.wait()
+                if p.returncode == 0:
+                    pass
             else:
                 # shutil.copy2(sfPath, dfPath)
                 shutil.copy(sfPath, dfPath)
@@ -267,7 +290,7 @@ def main(versionNo=None):
         # ===========================备份文件==========================================
         time_now = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
         if chkEquRlt:  # 备份equant
-            directory, dest = dirPath, os.path.join(workDir, "equant_back"+time_now)
+            directory, dest = dirPath, os.path.join(workDir, "equant_back_"+time_now)
             equbacRlt = backup(directory, dest)
             if equbacRlt == 0:  # 路径不存在
                 print("equant备份数据过程出错！")
@@ -316,8 +339,12 @@ def main(versionNo=None):
 
             src = os.path.join(workDir, "epolestar")
             des = os.path.abspath(os.path.join(dirPath, "..\\epolestar"))
-            os.system(f'xcopy "{src}" "{des}" /y /e /i /h /q')
-
+            #os.system(f'xcopy "{src}" "{des}" /y /e /i /h /q')
+            cmdstr = f'xcopy "{src}" "{des}" /y /e /i /h /q'
+            p = subprocess.Popen(cmdstr, shell=True)
+            p.wait()
+            if p.returncode == 0:
+                pass
         print("更新完成！")
 
 
