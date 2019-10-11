@@ -47,7 +47,7 @@ def backup(directory, des):
     if os.path.exists(directory):
         # ret = os.system(f'xcopy "{directory}" "{des}" /y /e /i /h')
         ret = os.system(
-            f'xcopy "{directory}" "{des}" /y /e /i /h /exclude:..\\equant\\exclude.txt')
+            f'xcopy "{directory}" "{des}" /y /e /i /h /q /exclude:..\\equant\\exclude.txt')
         if ret == 0:
             print("%s 备份成功！" % directory)
         return 1
@@ -147,11 +147,11 @@ def mergeFile(src, dst):
             else:
                 #print("Copy %s ===> %s"%(sfPath, dfPath))
                 #shutil.copyfile(sfPath, dfPath)
-                os.system(f'xcopy "{sfPath}" "{dfPath}" /y /e /i /h ')
+                os.system(f'xcopy "{sfPath}" "{dfPath}" /y /e /i /h /q')
         elif os.path.isfile(sfPath):
             if os.path.exists(dfPath):
                 # shutil.copyfile(sfPath, dfPath)
-                os.system(f'xcopy "{sfPath}" "{dfPath}" /y /e /i /h')
+                os.system(f'xcopy "{sfPath}" "{dfPath}" /y /e /i /h /q')
                 #print("Cover %s ===> %s" % (sfPath, dfPath))
             else:
                 # shutil.copy2(sfPath, dfPath)
@@ -265,7 +265,7 @@ def main(versionNo=None):
                 killProcesses(int(pid))
 
         # ===========================备份文件==========================================
-        time_now = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")[:-3]
+        time_now = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
         if chkEquRlt:  # 备份equant
             directory, dest = dirPath, os.path.join(workDir, "equant_back"+time_now)
             equbacRlt = backup(directory, dest)
@@ -316,7 +316,7 @@ def main(versionNo=None):
 
             src = os.path.join(workDir, "epolestar")
             des = os.path.abspath(os.path.join(dirPath, "..\\epolestar"))
-            os.system(f'xcopy "{src}" "{des}" /y /e /i /h')
+            os.system(f'xcopy "{src}" "{des}" /y /e /i /h /q')
 
         print("更新完成！")
 
