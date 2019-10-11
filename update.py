@@ -49,7 +49,7 @@ def backup(directory, des):
         # ret = os.system(f'xcopy "{directory}" "{des}" /y /e /i /h')
         cmdstr = f'xcopy "{directory}" "{des}" /y /e /i /h /q /exclude:..\\equant\\exclude.txt'
         #ret = os.system(f'xcopy "{directory}" "{des}" /y /e /i /h /q /exclude:..\\equant\\exclude.txt')
-        p = subprocess.Popen(cmdstr, shell=True)
+        p = subprocess.Popen(cmdstr, shell=True, stdout=subprocess.PIPE)
         p.wait()
         if p.returncode == 0:
             print("%s 备份成功！" % directory)
@@ -65,7 +65,7 @@ def killEpProcess():
         # os.system("taskkill /f /im %s" % "epolestar v9.5.exe")
         #os.system('taskkill /f /fi "IMAGENAME eq %s"' % "epolestar v9.5.exe")
         cmdstr = 'taskkill /f /fi "IMAGENAME eq %s"' % "epolestar v9.5.exe"
-        p = subprocess.Popen(cmdstr, shell=True)
+        p = subprocess.Popen(cmdstr, shell=True, stdout=subprocess.PIPE)
         p.wait()
         if p.returncode == 0:
             print("极星客户端进程杀死成功.")
@@ -83,7 +83,7 @@ def killProcesses(parent_pid, sig=signal.SIGTERM):
     try:
         cmdstr = 'taskkill /f /PID %d /fi "IMAGENAME eq python.exe"' % parent_pid
         #os.system('taskkill /f /PID %d /fi "IMAGENAME eq python.exe"' % parent_pid)
-        p = subprocess.Popen(cmdstr, shell=True)
+        p = subprocess.Popen(cmdstr, shell=True, stdout=subprocess.PIPE)
         p.wait()
         if p.returncode == 0:
             print('量化终端进程杀死成功, Pid:%s.' %parent_pid)
@@ -162,7 +162,7 @@ def mergeFile(src, dst):
                 #shutil.copyfile(sfPath, dfPath)
                 #os.system(f'xcopy "{sfPath}" "{dfPath}" /y /e /i /h /q')
                 cmdstr = f'xcopy "{sfPath}" "{dfPath}" /y /e /i /h /q'
-                p = subprocess.Popen(cmdstr, shell=True)
+                p = subprocess.Popen(cmdstr, shell=True, stdout=subprocess.PIPE)
                 p.wait()
                 if p.returncode == 0:
                     pass
@@ -172,7 +172,7 @@ def mergeFile(src, dst):
                 #os.system(f'xcopy "{sfPath}" "{dfPath}" /y /e /i /h /q')
                 #print("Cover %s ===> %s" % (sfPath, dfPath))
                 cmdstr = f'xcopy "{sfPath}" "{dfPath}" /y /e /i /h /q'
-                p = subprocess.Popen(cmdstr, shell=True)
+                p = subprocess.Popen(cmdstr, shell=True, stdout=subprocess.PIPE)
                 p.wait()
                 if p.returncode == 0:
                     pass
@@ -341,7 +341,7 @@ def main(versionNo=None):
             des = os.path.abspath(os.path.join(dirPath, "..\\epolestar"))
             #os.system(f'xcopy "{src}" "{des}" /y /e /i /h /q')
             cmdstr = f'xcopy "{src}" "{des}" /y /e /i /h /q'
-            p = subprocess.Popen(cmdstr, shell=True)
+            p = subprocess.Popen(cmdstr, shell=True, stdout=subprocess.PIPE)
             p.wait()
             if p.returncode == 0:
                 pass
