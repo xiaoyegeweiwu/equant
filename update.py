@@ -61,7 +61,7 @@ def backup(directory, des):
             print("%s 备份成功！备份目录：%s." % (directory, des))
             return 1
         else:
-            print("%s 备份失败！备份目录：%s，失败信息：%s" % (directory, des, p.stdout.readlines(1000)))
+            print("%s 备份失败！备份目录：%s，失败信息：%s" % (directory, des, ''.join([s.decode('gbk') for s in p.stdout.readlines()])))
             return 0
     else:
         print("Equant or Equant-master directory dosen't exist!")
@@ -79,7 +79,7 @@ def killEpProcess():
         if p.returncode == 0:
             print("极星客户端进程关闭成功.")
         else:
-            print("极星客户端进程关闭失败, %s" % p.stdout.readlines(1000))
+            print("极星客户端进程关闭失败, %s" % ''.join([s.decode('gbk') for s in p.stdout.readlines()]))
 
 
 # 杀进程及子进程
@@ -99,7 +99,7 @@ def killProcesses(parent_pid, sig=signal.SIGTERM):
         if p.returncode == 0:
             print('量化终端进程关闭成功, Pid:%s.' %parent_pid)
         else:
-            print('量化终端进程关闭失败, Pid:%s，失败信息：%s' %(parent_pid, p.stdout.readlines(1000)))
+            print('量化终端进程关闭失败, Pid:%s，失败信息：%s' %(parent_pid, ''.join([s.decode('gbk') for s in p.stdout.readlines()])))
     except:
         print("process %s doesn't exist" % parent_pid)
 
@@ -178,7 +178,7 @@ def mergeFile(src, dst):
                 p = subprocess.Popen(cmdstr, shell=True, stdout=subprocess.PIPE)
                 p.wait()
                 if p.returncode != 0:
-                    print("量化终端升级出错: %s" % p.stdout.readlines(1000))
+                    print("量化终端升级出错: %s" % ''.join([s.decode('gbk') for s in p.stdout.readlines()]))
         elif os.path.isfile(sfPath):
             if os.path.exists(dfPath):
                 # shutil.copyfile(sfPath, dfPath)
@@ -188,7 +188,7 @@ def mergeFile(src, dst):
                 p = subprocess.Popen(cmdstr, shell=True, stdout=subprocess.PIPE)
                 p.wait()
                 if p.returncode != 0:
-                    print("量化终端升级出错: %s" % p.stdout.readlines(1000))
+                    print("量化终端升级出错: %s" % ''.join([s.decode('gbk') for s in p.stdout.readlines()]))
             else:
                 # shutil.copy2(sfPath, dfPath)
                 shutil.copy(sfPath, dfPath)
@@ -351,7 +351,7 @@ def main(versionNo=None):
 
         # ==================删除9.5客户端，复制新版本===============================
         if chkEpoRlt and epobacRlt:
-            delFile(os.path.abspath(os.path.join(dirPath, "..\\epolestar")))
+            #delFile(os.path.abspath(os.path.join(dirPath, "..\\epolestar")))
 
             src = os.path.join(workDir, "epolestar")
             des = os.path.abspath(os.path.join(dirPath, "..\\epolestar"))
@@ -360,7 +360,7 @@ def main(versionNo=None):
             p = subprocess.Popen(cmdstr, shell=True, stdout=subprocess.PIPE)
             p.wait()
             if p.returncode != 0:
-                print("极星客户端升级出错: %s" % p.stdout.readlines(1000))
+                print("极星客户端升级出错: %s" % ''.join([s.decode('gbk') for s in p.stdout.readlines()]))
                 
         print("更新完成！")
 
