@@ -2,12 +2,17 @@ import os
 import sys
 import datetime
 import shutil
-import requests
 import zipfile
 import traceback
 import configparser
 import signal, psutil
 import subprocess
+import requests
+from requests.adapters import HTTPAdapter
+
+ssn = requests.Session()
+ssn.mount('http://', HTTPAdapter(max_retries=4))
+ssn.mount('https://', HTTPAdapter(max_retries=4))
 
 VERSION = ""
 EPVERSION = ""
@@ -94,7 +99,7 @@ def killProcesses(parent_pid, sig=signal.SIGTERM):
 def requestZip(zipUrl, tag):
     """下载"""
     try:
-        response = requests.get(zipUrl, timeout=5)
+        response = ssn.get(zipUrl, timeout=10)
         response.raise_for_status()
         with open (tag+".zip", "wb") as f:
             f.write(response.content)
@@ -198,7 +203,7 @@ def checkEquUpdate():
             lvl = VERSION.split('.')[:-1]
             lmv = '.'.join(lvl)
         
-        rsp = requests.get(EQVERURL, timeout=10)
+        rsp = ssn.get(EQVERURL, timeout=10)
         if rsp.status_code == 200:
             rvstr = rsp.content.decode('utf-8')
             rvl = rvstr.split('.')[:-1]
@@ -227,7 +232,7 @@ def checkEpoUpdate():
 
             lmv = EPVERSION
         
-        rsp = requests.get(EPVERURl, timeout=10)
+        rsp = ssn.get(EPVERURl, timeout=10)
         if rsp.status_code == 200:
             rvstr = rsp.content.decode('utf-8')
             with open('EPOVERSION.txt', 'w') as f:
