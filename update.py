@@ -9,6 +9,7 @@ import signal, psutil
 import subprocess
 import requests
 from requests.adapters import HTTPAdapter
+import time
 
 ssn = requests.Session()
 ssn.mount('http://', HTTPAdapter(max_retries=4))
@@ -57,8 +58,11 @@ def backup(directory, des):
         p = subprocess.Popen(cmdstr, shell=True, stdout=subprocess.PIPE)
         p.wait()
         if p.returncode == 0:
-            print("%s 备份成功！" % directory)
-        return 1
+            print("%s 备份成功！备份目录：%s." % (directory, des))
+            return 1
+        else:
+            print("%s 备份失败！备份目录：%s，失败信息：%s" % (directory, des, p.stdout.readlines(1000)))
+            return 0
     else:
         print("Equant or Equant-master directory dosen't exist!")
         return 0
@@ -73,7 +77,9 @@ def killEpProcess():
         p = subprocess.Popen(cmdstr, shell=True, stdout=subprocess.PIPE)
         p.wait()
         if p.returncode == 0:
-            print("极星客户端进程杀死成功.")
+            print("极星客户端进程关闭成功.")
+        else:
+            print("极星客户端进程关闭失败, %s" % p.stdout.readlines(1000))
 
 
 # 杀进程及子进程
@@ -91,7 +97,9 @@ def killProcesses(parent_pid, sig=signal.SIGTERM):
         p = subprocess.Popen(cmdstr, shell=True, stdout=subprocess.PIPE)
         p.wait()
         if p.returncode == 0:
-            print('量化终端进程杀死成功, Pid:%s.' %parent_pid)
+            print('量化终端进程关闭成功, Pid:%s.' %parent_pid)
+        else:
+            print('量化终端进程关闭失败, Pid:%s，失败信息：%s' %(parent_pid, p.stdout.readlines(1000)))
     except:
         print("process %s doesn't exist" % parent_pid)
 
@@ -169,8 +177,8 @@ def mergeFile(src, dst):
                 cmdstr = f'xcopy "{sfPath}" "{dfPath}" /y /e /i /h /q'
                 p = subprocess.Popen(cmdstr, shell=True, stdout=subprocess.PIPE)
                 p.wait()
-                if p.returncode == 0:
-                    pass
+                if p.returncode != 0:
+                    print("量化终端升级出错: %s" % p.stdout.readlines(1000))
         elif os.path.isfile(sfPath):
             if os.path.exists(dfPath):
                 # shutil.copyfile(sfPath, dfPath)
@@ -179,8 +187,8 @@ def mergeFile(src, dst):
                 cmdstr = f'xcopy "{sfPath}" "{dfPath}" /y /e /i /h /q'
                 p = subprocess.Popen(cmdstr, shell=True, stdout=subprocess.PIPE)
                 p.wait()
-                if p.returncode == 0:
-                    pass
+                if p.returncode != 0:
+                    print("量化终端升级出错: %s" % p.stdout.readlines(1000))
             else:
                 # shutil.copy2(sfPath, dfPath)
                 shutil.copy(sfPath, dfPath)
@@ -209,13 +217,13 @@ def checkEquUpdate():
             rvl = rvstr.split('.')[:-1]
             rmv = '.'.join(rvl)
             
-        print("Start epolestar, version info, equant local version: %s, remote version: %s!" %(VERSION, rvstr))
+        #print("Start epolestar, version info, equant local version: %s, remote version: %s!" %(VERSION, rvstr))
             
         if (len(lmv) == len(rmv) > 0 and rmv > lmv) or ( 0 < len(lmv) != len(rmv)):
             return rmv
 
         else:
-            print("Version don't need update, local:%s, remote:%s" %(lmv, rmv))
+            print("量化终端（equant）不需要升级, 本地版本:%s, 最新版本:%s" %(lmv, rmv))
             return ""
     except Exception as e:
        print("checkUpdate epolestar Error:%s" %(traceback.format_exc()))
@@ -244,13 +252,13 @@ def checkEpoUpdate():
                 ver = conf_reader.get("version", "cur")
             rmv = ver
             
-        print("Start epolestar, version info, epolestar local version: %s, remote version: %s!" %(EPVERSION, rmv))
+        #print("Start epolestar, version info, epolestar local version: %s, remote version: %s!" %(EPVERSION, rmv))
             
         if (len(lmv) == len(rmv) > 0 and rmv > lmv) or ( 0 < len(lmv) != len(rmv)):
             return rmv
 
         else:
-            print("Epolestar version don't need update, local:%s, remote:%s" %(lmv, rmv))
+            print("极星客户端（epolestar）不需要升级, 本地版本:%s, 最新版本:%s" %(lmv, rmv))
             return ""
     except Exception as e:
        print("checkUpdate epolestar Error:%s" %(traceback.format_exc()))
@@ -291,6 +299,8 @@ def main(versionNo=None):
             pid = f.readline()
             if pid:
                 killProcesses(int(pid))
+        
+        time.sleep(2)
 
         # ===========================备份文件==========================================
         time_now = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -310,6 +320,7 @@ def main(versionNo=None):
 
         # ===========删除equant的代码部分，保留config, strategy, log文件夹，复制新版本=====================
         if chkEquRlt and equbacRlt:
+            '''
             for file in os.listdir(os.path.join(dirPath, "src")):
                 if file not in ["config", "log", "strategy"]:
                     path = os.path.join(dirPath, "src\\%s" % file)
@@ -320,7 +331,7 @@ def main(versionNo=None):
                             return
                     if os.path.isfile(path):
                         os.remove(path)
-
+            '''
             # 合并config, strategy, log去重
             # TODO：会不会存在合并出错情况
             for src, dst in zip([styPath, cfgPath, logPath],
@@ -348,8 +359,9 @@ def main(versionNo=None):
             cmdstr = f'xcopy "{src}" "{des}" /y /e /i /h /q'
             p = subprocess.Popen(cmdstr, shell=True, stdout=subprocess.PIPE)
             p.wait()
-            if p.returncode == 0:
-                pass
+            if p.returncode != 0:
+                print("极星客户端升级出错: %s" % p.stdout.readlines(1000))
+                
         print("更新完成！")
 
 
