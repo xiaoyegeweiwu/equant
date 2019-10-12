@@ -265,9 +265,10 @@ def checkEpoUpdate():
 
 
 def main(versionNo=None):
-    inp = input(f"存在新版本{versionNo}可以升级,\n"
-                "升级前请关闭极星9.5客户端和量化终端，否则将更新失败\n"
-                "更新会覆盖本地代码，请做好备份。确认是否升级(y/n): ")
+    inp = input("------有新版本可以升级！-------\n"
+                "升级过程将自动关闭极星9.5客户端和量化终端；\n"
+                "升级过程将覆盖本地代码，升级程序会自动备份本地代码；\n"
+                "------请确认是否升级 (y/n) : ")
     if inp == 'y' or inp == 'Y':  # 确认升级
         # ======================更新epolestar和equant=============================
         chkEquRlt = checkEquUpdate()
