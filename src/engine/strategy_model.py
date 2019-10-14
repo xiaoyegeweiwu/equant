@@ -2137,8 +2137,8 @@ class StrategyModel(object):
         if not contNo:
             contNo = self._cfgModel.getBenchmark()
 
-        if self.getMarketPosition(contNo) == 0:
-            return -1
+        #if self.getMarketPosition(contNo) == 0:
+        #    return -1
 
         orderInfo = self._calcCenter.getFirstOpenOrder(contNo)
         if not orderInfo or key not in orderInfo:
@@ -2186,10 +2186,10 @@ class StrategyModel(object):
         '''获得当前持仓的最后一个建仓位置到当前位置的Bar计数'''
         contNo = self.getIndexMap(contNo)
 
-        if self.getMarketPosition(contNo) == 0:
-            return -1
+        #if self.getMarketPosition(contNo) == 0:
+        #    return -1
 
-        orderInfo = self._calcCenter.getLatestCoverOrder(contNo)
+        orderInfo = self._calcCenter.getLatestOpenOrder(contNo)
         if not orderInfo or 'CurBarIndex' not in orderInfo:
             return -1
 
