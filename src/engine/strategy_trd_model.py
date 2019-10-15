@@ -24,6 +24,9 @@ class StrategyTrade(TradeModel):
         if not self._selectedUserNo:
             return ''
         
+        if self._selectedUserNo not in self._userInfo:
+            return ''
+        
         user = self._userInfo[self._selectedUserNo]
         if not user.isReady():
             return ''
