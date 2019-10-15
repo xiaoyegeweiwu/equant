@@ -6735,6 +6735,25 @@ class BaseApi(object):
               无
         '''
         pass
+        
+    def StrategyId(self):
+        '''
+        【说明】
+             获取当前策略Id
+
+        【语法】
+             int StrategyId()
+
+        【参数】
+              无
+
+        【备注】
+              无
+              
+        【示例】
+              无
+        '''
+        return self._dataModel.getStrategyId()
 
 baseApi = BaseApi()
 
@@ -7708,5 +7727,8 @@ def SwingLow(Price, Length, Instance, Strength):
 
 def Alert(Info, bKeep=True, level='Signal'):
     return baseApi.Alert(Info, bKeep, level)
+    
+def StrategyId():
+    return baseApi.StrategyId()
 
     

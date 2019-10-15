@@ -1686,7 +1686,7 @@ class StrategyModel(object):
             else:
                 argStr = argStr + ' ' + str(arg)
 
-        return '[User]%s' % argStr
+        return '[User][%d]:%s' % (self.getStrategyId(), argStr)
 
     def LogDebug(self, args):
         logInfo = self.formatArgs(args)
@@ -2618,3 +2618,6 @@ class StrategyModel(object):
             winsound.PlaySound(audioName, winsound.SND_ASYNC) 
         #弹窗        
         createAlarmWin(Info, self._strategy.getStrategyId(), self._strategy.getStrategyName());
+        
+    def getStrategyId(self):
+        return self._strategy.getStrategyId()

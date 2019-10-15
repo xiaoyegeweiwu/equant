@@ -149,6 +149,7 @@ _all_func_ = {
     #                 ['MaxPositionLoss'     , '当前持仓的最大浮动亏损数'],
     #                 ['MaxPositionProfit'   , '当前持仓的最大浮动盈利数'],
     #                 ['PositionProfit'      , '当前持仓位置的浮动盈亏'],
+                    ['StrategyId'            , '获取当前策略Id'],
                 ],
                 
                 
