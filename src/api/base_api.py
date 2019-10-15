@@ -3666,6 +3666,25 @@ class BaseApi(object):
          '''
         return self._dataModel.getOrderStatus(userNo, localOrderId)
 
+    def A_OrderIsClose(self, userNo, localOrderId):
+        '''
+        【说明】
+              判断某个委托单是否完结。
+
+        【语法】
+              bool A_OrderIsClose(int|string localOrderId='')
+
+        【参数】
+              localOrderId 定单号，或者使用A_SendOrder返回的下单编号。
+
+        【备注】
+              当委托单是完结状态，返回True，否则返回False。
+              
+        【示例】
+              无
+         '''
+        return self._dataModel.getOrderIsClose(userNo, localOrderId)
+
     def A_OrderTime(self, userNo, localOrderId):
         '''
         【说明】
@@ -7191,6 +7210,9 @@ def A_OrderPrice(localOrderId):
 
 def A_OrderStatus(localOrderId):
     return baseApi.A_OrderStatus('', localOrderId)
+
+def A_OrderIsClose(localOrderId):
+    return baseApi.A_OrderIsClose('', localOrderId)
 
 def A_OrderTime(localOrderId):
     return baseApi.A_OrderTime('', localOrderId)

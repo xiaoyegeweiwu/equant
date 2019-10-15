@@ -204,6 +204,7 @@ _all_func_ = {
                     ['A_OrderLot'          , '委托数量'],
                     ['A_OrderPrice'        , '委托价格'],
                     ['A_OrderStatus'       , '定单状态'],
+                    ['A_OrderIsClose'      , '定单是否完结'],
                     ['A_OrderTime'         , '下单时间'],
                     #['A_OrderUpdateTime'   , '定单更新时间'],
                     ['A_FirstOrderNo'      , '当前账户第一个订单号'],
