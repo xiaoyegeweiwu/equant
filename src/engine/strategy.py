@@ -532,7 +532,7 @@ class Strategy:
             event = self._eg2stQueue.get()
             code = event.getEventCode()
             if code not in self._egCallbackDict:
-                self.logger.error("_egCallbackDict code(%d) not register!"%code)
+                self.logger.warn("_egCallbackDict code(%d) not register!"%code)
                 continue
             self._egCallbackDict[code](event) 
 
