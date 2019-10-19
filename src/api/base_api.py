@@ -2239,6 +2239,48 @@ class BaseApi(object):
         '''
         return self._dataModel.getBarsSinceLastEntry(contractNo)
 
+    def BarsSinceLastBuyEntry(self, contractNo):
+        '''
+        【说明】
+              获得当前持仓的最后一个Buy建仓位置到当前位置的Bar计数。
+
+        【语法】
+              int BarsSinceLastBuyEntry(string contractNo='')
+
+        【参数】
+              contractNo 合约编号，默认为基准合约。
+
+        【备注】
+              获得当前持仓指定合约的最后一个Buy建仓位置到当前位置的Bar计数，返回值为整型。
+              若当前策略持仓为0，则返回-1。
+              注意：在建仓Bar上为0。
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getBarsSinceLastBuyEntry(contractNo)
+
+    def BarsSinceLastSellEntry(self, contractNo):
+        '''
+        【说明】
+              获得当前持仓的最后一个Sell建仓位置到当前位置的Bar计数。
+
+        【语法】
+              int BarsSinceLastSellEntry(string contractNo='')
+
+        【参数】
+              contractNo 合约编号，默认为基准合约。
+
+        【备注】
+              获得当前持仓指定合约的最后一个Sell建仓位置到当前位置的Bar计数，返回值为整型。
+              若当前策略持仓为0，则返回-1。
+              注意：在建仓Bar上为0。
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getBarsSinceLastSellEntry(contractNo)
+
     def BarsSinceToday(self, contractNo, kLineType, kLineValue):
         '''
         【说明】
@@ -6995,6 +7037,12 @@ def BarsSinceExit(contractNo=''):
 
 def BarsSinceLastEntry(contractNo=''):
     return baseApi.BarsSinceLastEntry(contractNo)
+
+def BarsSinceLastBuyEntry(contractNo=''):
+    return baseApi.BarsSinceLastBuyEntry(contractNo)
+
+def BarsSinceLastSellEntry(contractNo=''):
+    return baseApi.BarsSinceLastSellEntry(contractNo)
 
 def BarsSinceToday(contractNo='', barType='', barValue=''):
     return baseApi.BarsSinceToday(contractNo, barType, barValue)

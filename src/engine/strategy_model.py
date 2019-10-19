@@ -2205,6 +2205,38 @@ class StrategyModel(object):
 
         curBar = self._hisModel.getCurBar()
         return (int(curBar['KLineIndex']) - barIndex)
+    
+    def getBarsSinceLastBuyEntry(self, contNo):
+        '''获得当前持仓的最后一个Buy建仓位置到当前位置的Bar计数'''
+        contNo = self.getIndexMap(contNo)
+
+        #if self.getMarketPosition(contNo) == 0:
+        #    return -1
+
+        orderInfo = self._calcCenter.getLatestBuyOpenOrder(contNo)["Order"]
+        if not orderInfo or 'CurBarIndex' not in orderInfo:
+            return -1
+
+        barIndex = orderInfo['CurBarIndex']
+
+        curBar = self._hisModel.getCurBar()
+        return (int(curBar['KLineIndex']) - barIndex)
+    
+    def getBarsSinceLastSellEntry(self, contNo):
+        '''获得当前持仓的最后一个Sell建仓位置到当前位置的Bar计数'''
+        contNo = self.getIndexMap(contNo)
+
+        #if self.getMarketPosition(contNo) == 0:
+        #    return -1
+
+        orderInfo = self._calcCenter.getLatestSellOpenOrder(contNo)["Order"]
+        if not orderInfo or 'CurBarIndex' not in orderInfo:
+            return -1
+
+        barIndex = orderInfo['CurBarIndex']
+
+        curBar = self._hisModel.getCurBar()
+        return (int(curBar['KLineIndex']) - barIndex)
 
     def getBarsSinceToday(self, contractNo, barType, barValue):
         contNo = self.getIndexMap(contractNo)
