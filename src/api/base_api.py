@@ -1472,16 +1472,16 @@ class BaseApi(object):
     def BarInterval(self):
         '''
         【说明】
-              合约图表周期数值
+              返回界面合约图表K线周期数值
 
         【语法】
-              list BarInterval()
+              int BarInterval()
 
         【参数】
               无
 
         【备注】
-              返回周期数值列表，通常和BarType一起使用进行数据周期的判别
+              返回界面图表K线周期数值，通常和BarType一起使用进行数据周期的判别
 
         【示例】
               当前数据周期为1日线，BarInterval等于1；
@@ -1494,7 +1494,7 @@ class BaseApi(object):
     def BarType(self):
         '''
         【说明】
-              合约图表周期类型值
+              返回界面合约K线图表周期类型字符
 
         【语法】
               char BarType()
