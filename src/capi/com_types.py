@@ -1229,7 +1229,8 @@ class EEquExchangeStateRsp(Structure):
         ("ExchangeNo", c_char*11),                        #交易所编号
         ("ExchangeDateTime", c_char*21),                  #交易所系统时间
         ("LocalDateTime", c_char*21),                     #本地系统时间
-        ("TradeState", c_char)                            #交易所状态
+        ("TradeState", c_char),                           #交易所状态
+        ("CommodityNo", c_char*21),                       #品种
     ]
 
 class EEquSpreadMappingReq(Structure):

@@ -1597,7 +1597,7 @@ class BaseApi(object):
     def ExchangeTime(self, exchangeNo):
         '''
         【说明】
-              合约对应交易所名称
+              交易所时间
 
         【语法】
               string ExchangeTime(string contractNo)
@@ -1616,10 +1616,10 @@ class BaseApi(object):
     def ExchangeStatus(self, exchangeNo):
         '''
         【说明】
-              合约对应交易所名称
+              交易所状态
 
         【语法】
-              string ExchangeStatus(string contractNo)
+              string ExchangeStatus(string exchangeNo)
 
         【参数】
               exchangeNo: 交易所编号，例如"ZCE","DCE","SHFE","CFFEX","INE"
@@ -1644,6 +1644,39 @@ class BaseApi(object):
               ExchangeStatus('ZCE')
         '''
         return self._dataModel.getExchangeStatus(exchangeNo)
+        
+    def CommodityStatus(self, commodityNo):
+        '''
+        【说明】
+              品种或合约交易状态
+
+        【语法】
+              string CommodityStatus(string commodityNo|string contractNo)
+
+        【参数】
+              commodityNo: 品种编号，例如"ZCE|F|SR", "DCE|F|I"
+                或者
+              contractNo: 合约编号，例如"ZCE|F|SR|001", "DCE|F|I|2001"
+        【备注】
+              返回字符
+              'N'   未知状态
+              'I'   正初始化
+              'R'   准备就绪
+              '0'   交易日切换
+              '1'   竞价申报
+              '2'   竞价撮合
+              '3'   连续交易
+              '4'   交易暂停
+              '5'   交易闭市  
+              '6'   竞价暂停
+              '7'   报盘未连
+              '8'   交易未连
+              '9'   闭市处理
+
+        【示例】
+              CommodityStatus('ZCE|F|SR')
+        '''
+        return self._dataModel.getCommodityStatus(commodityNo)
         
         
     def ExpiredDate(self, contractNo):
@@ -7631,6 +7664,9 @@ def ExchangeTime(exchangeNo):
   
 def ExchangeStatus(exchangeNo):
     return baseApi.ExchangeStatus(exchangeNo)
+    
+def CommodityStatus(commodityNo):
+    return baseApi.CommodityStatus(commodityNo)
 
 def ExpiredDate(contractNo=''):
     return baseApi.ExpiredDate(contractNo)

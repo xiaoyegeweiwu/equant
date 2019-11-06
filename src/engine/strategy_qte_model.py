@@ -48,6 +48,7 @@ class StrategyQuote(QuoteModel):
     def onExchange(self, event):
         dataDict = event.getData()
         strategyId = event.getStrategyId()
+        #self.logger.debug("QteModelOnExchange:%s" %dataDict)
         for k, v in dataDict.items():
             self._exchangeData[k] = ExchangeModel(self.logger, v) 
             self._exchangeData[k].updateStatus(strategyId, v)
@@ -132,6 +133,16 @@ class StrategyQuote(QuoteModel):
         if exchangeNo not in self._exchangeData:
             return ""
         return self._exchangeData[exchangeNo].getExchangeStatus()
+
+    def getCommodityStatus(self, commNo):
+        commSplit =  commNo.split('|')
+        if len(commSplit) < 3:
+            return ""
+        exchangeNo = commSplit[0]
+        commNo = commSplit[2]
+        if exchangeNo not in self._exchangeData:
+            return ""
+        return self._exchangeData[exchangeNo].getCommodityStatus(commNo)
 
     def getLv1DataAndUpdateTime(self, contNo):
         if not contNo:

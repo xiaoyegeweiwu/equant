@@ -1792,6 +1792,9 @@ class StrategyModel(object):
 
     def getExchangeStatus(self, exgNo):
         return self._qteModel.getExchangeStatus(exgNo)
+        
+    def getCommodityStatus(self, commodityNo):
+        return self._qteModel.getCommodityStatus(commodityNo)
 
     def getExpiredDate(self, contNo):
         return 0

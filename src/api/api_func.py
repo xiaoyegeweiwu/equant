@@ -89,6 +89,7 @@ _all_func_ = {
                     ['ExchangeName'        , '交易所名称'],
                     ['ExchangeTime'        , '交易所系统时间'],
                     ['ExchangeStatus'      , '交易所状态'],
+                    ['CommodityStatus'     , '品种交易状态'],
                     # ['ExpiredDate'         , '最后交易日'],
                     ['GetSessionCount'     , '交易时段个数'],
                     ['GetSessionStartTime' , '交易时段起始时间'],

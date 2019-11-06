@@ -1150,6 +1150,20 @@ class StrategyHisQuote(object):
             # print(self._strategy.isRealTimeStatus(), self._strategy._runStatus, self._strategy._runRealTimeStatus, self._strategy.isRealTimeAsHisStatus())
             self._sendFlushEvent()
 
+    def checkTriggerEvent(self, eventCode):
+        if eventCode == ST_TRIGGER_SANPSHOT_FILL:
+            return self._config.hasSnapShotTrigger()
+        elif eventCode == ST_TRIGGER_KLINE:
+            return self._config.hasKLineTrigger()
+        elif eventCode in (ST_TRIGGER_TRADE_ORDER, ST_TRIGGER_TRADE_MATCH):
+            return self._config.hasTradeTrigger()
+        elif eventCode == ST_TRIGGER_TIMER:
+            return self._config.hasTimerTrigger()
+        elif eventCode == ST_TRIGGER_CYCLE:
+            return self._config.hasCycleTrigger()
+        
+        return True
+
     # ST_STATUS_CONTINUES_AS_REALTIME 阶段
     def runRealTime(self, context, handle_data, event):
         eventCode = event.getEventCode()
@@ -1170,10 +1184,13 @@ class StrategyHisQuote(object):
             "DateTimeStamp": allData["DateTimeStamp"],
             "TriggerData": allData["Data"]
         }
-        # print(args)
-        self._strategy.setCurTriggerSourceInfo(args)
-        context.setCurTriggerSourceInfo(args)
-        handle_data(context)
+        
+        ## print(args)
+        # 判断当前触发类型是否需要触发
+        if self.checkTriggerEvent(eventCode):
+            self._strategy.setCurTriggerSourceInfo(args)
+            context.setCurTriggerSourceInfo(args)
+            handle_data(context)
         
         if eventCode == ST_TRIGGER_SANPSHOT_FILL:
             # 计算浮动盈亏
@@ -1194,9 +1211,6 @@ class StrategyHisQuote(object):
                 if comtype != 'S' and comtype != 'M':
                     self.logger.info(f"即时行情中的字段没有最新价")
 
-            # 延迟判断是否即时行情触发
-            if not self._config.hasSnapShotTrigger() or not self._strategy.isRealTimeStatus():
-                return
             if event.getContractNo() not in self._config.getTriggerContract():
                 return
         else:
