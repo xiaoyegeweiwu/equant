@@ -64,7 +64,7 @@ EV_UI2EG_STRATEGY_QUIT            = 0x106           # 策略停止
 EV_UI2EG_STRATEGY_FIGURE          = 0x107           # 策略信号和指标图
 EV_UI2EG_STRATEGY_REMOVE          = 0x108           # 删除策略
 EV_UI2EG_STRATEGY_RESTART         = 0x109           # 更改参数启动策略
-
+EV_UI2EG_SYNCPOS_CONF             = 0x110           # 持仓同步参数
 
 #////////////////////引擎->界面事件定义////////////////////////
 EV_EG2UI_LOADSTRATEGY_RESPONSE    = 0x181           # 策略加载应答
