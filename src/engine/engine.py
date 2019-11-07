@@ -87,7 +87,7 @@ class StrategyEngine(object):
         self._hisKLineOberverDict = {} #{'contractNo' : [strategyId1, strategyId2...]}
         
         self._lastMoneyTime = 0      #资金查询时间
-        self._lastPosTime   = 0      #持仓同步差异计算时间
+        self._lastPosTime   = datetime.now()      #持仓同步差异计算时间
         self._lastDoPosDiffTime = datetime.now()  #处理持仓差异时间
         
         #恢复策略
@@ -375,6 +375,8 @@ class StrategyEngine(object):
         conf = event.getData()
         self._isAutoSyncPos = conf["AutoSyncPos"]
         self._autoSyncPosConf = conf
+        if conf["SyncTick"] <= 500:
+            self._autoSyncPosConf["SyncTick"] = 500
 
     # ////////////////api回调及策略请求事件处理//////////////////
     def _handleApiData(self):
@@ -566,7 +568,7 @@ class StrategyEngine(object):
             self._lastPosTime = nowTime
             return
             
-        if self._lastPosTime == 0 or (nowTime - self._lastPosTime).total_seconds() >= 5:
+        if (nowTime - self._lastPosTime).total_seconds()*1000 >= 500:
             self._lastPosTime = nowTime
             
             accPos = {}
