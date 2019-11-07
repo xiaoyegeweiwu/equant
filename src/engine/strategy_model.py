@@ -425,9 +425,14 @@ class StrategyModel(object):
             userNo = "Default"
         # 对于开仓，需要平掉反向持仓
         qty = self._calcCenter.needCover(userNo, contNo, dBuy, share, price)
-        if qty > 0 and needCover:
-            self.buySellOrder(userNo, contNo, orderType, vtGFD, dBuy, oCoverA, hSpeculate, price, qty, curBar, (defaultPrice > 0))
-
+        exchg = contNo.split('|')[0]
+        if qty > 0:
+            if exchg in ('ZCE', 'DCE', 'SHFE', 'INE', 'CFFEX'):
+                if needCover:
+                    self.buySellOrder(userNo, contNo, orderType, vtGFD, dBuy, oCoverA, hSpeculate, price, qty, curBar, (defaultPrice > 0))
+            else:
+                self.buySellOrder(userNo, contNo, orderType, vtGFD, dBuy, oCoverA, hSpeculate, price, qty, curBar, (defaultPrice > 0))
+            
         # 交易计算、生成回测报告
         self.buySellOrder(userNo, contNo, orderType, vtGFD, dBuy, oOpen, hSpeculate, price, share, curBar, (defaultPrice > 0))
 
@@ -513,9 +518,14 @@ class StrategyModel(object):
         if not userNo:
             userNo = "Default"
         qty = self._calcCenter.needCover(userNo, contNo, dSell, share, price)
-        if qty > 0 and needCover:
-            self.buySellOrder(userNo, contNo, orderType, vtGFD, dSell, oCoverA, hSpeculate, price, qty, curBar, (defaultPrice > 0))
-
+        exchg = contNo.split('|')[0]
+        if qty > 0:
+            if exchg in ('ZCE', 'DCE', 'SHFE', 'INE', 'CFFEX'):
+                if needCover:
+                    self.buySellOrder(userNo, contNo, orderType, vtGFD, dSell, oCoverA, hSpeculate, price, qty, curBar, (defaultPrice > 0))
+            else:
+                self.buySellOrder(userNo, contNo, orderType, vtGFD, dSell, oCoverA, hSpeculate, price, qty, curBar, (defaultPrice > 0))
+        
         # 交易计算、生成回测报告
         self.buySellOrder(userNo, contNo, orderType, vtGFD, dSell, oOpen, hSpeculate,price, share, curBar, (defaultPrice > 0))
 
