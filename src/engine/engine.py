@@ -613,28 +613,51 @@ class StrategyEngine(object):
             
     def _doPosDiff(self, posDiff):
         for pos in posDiff:
+            contNo = pos[1]
+            
+            contDict = self._qteModel.getContractDict()
+            if contNo not in contDict:
+                continue
+                
+            exchgNo = contDict[contNo].getContract()['ExchangeNo']
+            exchgDict = self._qteModel.getExchangeDict()
+            if exchgNo not in exchgDict:
+                continue
+            
             stBuyPos = pos[5]
             stSellPos = pos[6]
             acBuyPos = pos[-4]
             acSellPos = pos[-3]
             
-            buyDiff = stBuyPos - acBuyPos
-            sellDiff = stSellPos - acSellPos
+            # 内盘可以双向持仓
+            if exchgNo in ('ZCE', 'DCE', 'SHFE', 'INE', 'CFFEX'):
+                buyDiff = stBuyPos - acBuyPos
+                sellDiff = stSellPos - acSellPos
             
-            # 处理买仓, 账户仓少开多平
-            if buyDiff > 0:
-                if not self._autoSyncPosConf['OnlyDec']:
-                    self._sendSyncPosOrder(pos, buyDiff, dBuy, oOpen)
-            elif buyDiff < 0:
-                self._sendSyncPosOrder(pos, -buyDiff, dSell, oCover)
-            
-            # 处理卖仓, 账户仓少开多平
-            if sellDiff > 0:
-                if not self._autoSyncPosConf['OnlyDec']:
-                    self._sendSyncPosOrder(pos, sellDiff, dSell, oOpen)
-            elif sellDiff < 0:
-                self._sendSyncPosOrder(pos, sellDiff, dBuy, oCover)
-            
+                # 处理买仓, 账户仓少开多平
+                if buyDiff > 0:
+                    if not self._autoSyncPosConf['OnlyDec']:
+                        self._sendSyncPosOrder(pos, buyDiff, dBuy, oOpen)
+                elif buyDiff < 0:
+                    self._sendSyncPosOrder(pos, -buyDiff, dSell, oCover)
+                
+                # 处理卖仓, 账户仓少开多平
+                if sellDiff > 0:
+                    if not self._autoSyncPosConf['OnlyDec']:
+                        self._sendSyncPosOrder(pos, sellDiff, dSell, oOpen)
+                elif sellDiff < 0:
+                    self._sendSyncPosOrder(pos, -sellDiff, dBuy, oCover)
+                    
+            else:
+                stPos = stBuyPos - stSellPos
+                acPos = acBuyPos - acSellPos
+                totalDiff = stPos - acPos
+                
+                if totalDiff < 0:
+                    self._sendSyncPosOrder(pos, -totalDiff, dSell, oOpen)
+                elif totalDiff > 0:
+                    self._sendSyncPosOrder(pos, totalDiff, dBuy, oOpen)
+
             
     def _sendSyncPosOrder(self, pos, orderQty, orderDirct, entryOrExit):
         userNo = pos[0]
