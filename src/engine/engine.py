@@ -64,7 +64,7 @@ class StrategyEngine(object):
         self._isStActualRun = {}
         
         # 持仓同步参数
-        self._isAutoSyncPos = True
+        self._isAutoSyncPos = False
         self._autoSyncPosConf = {
             "OneKeySync": False,                     # 一键同步
             "AutoSyncPos": self._isAutoSyncPos,      # 是否自动同步
@@ -602,7 +602,7 @@ class StrategyEngine(object):
                 "Data"      : posDiff,
             })
             
-            self.logger.debug("Sync position to ui:%s"%event.getData())
+            #self.logger.debug("Sync position to ui:%s"%event.getData())
             self._send2uiQueue(event)
             
             

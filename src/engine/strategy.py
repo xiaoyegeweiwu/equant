@@ -562,6 +562,7 @@ class Strategy:
                     self._dataModel.runRealTime(self._context, self._userModule.handle_data, event)
                 except queue.Empty as e:
                     if self._firstTriggerQueueEmpty:
+                        self._atHisOver()
                         self._runStatus = ST_STATUS_CONTINUES
                         self._send2UIStatus(self._runStatus)
                         self._firstTriggerQueueEmpty = False
@@ -573,6 +574,11 @@ class Strategy:
                 errorText = traceback.format_exc()
                 # traceback.print_exc()
                 self._exit(-1, errorText)
+
+    def _clearHisPos(self):
+        pass
+        #buyPos = self._dataModel.getBuyPositionInStrategy('')
+        #sellPos = self._dataModel.getSellPositionInStrategy('')
 
     def _startStrategyThread(self):
         '''历史数据准备完成后，运行策略'''
@@ -1223,6 +1229,14 @@ class Strategy:
             }
         })
         self.sendEvent2EngineForce(responseEvent)
+
+    def _atHisOver(self):
+        try:
+            # 历史回测结束回调
+            if hasattr(self._userModule, 'hisover_callback'):
+                self._userModule.hisover_callback(self._context)
+        except Exception as e:
+            self.logger.error('atHisOver callback error: %s' % str(e))
 
     def _switchStrategy(self, event):
         self._dataModel.getHisQuoteModel()._switchKLine()
