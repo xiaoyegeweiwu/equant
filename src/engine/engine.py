@@ -6,6 +6,7 @@ from threading import Thread
 from .strategy import StartegyManager
 from capi.py2c import PyAPI
 from capi.event import *
+from capi.com_types import *
 import time, queue
 from .engine_model import DataModel
 import copy
@@ -72,6 +73,7 @@ class StrategyEngine(object):
             "OnlyDec": False,                        # 是否只做减仓同步
             "SyncTick": 500,                         # 同步间隔，毫秒
         }
+        self._eSessionId = 0
         
         # 查询sessionId和账号对应关系
         self._SessionUserMap = {}
@@ -84,8 +86,9 @@ class StrategyEngine(object):
         # 历史K线订阅列表
         self._hisKLineOberverDict = {} #{'contractNo' : [strategyId1, strategyId2...]}
         
-        self._lastMoneyTime = 0  #资金查询时间
-        self._lastPosTime   = 0  #持仓同步时间
+        self._lastMoneyTime = 0      #资金查询时间
+        self._lastPosTime   = 0      #持仓同步差异计算时间
+        self._lastDoPosDiffTime = datetime.now()  #处理持仓差异时间
         
         #恢复策略
         self._resumeStrategy()
@@ -592,10 +595,6 @@ class StrategyEngine(object):
             
             posDiff = self._calPosDiff(posInfo)
             
-            self._doSyncPos(posDiff)
-            
-            #posDiff = self._calPosDiff(posInfo)
-            
             event = Event({
                 "EventCode" : EV_EG2UI_POSITION_NOTICE,
                 "Data"      : posDiff,
@@ -604,11 +603,133 @@ class StrategyEngine(object):
             self.logger.debug("Sync position to ui:%s"%event.getData())
             self._send2uiQueue(event)
             
-    def _doSyncPos(self, posDiff):
-        pass
+            
+            if self._isAutoSyncPos:
+                if (nowTime - self._lastDoPosDiffTime).total_seconds()*1000 >= self._autoSyncPosConf["SyncTick"]:
+                    self._doPosDiff(posDiff)
+                    self._lastDoPosDiffTime = nowTime
+            
+            #posDiff = self._calPosDiff(posInfo)
+            
+    def _doPosDiff(self, posDiff):
+        for pos in posDiff:
+            stBuyPos = pos[5]
+            stSellPos = pos[6]
+            acBuyPos = pos[-4]
+            acSellPos = pos[-3]
+            
+            buyDiff = stBuyPos - acBuyPos
+            sellDiff = stSellPos - acSellPos
+            
+            # 处理买仓, 账户仓少开多平
+            if buyDiff > 0:
+                if not self._autoSyncPosConf['OnlyDec']:
+                    self._sendSyncPosOrder(pos, buyDiff, dBuy, oOpen)
+            elif buyDiff < 0:
+                self._sendSyncPosOrder(pos, -buyDiff, dSell, oCover)
+            
+            # 处理卖仓, 账户仓少开多平
+            if sellDiff > 0:
+                if not self._autoSyncPosConf['OnlyDec']:
+                    self._sendSyncPosOrder(pos, sellDiff, dSell, oOpen)
+            elif sellDiff < 0:
+                self._sendSyncPosOrder(pos, sellDiff, dBuy, oCover)
+            
+            
+    def _sendSyncPosOrder(self, pos, orderQty, orderDirct, entryOrExit):
+        userNo = pos[0]
+        contNo = pos[1]
         
-    def _getSyncPosPrice(self, contNo):
-        pass
+        orderType = otLimit
+        orderPrice = 0
+        # 如果市价同步
+        if self._autoSyncPosConf["PriceType"] == 2:
+            orderType = otMarket
+        else:    
+            orderPrice = self._getSyncPosPrice(contNo, orderDirct)
+        
+            if orderPrice == 0:
+                self.logger.warn("Sync Position Price can not get!")
+                return
+        
+        aOrder = {
+            'UserNo': userNo,
+            'Sign': self._trdModel.getSign(userNo),
+            'Cont': contNo,
+            'OrderType': orderType,
+            'ValidType': '0',
+            'ValidTime': '0',
+            'Direct': orderDirct,
+            'Offset': entryOrExit,
+            'Hedge': 'T',
+            'OrderPrice': orderPrice,
+            'TriggerPrice': 0,
+            'TriggerMode': 'N',
+            'TriggerCondition': 'N',
+            'OrderQty': orderQty,
+            'StrategyType': 'N',
+            'Remark': '',
+            'AddOneIsValid': tsDay,
+        }
+        
+        stId = 0
+        eId = str(stId) + '-' + str(self._getESessionId())
+        aOrderEvent = Event({
+            "EventCode": EV_ST2EG_ACTUAL_ORDER,
+            "StrategyId": stId,
+            "Data": aOrder,
+            "ESessionId": eId,
+        })
+        
+        #self.logger.debug("SendSyncOrder:%s" %aOrderEvent)
+        self._st2egQueue.put_nowait(aOrderEvent)
+    
+    def _getESessionId(self):
+        self._eSessionId += 1
+        return self._eSessionId
+    
+    def _getSyncPosPrice(self, contNo, orderDirct):
+        syncPrice = 0
+        priceType = self._autoSyncPosConf['PriceType']
+        nTicks = self._autoSyncPosConf['PriceTick']
+        
+        # 市价
+        if priceType == 2:
+            return 0
+            
+        contDict = self._qteModel.getContractDict()
+        if contNo not in contDict:
+                return 0
+        # 对价
+        if priceType == 0:
+            if orderDirct == dBuy:
+                syncPrice = contDict[contNo].getLv1Data(19, 0)
+            else:
+                syncPrice = contDict[contNo].getLv1Data(17, 0)
+                
+        # 最新价
+        if priceType == 1:
+            syncPrice = contDict[contNo].getLv1Data(4, 0)
+            
+        if syncPrice == 0:
+            return 0
+        
+        # 获取priceTick
+        commNo = contDict[contNo].getContract()['CommodityNo']
+        commDict = self._qteModel.getCommodityDict()
+        if commNo not in commDict:
+            self.logger.warn("Sync Position not found commodity!")
+            return 0
+            
+        priceTick = commDict[commNo].getCommodity()['PriceTick']
+        
+        # 考虑超价点数
+        if orderDirct == dBuy:
+            syncPrice += nTicks*priceTick
+        else:
+            syncPrice -= nTicks*priceTick
+            
+        return syncPrice
         
     def _send2uiQueue(self, event):
         # self.logger.info("[ENGINE] Send event(%d,%d) to UI!"%(event.getEventCode(), event.getStrategyId()))
