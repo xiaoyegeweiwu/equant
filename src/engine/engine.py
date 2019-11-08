@@ -65,9 +65,10 @@ class StrategyEngine(object):
         self._stRunStatus = {}               # 运行状态
         
         # 持仓同步参数
-        self._isAutoSyncPos = False
+        self._isAutoSyncPos = True
+        self._isOneKeySyncPos = False
         self._autoSyncPosConf = {
-            "OneKeySync": False,                     # 一键同步
+            "OneKeySync": self._isOneKeySyncPos,     # 一键同步
             "AutoSyncPos": self._isAutoSyncPos,      # 是否自动同步
             "PriceType": 0,                          # 价格类型 0:对盘价, 1:最新价, 2:市价
             "PriceTick": 0,                          # 超价点数
@@ -377,6 +378,7 @@ class StrategyEngine(object):
     def _onSyncPosConf(self, event):
         conf = event.getData()
         self._isAutoSyncPos = conf["AutoSyncPos"]
+        self._isOneKeySyncPos = conf["OneKeySync"]
         self._autoSyncPosConf = conf
         if conf["SyncTick"] <= 500:
             self._autoSyncPosConf["SyncTick"] = 500
@@ -571,7 +573,7 @@ class StrategyEngine(object):
             self._lastPosTime = nowTime
             return
             
-        if (nowTime - self._lastPosTime).total_seconds()*1000 >= 500:
+        if self._isOneKeySyncPos or (nowTime - self._lastPosTime).total_seconds()*1000 >= 500 :
             self._lastPosTime = nowTime
             
             accPos = {}
@@ -612,10 +614,11 @@ class StrategyEngine(object):
             self._send2uiQueue(event)
             
             
-            if self._isAutoSyncPos:
-                if (nowTime - self._lastDoPosDiffTime).total_seconds()*1000 >= self._autoSyncPosConf["SyncTick"]:
+            if self._isOneKeySyncPos or self._isAutoSyncPos:
+                if self._isOneKeySyncPos or (nowTime - self._lastDoPosDiffTime).total_seconds()*1000 >= self._autoSyncPosConf["SyncTick"]:
                     self._doPosDiff(posDiff)
                     self._lastDoPosDiffTime = nowTime
+                    self._isOneKeySyncPos = False
             
             #posDiff = self._calPosDiff(posInfo)
             
