@@ -65,7 +65,7 @@ class StrategyEngine(object):
         self._stRunStatus = {}               # 运行状态
         
         # 持仓同步参数
-        self._isAutoSyncPos = True
+        self._isAutoSyncPos = False
         self._isOneKeySyncPos = False
         self._autoSyncPosConf = {
             "OneKeySync": self._isOneKeySyncPos,     # 一键同步
