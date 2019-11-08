@@ -663,7 +663,7 @@ class StrategyEngine(object):
                         self._sendSyncPosOrder(pos, sellDiff, dSell, oOpen)
                 elif sellDiff < 0:
                     self._sendSyncPosOrder(pos, -sellDiff, dBuy, oCover)
-                    
+            # 外盘不存在双向持仓      
             else:
                 stPos = stBuyPos - stSellPos
                 acPos = acBuyPos - acSellPos

@@ -221,6 +221,7 @@ class CalcCenter(object):
 
     def getUsersPosition(self):
         """获取包含账户信息的持仓信息"""
+        #print("AAAA,pos:", self._positions)
         return copy.deepcopy(self._positions)
 
     def _getSpecificPositionInfo(self, user, contract):
