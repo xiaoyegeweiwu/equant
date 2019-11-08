@@ -606,7 +606,7 @@ class Strategy:
                 sellPos = conts[ct]['TotalSell']
                 sellPrice = conts[ct]['SellPrice']
                 if sellPos > 0:
-                    self._dataModel.setBuyToCover(id, ct, buyPos, buyPrice)
+                    self._dataModel.setBuyToCover(id, ct, sellPos, sellPrice)
 
         posDict = calc.getUsersPosition()
         #self.logger.debug("PosDict2:%s" %posDict)
