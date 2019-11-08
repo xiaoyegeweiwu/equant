@@ -196,6 +196,7 @@ class StrategyConfig_new(object):
             'Pending': False,
             'Alarm': False, # 是否开启警报
             'PopOn': False, # 是否允许弹窗
+            'AutoSyncPos': False, #是否自动同步持仓, 和引擎设置一致
         }
 
     # ----------------------- 合约/K线类型/K线周期 ----------------------
@@ -275,6 +276,12 @@ class StrategyConfig_new(object):
                     'UseSample': useSample, # 运算起始点-不执行历史K线
                     'Trigger': trigger     # 是否订阅历史K线
                 }
+
+    def setAutoSyncPos(self, conf):
+        self._metaData['AutoSyncPos'] = conf['AutoSyncPos']
+        
+    def getAutoSyncPos(self):
+        return self._metaData['AutoSyncPos']
 
     def isVaildDate(self, date, format):
         try:
