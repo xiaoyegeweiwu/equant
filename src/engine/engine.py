@@ -68,12 +68,12 @@ class StrategyEngine(object):
         self._isAutoSyncPos = False
         self._isOneKeySyncPos = False
         self._autoSyncPosConf = {
-            "OneKeySync": self._isOneKeySyncPos,     # 一键同步
-            "AutoSyncPos": self._isAutoSyncPos,      # 是否自动同步
-            "PriceType": 0,                          # 价格类型 0:对盘价, 1:最新价, 2:市价
-            "PriceTick": 0,                          # 超价点数
-            "OnlyDec": False,                        # 是否只做减仓同步
-            "SyncTick": 500,                         # 同步间隔，毫秒
+            'OneKeySync': self._isOneKeySyncPos,     # 一键同步
+            'AutoSyncPos': self._isAutoSyncPos,      # 是否自动同步
+            'PriceType': 0,                          # 价格类型 0:对盘价, 1:最新价, 2:市价
+            'PriceTick': 0,                          # 超价点数
+            'OnlyDec': False,                        # 是否只做减仓同步
+            'SyncTick': 500,                         # 同步间隔，毫秒
         }
         self._eSessionId = 0
         
@@ -377,11 +377,14 @@ class StrategyEngine(object):
         
     def _onSyncPosConf(self, event):
         conf = event.getData()
-        self._isAutoSyncPos = conf["AutoSyncPos"]
-        self._isOneKeySyncPos = conf["OneKeySync"]
+        self._isAutoSyncPos = conf['AutoSyncPos']
+        self._isOneKeySyncPos = conf['OneKeySync']
         self._autoSyncPosConf = conf
-        if conf["SyncTick"] <= 500:
-            self._autoSyncPosConf["SyncTick"] = 500
+        if conf['SyncTick'] <= 500:
+            self._autoSyncPosConf['SyncTick'] = 500
+            
+        for id in self._isStActualRun:
+            self._sendEvent2Strategy(id, event)
 
     # ////////////////api回调及策略请求事件处理//////////////////
     def _handleApiData(self):
@@ -621,7 +624,7 @@ class StrategyEngine(object):
             self._send2uiQueue(event)
             
             if self._isOneKeySyncPos or self._isAutoSyncPos:
-                if self._isOneKeySyncPos or self._timeDiffMs(self._lastDoPosDiffTime, nowTime)>= self._autoSyncPosConf["SyncTick"]:
+                if self._isOneKeySyncPos or self._timeDiffMs(self._lastDoPosDiffTime, nowTime)>= self._autoSyncPosConf['SyncTick']:
                     self._doPosDiff(posDiff)
                     self._lastDoPosDiffTime = nowTime
                     self._isOneKeySyncPos = False

@@ -480,6 +480,7 @@ class Strategy:
             EV_UI2EG_EQUANT_EXIT            : self._onEquantExit             ,
             EV_UI2EG_STRATEGY_FIGURE        : self._switchStrategy           ,
             EV_UI2EG_STRATEGY_REMOVE        : self._onStrategyRemove         ,
+            EV_UI2EG_SYNCPOS_CONF           : self._onSyncPosConf            ,
         }
         
     def _actualRun(self):
@@ -1241,6 +1242,10 @@ class Strategy:
 
     def _switchStrategy(self, event):
         self._dataModel.getHisQuoteModel()._switchKLine()
+
+    def _onSyncPosConf(self, event):
+        conf = event.getData()
+        self._cfgModel.setAutoSyncPos(conf)
 
     def _onStrategyRemove(self, event):
         self._isSt2EgQueueEffective = False
