@@ -563,6 +563,7 @@ class Strategy:
                     self._dataModel.runRealTime(self._context, self._userModule.handle_data, event)
                 except queue.Empty as e:
                     if self._firstTriggerQueueEmpty:
+                        self._clearHisPos()
                         self._atHisOver()
                         self._runStatus = ST_STATUS_CONTINUES
                         self._send2UiEgStatus(self._runStatus)
@@ -577,9 +578,38 @@ class Strategy:
                 self._exit(-1, errorText)
 
     def _clearHisPos(self):
-        pass
-        #buyPos = self._dataModel.getBuyPositionInStrategy('')
-        #sellPos = self._dataModel.getSellPositionInStrategy('')
+        '''清空历史持仓'''
+        if self._runStatus == ST_STATUS_CONTINUES:
+            return
+            
+        if not self._cfgModel.isActualRun():
+            return
+            
+        if not self._cfgModel.getAutoSyncPos():
+            return
+    
+        calc = self._dataModel.getCalcCenter()
+        # 获取该策略所有合约的虚拟持仓
+        posDict = calc.getUsersPosition()
+        #self.logger.debug("PosDict1:%s" %posDict)
+        trd = self._dataModel.getTradeModel()
+        users = trd.getAllAccountId()
+        
+        for id in posDict:
+            conts = posDict[id]
+            for ct in conts:
+                buyPos = conts[ct]['TotalBuy']
+                buyPrice = conts[ct]['BuyPrice']
+                if buyPos > 0:
+                    self._dataModel.setSell(id, ct, buyPos, buyPrice)
+                    
+                sellPos = conts[ct]['TotalSell']
+                sellPrice = conts[ct]['SellPrice']
+                if sellPos > 0:
+                    self._dataModel.setBuyToCover(id, ct, buyPos, buyPrice)
+
+        posDict = calc.getUsersPosition()
+        #self.logger.debug("PosDict2:%s" %posDict)
 
     def _startStrategyThread(self):
         '''历史数据准备完成后，运行策略'''
