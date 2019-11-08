@@ -60,8 +60,9 @@ class StrategyEngine(object):
         # 策略进程队列列表
         self._eg2stQueueDict = {} #{strategy_id, queue}
         self._isEffective = {}
-        self._isSt2EngineDataEffective= {}
-        self._isStActualRun = {}
+        self._isSt2EngineDataEffective= {} 
+        self._isStActualRun = {}             # 实盘运行
+        self._stRunStatus = {}               # 运行状态
         
         # 持仓同步参数
         self._isAutoSyncPos = False
@@ -365,6 +366,8 @@ class StrategyEngine(object):
             self.logger.info(f"策略删除完成，策略id:{event.getStrategyId()}")
         elif stat == ST_STATUS_EXCEPTION:
             self._onStrategyExceptionCom(event)
+            
+        self._stRunStatus[event.getStrategyId()] = stat
 
     def _onStrategyExceptionCom(self, event):
         self.sendEvent2UI(event)
@@ -586,6 +589,9 @@ class StrategyEngine(object):
                     continue
                 
                 if not self._isStActualRun[id]:
+                    continue
+                    
+                if self._stRunStatus[id] != ST_STATUS_CONTINUES:
                     continue
 
                 strategyPos[id] = self._strategyPosDict[id]

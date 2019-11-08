@@ -547,7 +547,7 @@ class Strategy:
         try:
             # 等待回测阶段
             self._runStatus = ST_STATUS_HISTORY
-            self._send2UIStatus(self._runStatus)
+            self._send2UiEgStatus(self._runStatus)
             # runReport中会有等待
 
             self._dataModel.runReport(self._context, self._userModule.handle_data)
@@ -564,7 +564,7 @@ class Strategy:
                     if self._firstTriggerQueueEmpty:
                         self._atHisOver()
                         self._runStatus = ST_STATUS_CONTINUES
-                        self._send2UIStatus(self._runStatus)
+                        self._send2UiEgStatus(self._runStatus)
                         self._firstTriggerQueueEmpty = False
                     else:
                         time.sleep(0.1)
@@ -693,8 +693,8 @@ class Strategy:
         self._stTimer = Thread(target=self._runTimer)
         self._stTimer.start()
         
-    def _send2UIStatus(self, status):
-        '''通知界面策略运行状态'''
+    def _send2UiEgStatus(self, status):
+        '''通知界面和引擎策略运行状态'''
         event = Event({
             "StrategyId" : self._strategyId,
             "EventCode"  : EV_EG2UI_STRATEGY_STATUS,
@@ -703,6 +703,7 @@ class Strategy:
             }
         })
         self.sendEvent2UI(event)
+        self.sendEvent2Engine(event)
     
     # ////////////////////////////内部数据请求接口////////////////////
     def _reqData(self, code, data=''):
