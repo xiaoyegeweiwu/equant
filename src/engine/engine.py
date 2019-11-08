@@ -617,7 +617,7 @@ class StrategyEngine(object):
                 "Data"      : posDiff,
             })
             
-            self.logger.debug("Sync position to ui:%s"%event.getData())
+            #self.logger.debug("Sync position to ui:%s"%event.getData())
             self._send2uiQueue(event)
             
             if self._isOneKeySyncPos or self._isAutoSyncPos:
