@@ -455,7 +455,7 @@ class StrategyEngine(object):
             #10秒同步一次持仓
             self._syncPosition()
                 
-            time.sleep(1)
+            time.sleep(0.1)
                 
     def _start1secondsTimer(self):
         '''资金查询线程'''
@@ -565,15 +565,22 @@ class StrategyEngine(object):
                             
         return rlt
         
+    def _timeDiffMs(self, beg, end):
+        diff = end - beg
+        ret = diff.seconds*1000000 + diff.microseconds
+        
+        return ret/1000
+        
     def _syncPosition(self):
         nowTime = datetime.now()
         # 未登录，不同步持仓
         userDict = self._trdModel.getUserInfo()
         if len(userDict) <= 0:
             self._lastPosTime = nowTime
+            time.sleep(1)
             return
             
-        if self._isOneKeySyncPos or (nowTime - self._lastPosTime).total_seconds()*1000 >= 500 :
+        if self._isOneKeySyncPos or self._timeDiffMs(self._lastPosTime, nowTime) >= 400:
             self._lastPosTime = nowTime
             
             accPos = {}
@@ -610,17 +617,15 @@ class StrategyEngine(object):
                 "Data"      : posDiff,
             })
             
-            #self.logger.debug("Sync position to ui:%s"%event.getData())
+            self.logger.debug("Sync position to ui:%s"%event.getData())
             self._send2uiQueue(event)
             
-            
             if self._isOneKeySyncPos or self._isAutoSyncPos:
-                if self._isOneKeySyncPos or (nowTime - self._lastDoPosDiffTime).total_seconds()*1000 >= self._autoSyncPosConf["SyncTick"]:
+                if self._isOneKeySyncPos or self._timeDiffMs(self._lastDoPosDiffTime, nowTime)>= self._autoSyncPosConf["SyncTick"]:
                     self._doPosDiff(posDiff)
                     self._lastDoPosDiffTime = nowTime
                     self._isOneKeySyncPos = False
             
-            #posDiff = self._calPosDiff(posInfo)
             
     def _doPosDiff(self, posDiff):
         for pos in posDiff:
