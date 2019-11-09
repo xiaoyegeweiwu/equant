@@ -974,14 +974,23 @@ class QuantApplication(QWidget):
         self._logger = self._controller.get_logger()
 
         self.hbox = QHBoxLayout()
-
+        self.hbox.setContentsMargins(0, 0, 0, 0)
+        self.hbox.setSpacing(0)
         # self.topLayout = QGridLayout()  # 上方布局
         # self.bottomLayout = QGridLayout()  # 下方布局
         self.main_splitter = QSplitter(Qt.Horizontal)
+        self.main_splitter.setHandleWidth(0)
+        self.main_splitter.setContentsMargins(10, 10, 10, 10)
         self.left_splitter = QSplitter(Qt.Vertical)
+        self.left_splitter.setHandleWidth(0)
+        self.left_splitter.setContentsMargins(0, 0, 0, 0)
         self.right_splitter = QSplitter(Qt.Vertical)
+        self.right_splitter.setHandleWidth(0)
+        self.right_splitter.setContentsMargins(0, 0, 0, 0)
 
         self.left_top_splitter = QSplitter(Qt.Horizontal)
+        self.left_top_splitter.setHandleWidth(0)
+        self.left_top_splitter.setContentsMargins(0, 0, 0, 0)
 
         # 获取所有策略可用过滤规则及目录
         self.strategy_filter = get_strategy_filters(strategy_path)
@@ -1381,7 +1390,7 @@ class QuantApplication(QWidget):
         self.cbComboBox.addItems(['对盘价', '最新价', '市价'])
         self.cbComboBox.currentIndexChanged.connect(self.valid_spin)
         spacerItem = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
-        spacerItem2 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        spacerItem2 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Minimum)
         self.spin = QSpinBox()
         self.spin.setMinimum(1)
         self.spin.setMaximum(100)
