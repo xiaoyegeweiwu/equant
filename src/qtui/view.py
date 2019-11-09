@@ -1843,6 +1843,30 @@ class QuantApplication(QWidget):
                 item = QTableWidgetItem(str(positions[i][j]))
                 self.pos_table.setItem(i, j, item)
 
+    def reportDisplay(self, data, id):
+        """
+        显示回测报告
+        :param data: 回测报告数据
+        :param id:  对应策略Id
+        :return:
+        """
+        stManager = self.control.getStManager()
+        strategyPath = self.control.getEditorText()["path"]
+
+        stName = os.path.basename(strategyPath)
+
+        stData = stManager.getSingleStrategy(id)
+        # runMode = stData["Config"]["RunMode"]["Actual"]["SendOrder2Actual"]
+        runMode = stData["Config"]["RunMode"]["SendOrder2Actual"]
+        # 保存报告数据
+        save(data, runMode, stName)
+
+        self.hisTop = HistoryToplevel(self, self.root)
+
+        ReportView(data, self.hisTop)
+
+        self.hisTop.display_()
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
