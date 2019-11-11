@@ -25,7 +25,7 @@ from qtui.strategyPolicy import Ui_strategyMainWin
 from api.base_api import BaseApi
 from api.api_func import _all_func_
 from capi.com_types import *
-from qtui.utils import parseStrategtParam, Tree, get_strategy_filters
+from qtui.utils import parseStrategtParam, Tree, get_strategy_filters, FileIconProvider
 
 strategy_path = os.path.join(os.getcwd(), 'strategy')
 
@@ -497,7 +497,7 @@ class StrategyPolicy(QMainWindow, Ui_strategyMainWin):
         self.writeConfig(userConfig)
         config = self.getConfig()
         if config:  # 获取到config
-            if self.contractWin.row == -1:
+            if not self._paramFlag:
                 self._control._request.loadRequest(strategyPath, config)
                 self._control.logger.info("load strategy")
             else:
@@ -1077,6 +1077,7 @@ class QuantApplication(QWidget):
         self.model.setNameFilters(self.strategy_filter)
         self.model.setNameFilterDisables(False)
         self.model.setFilter(QDir.Dirs | QDir.Files)
+        self.model.setIconProvider(FileIconProvider())
         # self.strategy_tree.setHeaderLabels(['策略'])
         self.strategy_tree.setHeaderHidden(True)
         self.strategy_tree.hideColumn(1)
@@ -1360,8 +1361,9 @@ class QuantApplication(QWidget):
         self.strategy_table.setColumnCount(12)  # 列数
         self.strategy_table.verticalHeader().setVisible(False)
         self.strategy_table.setShowGrid(False)
-        # self.strategy_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)  # 所有列自动拉伸，充满界面
-        self.strategy_table.horizontalHeader().setSectionResizeMode(QHeaderView.Interactive)  # 所有列自动拉伸，充满界面
+        self.strategy_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)  # 所有列自动拉伸，充满界面
+        self.strategy_table.horizontalHeader().setSectionResizeMode(2, QHeaderView.Interactive)  # 指定列可以手动调整
+        self.strategy_table.horizontalHeader().setSectionResizeMode(3, QHeaderView.Interactive)  #
         self.strategy_table.setSelectionMode(QAbstractItemView.SingleSelection)  # 设置只能选中一行
         self.strategy_table.setEditTriggers(QTableView.NoEditTriggers)  # 不可编辑
         self.strategy_table.setSelectionBehavior(QAbstractItemView.SelectRows)  # 设置只有行选中
