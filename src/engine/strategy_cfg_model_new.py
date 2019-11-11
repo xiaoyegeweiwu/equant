@@ -498,7 +498,7 @@ class StrategyConfig_new(object):
     def setTradeFee(self, type, feeType, feeValue, contNo=''):
         '''设置交易手续费'''
         if not contNo:
-            contNo = self.getBenchmark()
+            contNo = self.getBenchmarkNo()
             
         typeMap = {
             'A': ('OpenFee', 'CloseFee', 'CloseTodayFee'),
@@ -527,7 +527,7 @@ class StrategyConfig_new(object):
     def getRatioOrFixedFee(self, feeType, isRatio, contNo=''):
         '''获取 开仓/平仓/今平 手续费率或固定手续费'''
         if not contNo:
-            contNo = self.getBenchmark()
+            contNo = self.getBenchmarkNo()
         
         typeDict = {'OpenFee':'开仓', 'CloseFee':'平仓', 'CloseTodayFee':'平今'}
         if feeType not in typeDict:
@@ -535,7 +535,11 @@ class StrategyConfig_new(object):
 
         openFeeType = EEQU_FEE_TYPE_RATIO if isRatio else EEQU_FEE_TYPE_FIXED
         if contNo not in self._metaData['Money'][feeType]:
-            raise Exception("请确保为合约%s设置了%s手续费！"%(contNo, typeDict[feeType]))
+            contList = list(self._metaData['Money'][feeType].keys())
+            if len(contList) > 0:
+                contNo = contList[0]
+            else:
+                raise Exception("请确保为合约%s设置了%s手续费！"%(contNo, typeDict[feeType]))
 
         return self._metaData['Money'][feeType][contNo]['Value'] if self._metaData['Money'][feeType][contNo]['Type'] == openFeeType else 0
 
@@ -711,6 +715,15 @@ class StrategyConfig_new(object):
         subContract = self._metaData['SubContract']
         if not subContract or len(subContract) == 0:
             raise Exception("请确保在设置界面或者在策略中调用SetBarInterval方法设置展示的合约、K线类型和周期")
+
+        return subContract[0]
+        
+    def getBenchmarkNo(self):
+        '''获取基准合约'''
+        # 1、取界面设置的第一个合约 2、取SetBarinterval第一个设置的合约
+        subContract = self._metaData['SubContract']
+        if not subContract or len(subContract) == 0:
+            return 'Default'
 
         return subContract[0]
 
