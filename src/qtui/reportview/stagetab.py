@@ -57,8 +57,8 @@ class Label(QWidget):
         self._content = content
         self._table = table
         self._parent = parent
-        self._pixUp = QPixmap("up.gif")
-        self._pixDn = QPixmap("down.gif")
+        self._pixUp = QPixmap("icon/up.gif")
+        self._pixDn = QPixmap("icon/down.gif")
 
         self._isOpend = True
         self.initLabel()

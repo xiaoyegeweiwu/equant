@@ -3,7 +3,7 @@ import pyqtgraph as pg
 import pandas as pd
 import numpy as np
 from functools import partial
-from crosshair import Crosshair
+from qtui.reportview.crosshair import Crosshair
 
 
 ########################################################################

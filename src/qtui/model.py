@@ -295,8 +295,10 @@ class GetEgData(object):
 
         # 取到报告数据弹出报告
         if self._reportData:
-            self._app.reportDisplay(self._reportData, id)
             self._logger.info(f"[UI][{id}]: Receiving report data answer successfully!")
+            self._app.reportDisplay(self._reportData, id)
+            return
+
         self._logger.info(f"[UI][{id}]: Report data received is empty!")
 
     def _onEgDebugInfo(self, event):

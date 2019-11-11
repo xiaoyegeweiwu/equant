@@ -648,24 +648,53 @@ class StrategyEngine(object):
             acBuyPos = pos[-4]
             acSellPos = pos[-3]
             
+            stTdBuyPos = pos[7]
+            stTdSellPos = pos[8]
+            acTdBuyPos = pos[-2]
+            acTdSellPos = pos[-1]
+            
             # 内盘可以双向持仓
             if exchgNo in ('ZCE', 'DCE', 'SHFE', 'INE', 'CFFEX'):
                 buyDiff = stBuyPos - acBuyPos
                 sellDiff = stSellPos - acSellPos
+                
+                buyTdDiff = stTdBuyPos - acTdBuyPos
+                sellTdDiff = stTdSellPos - acTdSellPos
+                
+                buyYsDiff = buyDiff - buyTdDiff
+                sellYsDiff = sellDiff - sellTdDiff
             
                 # 处理买仓, 账户仓少开多平
                 if buyDiff > 0:
                     if not self._autoSyncPosConf['OnlyDec']:
                         self._sendSyncPosOrder(pos, buyDiff, dBuy, oOpen)
                 elif buyDiff < 0:
-                    self._sendSyncPosOrder(pos, -buyDiff, dSell, oCover)
+                    # 上期区分平今平昨
+                    if exchgNo in ('SHFE', 'INE'):
+                        # 账户昨仓多, 平昨
+                        if buyYsDiff < 0:
+                            self._sendSyncPosOrder(pos, -buyYsDiff, dSell, oCover)
+                        # 账户今仓多, 平今
+                        if buyTdDiff < 0:
+                            self._sendSyncPosOrder(pos, -buyTdDiff, dSell, oCoverT)
+                    else:
+                        self._sendSyncPosOrder(pos, -buyDiff, dSell, oCover)
                 
                 # 处理卖仓, 账户仓少开多平
                 if sellDiff > 0:
                     if not self._autoSyncPosConf['OnlyDec']:
                         self._sendSyncPosOrder(pos, sellDiff, dSell, oOpen)
                 elif sellDiff < 0:
-                    self._sendSyncPosOrder(pos, -sellDiff, dBuy, oCover)
+                    if exchgNo in ('SHFE', 'INE'):
+                        # 账户昨仓多, 平昨
+                        if sellYsDiff < 0:
+                            self._sendSyncPosOrder(pos, -sellYsDiff, dBuy, oCover)
+                        # 账户今仓多, 平今
+                        if sellTdDiff < 0:
+                            self._sendSyncPosOrder(pos, -sellTdDiff, dBuy, oCoverT)
+                    else:
+                        self._sendSyncPosOrder(pos, -sellDiff, dBuy, oCover)
+                        
             # 外盘不存在双向持仓      
             else:
                 stPos = stBuyPos - stSellPos

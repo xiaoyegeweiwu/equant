@@ -10,12 +10,6 @@ from qtui.control import Controller
 from qtui.view import QuantApplication
 from utils.logger import Logger
 
-##################################################################
-# 系统任务栏图标，区分系统
-##################################################################
-import ctypes
-ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("myappid")
-
 
 def run_log_process(logger):
     logger.run()
