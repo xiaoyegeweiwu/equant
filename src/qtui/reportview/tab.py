@@ -2,11 +2,11 @@ import sys
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
-from fundtab import LineWidget
-from analysetab import AnalyseTable
-from tradetab import TradeTab
-from stagetab import StageTab
-from graphtab import GraphTab
+from qtui.reportview.fundtab import LineWidget
+from qtui.reportview.analysetab import AnalyseTable
+from qtui.reportview.tradetab import TradeTab
+from qtui.reportview.stagetab import StageTab
+from qtui.reportview.graphtab import GraphTab
 
 
 TABTEXT = {
@@ -555,9 +555,10 @@ DATAS = {
 
 class Tab(QTabWidget):
 
-    def __init__(self):
+    def __init__(self, datas):
         super(Tab, self).__init__()
-        self._datas = DATAS
+        # self._datas = DATAS
+        self._datas = datas
         self._createTab()
 
     def _createTab(self):

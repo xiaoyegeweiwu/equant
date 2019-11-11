@@ -26,6 +26,9 @@ from api.base_api import BaseApi
 from api.api_func import _all_func_
 from capi.com_types import *
 from qtui.utils import parseStrategtParam, Tree, get_strategy_filters
+from utils.utils import save
+
+from qtui.reportview.reportview import ReportView
 
 strategy_path = os.path.join(os.getcwd(), 'strategy')
 
@@ -966,12 +969,17 @@ class WebEngineView(QWebEngineView):
 
 
 class QuantApplication(QWidget):
+
+    reportShowSignal = pyqtSignal(dict)
+
     def __init__(self, control, parent=None):
         super().__init__(parent)
 
         # 初始化控制器
         self._controller = control
         self._logger = self._controller.get_logger()
+
+        self.reportView = self._controller.reportView
 
         self.hbox = QHBoxLayout()
 
@@ -1489,7 +1497,7 @@ class QuantApplication(QWidget):
         elif action == delete:
             self._controller.delStrategy(strategy_id_list)
         elif action == report:
-            pass
+            self._controller.generateReportReq(strategy_id_list)
         elif action == onSignal:
             self._controller.signalDisplay(strategy_id_list)
         elif action == policy:
@@ -1850,22 +1858,18 @@ class QuantApplication(QWidget):
         :param id:  对应策略Id
         :return:
         """
-        stManager = self.control.getStManager()
-        strategyPath = self.control.getEditorText()["path"]
+        stManager = self._controller.getStManager()
+        strategyPath = self._controller.getEditorText()["path"]
 
         stName = os.path.basename(strategyPath)
 
         stData = stManager.getSingleStrategy(id)
-        # runMode = stData["Config"]["RunMode"]["Actual"]["SendOrder2Actual"]
         runMode = stData["Config"]["RunMode"]["SendOrder2Actual"]
+
         # 保存报告数据
         save(data, runMode, stName)
 
-        self.hisTop = HistoryToplevel(self, self.root)
-
-        ReportView(data, self.hisTop)
-
-        self.hisTop.display_()
+        self.reportView.reportShowSig.emit(data)
 
 
 if __name__ == "__main__":

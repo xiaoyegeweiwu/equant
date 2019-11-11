@@ -6,9 +6,6 @@ import importlib
 import traceback
 import re
 
-from tkinter import Tk
-from tkinter import messagebox
-
 from PyQt5.QtCore import QTimer, QSharedMemory
 from PyQt5.QtGui import QFont, QIcon
 from PyQt5.QtWidgets import QApplication, QMessageBox
@@ -18,6 +15,7 @@ from qtui.view import QuantApplication
 from utils.language import *
 from capi.com_types import *
 from utils.window.framelesswindow import FramelessWindow, CommonHelper
+from qtui.reportview.reportview import ReportView
 
 
 class Controller(object):
@@ -44,6 +42,8 @@ class Controller(object):
         if not m.create(1):
             QMessageBox.warning(None, '警告', '程序已经在运行！！！')
         else:
+            # 回测报告窗口（主线程中创建)
+            self.reportView = ReportView()
             self.app = QuantApplication(self)
             self.mainWnd = FramelessWindow()
             self.mainWnd.setWindowTitle('极星量化')
@@ -231,7 +231,7 @@ class Controller(object):
             strategyData = self.strategyManager.getSingleStrategy(id)
             if status == ST_STATUS_QUIT:  # 策略已停止，从本地获取数据
                 if "ResultData" not in strategyData:  # 程序启动时恢复的策略没有回测数据
-                    messagebox.showinfo("提示", "策略未启动，报告数据不存在", parent=self.top)
+                    QMessageBox.showinfo("提示", "策略未启动，报告数据不存在")
                     return
                 reportData = strategyData["ResultData"]
                 self.app.reportDisplay(reportData, id)

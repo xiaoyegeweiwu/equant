@@ -3,7 +3,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 import pyqtgraph as pg
 
-from fundtab import KeyWraper, MyStringAxis, CustomViewBox
+from qtui.reportview.fundtab import KeyWraper, MyStringAxis, CustomViewBox
 
 
 DIR = {
