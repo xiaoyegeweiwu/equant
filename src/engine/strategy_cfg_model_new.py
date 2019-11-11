@@ -465,8 +465,6 @@ class StrategyConfig_new(object):
         if value < 0 or type not in (EEQU_FEE_TYPE_RATIO, EEQU_FEE_TYPE_FIXED):
             raise Exception("保证金类型只能是 'R': 按比例收取，'F': 按定额收取 中的一个，并且保证金比例/额度不能小于0！")
 
-        # TODO : 清空界面设置的参数
-
         if contNo not in self._metaData['Money']['Margin']:
             self._metaData['Money']['Margin'][contNo] = {}
 
@@ -497,8 +495,11 @@ class StrategyConfig_new(object):
         return self._metaData['Money']['Margin'][contNo]['Value']
 
     # ----------------------- 交易手续费 ----------------------
-    def setTradeFee(self, type, feeType, feeValue, contNo='Default'):
+    def setTradeFee(self, type, feeType, feeValue, contNo=''):
         '''设置交易手续费'''
+        if not contNo:
+            contNo = self.getBenchmark()
+            
         typeMap = {
             'A': ('OpenFee', 'CloseFee', 'CloseTodayFee'),
             'O': ('OpenFee',),
@@ -511,18 +512,23 @@ class StrategyConfig_new(object):
         if feeType not in (EEQU_FEE_TYPE_RATIO, EEQU_FEE_TYPE_FIXED):
             raise Exception("手续费收取方式只能取 'R': 按比例收取，'F': 按定额收取 中的一个！")
 
-        # TODO : 清空界面设置信息
-
         keyList = typeMap[type]
         for key in keyList:
             feeDict = self._metaData['Money'][key]
-            feeDict[contNo] = {
-                'Type': feeType,
-                'Value': feeValue
-            }
+            if contNo not in feeDict:
+                feeDict[contNo] = {}
+            #print("[0000000000]SetTradeFee:%s" %feeDict)    
+            feeDict[contNo]['Type'] = feeType
+            feeDict[contNo]['Value'] = feeValue
+            #print("[11111111]SetTradeFee:%s" %feeDict)
+             
+        return 0
 
-    def getRatioOrFixedFee(self, feeType, isRatio, contNo='Default'):
+    def getRatioOrFixedFee(self, feeType, isRatio, contNo=''):
         '''获取 开仓/平仓/今平 手续费率或固定手续费'''
+        if not contNo:
+            contNo = self.getBenchmark()
+        
         typeDict = {'OpenFee':'开仓', 'CloseFee':'平仓', 'CloseTodayFee':'平今'}
         if feeType not in typeDict:
             return 0
@@ -533,27 +539,27 @@ class StrategyConfig_new(object):
 
         return self._metaData['Money'][feeType][contNo]['Value'] if self._metaData['Money'][feeType][contNo]['Type'] == openFeeType else 0
 
-    def getOpenRatio(self, contNo='Default'):
+    def getOpenRatio(self, contNo=''):
         '''获取开仓手续费率'''
         return self.getRatioOrFixedFee('OpenFee', True, contNo)
 
-    def getOpenFixed(self, contNo='Default'):
+    def getOpenFixed(self, contNo=''):
         '''获取开仓固定手续费'''
         return self.getRatioOrFixedFee('OpenFee', False, contNo)
 
-    def getCloseRatio(self, contNo='Default'):
+    def getCloseRatio(self, contNo=''):
         '''获取平仓手续费率'''
         return self.getRatioOrFixedFee('CloseFee', True, contNo)
 
-    def getCloseFixed(self, contNo='Default'):
+    def getCloseFixed(self, contNo=''):
         '''获取平仓固定手续费'''
         return self.getRatioOrFixedFee('CloseFee', False, contNo)
 
-    def getCloseTodayRatio(self, contNo='Default'):
+    def getCloseTodayRatio(self, contNo=''):
         '''获取今平手续费率'''
         return self.getRatioOrFixedFee('CloseTodayFee', True, contNo)
 
-    def getCloseTodayFixed(self, contNo='Default'):
+    def getCloseTodayFixed(self, contNo=''):
         '''获取今平固定手续费'''
         return self.getRatioOrFixedFee('CloseTodayFee', False, contNo)
 
