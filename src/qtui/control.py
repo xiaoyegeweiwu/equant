@@ -11,7 +11,7 @@ from tkinter import messagebox
 
 from PyQt5.QtCore import QTimer, QSharedMemory
 from PyQt5.QtGui import QFont, QIcon
-from PyQt5.QtWidgets import QApplication, QMessageBox
+from PyQt5.QtWidgets import QApplication, QMessageBox, QDesktopWidget
 
 from qtui.model import QuantModel, SendRequest
 from qtui.view import QuantApplication
@@ -48,6 +48,9 @@ class Controller(object):
             self.mainWnd = FramelessWindow()
             self.mainWnd.setWindowTitle('极星量化')
             self.mainWnd.setWindowIcon(QIcon('icon/epolestar ix2.ico'))
+            screen = QDesktopWidget().screenGeometry()
+            self.mainWnd.setGeometry(screen.width() * 0.05, screen.height() * 0.05, screen.width() * 0.9,
+                         screen.height() * 0.9)
             self.mainWnd.titleBar.buttonClose.clicked.connect(self.quitThread)
             self.mainWnd.setWidget(self.app)
 

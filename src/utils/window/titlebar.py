@@ -89,20 +89,14 @@ class TitleBar(QWidget):
     def _theseCallback(self):
         if self.theseSelect.currentText() == "浅色":
             self.win.setStyleSheet("""""")
-            self.win._widget.setAutoFillBackground(True)
-            palette = self.win._widget.palette()
-            palette.setColor(palette.Window, QColor(250, 250, 250))
-            self.win._widget.setPalette(palette)
+            self.win._widget.contentEdit.sendSetThemeSignal('vs')
             style = CommonHelper.readQss(WHITESTYLE)
             self.win.setStyleSheet(style)
         else:
             # self.win.setStyleSheet("""""")
             # return
             self.win.setStyleSheet("""""")
-            self.win._widget.setAutoFillBackground(True)
-            palette = self.win._widget.palette()
-            palette.setColor(palette.Window, QColor(20, 20, 20))
-            self.win._widget.setPalette(palette)
+            self.win._widget.contentEdit.sendSetThemeSignal('vs-dark')
             style = CommonHelper.readQss(DARKSTYLE)
             self.win.setStyleSheet(style)
 

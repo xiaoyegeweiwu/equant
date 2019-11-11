@@ -857,6 +857,7 @@ class WebEngineView(QWebEngineView):
     customSignal = pyqtSignal(str, str)
     saveSignal = pyqtSignal()
     switchSignal = pyqtSignal(str)
+    setThemeSignal = pyqtSignal(str)
 
     def __init__(self, *args, **kwargs):
         super(WebEngineView, self).__init__(*args, **kwargs)
@@ -896,6 +897,9 @@ class WebEngineView(QWebEngineView):
 
     def sendSaveSignal(self):
         self.saveSignal.emit()
+
+    def sendSetThemeSignal(self, theme):
+        self.setThemeSignal.emit(theme)
 
     @pyqtSlot(str)
     def switchFile(self, path):
@@ -1147,7 +1151,7 @@ class QuantApplication(QWidget):
                 value = ''
                 while True:
                     value, ok = QInputDialog.getText(self, '新建文件', '策略名称', QLineEdit.Normal)
-                    path = os.path.join(os.path.split(item_path)[1], value + '.py')
+                    path = os.path.join(os.path.split(item_path)[0], value + '.py')
                     if os.path.exists(path) and ok:
                         QMessageBox.warning(self, '提示', '策略名在选择的分组%s已经存在！！！' % value, QMessageBox.Yes)
                     elif not ok:

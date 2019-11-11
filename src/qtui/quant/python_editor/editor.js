@@ -26,7 +26,7 @@ var g_editor = null;
 
 
 //初始化编辑器
-function init_editor(layoutid, code_str) {
+function init_editor(layoutid, code_str, theme) {
     if (g_editor)
         return;
     //初始化编辑器
@@ -41,7 +41,7 @@ function init_editor(layoutid, code_str) {
             document.getElementById(layoutid),
             {
                 language: 'python',             //程序语言
-                theme: 'vs-dark',               //界面主题
+                theme: theme,               //界面主题
                 value: code_str,                //初始文本内容
                 automaticLayout: true,          //随布局Element自动调整大小                        
                 minimap: {enabled: true},       //代码略缩图
