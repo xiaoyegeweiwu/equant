@@ -54,6 +54,7 @@ class Controller(object):
             self.mainWnd.titleBar.buttonClose.clicked.connect(self.quitThread)
             self.mainWnd.setWidget(self.app)
 
+
         # 创建模块
         self.model = QuantModel(self.app, self._ui2egQueue, self._eg2uiQueue, self.logger)
         self.app.init_control()

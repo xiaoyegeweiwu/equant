@@ -22,10 +22,11 @@ DIR = {
 
 class DirTree(QTreeWidget):
 
-    def __init__(self, datas, parent=None):
+    def __init__(self, parent=None):
         super(DirTree, self).__init__(parent)
-        self._graphDatas = datas
         self._parent = parent
+
+        self._graphDatas = None
 
         self.setColumnCount(1)
         self.setHeaderHidden(True)
@@ -75,7 +76,15 @@ class DirTree(QTreeWidget):
             self.pw.plot(x, y)
 
     def setInitialGraph(self, data):
-        self.data = data
+        self._graphDatas = data
+        self.pw.clear()
+        x, y = self.getPlotData("年度分析", 'Equity')
+
+        self.pw.plot(x, y)
+        self._parent.layout().addWidget(self.pw)
+
+    def showGraphDatas(self, datas):
+        self._graphDatas = datas
         self.pw.clear()
         x, y = self.getPlotData("年度分析", 'Equity')
 
@@ -85,17 +94,17 @@ class DirTree(QTreeWidget):
 
 class GraphTab(KeyWraper):
 
-    def __init__(self, datas, parent=None):
+    def __init__(self, parent=None):
         super(GraphTab, self).__init__(parent)
-        self._graphDatas = datas
 
         self._initUI()
 
     def _initUI(self):
         qLayout = QHBoxLayout()
         qLayout.setContentsMargins(0, 0, 0, 0)
-        dir = DirTree(self._graphDatas, self)
-        qLayout.addWidget(dir,  0, Qt.AlignLeft)
+        self.dir = DirTree(self)
+        qLayout.addWidget(self.dir,  0, Qt.AlignLeft)
         self.setLayout(qLayout)
 
-        dir.setInitialGraph(self._graphDatas)
+    def addGraphDatas(self, datas):
+        self.dir.showGraphDatas(datas)

@@ -29,6 +29,9 @@ class ReportView(QWidget):
         self.setMinimumSize(600, 600)
         self.setMaximumSize(1000, 600)
         self.setObjectName(self._objName)
+
+        # 初始化界面
+        self._initUI()
         # 接收报告显示信号
         self.reportShowSig.connect(self.showCallback)
 
@@ -40,7 +43,7 @@ class ReportView(QWidget):
         vLayout.setContentsMargins(0, 0, 0, 0)
         vLayout.setSpacing(0)
 
-        self.tab = Tab(self._datas)
+        self.tab = Tab()
         dir = Dir(self)
 
         vLayout.addSpacing(0)
@@ -54,14 +57,7 @@ class ReportView(QWidget):
     def showCallback(self, datas):
         # 传入回测数据
         self._datas = datas
-        self._initUI()
+
+        self.tab.showData(self._datas)
         self.show()
 
-
-#
-#
-# if __name__ == "__main__":
-#     app = QApplication(sys.argv)
-#     win = ReportView()
-#     win.show()
-#     sys.exit(app.exec_())

@@ -88,11 +88,6 @@ class Dir(QTreeView):
         """
         更新回测报告数据
         """
-        self._win.tab.fund.loadData(datas['Fund'])
-        self._win.tab.analyse.addAnalyseResult(datas["Detail"])
-        self._win.tab.stage.addStageDatas(datas["Stage"])
-        self._win.tab.trade.addTradeDatas(datas["Orders"], datas["KLineType"])
-        #TODO: 图标分析还没有更新
-        # self._win.tab.graph
+        self._win.tab.showData(datas)
 
 

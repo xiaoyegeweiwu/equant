@@ -48,8 +48,6 @@ def save(data, runMode, fileName):
     runType = formatExecuteType(runMode)
     strategyName, extension = os.path.splitext(fileName)
     fileDir = os.path.abspath(r"./reportdata/")
-    print("AAAAAA: ", fileDir)
-    print("BBBBBB: ", strategyName)
     if not os.path.exists(fileDir):
         os.makedirs(fileDir)
 

@@ -54,8 +54,6 @@ class TradeTab(QTableWidget):
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        # self._orders = orders
-        # self._kLineInfo = kLineInfo
         self.initStage()
 
     def initStage(self):

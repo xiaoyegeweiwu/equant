@@ -226,11 +226,11 @@ class LineWidget(KeyWraper):
 
     initCompleted = False
 
-    def __init__(self, datas, parent=None):
+    def __init__(self, parent=None):
         super().__init__(parent)
-        self.datas = pd.DataFrame(datas)
 
         self.parent = parent
+        self.datas = None
 
         self.count = 90
         self.index = None

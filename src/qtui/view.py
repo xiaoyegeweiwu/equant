@@ -8,7 +8,6 @@ import traceback
 from threading import Thread
 import time
 
-import qdarkstyle
 from PyQt5 import QtCore, QtGui
 from PyQt5.QtCore import Qt, QPoint, QUrl, pyqtSignal, pyqtSlot, QSharedMemory, QThread, QTimer, QDir
 from PyQt5.QtGui import QTextCursor, QIcon
@@ -27,8 +26,6 @@ from api.api_func import _all_func_
 from capi.com_types import *
 from qtui.utils import parseStrategtParam, Tree, get_strategy_filters, FileIconProvider
 from utils.utils import save
-
-from qtui.reportview.reportview import ReportView
 
 strategy_path = os.path.join(os.getcwd(), 'strategy')
 
@@ -1874,12 +1871,10 @@ class QuantApplication(QWidget):
         :return:
         """
         stManager = self._controller.getStManager()
-        print("======: ", stManager)
-        strategyPath = self._controller.getEditorText()["path"]
-        print("00000: ", self._controller.getEditorText())
+        strategyData = stManager.getSingleStrategy(id)
+        strategyPath = strategyData["Path"]
 
         stName = os.path.basename(strategyPath)
-        print("111111: ", strategyPath, stName)
 
         stData = stManager.getSingleStrategy(id)
         runMode = stData["Config"]["RunMode"]["SendOrder2Actual"]

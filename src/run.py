@@ -52,7 +52,6 @@ def main():
 
     control = Controller(logger, ui2eg_q, eg2ui_q)
     control.run()
-
     time.sleep(3)
     import atexit
     def exitHandler():
@@ -68,8 +67,8 @@ def main():
 
 
 if __name__ == '__main__':
-    # ------------任务栏显示app的图标-----------------
     sys.excepthook = excepthook
+    # ------------任务栏显示app的图标-----------------
     if 'windows' in platform.uname():
         import ctypes
         myappid = 'equant.ui.view.QuantApplication'  # app路径

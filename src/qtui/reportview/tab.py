@@ -555,66 +555,63 @@ DATAS = {
 
 class Tab(QTabWidget):
 
-    def __init__(self, datas):
-        super(Tab, self).__init__()
-        self._datas = datas
+    def __init__(self, parent=None):
+        super(Tab, self).__init__(parent)
         self._createTab()
 
     def _createTab(self):
-        fundTab = self.creaetFundTab()
-        analyseTab = self.createAnalyseTab()
-        stageTab = self.createStageTab()
-        tradeTab = self.createTradeTab()
-        graphTab = self.createGraphTab()
+        self.fundTab = LineWidget()
+        self.analyseTab = AnalyseTable()
+        self.stageTab = StageTab()
+        self.tradeTab = TradeTab()
+        self.graphTab = GraphTab()
 
-        self.addTab(fundTab, "资金详情")
-        self.addTab(analyseTab, "分析报告")
-        self.addTab(stageTab, "阶段总结")
-        self.addTab(tradeTab, "交易详情")
-        self.addTab(graphTab, "图表分析")
+        self.addTab(self.fundTab, "资金详情")
+        self.addTab(self.analyseTab, "分析报告")
+        self.addTab(self.stageTab, "阶段总结")
+        self.addTab(self.tradeTab, "交易详情")
+        self.addTab(self.graphTab, "图表分析")
 
-    def creaetFundTab(self):
+    def showData(self, datas):
+        """显示回测结果"""
+        self._addFundData(datas)
+        self._addAnalyseData(datas)
+        self._addStageData(datas)
+        self._addTradeData(datas)
+        self._addGraphData(datas)
+
+    def _addFundData(self, datas):
         try:
-            self.fundDatas = self._datas['Fund']
+            fundDatas = datas['Fund']
         except Exception as e:
             raise e
-        self.fund = LineWidget(self.fundDatas)
-        self.fund.loadData(self.fundDatas)
-        return self.fund
+        self.fundTab.loadData(fundDatas)
 
-    def createAnalyseTab(self):
+    def _addAnalyseData(self, datas):
         try:
-            details = self._datas["Detail"]
+            details = datas["Detail"]
         except Exception as e:
             raise e
-        self.analyse = AnalyseTable()
-        self.analyse.addAnalyseResult(details)
-        return self.analyse
+        self.analyseTab.addAnalyseResult(details)
 
-    def createStageTab(self):
+    def _addStageData(self, datas):
         try:
-            stage = self._datas["Stage"]
+            stage = datas["Stage"]
         except Exception as e:
             raise e
-        self.stage = StageTab()
-        self.stage.addStageDatas(stage)
-        return self.stage
+        self.stageTab.addStageDatas(stage)
 
-    def createTradeTab(self):
+    def _addTradeData(self, datas):
         try:
-            orders = self._datas["Orders"]
-            kLineInfo = self._datas["KLineType"]
+            orders = datas["Orders"]
+            kLineInfo = datas["KLineType"]
         except Exception as e:
             raise e
-        self.trade = TradeTab()
-        self.trade.addTradeDatas(orders, kLineInfo)
-        return self.trade
+        self.tradeTab.addTradeDatas(orders, kLineInfo)
 
-    def createGraphTab(self):
+    def _addGraphData(self, datas):
         try:
-            stage = self._datas["Stage"]
+            stage = datas["Stage"]
         except Exception as e:
             raise e
-        self.graph = GraphTab(stage)
-        return self.graph
-
+        self.graphTab.addGraphDatas(stage)
