@@ -3,6 +3,8 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 
+from report.fieldConfigure import *
+
 
 HEADERS = [
     "时间",
@@ -50,10 +52,10 @@ class BaseCell(QTableWidgetItem):
 
 class TradeTab(QTableWidget):
 
-    def __init__(self, orders, kLineInfo, parent=None):
+    def __init__(self, parent=None):
         super().__init__(parent)
-        self._orders = orders
-        self._kLineInfo = kLineInfo
+        # self._orders = orders
+        # self._kLineInfo = kLineInfo
         self.initStage()
 
     def initStage(self):
@@ -62,29 +64,27 @@ class TradeTab(QTableWidget):
         self.setHorizontalHeaderLabels(HEADERS)
         self.horizontalHeader().setSectionsMovable(False)
         self.horizontalHeader().setStretchLastSection(True)
+        self.horizontalHeader().setDefaultAlignment(Qt.AlignRight)
         self.setShowGrid(False)
         self.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.setSelectionMode(QAbstractItemView.NoSelection)
-        self.horizontalHeader().setFixedHeight(25)
+        self.horizontalHeader().setFixedHeight(26)
 
         # 去除边框
         self.setFrameShape(QFrame.NoFrame)
 
         self.verticalHeader().setVisible(False)
 
-        # -----------增加trade数据---------------
-        self.addTradeDatas(self._orders)
-
-    def addTradeDatas(self, orders):
+    def addTradeDatas(self, orders, kLineInfo):
         self.setRowCount(len(orders))
         for eo, row in zip(orders, range(self.columnCount())):
-            time = formatOrderTime(self._kLineInfo, eo["Order"])
-            direct = eo["Order"]["Direct"]
-            offset = eo["Order"]["Offset"]
+            time = formatOrderTime(kLineInfo, eo["Order"])
+            direct = DirectDict[eo["Order"]["Direct"]]
+            offset = OffsetDict[eo["Order"]["Offset"]]
             cont = eo["Order"]["Cont"]
             tradeType = direct + offset
-            orderType = eo["Order"]["OrderPrice"]
+            orderType = OrderTypeDict[eo["Order"]["OrderType"]]
             orderQty = eo['Order']['OrderQty']
             orderPrice = '{:.2f}'.format(float(eo['Order']['OrderPrice']))
             turnover =  '{:.1f}'.format(float(eo['Turnover']))

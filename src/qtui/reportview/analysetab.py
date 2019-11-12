@@ -93,9 +93,8 @@ class DataCell(QTableWidgetItem):
 
 
 class AnalyseTable(QTableWidget):
-    def __init__(self, datas, parent=None):
+    def __init__(self, parent=None):
         super().__init__(parent)
-        self._detail = datas
         self.initUI()
 
     def initUI(self):
@@ -114,8 +113,6 @@ class AnalyseTable(QTableWidget):
 
         for row, item in enumerate(ITEMS.keys()):
             self.setItem(row, 0, BaseCell(item))
-
-        self.addAnalyseResult(self._detail)
 
     def addAnalyseResult(self, detail):
         """增加回测结果数据"""

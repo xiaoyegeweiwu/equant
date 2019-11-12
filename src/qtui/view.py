@@ -1874,9 +1874,12 @@ class QuantApplication(QWidget):
         :return:
         """
         stManager = self._controller.getStManager()
+        print("======: ", stManager)
         strategyPath = self._controller.getEditorText()["path"]
+        print("00000: ", self._controller.getEditorText())
 
         stName = os.path.basename(strategyPath)
+        print("111111: ", strategyPath, stName)
 
         stData = stManager.getSingleStrategy(id)
         runMode = stData["Config"]["RunMode"]["SendOrder2Actual"]

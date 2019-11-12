@@ -557,42 +557,64 @@ class Tab(QTabWidget):
 
     def __init__(self, datas):
         super(Tab, self).__init__()
-        # self._datas = DATAS
         self._datas = datas
         self._createTab()
 
     def _createTab(self):
+        fundTab = self.creaetFundTab()
+        analyseTab = self.createAnalyseTab()
+        stageTab = self.createStageTab()
+        tradeTab = self.createTradeTab()
+        graphTab = self.createGraphTab()
+
+        self.addTab(fundTab, "资金详情")
+        self.addTab(analyseTab, "分析报告")
+        self.addTab(stageTab, "阶段总结")
+        self.addTab(tradeTab, "交易详情")
+        self.addTab(graphTab, "图表分析")
+
+    def creaetFundTab(self):
         try:
             self.fundDatas = self._datas['Fund']
         except Exception as e:
             raise e
         self.fund = LineWidget(self.fundDatas)
         self.fund.loadData(self.fundDatas)
+        return self.fund
 
+    def createAnalyseTab(self):
         try:
             details = self._datas["Detail"]
         except Exception as e:
             raise e
-        self.analyse = AnalyseTable(details)
+        self.analyse = AnalyseTable()
+        self.analyse.addAnalyseResult(details)
+        return self.analyse
 
+    def createStageTab(self):
         try:
             stage = self._datas["Stage"]
         except Exception as e:
             raise e
-        self.stage = StageTab(stage)
+        self.stage = StageTab()
+        self.stage.addStageDatas(stage)
+        return self.stage
 
+    def createTradeTab(self):
         try:
             orders = self._datas["Orders"]
             kLineInfo = self._datas["KLineType"]
         except Exception as e:
             raise e
-        self.trade = TradeTab(orders, kLineInfo)
+        self.trade = TradeTab()
+        self.trade.addTradeDatas(orders, kLineInfo)
+        return self.trade
 
+    def createGraphTab(self):
+        try:
+            stage = self._datas["Stage"]
+        except Exception as e:
+            raise e
         self.graph = GraphTab(stage)
-
-        self.addTab(self.fund, "资金详情")
-        self.addTab(self.analyse, "分析报告")
-        self.addTab(self.stage, "阶段总结")
-        self.addTab(self.trade, "交易详情")
-        self.addTab(self.graph, "图表分析")
+        return self.graph
 
