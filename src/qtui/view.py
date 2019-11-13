@@ -739,7 +739,7 @@ class ContractWin(QMainWindow, Ui_contractWin):
                 QMessageBox.warning(self, '提示', '输入的时间格式不合法，请重新输入！！！', QMessageBox.Yes)
                 return
         self.confirm_signal.emit(self.get_contract_policy())
-        self.close()
+        self.parent().close()
 
     def get_contract_policy(self):
         """获取商品属性"""
