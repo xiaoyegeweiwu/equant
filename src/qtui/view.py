@@ -8,7 +8,6 @@ import traceback
 from threading import Thread
 import time
 
-import qdarkstyle
 from PyQt5 import QtCore, QtGui
 from PyQt5.QtCore import Qt, QPoint, QUrl, pyqtSignal, pyqtSlot, QSharedMemory, QThread, QTimer, QDir
 from PyQt5.QtGui import QTextCursor, QIcon, QKeySequence
@@ -1952,7 +1951,8 @@ class QuantApplication(QWidget):
         :return:
         """
         stManager = self._controller.getStManager()
-        strategyPath = self._controller.getEditorText()["path"]
+        strategyData = stManager.getSingleStrategy(id)
+        strategyPath = strategyData["Path"]
 
         stName = os.path.basename(strategyPath)
 

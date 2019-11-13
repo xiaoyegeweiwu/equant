@@ -1,5 +1,7 @@
 import sys
+import platform
 import time
+import traceback
 from multiprocessing import Process, Queue
 
 from PyQt5.QtCore import QSharedMemory
@@ -9,6 +11,17 @@ from engine.engine import StrategyEngine
 from qtui.control import Controller
 from qtui.view import QuantApplication
 from utils.logger import Logger
+
+
+def excepthook(exctype, value, tb):
+    """
+     显示异常的详细信息
+    """
+    sys.__excepthook__(exctype, value, tb)
+    msg = "".join(traceback.format_exception(exctype, value, tb))
+    QMessageBox.critical(
+        None, "Exception", msg, QMessageBox.Ok
+    )
 
 
 def run_log_process(logger):
@@ -39,7 +52,6 @@ def main():
 
     control = Controller(logger, ui2eg_q, eg2ui_q)
     control.run()
-
     time.sleep(3)
     import atexit
     def exitHandler():
@@ -55,10 +67,12 @@ def main():
 
 
 if __name__ == '__main__':
+    sys.excepthook = excepthook
     # ------------任务栏显示app的图标-----------------
-    import ctypes
-    myappid = 'equant.ui.view.QuantApplication'  # app路径
-    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
+    if 'windows' in platform.uname():
+        import ctypes
+        myappid = 'equant.ui.view.QuantApplication'  # app路径
+        ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
     # ------------------------------------------------
     main()
 

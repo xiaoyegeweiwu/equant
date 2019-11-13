@@ -8,6 +8,8 @@ import sys
 import requests
 import os
 import traceback
+from tkinter import messagebox
+
 
 sys.path.append(".")
 sys.path.append("./ui")
@@ -59,6 +61,7 @@ def saveMainPid(pid=""):
         f.write(str(pid))
 
 def main():
+
     # 创建日志模块
     logger = Logger()
     log_process = Process(target=run_log_process, args=(logger,))

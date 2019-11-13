@@ -3,6 +3,8 @@
 import re
 import sys
 import os
+import traceback
+from tkinter import messagebox
 from equant import main
 
 

@@ -29,9 +29,11 @@ class ReportView(QWidget):
         self.setMinimumSize(600, 600)
         self.setMaximumSize(1000, 600)
         self.setObjectName(self._objName)
-        self.reportShowSig.connect(self.showCallback)
 
-        # self._initUI()
+        # 初始化界面
+        self._initUI()
+        # 接收报告显示信号
+        self.reportShowSig.connect(self.showCallback)
 
     def _initUI(self):
         style = CommonHelper.readQss(self.styleFile)
@@ -41,26 +43,21 @@ class ReportView(QWidget):
         vLayout.setContentsMargins(0, 0, 0, 0)
         vLayout.setSpacing(0)
 
-        dir = Dir()
-        tab = Tab(self._datas)
+        self.tab = Tab()
+        dir = Dir(self)
+
         vLayout.addSpacing(0)
         vLayout.addWidget(dir)
         vLayout.setSpacing(1)
-        vLayout.addWidget(tab)
+        vLayout.addWidget(self.tab)
         vLayout.setSpacing(2)
 
         self.setLayout(vLayout)
 
     def showCallback(self, datas):
+        # 传入回测数据
         self._datas = datas
-        self._initUI()
+
+        self.tab.showData(self._datas)
         self.show()
 
-
-#
-#
-# if __name__ == "__main__":
-#     app = QApplication(sys.argv)
-#     win = ReportView()
-#     win.show()
-#     sys.exit(app.exec_())

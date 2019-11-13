@@ -111,10 +111,8 @@ class Label(QWidget):
 
 class StageTab(QWidget):
 
-    def __init__(self, datas, parent=None):
+    def __init__(self, parent=None):
         super().__init__(parent)
-        self._stageDatas = datas
-        print("BBBBBBBBBB: ", self._stageDatas)
         self.initStage()
 
     def initStage(self):
@@ -159,9 +157,7 @@ class StageTab(QWidget):
 
         self.setLayout(vbox)
 
-        self._addStageDatas(self._stageDatas)
-
-    def _addStageDatas(self, datas):
+    def addStageDatas(self, datas):
         tables = (self.ytable, self.qtable, self.mtable, self.wtable, self.dtable)
         for table, data in zip(tables, datas.values()):
             table.setRowCount(len(data))
