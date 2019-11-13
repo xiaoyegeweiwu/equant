@@ -39,8 +39,10 @@ class StrategyPolicy(QMainWindow, Ui_strategyMainWin):
         super().__init__(parent)
         self.setupUi(self)
         self.contractTableWidget.hideColumn(4)
+        self.contractTableWidget.verticalHeader().setVisible(False)
         self.contractTableWidget.setSelectionMode(QAbstractItemView.SingleSelection)
         self.contractTableWidget.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.contractTableWidget.setEditTriggers(QTableView.NoEditTriggers)
         self.cycleLineEdit.setValidator(QtGui.QIntValidator())  # 设置只能输入数字
         self.initFundlineEdit.setValidator(QtGui.QIntValidator())  # 设置只能输入数字
         self.defaultOrderLineEdit.setValidator(QtGui.QIntValidator())  # 设置只能输入数字
@@ -1443,6 +1445,7 @@ class QuantApplication(QWidget):
         self.log_widget.addTab(self.signal_log_widget, '信号日志')
         self.log_widget.addTab(self.sys_log_widget, '系统日志')
         self.log_widget.tabBarClicked.connect(self.loadSysLogFile)
+        self.log_widget.tabBarClicked.connect(self.loadSigLogFile)
         # self.log_widget.currentChanged.connect(self.loadSysLogFile)
 
         # -----------------设置文本框变化的时候滚动条自动滚动到最底部-------------------
@@ -1695,8 +1698,8 @@ class QuantApplication(QWidget):
                     usrData += logData[1] + "\n"
                 elif logData[0] == "E":
                     errData += logData[1] + "\n"
-                elif logData[0] == "S":
-                    sigData += logData[1] + "\n"
+                # elif logData[0] == "S":
+                #     sigData += logData[1] + "\n"
 
                 if guiQueue.empty():
                     flag = False
@@ -1704,13 +1707,27 @@ class QuantApplication(QWidget):
             return
         else:
             if usrData:
-                self.user_log_widget.append(usrData)
+                if self.user_log_widget.verticalScrollBar().maximum() - \
+                        self.user_log_widget.verticalScrollBar().sliderPosition() in [4, 0]:
+                    self.user_log_widget.insertPlainText(usrData)
+                    cursor = self.user_log_widget.textCursor()
+                    self.user_log_widget.moveCursor(cursor.End)
+                else:
+                    self.user_log_widget.insertPlainText(usrData)
             if errData:
-                self.error_info_widget.append(errData)
+                self.error_info_widget.insertPlainText(errData)
                 self.tab_widget.setCurrentIndex(2)
-            if sigData:
-                self.signal_log_widget.append(sigData)
+            # if sigData:
+            #     self.signal_log_widget.append(sigData)
         self.timer.start(1000)
+
+    def loadSigLogFile(self):
+        """读取本地信号日志并写入界面"""
+        sigLogPath = r"./log/trade.dat"
+        with open(sigLogPath, "r", encoding="utf-8") as f:
+            data = f.read()
+        self.signal_log_widget.setText(data)
+        self.signal_log_widget.moveCursor(QTextCursor.End)
 
     def setConnect(self, src):
         if src == 'Q':

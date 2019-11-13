@@ -333,8 +333,7 @@
         </rect>
        </property>
        <property name="styleSheet">
-        <string notr="true">background-color: rgb(255, 255, 255);
-gridline-color: rgb(255, 255, 255);</string>
+        <string notr="true"/>
        </property>
       </widget>
      </widget>
@@ -600,7 +599,7 @@ gridline-color: rgb(255, 255, 255);</string>
        </rect>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(255, 255, 255);</string>
+       <string notr="true"/>
       </property>
       <item>
        <property name="text">
@@ -628,7 +627,7 @@ gridline-color: rgb(255, 255, 255);</string>
        </rect>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(255, 255, 255);</string>
+       <string notr="true"/>
       </property>
       <item>
        <property name="text">
@@ -734,7 +733,7 @@ gridline-color: rgb(255, 255, 255);</string>
        </rect>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(255, 255, 255);</string>
+       <string notr="true"/>
       </property>
       <item>
        <property name="text">
@@ -783,7 +782,7 @@ gridline-color: rgb(255, 255, 255);</string>
        </rect>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(255, 255, 255);</string>
+       <string notr="true"/>
       </property>
       <item>
        <property name="text">
