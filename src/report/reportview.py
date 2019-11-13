@@ -9,6 +9,8 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import matplotlib.pyplot as plt, matplotlib.dates as mdate
 from matplotlib import ticker
 
+plt.switch_backend('agg')
+
 import tkinter as tk
 import tkinter.ttk as ttk
 from dateutil.parser import parse

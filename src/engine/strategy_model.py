@@ -400,6 +400,9 @@ class StrategyModel(object):
 
     # ////////////////////////策略函数////////////////////////////
     def setBuy(self, userNo, contractNo, share, price, needCover=True, orderType=otLimit):
+        if self._cfgModel.getTradeDirection() == 2:
+            return
+        
         contNo = contractNo if contractNo else self._cfgModel.getBenchmark()
         
         if contNo not in self._cfgModel.getContract():
@@ -437,6 +440,9 @@ class StrategyModel(object):
         self.buySellOrder(userNo, contNo, orderType, vtGFD, dBuy, oOpen, hSpeculate, price, share, curBar, (defaultPrice > 0))
 
     def setBuyToCover(self, userNo, contractNo, share, price, coverFlag='A', orderType=otLimit):
+        if self._cfgModel.getTradeDirection() == 1:
+            return
+    
         contNo = contractNo if contractNo is not None else self._cfgModel.getBenchmark()
 
         if contNo not in self._cfgModel.getContract():
@@ -466,6 +472,9 @@ class StrategyModel(object):
 
 
     def setSell(self, userNo, contractNo, share, price, coverFlag='A', orderType=otLimit):
+        if self._cfgModel.getTradeDirection() == 1:
+            return
+    
         contNo = contractNo if contractNo is not None else self._cfgModel.getBenchmark()
 
         if contNo not in self._cfgModel.getContract():
@@ -494,6 +503,9 @@ class StrategyModel(object):
         self.buySellOrder(userNo, contNo, orderType, vtGFD, dSell, coverFlag, hSpeculate, price, share, curBar, (defaultPrice > 0))
 
     def setSellShort(self, userNo, contractNo, share, price, needCover=True, orderType=otLimit):
+        if self._cfgModel.getTradeDirection() == 2:
+            return
+    
         contNo = contractNo if contractNo is not None else self._cfgModel.getBenchmark()
 
         if contNo not in self._cfgModel.getContract():
@@ -1108,6 +1120,12 @@ class StrategyModel(object):
     def sendOrder(self, userNo, contNo, orderType, validType, orderDirct, entryOrExit, hedge, orderPrice, orderQty, \
                   triggerType=stNone, triggerMode=tmNone, triggerCondition=tcNone, triggerPrice=0, aFunc=False):
         '''A账户下单函数，不经过calc模块，直接发单'''
+        if entryOrExit in (oCover, oCoverA) and self._cfgModel.getTradeDirection() == 1:
+            return -6, "当前设置仅允许开仓"
+            
+        if entryOrExit == oOpen and self._cfgModel.getTradeDirection() == 2:
+            return -7, "当前设置仅允许平仓"
+        
         if not userNo:
             userNo = self._cfgModel.getUserNo()
             
