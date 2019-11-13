@@ -28,3 +28,40 @@ TitleBar {
 #titleLabel {
     color: #000000;
 }
+
+QTabWidget QTableView,
+QTabWidget QTreeView,
+QTabWidget QTreeWidget,
+QTabWidget QLineEdit,
+QTabWidget QTextEdit {
+  border: 0px solid #32414B;
+}
+
+QTabWidget {
+  padding: 0px;
+  selection-background-color: #32414B;
+  /* Add wanted borders - fix #141, #126, #123 */
+}
+
+
+QTreeView {
+  border: 1px solid #D9D9D9;
+}
+
+QTabWidget QTreeWidget {
+  border: 0px solid #D9D9D9;
+}
+
+QTabWidget QLineEdit,
+QTabWidget QSpinBox,
+QTabWidget QlineEdit {
+  border: 1px solid #D9D9D9;
+}
+
+QTextEdit {
+  border: 1px solid #D9D9D9;
+}
+
+#strategyTabWidget QTableView {
+  border: 1px solid #D9D9D9;
+}

@@ -57,6 +57,7 @@ function init_editor(layoutid, code_str, theme) {
                 //automaticLayout: false,       //自动布局
                 //autoIndent:true,              //自动布局
                 //quickSuggestionsDelay: 500,   //代码提示延时
+                contextmenu: false,
             }
         );
     });

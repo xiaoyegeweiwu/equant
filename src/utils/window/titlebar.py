@@ -42,7 +42,7 @@ class TitleBar(QWidget):
         layout = QHBoxLayout(self, spacing=0)
         layout.setContentsMargins(0, 0, 0, 0)
         # 窗口图标
-        self.iconLabel = QLabel(self)
+        self.iconLabel = QLabel(self, objectName='iconLabel')
         # 窗口标题
         self.titleLabel = QLabel(self, objectName='titleLabel')
         self.titleLabel.setMargin(5)
@@ -147,7 +147,8 @@ class TitleBar(QWidget):
 
     def mouseDoubleClickEvent(self, event):
         """双击标题栏事件"""
-        self.showMaximized()
+        if self.titleLabel == '极星量化':
+            self.showMaximized()
         return QWidget().mouseDoubleClickEvent(event)
 
     def mousePressEvent(self, event):

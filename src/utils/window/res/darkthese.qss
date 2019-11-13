@@ -2068,8 +2068,16 @@ PlotWidget {
 TitleBar {
     background-color: #1E1E1E;
 }
+#titleLabel  {
+    background-color: #1E1E1E;
+}
+#iconLabel {
+    background-color: #1E1E1E;
+}
 /*最小化最大化关闭按钮通用默认背景*/
-#buttonMinimum,#buttonMaximum,#buttonClose {
+#buttonMinimum,
+#buttonMaximum,
+#buttonClose {
     border: none;
     color: #E6E6E6;
     background-color: #1E1E1E;
@@ -2078,6 +2086,9 @@ TitleBar {
 #buttonMinimum:hover,#buttonMaximum:hover, #buttonClose:hover{
     background-color: #3D3D3D;
     color: white;
+}
+#buttonClose:hover {
+    background-color:red;
 }
 
 /*鼠标按下不放*/

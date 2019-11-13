@@ -11,7 +11,7 @@ import time
 import qdarkstyle
 from PyQt5 import QtCore, QtGui
 from PyQt5.QtCore import Qt, QPoint, QUrl, pyqtSignal, pyqtSlot, QSharedMemory, QThread, QTimer, QDir
-from PyQt5.QtGui import QTextCursor, QIcon
+from PyQt5.QtGui import QTextCursor, QIcon, QKeySequence
 from PyQt5.QtWebChannel import QWebChannel
 from PyQt5.QtWebEngineWidgets import QWebEngineView, QWebEngineSettings
 from PyQt5.QtWidgets import *
@@ -29,6 +29,8 @@ from qtui.utils import parseStrategtParam, Tree, get_strategy_filters, FileIconP
 from utils.utils import save
 
 from qtui.reportview.reportview import ReportView
+from utils.window.framelesswindow import FramelessWindow, CommonHelper
+from utils.window.res.default import *
 
 strategy_path = os.path.join(os.getcwd(), 'strategy')
 
@@ -74,7 +76,31 @@ class StrategyPolicy(QMainWindow, Ui_strategyMainWin):
 
         # 设置属性值
         self.setDefaultConfigure()
+        # 设置无边框
+        self.setWindowFlags(Qt.FramelessWindowHint)
+        # print('--------------------------------')
+        # print(self.style())
         self.contractWin = ContractWin()
+        # self.contractWin.setStyle(self.style())
+
+        self.main_contractWin = FramelessWindow()
+        self.main_contractWin.setFixedSize(410, 360)
+        self.main_contractWin.titleBar.theseSelect.hide()
+        self.main_contractWin.titleBar.iconLabel.hide()
+        self.main_contractWin.titleBar.buttonMaximum.setEnabled(False)
+        self.main_contractWin.setWindowTitle('合约设置')
+        self.main_contractWin.titleBar.buttonClose.clicked.connect(self.main_contractWin.close)
+        self.main_contractWin.setWidget(self.contractWin)
+        self.contractWin.cancel.clicked.connect(self.main_contractWin.close)
+        if self._control.mainWnd.titleBar.theseSelect.currentText() == '浅色':
+            style = CommonHelper.readQss(WHITESTYLE)
+        else:
+            style = CommonHelper.readQss(DARKSTYLE)
+        self.main_contractWin.setStyleSheet('')
+        self.main_contractWin.setStyleSheet(style)
+
+        self.layout().setContentsMargins(0, 0, 0, 0)
+        self.layout().setSpacing(0)
 
     def add_timer(self):
         t = self.timerEdit.text()
@@ -89,19 +115,34 @@ class StrategyPolicy(QMainWindow, Ui_strategyMainWin):
     def create_contract_win(self):
         # 增加合约槽函数，弹出合约设置窗口
         self.contractWin.confirm_signal.connect(self.add_contract)
-        self.contractWin.setWindowModality(Qt.ApplicationModal)  # 阻塞父窗口
-        self.contractWin.show()
+        self.main_contractWin.setWindowModality(Qt.ApplicationModal)  # 阻塞父窗口
+        self.main_contractWin.show()
 
     def contractSelect(self, exchange, commodity, contract):
         self.contractSelectWin = ContractSelect(exchange, commodity, contract)
-        self.contractSelectWin.setWindowModality(Qt.ApplicationModal)  # 阻塞父窗口
-        self.contractSelectWin.show()
+        self.main_contractSelectWin = FramelessWindow()
+        self.main_contractSelectWin.setFixedSize(750, 550)
+        self.main_contractSelectWin.titleBar.theseSelect.hide()
+        self.main_contractSelectWin.titleBar.iconLabel.hide()
+        self.main_contractSelectWin.titleBar.buttonMaximum.setEnabled(False)
+        self.main_contractSelectWin.setWindowTitle('选择合约')
+        self.main_contractSelectWin.titleBar.buttonClose.clicked.connect(self.main_contractSelectWin.close)
+        self.main_contractSelectWin.setWidget(self.contractSelectWin)
+        if self._control.mainWnd.titleBar.theseSelect.currentText() == '浅色':
+            style = CommonHelper.readQss(WHITESTYLE)
+        else:
+            style = CommonHelper.readQss(DARKSTYLE)
+        self.main_contractSelectWin.setStyleSheet('')
+        self.main_contractSelectWin.setStyleSheet(style)
+        self.main_contractSelectWin.setWindowModality(Qt.ApplicationModal)  # 阻塞父窗口
+        self.main_contractSelectWin.show()
         self.contractSelectWin.confirm.clicked.connect(self.set_contract)
+        self.contractSelectWin.cancel.clicked.connect(self.main_contractSelectWin.close)
 
     def set_contract(self):
         if self.contractSelectWin.choice_tree.topLevelItemCount() == 1:
             self.contractWin.contractCodeLineEdit.setText(self.contractSelectWin.choice_tree.topLevelItem(0).text(0))
-            self.contractSelectWin.close()
+            self.main_contractSelectWin.close()
 
     def add_contract(self, sample_dict):
         if self.contractWin.row != -1:
@@ -173,8 +214,8 @@ class StrategyPolicy(QMainWindow, Ui_strategyMainWin):
         else:
             pass
         self.contractWin.row = row
-        self.contractWin.setWindowModality(Qt.ApplicationModal)  # 阻塞父窗口
-        self.contractWin.show()
+        self.main_contractWin.setWindowModality(Qt.ApplicationModal)  # 阻塞父窗口
+        self.main_contractWin.show()
 
     def enter(self):
         # TODO: IntVar()显示时会补充一个0？？？
@@ -676,8 +717,11 @@ class ContractWin(QMainWindow, Ui_contractWin):
         self.kLineTypeComboBox.currentIndexChanged.connect(self.valid)
         self.qtylineEdit.setValidator(QtGui.QIntValidator())
         self.confirm.clicked.connect(self.valid_contract)
-        self.cancel.clicked.connect(self.close)
+        self.setWindowFlags(Qt.FramelessWindowHint)
         self.row = -1
+
+        self.layout().setContentsMargins(0, 0, 0, 0)
+        self.layout().setSpacing(0)
 
     def valid(self, index):
         if index == 0:
@@ -772,12 +816,14 @@ class ContractSelect(QMainWindow, Ui_contractSelect):
         self.contract_tree.clicked.connect(self.load_child_contract)  # 加载分类下的合约
         self.choice_tree.doubleClicked.connect(self.clear_choice)  # 双击选择的合约
         self.contract_child_tree.doubleClicked.connect(self.load_choice)
-        self.cancel.clicked.connect(self.close)
 
         self._exchange = pd.DataFrame(exchange).drop_duplicates()
         self._commodity = pd.DataFrame(commodity, columns=["CommodityNo", "CommodityName"]).drop_duplicates()
         self._contract = pd.DataFrame(contract, columns=["ContractNo"]).drop_duplicates()
         self.load_contract()
+
+        # 设置无边框
+        self.setWindowFlags(Qt.FramelessWindowHint)
 
     def load_contract(self):
         for exchangeNo in self.exchangeList:
@@ -992,17 +1038,21 @@ class QuantApplication(QWidget):
         # self.bottomLayout = QGridLayout()  # 下方布局
         self.main_splitter = QSplitter(Qt.Horizontal)
         self.main_splitter.setHandleWidth(0)
-        self.main_splitter.setContentsMargins(10, 10, 10, 10)
+        self.main_splitter.setChildrenCollapsible(False)  # 设置下限，不隐藏
+        self.main_splitter.setContentsMargins(20, 0, 20, 20)
         self.left_splitter = QSplitter(Qt.Vertical)
         self.left_splitter.setHandleWidth(0)
+        self.left_splitter.setChildrenCollapsible(False)
         self.left_splitter.setContentsMargins(0, 0, 0, 0)
         self.right_splitter = QSplitter(Qt.Vertical)
         self.right_splitter.setHandleWidth(0)
-        self.right_splitter.setContentsMargins(0, 0, 0, 0)
+        self.right_splitter.setChildrenCollapsible(False)
+        self.right_splitter.setContentsMargins(0, 10, 0, 0)
 
         self.left_top_splitter = QSplitter(Qt.Horizontal)
         self.left_top_splitter.setHandleWidth(0)
-        self.left_top_splitter.setContentsMargins(0, 0, 0, 0)
+        self.left_top_splitter.setChildrenCollapsible(False)
+        self.left_top_splitter.setContentsMargins(0, 0, 0, 10)
 
         # 获取所有策略可用过滤规则及目录
         self.strategy_filter = get_strategy_filters(strategy_path)
@@ -1014,27 +1064,27 @@ class QuantApplication(QWidget):
         self.create_func_doc()
         # self.mainLayout = QGridLayout()  # 主布局为垂直布局
         # self.mainLayout.setSpacing(5)  # 主布局添加补白
-        screen = QDesktopWidget().screenGeometry()  # 获取电脑屏幕分辨率
-        width = screen.width()
-        height = screen.height()
+        self.screen = QDesktopWidget().screenGeometry()  # 获取电脑屏幕分辨率
+        self.width = self.screen.width()
+        self.height = self.screen.height()
         # 左上部布局
         self.left_top_splitter.addWidget(self.strategy_vbox)
         self.left_top_splitter.addWidget(self.content_vbox)
-        self.left_top_splitter.setSizes([width * 0.8 * 0.2, width * 0.8 * 0.6])
+        self.left_top_splitter.setSizes([self.width * 0.8 * 0.2, self.width * 0.8 * 0.6])
 
         # 左部布局
         self.left_splitter.addWidget(self.left_top_splitter)
         self.left_splitter.addWidget(self.tab_widget)
-        self.left_splitter.setSizes([height * 0.8 * 0.4, height * 0.8 * 0.1])
+        self.left_splitter.setSizes([self.height * 0.8 * 0.4, self.height * 0.8 * 0.1])
 
         # 右部布局
         self.right_splitter.addWidget(self.func_tab)
         self.right_splitter.addWidget(self.func_doc)
-        self.right_splitter.setSizes([height * 0.8 * 0.3, height * 0.8 * 0.1])
+        self.right_splitter.setSizes([self.height * 0.8 * 0.265, self.height * 0.8 * 0.1])
 
         self.main_splitter.addWidget(self.left_splitter)
         self.main_splitter.addWidget(self.right_splitter)
-        self.main_splitter.setSizes([width * 0.8 * 0.4, width * 0.8 * 0.1])
+        self.main_splitter.setSizes([self.width * 0.8 * 0.4, self.width * 0.8 * 0.1])
 
         self.hbox.addWidget(self.main_splitter)
         self.setLayout(self.hbox)
@@ -1072,6 +1122,7 @@ class QuantApplication(QWidget):
         self.strategy_vbox = QFrame()
         label = QLabel('策略')
         self.strategy_layout = QVBoxLayout()
+        self.strategy_layout.setContentsMargins(0, 18, 0, 0)
         self.model = QFileSystemModel()
         self.strategy_tree = Tree(self.model, self.strategy_filter)
         # self.strategy_tree = Tree(strategy_path)
@@ -1255,6 +1306,8 @@ class QuantApplication(QWidget):
         self.content_layout = QGridLayout()
         self.save_btn = QPushButton('保存')
         self.run_btn = QPushButton('运行')
+        self.run_btn.setMinimumWidth(100)
+        self.save_btn.setMinimumWidth(100)
         self.run_btn.setEnabled(False)
         # self.contentEdit = MainFrmQt("localhost", 8765, "pyeditor", os.path.join(os.getcwd(), 'quant\python_editor\editor.htm'))
         self.contentEdit = WebEngineView()
@@ -1267,12 +1320,14 @@ class QuantApplication(QWidget):
         self.save_btn.setMaximumSize(40, 30)
         self.run_btn.setMaximumSize(40, 30)
         self.content_layout.addWidget(self.statusBar, 0, 0, 1, 1)
-        self.content_layout.addWidget(self.run_btn, 1, 1, 1, 1)
-        self.content_layout.addWidget(self.save_btn, 1, 2, 1, 1)
+        self.content_layout.addWidget(self.run_btn, 0, 1, 1, 1)
+        self.content_layout.addWidget(self.save_btn, 0, 2, 1, 1)
         self.content_layout.addWidget(self.contentEdit, 2, 0, 20, 3)
         self.content_vbox.setLayout(self.content_layout)
         self.run_btn.clicked.connect(lambda: self.create_strategy_policy_win({}, self.strategy_path, False))
+        self.run_btn.clicked.connect(self.emit_custom_signal)
         self.save_btn.clicked.connect(self.emit_custom_signal)
+        self.save_btn.setShortcut("Ctrl+S")  # ctrl + s 快捷保存
 
     def switch_strategy_path(self, path):
         self.strategy_path = path
@@ -1564,7 +1619,7 @@ class QuantApplication(QWidget):
         func_list = []
         for k, v in _all_func_.items():
             for item in v:
-                if word in item[0] or word in item[1]:
+                if word.lower() in item[0].lower() or word.lower() in item[1].lower():
                     func_list.append(item)
         func_list.sort(key=lambda x: x[0])
 
@@ -1577,6 +1632,25 @@ class QuantApplication(QWidget):
         # 运行点击槽函数，弹出策略属性设置窗口
         if path:
             self.strategy_policy_win = StrategyPolicy(self._controller, path, param=param, flag=flag)
+            self.main_strategy_policy_win = FramelessWindow()
+            self.main_strategy_policy_win.setGeometry((self.width - 580)/2, (self.height - 620)/2, 590, 630)
+            self.main_strategy_policy_win.setFixedSize(590, 650)
+            self.main_strategy_policy_win.titleBar.theseSelect.hide()
+            self.main_strategy_policy_win.titleBar.iconLabel.hide()
+            self.main_strategy_policy_win.titleBar.buttonMaximum.setEnabled(False)
+            self.main_strategy_policy_win.setWindowTitle('属性设置')
+            self.main_strategy_policy_win.titleBar.buttonClose.clicked.connect(self.strategy_policy_win.close)
+            self.main_strategy_policy_win.setWidget(self.strategy_policy_win)
+            if self._controller.mainWnd.titleBar.theseSelect.currentText() == '浅色':
+                style = CommonHelper.readQss(WHITESTYLE)
+            else:
+                style = CommonHelper.readQss(DARKSTYLE)
+            self.main_strategy_policy_win.setStyleSheet('')
+            self.main_strategy_policy_win.setStyleSheet(style)
+            self.strategy_policy_win.setStyleSheet('')
+            self.strategy_policy_win.setStyleSheet(style)
+            self.strategy_policy_win.confirm.clicked.connect(self.main_strategy_policy_win.close)
+            self.strategy_policy_win.cancel.clicked.connect(self.main_strategy_policy_win.close)
 
             # ----------------------解析g_params参数----------------------------
             g_params = parseStrategtParam(path)
@@ -1600,8 +1674,8 @@ class QuantApplication(QWidget):
                 self.strategy_policy_win.paramsTableWidget.setItem(i, 3, QTableWidgetItem(str(item[1][1])))
             self.strategy_policy_win.contractWin.select.clicked.connect(
                 lambda: self.strategy_policy_win.contractSelect(self._exchange, self._commodity, self._contract))
-            self.strategy_policy_win.setWindowModality(Qt.ApplicationModal)  # 设置阻塞父窗口
-            self.strategy_policy_win.show()
+            self.main_strategy_policy_win.setWindowModality(Qt.ApplicationModal)  # 设置阻塞父窗口
+            self.main_strategy_policy_win.show()
         else:
             QMessageBox.warning(self, '提示', '请选择策略！！！', QMessageBox.Yes)
 
@@ -1634,6 +1708,7 @@ class QuantApplication(QWidget):
                 self.user_log_widget.append(usrData)
             if errData:
                 self.error_info_widget.append(errData)
+                self.tab_widget.setCurrentIndex(2)
             if sigData:
                 self.signal_log_widget.append(sigData)
         self.timer.start(1000)
@@ -1751,6 +1826,7 @@ class QuantApplication(QWidget):
             for k, v in colValues.items():
                 try:
                     item = QTableWidgetItem(v)
+                    item.setTextAlignment(Qt.AlignCenter)
                     self.strategy_table.setItem(row, k, item)
                 except Exception as e:
                     self._logger.error(f"[UI][{strategyId}]: 更新策略执行数据时出错，执行列表中该策略已删除！")
@@ -1760,6 +1836,7 @@ class QuantApplication(QWidget):
         row = self.get_row_from_strategy_id(strategyId)
         if row != -1:
             item = QTableWidgetItem(str(StrategyStatus[status]))
+            item.setTextAlignment(Qt.AlignCenter)
             self.strategy_table.setItem(row, 5, item)
 
     def updateRunMode(self, strategyId, status):
@@ -1767,6 +1844,7 @@ class QuantApplication(QWidget):
         row = self.get_row_from_strategy_id(strategyId)
         if row != -1:
             item = QTableWidgetItem(str(status))
+            item.setTextAlignment(Qt.AlignCenter)
             self.strategy_table.setItem(row, 6, item)
 
     def delUIStrategy(self, strategy_id):
