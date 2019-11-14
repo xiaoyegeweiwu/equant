@@ -13,7 +13,7 @@ from qtui.view import QuantApplication
 from utils.logger import Logger
 
 
-def excepthook(exctype, value, tb):
+def excepthook_(exctype, value, tb):
     """
      显示异常的详细信息
     """
@@ -67,9 +67,9 @@ def main():
 
 
 if __name__ == '__main__':
-    sys.excepthook = excepthook
+    sys.excepthook = excepthook_
     # ------------任务栏显示app的图标-----------------
-    if 'windows' in platform.uname():
+    if 'Windows' == platform.system():
         import ctypes
         myappid = 'equant.ui.view.QuantApplication'  # app路径
         ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)

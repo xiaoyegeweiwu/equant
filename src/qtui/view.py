@@ -3,7 +3,7 @@ import json
 import os
 import pandas as pd
 import shutil
-import sys
+# import sys
 import traceback
 from threading import Thread
 import time
@@ -39,8 +39,10 @@ class StrategyPolicy(QMainWindow, Ui_strategyMainWin):
         super().__init__(parent)
         self.setupUi(self)
         self.contractTableWidget.hideColumn(4)
+        self.contractTableWidget.verticalHeader().setVisible(False)
         self.contractTableWidget.setSelectionMode(QAbstractItemView.SingleSelection)
         self.contractTableWidget.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.contractTableWidget.setEditTriggers(QTableView.NoEditTriggers)
         self.cycleLineEdit.setValidator(QtGui.QIntValidator())  # 设置只能输入数字
         self.initFundlineEdit.setValidator(QtGui.QIntValidator())  # 设置只能输入数字
         self.defaultOrderLineEdit.setValidator(QtGui.QIntValidator())  # 设置只能输入数字
@@ -1046,7 +1048,7 @@ class QuantApplication(QWidget):
         self.right_splitter = QSplitter(Qt.Vertical)
         self.right_splitter.setHandleWidth(0)
         self.right_splitter.setChildrenCollapsible(False)
-        self.right_splitter.setContentsMargins(0, 10, 0, 0)
+        self.right_splitter.setContentsMargins(0, 0, 0, 0)
 
         self.left_top_splitter = QSplitter(Qt.Horizontal)
         self.left_top_splitter.setHandleWidth(0)
@@ -1074,16 +1076,16 @@ class QuantApplication(QWidget):
         # 左部布局
         self.left_splitter.addWidget(self.left_top_splitter)
         self.left_splitter.addWidget(self.tab_widget)
-        self.left_splitter.setSizes([self.height * 0.8 * 0.4, self.height * 0.8 * 0.1])
+        self.left_splitter.setSizes([self.height * 0.75, self.height * 0.25])
 
         # 右部布局
         self.right_splitter.addWidget(self.func_tab)
         self.right_splitter.addWidget(self.func_doc)
-        self.right_splitter.setSizes([self.height * 0.8 * 0.265, self.height * 0.8 * 0.1])
+        self.right_splitter.setSizes([self.height * 0.75, self.height * 0.25])
 
         self.main_splitter.addWidget(self.left_splitter)
         self.main_splitter.addWidget(self.right_splitter)
-        self.main_splitter.setSizes([self.width * 0.8 * 0.4, self.width * 0.8 * 0.1])
+        self.main_splitter.setSizes([self.width * 0.4, self.width * 0.1])
 
         self.hbox.addWidget(self.main_splitter)
         self.setLayout(self.hbox)
@@ -1121,7 +1123,7 @@ class QuantApplication(QWidget):
         self.strategy_vbox = QFrame()
         label = QLabel('策略')
         self.strategy_layout = QVBoxLayout()
-        self.strategy_layout.setContentsMargins(0, 18, 0, 0)
+        self.strategy_layout.setContentsMargins(0, 16, 0, 0)
         self.model = QFileSystemModel()
         self.strategy_tree = Tree(self.model, self.strategy_filter)
         # self.strategy_tree = Tree(strategy_path)
@@ -1443,6 +1445,7 @@ class QuantApplication(QWidget):
         self.log_widget.addTab(self.signal_log_widget, '信号日志')
         self.log_widget.addTab(self.sys_log_widget, '系统日志')
         self.log_widget.tabBarClicked.connect(self.loadSysLogFile)
+        self.log_widget.tabBarClicked.connect(self.loadSigLogFile)
         # self.log_widget.currentChanged.connect(self.loadSysLogFile)
 
         # -----------------设置文本框变化的时候滚动条自动滚动到最底部-------------------
@@ -1695,8 +1698,8 @@ class QuantApplication(QWidget):
                     usrData += logData[1] + "\n"
                 elif logData[0] == "E":
                     errData += logData[1] + "\n"
-                elif logData[0] == "S":
-                    sigData += logData[1] + "\n"
+                # elif logData[0] == "S":
+                #     sigData += logData[1] + "\n"
 
                 if guiQueue.empty():
                     flag = False
@@ -1704,13 +1707,27 @@ class QuantApplication(QWidget):
             return
         else:
             if usrData:
-                self.user_log_widget.append(usrData)
+                if self.user_log_widget.verticalScrollBar().maximum() - \
+                        self.user_log_widget.verticalScrollBar().sliderPosition() in [4, 0]:
+                    self.user_log_widget.insertPlainText(usrData)
+                    cursor = self.user_log_widget.textCursor()
+                    self.user_log_widget.moveCursor(cursor.End)
+                else:
+                    self.user_log_widget.insertPlainText(usrData)
             if errData:
-                self.error_info_widget.append(errData)
+                self.error_info_widget.insertPlainText(errData)
                 self.tab_widget.setCurrentIndex(2)
-            if sigData:
-                self.signal_log_widget.append(sigData)
+            # if sigData:
+            #     self.signal_log_widget.append(sigData)
         self.timer.start(1000)
+
+    def loadSigLogFile(self):
+        """读取本地信号日志并写入界面"""
+        sigLogPath = r"./log/trade.dat"
+        with open(sigLogPath, "r", encoding="utf-8") as f:
+            data = f.read()
+        self.signal_log_widget.setText(data)
+        self.signal_log_widget.moveCursor(QTextCursor.End)
 
     def setConnect(self, src):
         if src == 'Q':
@@ -1924,7 +1941,6 @@ class QuantApplication(QWidget):
             'OnlyDec': self.reducePositionCheckBox.isChecked(),  # 是否只做减仓同步
             'SyncTick': self.intervalSpinBox.value(),  # 同步间隔，毫秒
         }
-        print(config)
         self.writePositionConfig(config)
         self._controller._request.resetSyncPosConf(config)
 
@@ -1938,7 +1954,6 @@ class QuantApplication(QWidget):
         self.pos_table.clearContents()
         self.pos_table.setRowCount(len(positions))
         for i in range(len(positions)):
-            positions[0][2] = int(time.time() - 1573265040)
             for j in range(len(positions[i])):
                 item = QTableWidgetItem(str(positions[i][j]))
                 self.pos_table.setItem(i, j, item)

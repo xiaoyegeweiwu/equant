@@ -146,6 +146,7 @@ class CustomViewBox(pg.ViewBox):
         pg.ViewBox.mousePressEvent(self, event)
 
     def mouseDragEvent(self, ev, axis=None):
+
         # if ev.start==True and ev.finish==False: ##判断拖拽事件是否结束
         pos = ev.pos()
         lastPos = ev.lastPos()
@@ -161,8 +162,6 @@ class CustomViewBox(pg.ViewBox):
         xMin = self.parent.index - self.parent.count
         if xMin < 0:
             xMin = 0
-
-        # self.parent.plotAll(False, xMin, xMax) #注释原因：拖动事件不需要先绘制图形界面
 
         pg.ViewBox.mouseDragEvent(self, ev, axis)
 

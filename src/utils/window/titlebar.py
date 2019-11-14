@@ -121,12 +121,12 @@ class TitleBar(QWidget):
         """设置标题栏高度"""
         self.setFixedHeight(height)
         # 设置右边按钮的大小
-        self.buttonMinimum.setMinimumSize(height-10, height-10)
-        self.buttonMinimum.setMaximumSize(height-10, height-10)
-        self.buttonMaximum.setMinimumSize(height-10, height-10)
-        self.buttonMaximum.setMaximumSize(height-10, height-10)
-        self.buttonClose.setMinimumSize(height-10, height-10)
-        self.buttonClose.setMaximumSize(height-10, height-10)
+        self.buttonMinimum.setMinimumSize(height, height)
+        self.buttonMinimum.setMaximumSize(height, height)
+        self.buttonMaximum.setMinimumSize(height, height)
+        self.buttonMaximum.setMaximumSize(height, height)
+        self.buttonClose.setMinimumSize(height, height)
+        self.buttonClose.setMaximumSize(height, height)
 
     def setTitle(self, title):
         """设置标题"""
