@@ -1048,7 +1048,7 @@ class QuantApplication(QWidget):
         self.right_splitter = QSplitter(Qt.Vertical)
         self.right_splitter.setHandleWidth(0)
         self.right_splitter.setChildrenCollapsible(False)
-        self.right_splitter.setContentsMargins(0, 10, 0, 0)
+        self.right_splitter.setContentsMargins(0, 0, 0, 0)
 
         self.left_top_splitter = QSplitter(Qt.Horizontal)
         self.left_top_splitter.setHandleWidth(0)
@@ -1076,16 +1076,16 @@ class QuantApplication(QWidget):
         # 左部布局
         self.left_splitter.addWidget(self.left_top_splitter)
         self.left_splitter.addWidget(self.tab_widget)
-        self.left_splitter.setSizes([self.height * 0.8 * 0.4, self.height * 0.8 * 0.1])
+        self.left_splitter.setSizes([self.height * 0.75, self.height * 0.25])
 
         # 右部布局
         self.right_splitter.addWidget(self.func_tab)
         self.right_splitter.addWidget(self.func_doc)
-        self.right_splitter.setSizes([self.height * 0.8 * 0.265, self.height * 0.8 * 0.1])
+        self.right_splitter.setSizes([self.height * 0.75, self.height * 0.25])
 
         self.main_splitter.addWidget(self.left_splitter)
         self.main_splitter.addWidget(self.right_splitter)
-        self.main_splitter.setSizes([self.width * 0.8 * 0.4, self.width * 0.8 * 0.1])
+        self.main_splitter.setSizes([self.width * 0.4, self.width * 0.1])
 
         self.hbox.addWidget(self.main_splitter)
         self.setLayout(self.hbox)
@@ -1123,7 +1123,7 @@ class QuantApplication(QWidget):
         self.strategy_vbox = QFrame()
         label = QLabel('策略')
         self.strategy_layout = QVBoxLayout()
-        self.strategy_layout.setContentsMargins(0, 18, 0, 0)
+        self.strategy_layout.setContentsMargins(0, 16, 0, 0)
         self.model = QFileSystemModel()
         self.strategy_tree = Tree(self.model, self.strategy_filter)
         # self.strategy_tree = Tree(strategy_path)
@@ -1941,7 +1941,6 @@ class QuantApplication(QWidget):
             'OnlyDec': self.reducePositionCheckBox.isChecked(),  # 是否只做减仓同步
             'SyncTick': self.intervalSpinBox.value(),  # 同步间隔，毫秒
         }
-        print(config)
         self.writePositionConfig(config)
         self._controller._request.resetSyncPosConf(config)
 
@@ -1955,7 +1954,6 @@ class QuantApplication(QWidget):
         self.pos_table.clearContents()
         self.pos_table.setRowCount(len(positions))
         for i in range(len(positions)):
-            positions[0][2] = int(time.time() - 1573265040)
             for j in range(len(positions[i])):
                 item = QTableWidgetItem(str(positions[i][j]))
                 self.pos_table.setItem(i, j, item)

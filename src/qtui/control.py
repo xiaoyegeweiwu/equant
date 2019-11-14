@@ -49,8 +49,8 @@ class Controller(object):
             self.mainWnd.setWindowTitle('极星量化')
             self.mainWnd.setWindowIcon(QIcon('icon/epolestar ix2.ico'))
             screen = QDesktopWidget().screenGeometry()
-            self.mainWnd.setGeometry(screen.width() * 0.05, screen.height() * 0.05, screen.width() * 0.9,
-                         screen.height() * 0.9)
+            self.mainWnd.setGeometry(screen.width() * 0.1, screen.height() * 0.1, screen.width() * 0.8,
+                         screen.height() * 0.8)
             self.mainWnd.titleBar.buttonClose.clicked.connect(self.quitThread)
             self.mainWnd.setWidget(self.app)
 
