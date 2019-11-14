@@ -563,8 +563,11 @@ class Strategy:
                     self._dataModel.runRealTime(self._context, self._userModule.handle_data, event)
                 except queue.Empty as e:
                     if self._firstTriggerQueueEmpty:
-                        self._clearHisPos()
                         self._atHisOver()
+                        if self._cfgModel.getParamsOptmz():
+                            self._killStrategy()
+                            break
+                        self._clearHisPos()
                         self._runStatus = ST_STATUS_CONTINUES
                         self._send2UiEgStatus(self._runStatus)
                         self._firstTriggerQueueEmpty = False
@@ -576,6 +579,19 @@ class Strategy:
                 errorText = traceback.format_exc()
                 # traceback.print_exc()
                 self._exit(-1, errorText)
+
+    def _killStrategy(self):
+        '''策略进程自杀'''
+        msg = {
+            "EventSrc"    :   EEQU_EVSRC_UI,
+            "EventCode"   :   EV_UI2EG_STRATEGY_QUIT,
+            "SessionId"   :   0,
+            "StrategyId"  :   self._strategyId,
+            "Data"        :   {}
+        }
+
+        event = Event(msg)
+        self._eg2stQueue.put(event)
 
     def _clearHisPos(self):
         '''清空历史持仓'''
@@ -1222,6 +1238,7 @@ class Strategy:
         quitEvent = Event({
             "EventCode": EV_EG2UI_STRATEGY_STATUS,
             "StrategyId": self._strategyId,
+            "GroupId": self._cfgModel.getGroupId(),
             "Data":{
                 "Status":status,
                 "Config":config,
