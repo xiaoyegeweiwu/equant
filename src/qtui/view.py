@@ -3,7 +3,7 @@ import json
 import os
 import pandas as pd
 import shutil
-import sys
+# import sys
 import traceback
 from threading import Thread
 import time
