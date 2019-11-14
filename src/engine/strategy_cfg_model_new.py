@@ -193,7 +193,7 @@ class StrategyConfig_new(object):
             'FloatStopPoint' : {},   # 浮动止损信息
             'SubQuoteContract' : [], # 即时行情订阅合约列表
             'Params': {}, # 用户设置参数
-            'Pending': False,
+            'Pending': False,  # 是否允许向实盘下单
             'Alarm': False, # 是否开启警报
             'PopOn': False, # 是否允许弹窗
             'AutoSyncPos': False, #是否自动同步持仓, 和引擎设置一致
