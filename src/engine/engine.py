@@ -701,11 +701,26 @@ class StrategyEngine(object):
                 acPos = acBuyPos - acSellPos
                 totalDiff = stPos - acPos
                 
-                if totalDiff < 0:
-                    self._sendSyncPosOrder(pos, -totalDiff, dSell, oOpen)
-                elif totalDiff > 0:
-                    self._sendSyncPosOrder(pos, totalDiff, dBuy, oOpen)
-
+                # 账户持多仓
+                if stPos > 0:
+                    if totalDiff < 0:
+                        self._sendSyncPosOrder(pos, -totalDiff, dSell, oCover)
+                    elif totalDiff > 0:
+                        if not self._autoSyncPosConf['OnlyDec']:
+                            self._sendSyncPosOrder(pos, totalDiff, dBuy, oOpen)
+                # 账户持空仓
+                elif stPos < 0:
+                    if totalDiff < 0:
+                        if not self._autoSyncPosConf['OnlyDec']:
+                            self._sendSyncPosOrder(pos, -totalDiff, dSell, oOpen)
+                    elif totalDiff > 0:
+                        self._sendSyncPosOrder(pos, totalDiff, dBuy, oCover)
+                # 账户不持仓
+                else:
+                    if totalDiff < 0:
+                        self._sendSyncPosOrder(pos, -totalDiff, dSell, oCover)
+                    elif totalDiff > 0:
+                        self._sendSyncPosOrder(pos, totalDiff, dBuy, oCover)
             
     def _sendSyncPosOrder(self, pos, orderQty, orderDirct, entryOrExit):
         userNo = pos[0]
