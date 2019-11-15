@@ -65,3 +65,7 @@ QTextEdit {
 #strategyTabWidget QTableView {
   border: 1px solid #D9D9D9;
 }
+
+#contentEdit {
+  border: 1px solid #D9D9D9
+}

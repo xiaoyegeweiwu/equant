@@ -45,7 +45,7 @@ body{
     height: 38px;
     position: relative;
     color: #3c3f41;
-    background: #adadad;
+    background: #fafafa;
     overflow: hidden;                           /*处理超出的内容*/
 }
 

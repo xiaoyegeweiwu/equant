@@ -45,7 +45,7 @@ function init_editor(layoutid, code_str, theme) {
                 value: code_str,                //初始文本内容
                 automaticLayout: true,          //随布局Element自动调整大小                        
                 minimap: {enabled: true},       //代码略缩图
-                fontSize: 24,                   //字体大小
+                fontSize: 20,                   //字体大小
                 //wordWrap: "on",               //自动换行，注意大小写
                 //wrappingIndent: "indent",     //自动缩进
                 //glyphMargin: true,            //字形边缘

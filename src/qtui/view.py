@@ -1040,9 +1040,9 @@ class QuantApplication(QWidget):
         self.main_splitter = QSplitter(Qt.Horizontal)
         self.main_splitter.setHandleWidth(0)
         self.main_splitter.setChildrenCollapsible(False)  # 设置下限，不隐藏
-        self.main_splitter.setContentsMargins(20, 0, 20, 20)
+        self.main_splitter.setContentsMargins(1, 0, 0, 0)
         self.left_splitter = QSplitter(Qt.Vertical)
-        self.left_splitter.setHandleWidth(0)
+        self.left_splitter.setHandleWidth(1)
         self.left_splitter.setChildrenCollapsible(False)
         self.left_splitter.setContentsMargins(0, 0, 0, 0)
         self.right_splitter = QSplitter(Qt.Vertical)
@@ -1053,7 +1053,7 @@ class QuantApplication(QWidget):
         self.left_top_splitter = QSplitter(Qt.Horizontal)
         self.left_top_splitter.setHandleWidth(0)
         self.left_top_splitter.setChildrenCollapsible(False)
-        self.left_top_splitter.setContentsMargins(0, 0, 0, 10)
+        self.left_top_splitter.setContentsMargins(0, 0, 0, 0)
 
         # 获取所有策略可用过滤规则及目录
         self.strategy_filter = get_strategy_filters(strategy_path)
@@ -1122,8 +1122,9 @@ class QuantApplication(QWidget):
         # 策略树
         self.strategy_vbox = QFrame()
         label = QLabel('策略')
+        label.setContentsMargins(5, 0, 0, 0)
         self.strategy_layout = QVBoxLayout()
-        self.strategy_layout.setContentsMargins(0, 16, 0, 0)
+        self.strategy_layout.setContentsMargins(0, 4, 0, 0)
         self.model = QFileSystemModel()
         self.strategy_tree = Tree(self.model, self.strategy_filter)
         # self.strategy_tree = Tree(strategy_path)
@@ -1305,6 +1306,8 @@ class QuantApplication(QWidget):
         # self.content_vbox = QGroupBox('内容')
         self.content_vbox = QWidget()
         self.content_layout = QGridLayout()
+        self.content_layout.setContentsMargins(0, 0, 0, 0)
+        self.content_layout.setSpacing(0)
         self.save_btn = QPushButton('保存')
         self.run_btn = QPushButton('运行')
         self.run_btn.setMinimumWidth(100)
@@ -1312,6 +1315,7 @@ class QuantApplication(QWidget):
         self.run_btn.setEnabled(False)
         # self.contentEdit = MainFrmQt("localhost", 8765, "pyeditor", os.path.join(os.getcwd(), 'quant\python_editor\editor.htm'))
         self.contentEdit = WebEngineView()
+        self.contentEdit.setObjectName('contentEdit')
         self.contentEdit.load(
             QUrl.fromLocalFile(os.path.abspath(r'qtui/quant/python_editor/editor.htm')))
         self.contentEdit.switchSignal.connect(self.switch_strategy_path)
@@ -1348,10 +1352,11 @@ class QuantApplication(QWidget):
         # 函数列表
         # self.func_vbox = QGroupBox('函数')
         self.func_tab = QTabWidget()  # 通过tab切换目录、检索
+        self.func_tab.setContentsMargins(0, 0, 0, 0)
         self.search_widget = QWidget()
         self.func_layout = QVBoxLayout()
         self.func_layout.setSpacing(0)
-        self.func_layout.setContentsMargins(0, 5, 0, 0)
+        self.func_layout.setContentsMargins(0, 0, 0, 0)
 
         # 函数树结构
         self.func_tree = QTreeWidget()
@@ -1423,11 +1428,12 @@ class QuantApplication(QWidget):
         self.strategy_table = QTableWidget()
         self.strategy_table.setRowCount(0)  # 行数
         self.strategy_table.setColumnCount(12)  # 列数
+        self.strategy_table.verticalHeader().setMinimumSectionSize(5)
+        self.strategy_table.verticalHeader().setDefaultSectionSize(20)
+        self.strategy_table.horizontalHeader().setDefaultSectionSize(101)
         self.strategy_table.verticalHeader().setVisible(False)
         self.strategy_table.setShowGrid(False)
-        self.strategy_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)  # 所有列自动拉伸，充满界面
-        self.strategy_table.horizontalHeader().setSectionResizeMode(2, QHeaderView.Interactive)  # 指定列可以手动调整
-        self.strategy_table.horizontalHeader().setSectionResizeMode(3, QHeaderView.Interactive)  #
+        self.strategy_table.horizontalHeader().setSectionResizeMode(QHeaderView.Interactive)  # 所有列自动拉伸，充满界面
         self.strategy_table.setSelectionMode(QAbstractItemView.SingleSelection)  # 设置只能选中一行
         self.strategy_table.setEditTriggers(QTableView.NoEditTriggers)  # 不可编辑
         self.strategy_table.setSelectionBehavior(QAbstractItemView.SelectRows)  # 设置只有行选中
@@ -1583,13 +1589,14 @@ class QuantApplication(QWidget):
         self.func_doc = QWidget()
         self.func_doc_layout = QVBoxLayout()
         self.func_doc_layout.setSpacing(0)
-        self.func_doc_layout.setContentsMargins(0, 5, 0, 0)
+        self.func_doc_layout.setContentsMargins(0, 0, 0, 0)
         self.func_doc_line = QLabel()
         self.func_doc_line.setText('函数简介')
         self.func_content = QTextBrowser()
         self.func_doc_layout.addWidget(self.func_doc_line)
         self.func_doc_layout.addWidget(self.func_content)
         self.func_doc.setLayout(self.func_doc_layout)
+        self.func_doc.setContentsMargins(0, 8, 2, 1)
 
     def strategy_tree_clicked(self):
         # 策略双击槽函数
@@ -1772,8 +1779,14 @@ class QuantApplication(QWidget):
             row = self.strategy_table.rowCount()
             self.strategy_table.setRowCount(row + 1)
             for j in range(len(values)):
+                print(type(values[j]))
                 item = QTableWidgetItem(str(values[j]))
-                item.setTextAlignment(Qt.AlignCenter)  # 设置文本居中显示
+                if j == 0:
+                    item.setTextAlignment(Qt.AlignLeft)
+                elif j in range(1, 7):
+                    item.setTextAlignment(Qt.AlignCenter)  # 设置文本居中显示
+                else:
+                    item.setTextAlignment(Qt.AlignRight)
                 self.strategy_table.setItem(row, j, item)
 
     def _formatMonitorInfo(self, dataDict):
