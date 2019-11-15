@@ -44,6 +44,18 @@ class FramelessWindow(QWidget):
         self.windowTitleChanged.connect(self.titleBar.setTitle)
         self.windowIconChanged.connect(self.titleBar.setIcon)
 
+    def getWinThese(self):
+        """获取标题栏的配色风格"""
+        return self.titleBar.theseState
+
+    def hideTheseBtn(self):
+        """隐藏换肤按钮"""
+        self.titleBar.theseSelect.hide()
+
+    def showTheseBtn(self):
+        """显示换肤按钮"""
+        self.titleBar.theseSelect.show()
+
     def setTitleBarHeight(self, height=TITLE_BAR_HEIGHT):
         """设置标题栏高度"""
         self.titleBar.setHeight(height)

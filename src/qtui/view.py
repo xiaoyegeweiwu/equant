@@ -86,14 +86,14 @@ class StrategyPolicy(QMainWindow, Ui_strategyMainWin):
 
         self.main_contractWin = FramelessWindow()
         self.main_contractWin.setFixedSize(410, 360)
-        self.main_contractWin.titleBar.theseSelect.hide()
+        self.main_contractWin.hideTheseBtn()
         self.main_contractWin.titleBar.iconLabel.hide()
         self.main_contractWin.titleBar.buttonMaximum.setEnabled(False)
         self.main_contractWin.setWindowTitle('合约设置')
         self.main_contractWin.titleBar.buttonClose.clicked.connect(self.main_contractWin.close)
         self.main_contractWin.setWidget(self.contractWin)
         self.contractWin.cancel.clicked.connect(self.main_contractWin.close)
-        if self._control.mainWnd.titleBar.theseSelect.currentText() == '浅色':
+        if self._control.mainWnd.titleBar.theseState == '浅色':
             style = CommonHelper.readQss(WHITESTYLE)
         else:
             style = CommonHelper.readQss(DARKSTYLE)
@@ -129,7 +129,7 @@ class StrategyPolicy(QMainWindow, Ui_strategyMainWin):
         self.main_contractSelectWin.setWindowTitle('选择合约')
         self.main_contractSelectWin.titleBar.buttonClose.clicked.connect(self.main_contractSelectWin.close)
         self.main_contractSelectWin.setWidget(self.contractSelectWin)
-        if self._control.mainWnd.titleBar.theseSelect.currentText() == '浅色':
+        if self._control.mainWnd.getWinThese() == '浅色':
             style = CommonHelper.readQss(WHITESTYLE)
         else:
             style = CommonHelper.readQss(DARKSTYLE)
@@ -1637,13 +1637,13 @@ class QuantApplication(QWidget):
             self.main_strategy_policy_win = FramelessWindow()
             self.main_strategy_policy_win.setGeometry((self.width - 580)/2, (self.height - 620)/2, 590, 630)
             self.main_strategy_policy_win.setFixedSize(590, 650)
-            self.main_strategy_policy_win.titleBar.theseSelect.hide()
+            self.main_strategy_policy_win.hideTheseBtn()
             self.main_strategy_policy_win.titleBar.iconLabel.hide()
             self.main_strategy_policy_win.titleBar.buttonMaximum.setEnabled(False)
             self.main_strategy_policy_win.setWindowTitle('属性设置')
             self.main_strategy_policy_win.titleBar.buttonClose.clicked.connect(self.strategy_policy_win.close)
             self.main_strategy_policy_win.setWidget(self.strategy_policy_win)
-            if self._controller.mainWnd.titleBar.theseSelect.currentText() == '浅色':
+            if self._controller.mainWnd.getWinThese() == '浅色':
                 style = CommonHelper.readQss(WHITESTYLE)
             else:
                 style = CommonHelper.readQss(DARKSTYLE)
