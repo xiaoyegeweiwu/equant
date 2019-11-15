@@ -42,6 +42,15 @@
                     document.getElementById('main_link').href = 'editor_vs.css'
                 }
             });
+            Bridge.themeSignal.connect(function (text) {
+                if (text == 'vs-dark'){
+                    init_editor("editor", "# equant code editor\n\n", 'vs-dark');
+                    document.getElementById('main_link').href = 'editor.css'
+                }else {
+                    init_editor("editor", "# equant code editor\n\n", 'vs');
+                    document.getElementById('main_link').href = 'editor_vs.css'
+                }
+            })
 
         }
     );
@@ -58,10 +67,7 @@
 
 <!--编辑器-->
 <div id="editor">
-    <script type="text/javascript">
-        init_editor("editor", "# equant code editor\n\n", 'vs');
-    </script>
-    <link id="main_link" href="editor_vs.css" type="text/css" rel="stylesheet"/>
+    <link id="main_link" type="text/css" rel="stylesheet"/>
 </div>
 </body>
 
