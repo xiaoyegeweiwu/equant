@@ -2066,25 +2066,25 @@ PlotWidget {
 
 /*标题栏*/
 TitleBar {
-    background-color: #1E1E1E;
+    background-color: #3c3c3c;
 }
 #titleLabel  {
-    background-color: #1E1E1E;
+    background-color: #3c3c3c;
 }
 #iconLabel {
-    background-color: #1E1E1E;
+    background-color: #3c3c3c;
 }
 /*最小化最大化关闭按钮通用默认背景*/
 #buttonMinimum,
 #buttonMaximum,
 #buttonClose {
     border: none;
-    color: #E6E6E6;
-    background-color: #1E1E1E;
+    color: #646464;
+    background-color: #3c3c3c;
 }
 /*悬停*/
 #buttonMinimum:hover,#buttonMaximum:hover, #buttonClose:hover{
-    background-color: #3D3D3D;
+    background-color: #474748;
     color: white;
 }
 #buttonClose:hover {
@@ -2093,11 +2093,11 @@ TitleBar {
 
 /*鼠标按下不放*/
 #buttonMinimum:pressed,#buttonMaximum:pressed {
-    background-color: #323232;
+    background-color: #474748;
 }
 #buttonClose:pressed {
     color: white;
-    background-color: #323232;
+    background-color: red;
 }
 #titleLabel {
     color: white;
@@ -2106,4 +2106,9 @@ TitleBar {
 /*自定义标题栏窗口边框颜色*/
 #Framless {
     background: #363636
+}
+
+/*标题栏换肤按钮*/
+#theseSelect {
+    image: url(":/icon/whitethese.png");
 }
