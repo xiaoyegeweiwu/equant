@@ -29,6 +29,11 @@ TitleBar {
     color: #000000;
 }
 
+/*自定义标题栏窗口边框颜色*/
+#Framless {
+    background: #696969
+}
+
 QTabWidget QTableView,
 QTabWidget QTreeView,
 QTabWidget QTreeWidget,

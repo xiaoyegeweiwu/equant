@@ -2102,3 +2102,8 @@ TitleBar {
 #titleLabel {
     color: white;
 }
+
+/*自定义标题栏窗口边框颜色*/
+#Framless {
+    background: #363636
+}

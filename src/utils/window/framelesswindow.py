@@ -25,11 +25,12 @@ class FramelessWindow(QWidget):
         self._pressed = False
         self.Direction = None
         # 背景透明
-        self.setAttribute(Qt.WA_TranslucentBackground, True)
-        # 无边框
+        # self.setAttribute(Qt.WA_TranslucentBackground, True)
+        # 无标题栏和边框
         self.setWindowFlags(Qt.FramelessWindowHint)
         # 鼠标跟踪
         self.setMouseTracking(True)
+        self.setObjectName("Framless")
         # # 布局
         layout = QVBoxLayout(self, spacing=0)
         # 预留边界用于实现无边框窗口调整大小
@@ -61,9 +62,9 @@ class FramelessWindow(QWidget):
         self._widget = widget
         # 设置默认背景颜色， 否则由于受到父窗口的影响导致透明
         self._widget.setAutoFillBackground(True)
-        palette = self._widget.palette()
-        palette.setColor(palette.Window, QColor(250, 250, 250))
-        self._widget.setPalette(palette)
+        # palette = self._widget.palette()
+        # palette.setColor(palette.Window, QColor(250, 250, 250))
+        # self._widget.setPalette(palette)
         self._widget.installEventFilter(self)
         self.layout().addWidget(self._widget)
 

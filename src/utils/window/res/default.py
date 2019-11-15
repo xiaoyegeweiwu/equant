@@ -1,4 +1,4 @@
-MARGINS = 5
+MARGINS = 1
 
 DARKSTYLE = r"utils/window/res/darkthese.qss"
 WHITESTYLE = r"utils/window/res/whitethese.qss"
