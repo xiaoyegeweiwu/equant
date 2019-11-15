@@ -1053,7 +1053,7 @@ class QuantApplication(QWidget):
         self.main_splitter = QSplitter(Qt.Horizontal)
         self.main_splitter.setHandleWidth(0)
         self.main_splitter.setChildrenCollapsible(False)  # 设置下限，不隐藏
-        self.main_splitter.setContentsMargins(1, 0, 0, 0)
+        self.main_splitter.setContentsMargins(0, 0, 0, 0)
         self.left_splitter = QSplitter(Qt.Vertical)
         self.left_splitter.setHandleWidth(1)
         self.left_splitter.setChildrenCollapsible(False)
@@ -1156,9 +1156,10 @@ class QuantApplication(QWidget):
         # 策略树
         self.strategy_vbox = QFrame()
         label = QLabel('策略')
-        label.setContentsMargins(5, 0, 0, 0)
+        label.setContentsMargins(0, 0, 0, 0)
         self.strategy_layout = QVBoxLayout()
-        self.strategy_layout.setContentsMargins(0, 4, 0, 0)
+        self.strategy_layout.setContentsMargins(0, 0, 0, 0)
+        self.strategy_layout.setSpacing(0)
         self.model = QFileSystemModel()
         self.strategy_tree = Tree(self.model, self.strategy_filter)
         # self.strategy_tree = Tree(strategy_path)
@@ -1344,8 +1345,8 @@ class QuantApplication(QWidget):
         self.content_layout.setSpacing(0)
         self.save_btn = QPushButton('保存')
         self.run_btn = QPushButton('运行')
-        self.run_btn.setMinimumWidth(100)
-        self.save_btn.setMinimumWidth(100)
+        self.run_btn.setMaximumWidth(100)
+        self.save_btn.setMaximumWidth(100)
         self.run_btn.setEnabled(False)
         # self.contentEdit = MainFrmQt("localhost", 8765, "pyeditor", os.path.join(os.getcwd(), 'quant\python_editor\editor.htm'))
         self.contentEdit = WebEngineView()
@@ -1356,8 +1357,6 @@ class QuantApplication(QWidget):
         self.statusBar = QLabel()
         self.statusBar.setStyleSheet('border: none;')
 
-        self.save_btn.setMaximumSize(40, 30)
-        self.run_btn.setMaximumSize(40, 30)
         self.content_layout.addWidget(self.statusBar, 0, 0, 1, 1)
         self.content_layout.addWidget(self.run_btn, 0, 1, 1, 1)
         self.content_layout.addWidget(self.save_btn, 0, 2, 1, 1)
@@ -1640,7 +1639,7 @@ class QuantApplication(QWidget):
         self.func_doc_layout.addWidget(self.func_doc_line)
         self.func_doc_layout.addWidget(self.func_content)
         self.func_doc.setLayout(self.func_doc_layout)
-        self.func_doc.setContentsMargins(0, 8, 2, 1)
+        self.func_doc.setContentsMargins(0, 0, 0, 0)
 
     def strategy_tree_clicked(self):
         # 策略双击槽函数
