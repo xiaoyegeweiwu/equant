@@ -15,7 +15,7 @@ body{
 /*标签上的关闭按钮*/
 #tabs a{
     margin-left: 40px;
-    margin-right: 3px;
+    margin-right: 0;
     cursor: default;
     font-size: 0;
     display: inline-block;
@@ -28,10 +28,10 @@ body{
     display: block;
 }
 #tabs a:before{
-    transform: translateY(12px) rotate(45deg);
+    transform: translateY(11px) rotate(45deg);
 }
 #tabs a:after{
-    transform: translateY(-25px) rotate(-45deg);
+    transform: translateY(-24px) rotate(-45deg);
 }
 #tabs a:hover:before, #tabs li a:hover:after{
     background: #aa2b30;
@@ -45,53 +45,34 @@ body{
     height: 38px;
     position: relative;
     color: #3c3f41;
-    background: #fafafa;
+    background: #f0f0f0;
     overflow: hidden;                           /*处理超出的内容*/
 }
 
 #tabs li{
-    top: 3px;
+    top: 5px;
     height:33px;
-    line-height: 36px;                          /*行距，一行文字的高度*/
+    line-height: 34px;                          /*行距，一行文字的高度*/
     padding: 0 .6em 0 .8em;
-    margin-left: .2em;                          /*确定梯形交叠的范围大小*/
+
     display: inline-block;
     position: relative;
     text-align: left;
     cursor: default;
-    z-index: 1;
-}
-#tabs li:before {
-    content: '';
-    background: #e0e0e0;
-    text-decoration:none;
-    top: 0; right: 0; bottom: 0; left: 0;
-    border: 1px solid rgba(0,0,0,.4);           /*描边*/
-    border-bottom: none;                        /*不画底边*/
-    border-radius: 5px 5px 0 0;                 /*圆角*/
-    transform: perspective(8px) rotateX(5deg); /*梯形*/
-    transform-origin: left right bottom;        /*梯形*/
-    position: absolute;
-    z-index: -3;
+
 }
 
 /*鼠标经过*/
 #tabs li:hover {
-    z-index: 2;
-}
-#tabs li:hover:before {
-    background: #D9D9D9;
-    z-index: -2;
+    color: #030101;
+    background-color: #d9d9d9;
 }
 
 /*当前选中*/
 #tabs li.current{
-    color: #3c3f41;
-    z-index: 3;
-}
-#tabs li.current:before {
+    color: #030101;
     background: #ffffff;
-    z-index: -1;
+
 }
 
 /*编辑器*/
@@ -99,5 +80,4 @@ body{
     margin: 0;
     width: 100%; 
     height: 100%;
-    color: #fff;
 }

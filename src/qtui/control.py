@@ -151,6 +151,9 @@ class Controller(object):
         #启动主界面线程
 
         self.mainWnd.show()
+        # if self.app.settings.contains('theme'):
+        #     print(self.app.settings.value('theme'), type(self.app.settings.value('theme')))
+        #     self.app.contentEdit.sendSetThemeSignal(self.app.settings.value('theme'))
         self.mainApp.exec_()
         
     def set_help_text(self, funcName, text):

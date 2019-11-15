@@ -9,7 +9,7 @@ from threading import Thread
 import time
 
 from PyQt5 import QtCore, QtGui
-from PyQt5.QtCore import Qt, QPoint, QUrl, pyqtSignal, pyqtSlot, QSharedMemory, QThread, QTimer, QDir
+from PyQt5.QtCore import Qt, QPoint, QUrl, pyqtSignal, pyqtSlot, QSharedMemory, QThread, QTimer, QDir, QSettings
 from PyQt5.QtGui import QTextCursor, QIcon, QKeySequence
 from PyQt5.QtWebChannel import QWebChannel
 from PyQt5.QtWebEngineWidgets import QWebEngineView, QWebEngineSettings
@@ -60,6 +60,8 @@ class StrategyPolicy(QMainWindow, Ui_strategyMainWin):
         self.updateContract.clicked.connect(self.update_contract)
         self.cancel.clicked.connect(self.close)
         self.confirm.clicked.connect(self.enter)
+        # self.setContentsMargins(0, 0, 0, 0)
+        self.centralwidget.setContentsMargins(0, 0, 0, 0)
 
         self._control = control
 
@@ -908,6 +910,7 @@ class WebEngineView(QWebEngineView):
     saveSignal = pyqtSignal()
     switchSignal = pyqtSignal(str)
     setThemeSignal = pyqtSignal(str)
+    themeSignal = pyqtSignal(str)
 
     def __init__(self, *args, **kwargs):
         super(WebEngineView, self).__init__(*args, **kwargs)
@@ -950,6 +953,10 @@ class WebEngineView(QWebEngineView):
 
     def sendSetThemeSignal(self, theme):
         self.setThemeSignal.emit(theme)
+
+    def sendThemeSignal(self, text):
+        print('sendThemeSignalsendThemeSignalsendThemeSignalsendThemeSignalsendThemeSignalsendThemeSignal')
+        self.themeSignal.emit(text)
 
     @pyqtSlot(str)
     def switchFile(self, path):
@@ -1022,9 +1029,15 @@ class WebEngineView(QWebEngineView):
 class QuantApplication(QWidget):
 
     reportShowSignal = pyqtSignal(dict)
+    exitSignal = pyqtSignal()
+    positionSignal = pyqtSignal(list)
 
     def __init__(self, control, parent=None):
         super().__init__(parent)
+
+        self.exitSignal.connect(self.show_warn)
+        self.positionSignal.connect(self.updateSyncPosition)
+        self.init_settings()
 
         # 初始化控制器
         self._controller = control
@@ -1071,21 +1084,33 @@ class QuantApplication(QWidget):
         # 左上部布局
         self.left_top_splitter.addWidget(self.strategy_vbox)
         self.left_top_splitter.addWidget(self.content_vbox)
-        self.left_top_splitter.setSizes([self.width * 0.8 * 0.2, self.width * 0.8 * 0.6])
+        if self.settings.contains('left_top_splitter'):
+            self.left_top_splitter.restoreState(self.settings.value('left_top_splitter'))
+        else:
+            self.left_top_splitter.setSizes([self.width * 0.8 * 0.2, self.width * 0.8 * 0.6])
 
         # 左部布局
         self.left_splitter.addWidget(self.left_top_splitter)
         self.left_splitter.addWidget(self.tab_widget)
-        self.left_splitter.setSizes([self.height * 0.75, self.height * 0.25])
+        if self.settings.contains('left_splitter'):
+            self.left_splitter.restoreState(self.settings.value('left_splitter'))
+        else:
+            self.left_splitter.setSizes([self.height * 0.75, self.height * 0.25])
 
         # 右部布局
         self.right_splitter.addWidget(self.func_tab)
         self.right_splitter.addWidget(self.func_doc)
-        self.right_splitter.setSizes([self.height * 0.75, self.height * 0.25])
+        if self.settings.contains('right_splitter'):
+            self.right_splitter.restoreState(self.settings.value('right_splitter'))
+        else:
+            self.right_splitter.setSizes([self.height * 0.75, self.height * 0.25])
 
         self.main_splitter.addWidget(self.left_splitter)
         self.main_splitter.addWidget(self.right_splitter)
-        self.main_splitter.setSizes([self.width * 0.4, self.width * 0.1])
+        if self.settings.contains('main_splitter'):
+            self.main_splitter.restoreState(self.settings.value('main_splitter'))
+        else:
+            self.main_splitter.setSizes([self.width * 0.4, self.width * 0.1])
 
         self.hbox.addWidget(self.main_splitter)
         self.setLayout(self.hbox)
@@ -1107,8 +1132,17 @@ class QuantApplication(QWidget):
         self.timer.timeout.connect(self._controller.update_mon)
         self.timer.start(1000)
 
+    def init_settings(self):
+        self.settings = QSettings('settings.ini', QSettings.IniFormat)
+
     def closeEvent(self, event):
         # 退出子线程和主线程
+        self.settings.setValue('left_top_splitter', self.left_top_splitter.saveState())
+        self.settings.setValue('left_splitter', self.left_splitter.saveState())
+        self.settings.setValue('right_splitter', self.right_splitter.saveState())
+        self.settings.setValue('main_splitter', self.main_splitter.saveState())
+        self.settings.setValue(
+            'theme', 'vs' if self._controller.mainWnd.titleBar.theseSelect.currentText == '浅色' else 'vs-dark')
         self._controller.sendExitRequest()
         self._controller.quitThread()
 
@@ -1430,10 +1464,14 @@ class QuantApplication(QWidget):
         self.strategy_table.setColumnCount(12)  # 列数
         self.strategy_table.verticalHeader().setMinimumSectionSize(5)
         self.strategy_table.verticalHeader().setDefaultSectionSize(20)
-        self.strategy_table.horizontalHeader().setDefaultSectionSize(101)
+        self.strategy_table.horizontalHeader().setDefaultSectionSize(100)
+        self.strategy_table.setColumnWidth(2, 130)
+        self.strategy_table.setColumnWidth(3, 150)
         self.strategy_table.verticalHeader().setVisible(False)
         self.strategy_table.setShowGrid(False)
-        self.strategy_table.horizontalHeader().setSectionResizeMode(QHeaderView.Interactive)  # 所有列自动拉伸，充满界面
+        self.strategy_table.horizontalHeader().setStretchLastSection(True)  # 最后一行自适应长度，充满界面
+        self.strategy_table.horizontalHeader().setSectionResizeMode(QHeaderView.Interactive)
+        self.strategy_table.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeToContents)  # 第一列自适应长度，充满界面
         self.strategy_table.setSelectionMode(QAbstractItemView.SingleSelection)  # 设置只能选中一行
         self.strategy_table.setEditTriggers(QTableView.NoEditTriggers)  # 不可编辑
         self.strategy_table.setSelectionBehavior(QAbstractItemView.SelectRows)  # 设置只有行选中
@@ -1477,8 +1515,8 @@ class QuantApplication(QWidget):
         self.intervalSpinBox = QSpinBox()
         self.intervalSpinBox.setMinimum(500)
         self.intervalSpinBox.setMaximum(2147483647)
-        self.intervalSpinBox.setButtonSymbols(QAbstractSpinBox.NoButtons)
-        self.intervalSpinBox.setMinimumWidth(80)
+        self.intervalSpinBox.setMaximumWidth(80)
+        self.intervalSpinBox.setSingleStep(100)
         self.reducePositionCheckBox = QCheckBox('仅自动减仓')
 
         self.union_layout.addWidget(self.one_key_sync, 0, 0, 1, 1)
@@ -1523,9 +1561,15 @@ class QuantApplication(QWidget):
         self.pos_table = QTableWidget()
         self.pos_table.setRowCount(0)  # 行数
         self.pos_table.setColumnCount(13)  # 列数
+        self.pos_table.verticalHeader().setMinimumSectionSize(5)
+        self.pos_table.verticalHeader().setDefaultSectionSize(20)  # 设置行高
+        self.pos_table.horizontalHeader().setDefaultSectionSize(80)
+        self.pos_table.setColumnWidth(0, 150)
+        self.pos_table.setColumnWidth(1, 150)
         self.pos_table.verticalHeader().setVisible(False)
         self.pos_table.setShowGrid(False)
-        self.pos_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)  # 所有列自动拉伸，充满界面
+        self.pos_table.horizontalHeader().setStretchLastSection(True)  # 最后一列自动拉伸充满界面
+        self.pos_table.horizontalHeader().setSectionResizeMode(QHeaderView.Interactive)  # 所有列自动拉伸，充满界面
         self.pos_table.setSelectionMode(QAbstractItemView.SingleSelection)  # 设置只能选中一行
         self.pos_table.setEditTriggers(QTableView.NoEditTriggers)  # 不可编辑
         self.pos_table.setSelectionBehavior(QAbstractItemView.SelectRows)  # 设置只有行选中
@@ -1642,8 +1686,8 @@ class QuantApplication(QWidget):
         if path:
             self.strategy_policy_win = StrategyPolicy(self._controller, path, param=param, flag=flag)
             self.main_strategy_policy_win = FramelessWindow()
-            self.main_strategy_policy_win.setGeometry((self.width - 580)/2, (self.height - 620)/2, 590, 630)
-            self.main_strategy_policy_win.setFixedSize(590, 650)
+            self.main_strategy_policy_win.setGeometry((self.width - 580)/2, (self.height - 620)/2, 580, 640)
+            self.main_strategy_policy_win.setMinimumSize(580, 640)
             self.main_strategy_policy_win.titleBar.theseSelect.hide()
             self.main_strategy_policy_win.titleBar.iconLabel.hide()
             self.main_strategy_policy_win.titleBar.buttonMaximum.setEnabled(False)
@@ -1759,7 +1803,11 @@ class QuantApplication(QWidget):
 
         if src == 'S':
             self.statusBar.setText("极星9.5退出")
-            QMessageBox.critical("错误", "极星9.5退出")
+            self.exitSignal.emit()
+
+    def show_warn(self):
+        """极星9.5退出时，弹出窗口槽函数"""
+        QMessageBox.critical(self, "错误", "极星9.5退出", QMessageBox.Yes)
 
     def addExecute(self, dataDict):
         values = self._formatMonitorInfo(dataDict)
@@ -1779,11 +1827,8 @@ class QuantApplication(QWidget):
             row = self.strategy_table.rowCount()
             self.strategy_table.setRowCount(row + 1)
             for j in range(len(values)):
-                print(type(values[j]))
                 item = QTableWidgetItem(str(values[j]))
-                if j == 0:
-                    item.setTextAlignment(Qt.AlignLeft)
-                elif j in range(1, 7):
+                if j in range(7):
                     item.setTextAlignment(Qt.AlignCenter)  # 设置文本居中显示
                 else:
                     item.setTextAlignment(Qt.AlignRight)
@@ -1855,7 +1900,10 @@ class QuantApplication(QWidget):
             for k, v in colValues.items():
                 try:
                     item = QTableWidgetItem(v)
-                    item.setTextAlignment(Qt.AlignCenter)
+                    if k in range(7):
+                        item.setTextAlignment(Qt.AlignCenter)  # 设置文本居中显示
+                    else:
+                        item.setTextAlignment(Qt.AlignRight)
                     self.strategy_table.setItem(row, k, item)
                 except Exception as e:
                     self._logger.error(f"[UI][{strategyId}]: 更新策略执行数据时出错，执行列表中该策略已删除！")
@@ -1964,9 +2012,9 @@ class QuantApplication(QWidget):
             self.spin.setEnabled(True)
 
     def updateSyncPosition(self, positions):
-        self.pos_table.clearContents()
         self.pos_table.setRowCount(len(positions))
         for i in range(len(positions)):
+            positions[0][2] = int(time.time() - 1573797464)
             for j in range(len(positions[i])):
                 item = QTableWidgetItem(str(positions[i][j]))
                 self.pos_table.setItem(i, j, item)
