@@ -1142,7 +1142,7 @@ class QuantApplication(QWidget):
         self.settings.setValue('right_splitter', self.right_splitter.saveState())
         self.settings.setValue('main_splitter', self.main_splitter.saveState())
         self.settings.setValue(
-            'theme', 'vs' if self._controller.mainWnd.titleBar.theseSelect.currentText == '浅色' else 'vs-dark')
+            'theme', 'vs' if self._controller.mainWnd.getWinThese() == '浅色' else 'vs-dark')
         self._controller.sendExitRequest()
         self._controller.quitThread()
 
@@ -1458,6 +1458,7 @@ class QuantApplication(QWidget):
 
     def create_tab(self):
         self.tab_widget = QTabWidget()
+        self.tab_widget.setContentsMargins(0, 0, 0, 0)
         # 策略运行table
         self.strategy_table = QTableWidget()
         self.strategy_table.setRowCount(0)  # 行数
