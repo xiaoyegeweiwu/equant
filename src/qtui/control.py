@@ -45,11 +45,10 @@ class Controller(object):
         else:
             qss_path = WHITESTYLE
             theme = THESE_STATE_WHITE
-
-        style = CommonHelper.readQss(qss_path)
-        self.mainApp.setStyleSheet(style)
         # 回测报告窗口（主线程中创建)
         self.mainWnd = FramelessWindow()
+        style = CommonHelper.readQss(qss_path)
+        self.mainWnd.setStyleSheet(style)
         self.mainWnd.setWindowTitle('极星量化')
         self.mainWnd.setWinThese(theme)
         self.mainWnd.setWindowIcon(QIcon('icon/epolestar ix2.ico'))
