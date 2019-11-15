@@ -7,7 +7,6 @@ from functools import partial
 
 
 from qtui.reportview.fundtab import KeyWraper, MyStringAxis, CustomViewBox
-from qtui.reportview.crosshair import Crosshair
 
 
 DIR = {
@@ -32,6 +31,83 @@ GRAPHTYPE = {
     "MeanReturns" : "柱状图",
     "IncSpeed"    : "立体"
 }
+
+
+# class DirTree(QTreeWidget):
+#
+#     def __init__(self, parent=None):
+#         super(DirTree, self).__init__(parent)
+#         self._parent = parent
+#
+#         self._graphDatas = None
+#
+#         self.setColumnCount(1)
+#         self.setHeaderHidden(True)
+#         self._addTreeItem()
+#         self.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Expanding)
+#         self.setColumnWidth(0, 50)
+#         self.setFixedWidth(140)
+#         self._initPlotWidget()
+#
+#     def _initPlotWidget(self):
+#         self.stringaxis = pg.AxisItem(orientation='bottom')
+#         self.mYAxis = pg.AxisItem(orientation='left')
+#         self.pw = pg.PlotWidget(name="master", axisItem={'bottom': self.stringaxis, 'left': self.mYAxis},
+#                                 enableMenu=False, border=(150, 150, 150))
+#         self.pw.showGrid(x=True, y=True)
+#         # self.pw.setLimits(xMin=0, xMax=-1, yMin=0, yMax=-1)
+#
+#         self.pw.getAxis('left').setWidth(60)
+#         self.pw.getAxis('left').setStyle(tickFont=QFont("Roman times", 10, QFont.Bold))
+#         self.pw.getAxis('left').setPen(color=(255, 255, 255, 255), width=0.8)
+#         self.pw.hideButtons()
+#
+#     def _addTreeItem(self):
+#         for key in DIR.keys():
+#             root = QTreeWidgetItem(self)
+#             root.setText(0, key)
+#             for item in DIR[key]:
+#                 child = QTreeWidgetItem(root)
+#                 child.setText(0, item[0])  # 设置文本
+#                 child.setText(1, item[1])
+#
+#             self.addTopLevelItem(root)
+#
+#         self.itemClicked.connect(self.itemClickedCallback)
+#
+#     def getPlotData(self, key, tag):
+#         x, y = [], []
+#         for sd in self._graphDatas[key]:
+#             x.append(sd.get('Time'))
+#             y.append(sd.get(tag))
+#         return x, y
+#
+#     def itemClickedCallback(self, item):
+#         if item.parent():
+#             rootKey = item.parent().text(0)
+#             key = item.text(0)
+#             flag = item.text(1)
+#             x, y = self.getPlotData(rootKey, flag)
+#
+#             self.pw.plot(title="testing")
+#             self.pw.clear()
+#             self.pw.plot(x, y)
+#
+#     def setInitialGraph(self, data):
+#         self._graphDatas = data
+#         self.pw.clear()
+#         x, y = self.getPlotData("年度分析", 'Equity')
+#
+#         self.pw.plot(x, y)
+#         self._parent.layout().addWidget(self.pw)
+#
+#     def showGraphDatas(self, datas):
+#         self._graphDatas = datas
+#         self.pw.clear()
+#         x, y = self.getPlotData("年度分析", 'Equity')
+#
+#         self.pw.plot(x, y)
+#         self._parent.layout().addWidget(self.pw)
 
 
 class DirTree(QTreeWidget):
@@ -77,8 +153,9 @@ class DirTree(QTreeWidget):
             flag = item.text(1)
             x, y = self.getPlotData(rootKey, flag)
 
+            self._graph.plot(title="testing")
+            # self._graph.clear()
             self._graph.loadData(y)
-            self._graph.update()
 
     def setInitialGraph(self, data):
         self._graphDatas = data
@@ -102,7 +179,6 @@ class BarGraph(pg.GraphicsObject):
     def __init__(self, datas):
         super(BarGraph, self).__init__()
         self.data = datas
-        self.setFlag(self.ItemUsesExtendedStyleOption)
         self.generatePicture(self.data)
 
     def generatePicture(self, datas=None):
@@ -129,146 +205,113 @@ class BarGraph(pg.GraphicsObject):
 
 class GraphWidget(KeyWraper):
 
-    initCompleted = False
-
     def __init__(self, parent=None):
-        super().__init__(parent)
-
+        super(GraphWidget, self).__init__(parent)
         self.parent = parent
-        self.datas = None
+        self.name = None
 
-        self.count = 90
-        self.index = None
-        self.oldsize = 0
+        self.countK = 60
 
-        # 初始化完成
-        self.initCompleted = False
         self.initUI()
 
     def initUI(self):
+        """初始化图表控件"""
         self.pw = pg.PlotWidget()
-        self.layout = pg.GraphicsLayout(border=(10, 10, 10))
-        self.layout.setContentsMargins(0, 0, 0, 0)
-        self.layout.setSpacing(0)
-        self.layout.setBorder(color=(255, 255, 255, 255), width=0.8)
-        self.layout.setZValue(0)
-        self.layout.setMinimumHeight(140)
-        self.pw.setCentralWidget(self.layout)
+        self.layGraph = pg.GraphicsLayout(border=(100, 100, 100))
+        self.layGraph.setContentsMargins(10, 10, 10, 10)
+        self.layGraph.setSpacing(0)
+        self.layGraph.setBorder(color=(255, 255, 255, 255), width=0.8)
+        self.layGraph.setZValue(0)
+        self.layGraph.setMinimumHeight(140)
+        # self.gTitle = self.layGraph.addLabel(u"")
+        self.pw.setCentralWidget(self.layGraph)
+
         # 设置横坐标
         xdict = {}
         self.axisTime = MyStringAxis(xdict, orientation='bottom')
-        # 初始化资金曲线
-        self.initPlotFund()
-        # 十字光标
-        self.crosshair = Crosshair(self.pw, self)
+        # 初始化图
+        self.initGraph()
 
-        self.vbox = QVBoxLayout()
-        self.vbox.addWidget(self.pw)
-        self.setLayout(self.vbox)
+        self.vb = QVBoxLayout()
+        self.vb.addWidget(self.pw)
+        self.setLayout(self.vb)
 
-        self.initCompleted = True
-        self.oldSize = self.rect().height()
-
-    def makePI(self, name):
-        """生成PlotItem对象"""
+    def makeBarPI(self, name):
+        """plotItem 对象"""
         vb = CustomViewBox(self)
-        plotItem = pg.PlotItem(viewBox=vb, name=name, axisItems={'bottom': self.axisTime})
-        plotItem.setMenuEnabled(False)
-        # 仅绘制ViewBox可见范围内的点
-        plotItem.setClipToView(True)
-        plotItem.showAxis('left')
-        # 设置采样模式
-        plotItem.setDownsampling(mode='peak')
-        plotItem.setRange(xRange=(0, 1), yRange=(0, 1))
-        plotItem.getAxis('left').setWidth(70)
-        plotItem.getAxis('left').setStyle(tickFont=QtGui.QFont('Roman times', 10, QtGui.QFont.Bold))
-        plotItem.getAxis('left').setPen(color=(255, 255, 255, 255), width=0.8)
-        plotItem.showGrid(True, True)
-        plotItem.hideButtons()
+        #TODO: 作用？？
+        barItem = pg.PlotItem(viewBox=vb, name=name, axisItems={'bottom': self.axisTime})
+        barItem.setMenuEnabled(False)
+        barItem.setClipToView(True)
+        barItem.setDownsampling(mode='peak')
+        barItem.setRange(xRange=(0, 1), yRange=(0, 1))
+        barItem.getAxis('left').setWidth(60)
+        barItem.getAxis('left').setStyle(tickFont=QFont("Roman times", 10, QFont.Bold))
+        barItem.getAxis('left').setPen(color=(255, 255, 255, 255), width=0.8)
+        barItem.showGrid(True, True)
+        barItem.hideButtons()
 
-        return plotItem
+        return barItem
 
-    def initPlotFund(self):
-        """初始化资金曲线图"""
-        self.pwFund = self.makePI('PlotFund')
-        self.fund = BarGraph([1, 2, 3, 4, 5, 6, 7])
-        self.pwFund.addItem(self.fund)
-        self.pwFund.setMinimumHeight(12)
+    def initGraph(self):
+        self.pwBar = self.makeBarPI("Testing")
+        self.barGraph = BarGraph([1, 2, 3, 4, 5, 4, 3, 2, 1])
+        self.pwBar.setMaximumHeight((self.rect().height() - 30) / 4)
+        self.pwBar.setMinimumHeight(20)
 
-        self.layout.nextRow()
-        self.layout.addItem(self.pwFund)
-        self.layout.adjustSize()
+        self.layGraph.nextRow()
+        self.layGraph.addItem(self.pwBar)
 
-    def plotFund(self, xmin=0, xmax=-1):
-        """重画资金曲线"""
-        if self.initCompleted:
-            self.fund.generatePicture(self.datas[xmin:xmax] + [0])
+    def plotBar(self, xmin=0, xmax=-1):
+        print("AAAA: ", self.datas)
+        self.barGraph.setData(self.datas[xmin:xmax] + [0], name="Bar")
+
+    def updateGraph(self):
+        #TODO:
+        datas = self.datas
+        self.pwBar.update()
+
+        def update(view, low, high):
+            vRange = view.viewRange()
+            xmin = max(0, int(vRange[0][0]))
+            xmax = max(0, int(vRange[0][1]))
+            xmax = min(xmax, len(datas))
+            if len(datas) > 0 and xmax > xmin:
+                ymin = min(datas[xmin:xmax][low])
+                ymax = max(datas[xmin:xmax][high])
+                if  ymin and ymax:
+                   view.setRange(yRange=(ymin, ymax))
+            else:
+                view.setRange(yRange=(0, 1))
+
+        update(self.pwBar.getViewBox(), 'a', 'b')
+
+    def plotAll(self, redraw=True, xMin=0, xMax=-1):
+        if redraw:
+            xmax = len(self.datas) if xMax < 0 else xMax
+            xmin = max(0, xmax - self.countK)
+            self.index = int((xmax + xmin) / 2)
+
+        self.pwBar.setLimits(xMin=xMin, xMax=xMax)
+        self.plotBar(xMin, xMax)
+        self.refresh()
 
     def refresh(self):
-        """
-        刷新资金曲线的现实范围
-        """
         datas = self.datas
-        minutes = int(self.count / 2)
-        xmin = max(0, self.index - minutes)
+        minutes = int(self)
+        xmin = max(0, self.indexe - minutes)
         xmax = xmin + 2 * minutes
-        self.pwFund.setRange(xRange=(xmin, xmax))
 
-    def onDown(self):
-        """放大显示区间"""
-        self.count = min(len(self.datas), int(self.count * 1.2) + 1)
-        self.refresh()
-        if len(self.datas) > 0:
-            x = self.index - self.count / 2 + 2 if int(
-                self.crosshair.xAxis) < self.index - self.count / 2 + 2 else int(self.crosshair.xAxis)
-            x = self.index + self.count / 2 - 2 if x > self.index + self.count / 2 - 2 else x
-            x = min(x, len(self.datas) - 1)
-            y = self.datas[int(x)]
-            self.crosshair.signal.emit((x, y))
-
-    def onUp(self):
-        """缩小显示区间"""
-        self.count = max(20, int(self.count / 1.2) - 1)  # 最小显示范围20
-        self.refresh()
-        if len(self.datas) > 0:
-            x = self.index - self.count / 2 + 2 if int(
-                self.crosshair.xAxis) < self.index - self.count + 2 else int(self.crosshair.xAxis)
-            x = self.index + self.count / 2 - 2 if x > self.index + self.count / 2 - 2 else x
-            x = min(x, len(self.datas) - 1)
-            y = self.datas[int(x)]
-            self.crosshair.signal.emit((x, y))
-
-    def onLeft(self):
-        """向左移动"""
-        if len(self.datas) > 0 and int(self.crosshair.xAxis) > 2:
-            x = int(self.crosshair.xAxis) - 1
-            y = self.datas[x]
-            if x <= self.index - self.count / 2 + 2 and self.index > 1:
-                self.index -= 1
-                self.refresh()
-            self.crosshair.signal.emit((x, y))
-
-    def onRight(self):
-        """向右移动"""
-        if len(self.datas) > 0 and int(self.crosshair.xAxis) < len(self.datas) - 1:
-            x = int(self.crosshair.xAxis) + 1
-            y = self.datas[x]
-            if x >= self.index + int(self.count / 2) - 2:
-                self.index += 1
-                self.refresh()
-            self.crosshair.signal.emit((x, y))
+        self.pwBar.setRange(xRange=(xmin, xmax))
 
     def onPaint(self):
         """界面刷新回调"""
-        view = self.pwFund.getViewBox()
+        view = self.pwBar.getViewBox()
         vRange = view.viewRange()
-        xmin = max(0, int(vRange[0][0]))
-        xmax = max(0, int(vRange[0][1]))
-        self.index = int((xmin+xmax)/2)+1
 
     def resignData(self, datas):
-        self.crosshair.datas = datas
-
+        #TODO:
+        # self.crosshair.datas = datas
         def viewXRangeChanged(low, high, self):
             vRange = self.viewRange()
             xmin = max(0, int(vRange[0][0]))
@@ -278,11 +321,11 @@ class GraphWidget(KeyWraper):
                 ymin = min(datas[xmin:xmax])
                 ymax = max(datas[xmin:xmax])
                 if ymin and ymax:
-                    self.setRange(yRange=(ymin, ymax))
+                   self.setRange(yRange=(ymin, ymax))
             else:
                 self.setRange(yRange=(0, 1))
 
-        view = self.pwFund.getViewBox()
+        view = self.pwBar.getViewBox()
         view.sigXRangeChanged.connect(partial(viewXRangeChanged, 'low', 'high'))
 
     def loadData(self, datas):
@@ -297,16 +340,6 @@ class GraphWidget(KeyWraper):
         self.resignData(self.datas)
 
         self.plotAll(True, 0, len(self.datas))
-
-    def plotAll(self, redraw=True, xMin=0, xMax=-1):
-        if redraw:
-            xmax = len(self.datas) if xMax < 0 else xMax
-            xmin = max(0, xmax - self.count)
-            self.index = int((xmax + xmin) / 2)
-
-        self.pwFund.setLimits(xMin=xMin, xMax=xMax)
-        self.plotFund(0, len(self.datas))
-        self.refresh()
 
 
 

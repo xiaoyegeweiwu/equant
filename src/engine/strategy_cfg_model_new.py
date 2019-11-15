@@ -196,7 +196,9 @@ class StrategyConfig_new(object):
             'Pending': False,  # 是否允许向实盘下单
             'Alarm': False, # 是否开启警报
             'PopOn': False, # 是否允许弹窗
-            'AutoSyncPos': False, #是否自动同步持仓, 和引擎设置一致
+            'AutoSyncPos': False, # 是否自动同步持仓, 和引擎设置一致
+            'ParamsOptmz': False, # 是否参数优化
+            'GroupId': 0, # 参数优化, 组合ID
         }
 
     # ----------------------- 合约/K线类型/K线周期 ----------------------
@@ -604,6 +606,22 @@ class StrategyConfig_new(object):
             "CoverPosOrderType": nPriceType,
             "StopType": '0',
         }
+
+    def setParamsOptmz(self, optmz=False):
+        '''设置是否为参数优化策略'''
+        self._metaData['ParamsOptmz'] = optmz
+    
+    def getParamsOptmz(self):
+        '''获取是否为参数优化策略'''
+        return self._metaData['ParamsOptmz']
+        
+    def setGroupId(self, gid=0):
+        '''设置参数优化策略组ID'''
+        self._metaData['GroupId'] = gid
+        
+    def getGroupId(self):
+        '''获取参数优化策略组ID'''
+        return self._metaData['GroupId']
 
     def getStopWinParams(self, contractNo=None):
         '''获取止盈信息'''
