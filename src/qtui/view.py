@@ -1385,6 +1385,7 @@ class QuantApplication(QWidget):
         # 函数列表
         # self.func_vbox = QGroupBox('函数')
         self.func_tab = QTabWidget()  # 通过tab切换目录、检索
+        self.func_tab.setObjectName("FuncTab")
         self.func_tab.setContentsMargins(0, 0, 0, 0)
         self.search_widget = QWidget()
         self.func_layout = QVBoxLayout()
@@ -1410,6 +1411,7 @@ class QuantApplication(QWidget):
 
         # 函数检索
         self.search_line = QLineEdit()
+        self.search_line.setObjectName("SearchLine")
         self.search_line.setPlaceholderText('请输入要搜索的函数名或介绍')
         self.search_line.textChanged.connect(self.search)
         # self.func_table = QTableWidget()
@@ -1573,6 +1575,7 @@ class QuantApplication(QWidget):
         self.pos_table.setShowGrid(False)
         self.pos_table.horizontalHeader().setStretchLastSection(True)  # 最后一列自动拉伸充满界面
         self.pos_table.horizontalHeader().setSectionResizeMode(QHeaderView.Interactive)  # 所有列自动拉伸，充满界面
+        self.pos_table.horizontalHeader().setObjectName("PosTableHeader")
         self.pos_table.setSelectionMode(QAbstractItemView.SingleSelection)  # 设置只能选中一行
         self.pos_table.setEditTriggers(QTableView.NoEditTriggers)  # 不可编辑
         self.pos_table.setSelectionBehavior(QAbstractItemView.SelectRows)  # 设置只有行选中
@@ -1639,6 +1642,7 @@ class QuantApplication(QWidget):
         self.func_doc_layout.setContentsMargins(0, 0, 0, 0)
         self.func_doc_line = QLabel()
         self.func_doc_line.setText('函数简介')
+        self.func_doc_line.setObjectName("FuncDetailLabel")
         self.func_content = QTextBrowser()
         self.func_doc_layout.addWidget(self.func_doc_line)
         self.func_doc_layout.addWidget(self.func_content)
