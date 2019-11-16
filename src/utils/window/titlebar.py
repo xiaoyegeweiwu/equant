@@ -88,7 +88,6 @@ class TitleBar(QWidget):
         # self.setHeight()
 
     def _theseCallback(self):
-        print(self.theseState)
         if self.theseState == THESE_STATE_DARK:
             self.win.setStyleSheet("""""")
             self.win._widget.contentEdit.sendSetThemeSignal('vs')
