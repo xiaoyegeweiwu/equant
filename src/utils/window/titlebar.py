@@ -32,7 +32,6 @@ class TitleBar(QWidget):
 
         self._initViews()
 
-
     def _initViews(self):
         self.setFixedHeight(TITLE_BAR_HEIGHT)
 

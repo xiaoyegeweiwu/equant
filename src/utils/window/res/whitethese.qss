@@ -34,10 +34,7 @@ TitleBar {
     background: #696969
 }
 
-/*标题栏换肤按钮*/
-#theseSelect {
-    color: ;
-}
+/*******************************************/
 
 QTabWidget QTableView,
 QTabWidget QTreeView,
