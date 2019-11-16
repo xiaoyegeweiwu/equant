@@ -155,9 +155,6 @@ class Controller(object):
         #启动主界面线程
 
         self.mainWnd.show()
-        if self.app.settings.contains('theme'):
-            t = threading.Thread(target=self.send_theme_setting, args=[self.app.settings.value('theme')])
-            t.start()
         self.mainApp.exec_()
 
     def send_theme_setting(self, text):
