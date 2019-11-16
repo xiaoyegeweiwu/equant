@@ -1393,6 +1393,7 @@ class QuantApplication(QWidget):
 
         # 函数树结构
         self.func_tree = QTreeWidget()
+        self.func_tree.setObjectName("FuncTree")
         self.func_tree.setColumnCount(2)
         self.func_tree.setHeaderLabels(['函数名', '函数介绍'])
         self.func_tree.header().setSectionResizeMode(QHeaderView.ResizeToContents)  # 设置列宽自适应
@@ -1431,6 +1432,7 @@ class QuantApplication(QWidget):
 
         #######################################################
         self.search_tree = QTreeWidget()
+        self.search_tree.setObjectName("SearchTree")
         self.search_tree.setColumnCount(2)
         self.search_tree.setHeaderLabels(['函数名', '函数介绍'])
         self.search_tree.header().setSectionResizeMode(QHeaderView.ResizeToContents)
@@ -1499,6 +1501,7 @@ class QuantApplication(QWidget):
 
         # -------------------组合监控----------------------------
         self.union_monitor = QWidget()
+        self.union_monitor.setObjectName("UnionMonitor")
         self.union_layout = QGridLayout()
         self.one_key_sync = QPushButton('持仓一键同步')
         self.cbComboBox = QComboBox()
