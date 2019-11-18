@@ -2,7 +2,7 @@
 QWidget {
     padding: 0px;
     border: 0px;
-    background-color: #252526;
+    background-color: #252526; /*252526*/
     color: #C2C3C3;
     selection-background-color: #125685;
 }
@@ -19,6 +19,7 @@ QPushButton {
     border-radius: 0px;
     color: #FFFFFF;
     padding: 3px;
+    margin-right: 5px;  /*两个控件间距*/
     outline: none;
 }
 
@@ -134,7 +135,7 @@ QTabBar::tab:bottom {
 QLabel {
     background-color: transparent;
     border: 0px solid #32414B;
-    padding: 5px;
+    padding: 0px;
     margin: 0px;
     color: #C3C3C3;
     min-height: 30px;
@@ -339,7 +340,7 @@ QColumnView::item:!selected:hover {
 
 /* **************************QCheckBox*********************************/
 QCheckBox {
-    background-color: #252526;
+    background-color: transparent;
     color: #BBBBBB;
     spacing: 4px;
     outline: none;
@@ -359,6 +360,7 @@ QCheckBox QWidget:disabled {
 /* checkbox 小方块设置 */
 QCheckBox::indicator {
     background-color: #3C3C3C;
+    border: 1px solid #252526;
     height: 16px;
     width: 16px;
 }
@@ -462,42 +464,29 @@ QComboBox::down-arrow {
     width:10px;
 }
 
-/* 函数检索输入框*/
-#SearchLine {
-    color: #A6A6A6;
+/* **************************QGroupBox*************************/
+QGroupBox {
+  font-weight: bold;
+  border: 1px solid #32414B;
+  border-radius: 4px;
+  padding: 4px;
+  margin-top: 16px;
 }
 
-
-/* 组合监控功能区背景色设置 */
-#UnionMonitor {
-    background-color: #252526;
-    padding: 0px;
-    margin: 0px;
-
+QGroupBox::title {
+  subcontrol-origin: margin;
+  subcontrol-position: top left;
+  left: 3px;
+  padding-left: 3px;
+  padding-right: 5px;
+  padding-top: 8px;
+  padding-bottom: 16px;
 }
 
-/* 持仓同步表格控件 */
-#PosTableHeader::section::horizontal {
-    border-top: 1px solid #383838;
-}
-
-#PosTableHeader::section::vertical {
-    border-top: 1px solid #383838;
-}
-
-/* 函数简介label属性设置 */
-#FuncDetailLabel {
-    padding: 0px;
-}
-
-/*********************************************************************************************************************/
-/* 函数目录树属性设置*/
-#FuncTab::tab:selected {
-    background-color: #2D2D2D;
-}
-
-#FuncTab::tab:!selected {
-    background-color: #383838;
+QGroupBox::indicator {
+  margin-left: 2px;
+  height: 12px;
+  width: 12px;
 }
 
 /* *****************************************QLineEdit**************************************/
@@ -524,6 +513,56 @@ QLineEdit:selected, QLineEdit:pressed, QLineEdit:focus {
     color: #F0F0F0;
     border: 1px solid #135785;
 }
+
+/***************************************************************************/
+
+/* 函数检索输入框*/
+#SearchLine {
+    color: #A6A6A6;
+    background-color: black;
+    border: 6px solid #252526;
+}
+
+
+/* 组合监控功能区背景色设置 */
+#UnionMonitor {
+    background-color: #252526;
+    padding: 0px;
+    margin: 0px;
+
+}
+
+/* 持仓同步表格控件 */
+#PosTableHeader::section::horizontal {
+    border-top: 1px solid #383838;
+}
+
+#PosTableHeader::section::vertical {
+    border-top: 1px solid #383838;
+}
+
+/* 函数简介label属性设置 */
+#FuncDetailLabel {
+    background-color: #343434;
+    padding: 0px;
+    border-left: 1px solid #383838;
+}
+
+/* 函数简介内容设置 */
+#FuncContent {
+    border-left: 1px solid #383838;
+}
+
+#FuncTree {
+    background-color: #252526;
+    border-left: 1px solid #383838;
+}
+
+#SearchTree {
+    background-color: #252526;
+    border-left: 1px solid #383838;
+}
+
 
 /* *****************************************标题栏相关*************************************/
 /*标题栏*/

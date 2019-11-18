@@ -2038,6 +2038,7 @@ class QuantApplication(QWidget):
         self.func_doc_line.setText('函数简介')
         self.func_doc_line.setObjectName("FuncDetailLabel")
         self.func_content = QTextBrowser()
+        self.func_content.setObjectName("FuncContent")
         self.func_doc_layout.addWidget(self.func_doc_line)
         self.func_doc_layout.addWidget(self.func_content)
         self.func_doc.setLayout(self.func_doc_layout)
