@@ -14,7 +14,8 @@ from qtui.model import QuantModel, SendRequest
 from qtui.view import QuantApplication
 from utils.language import *
 from capi.com_types import *
-from utils.window.framelesswindow import FramelessWindow, CommonHelper
+from utils.window.framelesswindow import FramelessWindow, CommonHelper, DARKSTYLE, WHITESTYLE, THESE_STATE_DARK, \
+    THESE_STATE_WHITE
 from qtui.reportview.reportview import ReportView
 
 
@@ -23,9 +24,9 @@ class Controller(object):
 
     def __init__(self, logger, ui2eg_q, eg2ui_q):
 
-        #日志对象
+        # 日志对象
         self.logger = logger
-        #初始化多语言
+        # 初始化多语言
         # load_language("config")
         self._ui2egQueue = ui2eg_q
         self._eg2uiQueue = eg2ui_q
@@ -35,25 +36,27 @@ class Controller(object):
 
         # 创建主窗口
         self.mainApp = QApplication(sys.argv)
+        self.reportView = ReportView()
+        self.app = QuantApplication(self)
         self.mainApp.setFont(QFont("Microsoft YaHei", 10))
-        style = CommonHelper.readQss("utils/window/res/whitethese.qss")
-        self.mainApp.setStyleSheet(style)
-        m = QSharedMemory(self.mainApp.applicationName())
-        if not m.create(1):
-            QMessageBox.warning(None, '警告', '程序已经在运行！！！')
+        if self.app.settings.contains('theme') and self.app.settings.value('theme') == 'vs-dark':
+            qss_path = DARKSTYLE
+            theme = THESE_STATE_DARK
         else:
-            # 回测报告窗口（主线程中创建)
-            self.reportView = ReportView()
-            self.app = QuantApplication(self)
-            self.mainWnd = FramelessWindow()
-            self.mainWnd.setWindowTitle('极星量化')
-            self.mainWnd.setWindowIcon(QIcon('icon/epolestar ix2.ico'))
-            screen = QDesktopWidget().screenGeometry()
-            self.mainWnd.setGeometry(screen.width() * 0.1, screen.height() * 0.1, screen.width() * 0.8,
-                         screen.height() * 0.8)
-            self.mainWnd.titleBar.buttonClose.clicked.connect(self.quitThread)
-            self.mainWnd.setWidget(self.app)
-
+            qss_path = WHITESTYLE
+            theme = THESE_STATE_WHITE
+        # 回测报告窗口（主线程中创建)
+        self.mainWnd = FramelessWindow()
+        style = CommonHelper.readQss(qss_path)
+        self.mainWnd.setStyleSheet(style)
+        self.mainWnd.setWindowTitle('极星量化')
+        self.mainWnd.setWinThese(theme)
+        self.mainWnd.setWindowIcon(QIcon('icon/epolestar ix2.ico'))
+        screen = QDesktopWidget().screenGeometry()
+        self.mainWnd.setGeometry(screen.width() * 0.1, screen.height() * 0.1, screen.width() * 0.8,
+                                 screen.height() * 0.8)
+        self.mainWnd.titleBar.buttonClose.clicked.connect(self.quitThread)
+        self.mainWnd.setWidget(self.app)
 
         # 创建模块
         self.model = QuantModel(self.app, self._ui2egQueue, self._eg2uiQueue, self.logger)
@@ -96,15 +99,15 @@ class Controller(object):
         # 更新监控界面策略信息
         try:
             strategyDict = self.strategyManager.getStrategyDict()
-            #TODO: strategyDict的异常策略应该怎么处理?
+            # TODO: strategyDict的异常策略应该怎么处理?
             for stId in strategyDict:
                 if "RunningData" not in strategyDict[stId]:
                     continue
                 try:
-                    #TODO：StrategyState为什么会不存在呢？
+                    # TODO：StrategyState为什么会不存在呢？
                     if strategyDict[stId]["StrategyState"] == ST_STATUS_PAUSE or strategyDict[stId][
-                          "StrategyState"] == ST_STATUS_QUIT or strategyDict[stId][
-                          "StrategyState"] == ST_STATUS_EXCEPTION:
+                        "StrategyState"] == ST_STATUS_QUIT or strategyDict[stId][
+                        "StrategyState"] == ST_STATUS_EXCEPTION:
                         continue
                 except KeyError as e:
                     self.logger.warn(f"策略数据错误: {stId}, {strategyDict[stId]}")
@@ -139,9 +142,9 @@ class Controller(object):
         self.logger.info("after app.close")
 
     def run(self):
-        #启动监控策略线程
+        # 启动监控策略线程
         # self.monitorThread.start()
-        #启动接收数据线程
+        # 启动接收数据线程
         self.receiveEgThread.start()
 
         # self.sigThread.start()
@@ -199,7 +202,7 @@ class Controller(object):
         return g_params
 
     def load(self, strategyPath, param={}):
-        #TODO：新增param参数，用于接收用户策略的参数
+        # TODO：新增param参数，用于接收用户策略的参数
         """
         加载合约事件
         :param strategyPath: 策略路径
@@ -213,7 +216,7 @@ class Controller(object):
         self.app.create_strategy_policy_win(param=param)
 
         config = self.app.getConfig()
-        if config:   # 获取到config
+        if config:  # 获取到config
             self._request.loadRequest(strategyPath, config)
             self.logger.info("load strategy")
 
@@ -325,11 +328,11 @@ class Controller(object):
             if id in strategyDict:
                 status = self.strategyManager.queryStrategyStatus(id)
                 if status == ST_STATUS_QUIT:
-                    self.logger.info("策略%s已停止!"%(id))
+                    self.logger.info("策略%s已停止!" % (id))
                     continue
                 self._request.strategyQuit(id)
             else:
-                self.logger.info("策略管理器中不存在策略%s"%(id))
+                self.logger.info("策略管理器中不存在策略%s" % (id))
 
     def delStrategy(self, strategyIdList):
         # 获取策略管理器
@@ -364,6 +367,7 @@ class Controller(object):
 
 class ChildThread(threading.Thread):
     """带停止标志位的线程"""
+
     def __init__(self, target, wait=0):
         threading.Thread.__init__(self)
 
