@@ -361,8 +361,8 @@ QCheckBox QWidget:disabled {
 QCheckBox::indicator {
     background-color: #3C3C3C;
     border: 1px solid #252526;
-    height: 16px;
-    width: 16px;
+    height: 12px;
+    width: 12px;
 }
 
 QCheckBox::indicator:focus {
@@ -468,19 +468,18 @@ QComboBox::down-arrow {
 /* **************************QGroupBox*************************/
 QGroupBox {
   font-weight: bold;
-  border: 1px solid #32414B;
-  border-radius: 4px;
+  border: 1px solid #383838;
   padding: 4px;
-  margin-top: 16px;
+  margin-top: 8px;
 }
 
 QGroupBox::title {
   subcontrol-origin: margin;
   subcontrol-position: top left;
-  left: 3px;
-  padding-left: 3px;
+  left: 8px;
+  padding-left: 10px;
   padding-right: 5px;
-  padding-top: 8px;
+  padding-top: 0px;
   padding-bottom: 16px;
 }
 
@@ -564,6 +563,33 @@ QLineEdit:selected, QLineEdit:pressed, QLineEdit:focus {
     border-left: 1px solid #383838;
 }
 
+#StrategyTabWidget QGroupBox {
+    border: 1px solid #383838;
+}
+
+#StrategyTabWidget QLineEdit {
+    padding-top: 0px;
+    margin: 0px;
+    padding-bottom: 0px;
+}
+
+#StrategyTabWidget QLabel {
+    min-height: 20px;
+    max-height: 20px;
+}
+
+#StrategyTabWidget QListWidget,
+#StrategyTabWidget QLineEdit,
+#StrategyTabWidget QComboBox,
+#StrategyTabWidget QTableView{
+    border: 1px solid #383838;
+
+}
+
+#StrategyTabWidget QLineEdit {
+    min-height: 19px;
+    max-height: 19px;
+}
 
 /* *****************************************标题栏相关*************************************/
 /*标题栏*/

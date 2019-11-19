@@ -321,8 +321,8 @@ QCheckBox QWidget:disabled {
 QCheckBox::indicator {
     background-color: #FFFFFF;
     border: 1px solid #CECECE;
-    height: 16px;
-    width: 16px;
+    height: 12px;
+    width: 12px;
 }
 
 QCheckBox::indicator:focus {
@@ -426,48 +426,54 @@ QComboBox::down-arrow {
     width:10px;
 }
 
-/* **************************QGroupBox*************************/
-QGroupBox {
-  font-weight: bold;
-  border: 1px solid #32414B;
-  border-radius: 4px;
-  padding: 4px;
-  margin-top: 16px;
+/* **************************QRadioButton**********************/
+QRadioButton {
+    background-color: transparent;
 }
 
+/* **************************QGroupBox*************************/
+QGroupBox {
+  background-color: transparent;
+
+  border: 1px solid #CCCCCC;
+  padding: 4px;
+  margin-top: 8px;
+}
+
+/* QGroupBox 标题 */
 QGroupBox::title {
-  subcontrol-origin: margin;
-  subcontrol-position: top left;
-  left: 3px;
-  padding-left: 3px;
-  padding-right: 5px;
-  padding-top: 8px;
-  padding-bottom: 16px;
+     subcontrol-origin: margin;
+     subcontrol-position: top left;
+     left: 8px;
+     padding-left: 10px;
+     padding-right: 5px;
+     padding-top: 0px;
+     padding-bottom: 16px;
 }
 
 QGroupBox::indicator {
-  margin-left: 2px;
-  height: 12px;
-  width: 12px;
+    margin-left: 2px;
+    height: 12px;
+    width: 12px;
 }
 
 /* *****************************************QLineEdit**************************************/
 /* 输入框 */
 QLineEdit {
-  background-color: #FFFFFF;
-  padding-top: 2px;
-  margin-top: 2px;
-  padding-bottom: 2px;
-  padding-left: 4px;
-  padding-right: 4px;
-  border-style: solid;
-  border: 1px solid #7CADCE;
-  color: #000000;
+    background-color: #FFFFFF;
+    padding-top: 2px;
+    margin-top: 2px;
+    padding-bottom: 2px;
+    padding-left: 4px;
+    padding-right: 4px;
+    border-style: solid;
+    border: 1px solid #7CADCE;
+    color: #000000;
 }
 
 QLineEdit:disabled {
-  background-color: #F3F3F3;
-  color: #6A6A6A;
+    background-color: #F3F3F3;
+    color: #6A6A6A;
 }
 
 QLineEdit:selected, QLineEdit:pressed, QLineEdit:focus {
@@ -529,6 +535,39 @@ QLineEdit:selected, QLineEdit:pressed, QLineEdit:focus {
     background-color: #FFFFFF;
 }
 
+#StrategyTabWidget QGroupBox {
+    border: 1px solid #CCCCCC;
+}
+
+#StrategyTabWidget QLineEdit {
+    padding-top: 0px;
+    margin: 0px;
+    padding-bottom: 0px;
+}
+
+#StrategyTabWidget QLabel {
+    min-height: 20px;
+    max-height: 20px;
+}
+
+/* 参数设置label属性 */
+#ParamLabel {
+   margin-left: 10px;
+}
+
+#StrategyTabWidget QListWidget,
+#StrategyTabWidget QLineEdit,
+#StrategyTabWidget QComboBox,
+#StrategyTabWidget QTableView{
+    border: 1px solid #CCCCCC;
+
+}
+
+#StrategyTabWidget QLineEdit {
+    min-height: 19px;
+    max-height: 19px;
+}
+
 /* *****************************************标题栏相关*************************************/
 /*标题栏*/
 TitleBar {
@@ -566,5 +605,6 @@ TitleBar {
 
 /*自定义标题栏窗口边框颜色*/
 #Framless {
-    background: #696969
+
+    border: 1px solid red;
 }
