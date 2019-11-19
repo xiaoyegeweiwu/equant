@@ -505,7 +505,10 @@ class StrategyPolicy(QWidget):
     def add_timer(self):
         t = self.timerEdit.text()
         ti = t.replace(':', '')
-        self.timerListWidget.addItem(ti)
+        if not self.timerListWidget.findItems(ti, Qt.MatchExactly):
+            self.timerListWidget.addItem(ti)
+        else:
+            QMessageBox.warning(self, "提示", "已存在该时间！", QMessageBox.Yes)
 
     def delete_timer(self):
         row = self.timerListWidget.currentRow()
@@ -1872,7 +1875,6 @@ class QuantApplication(QWidget):
     # QTextBrowser 右键菜单
     def user_log_right_menu(self, point):
         self.user_log_widget.popMenu = QMenu()
-        self.user_log_widget.scroll_type = QMenu(self.user_log_widget.popMenu)
         copy = QAction('复制')
         select_all = QAction('全选')
         clear = QAction('清除')
@@ -1880,7 +1882,6 @@ class QuantApplication(QWidget):
         self.user_log_widget.popMenu.addAction(copy)
         self.user_log_widget.popMenu.addAction(select_all)
         self.user_log_widget.popMenu.addAction(clear)
-        self.user_log_widget.popMenu.addAction(self.auto_scroll)
 
         # 右键动作
         action = self.user_log_widget.popMenu.exec_(self.user_log_widget.mapToGlobal(point))
@@ -1890,6 +1891,86 @@ class QuantApplication(QWidget):
             self.user_log_widget.selectAll()
         elif action == clear:
             self.user_log_widget.clear()
+
+    def error_log_right_menu(self, point):
+        self.error_info_widget.popMenu = QMenu()
+        copy = QAction('复制')
+        select_all = QAction('全选')
+        clear = QAction('清除')
+
+        self.error_info_widget.popMenu.addAction(copy)
+        self.error_info_widget.popMenu.addAction(select_all)
+        self.error_info_widget.popMenu.addAction(clear)
+
+        # 右键动作
+        action = self.error_info_widget.popMenu.exec_(self.error_info_widget.mapToGlobal(point))
+        if action == copy:
+            self.error_info_widget.copy()
+        elif action == select_all:
+            self.error_info_widget.selectAll()
+        elif action == clear:
+            self.error_info_widget.clear()
+
+    def signal_log_right_menu(self, point):
+        self.signal_log_widget.popMenu = QMenu()
+        copy = QAction('复制')
+        select_all = QAction('全选')
+        clear = QAction('清除')
+        refresh = QAction('刷新')
+
+        self.signal_log_widget.popMenu.addAction(copy)
+        self.signal_log_widget.popMenu.addAction(select_all)
+        self.signal_log_widget.popMenu.addAction(clear)
+        self.signal_log_widget.popMenu.addAction(refresh)
+
+        # 右键动作
+        action = self.signal_log_widget.popMenu.exec_(self.signal_log_widget.mapToGlobal(point))
+        if action == copy:
+            self.signal_log_widget.copy()
+        elif action == select_all:
+            self.signal_log_widget.selectAll()
+        elif action == clear:
+            self.signal_log_widget.clear()
+        elif action == refresh:
+            self.loadSigLogFile()
+
+    def sys_log_right_menu(self, point):
+        self.sys_log_widget.popMenu = QMenu()
+        copy = QAction('复制')
+        select_all = QAction('全选')
+        clear = QAction('清除')
+        refresh = QAction('刷新')
+
+        self.sys_log_widget.popMenu.addAction(copy)
+        self.sys_log_widget.popMenu.addAction(select_all)
+        self.sys_log_widget.popMenu.addAction(clear)
+        self.sys_log_widget.popMenu.addAction(refresh)
+
+        # 右键动作
+        action = self.sys_log_widget.popMenu.exec_(self.sys_log_widget.mapToGlobal(point))
+        if action == copy:
+            self.sys_log_widget.copy()
+        elif action == select_all:
+            self.sys_log_widget.selectAll()
+        elif action == clear:
+            self.sys_log_widget.clear()
+        elif action == refresh:
+            self.loadSysLogFile()
+
+    def func_doc_right_menu(self, point):
+        self.func_content.popMenu = QMenu()
+        copy = QAction('复制')
+        select_all = QAction('全选')
+
+        self.func_content.popMenu.addAction(copy)
+        self.func_content.popMenu.addAction(select_all)
+
+        # 右键动作
+        action = self.func_content.popMenu.exec_(self.func_content.mapToGlobal(point))
+        if action == copy:
+            self.func_content.copy()
+        elif action == select_all:
+            self.func_content.selectAll()
 
     def create_content_vbox(self):
         # self.content_vbox = QGroupBox('内容')
@@ -2048,9 +2129,11 @@ class QuantApplication(QWidget):
         self.user_log_widget.setContextMenuPolicy(Qt.CustomContextMenu)
         self.user_log_widget.customContextMenuRequested[QPoint].connect(self.user_log_right_menu)
         self.signal_log_widget = QTextBrowser()
-        self.signal_log_widget.setContextMenuPolicy(Qt.NoContextMenu)
+        self.signal_log_widget.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.signal_log_widget.customContextMenuRequested[QPoint].connect(self.signal_log_right_menu)
         self.sys_log_widget = QTextBrowser()
-        self.sys_log_widget.setContextMenuPolicy(Qt.NoContextMenu)
+        self.sys_log_widget.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.sys_log_widget.customContextMenuRequested[QPoint].connect(self.sys_log_right_menu)
         self.log_widget.addTab(self.user_log_widget, '用户日志')
         self.log_widget.addTab(self.signal_log_widget, '信号日志')
         self.log_widget.addTab(self.sys_log_widget, '系统日志')
@@ -2062,7 +2145,8 @@ class QuantApplication(QWidget):
         # self.sys_log_widget.textChanged.connect(lambda: self.sys_log_widget.moveCursor(QTextCursor.End))
         # self.sys_log_widget.moveCursor(QTextCursor.End)
         self.error_info_widget = QTextBrowser()
-        self.error_info_widget.setContextMenuPolicy(Qt.NoContextMenu)
+        self.error_info_widget.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.error_info_widget.customContextMenuRequested[QPoint].connect(self.error_log_right_menu)
 
         # -------------------组合监控----------------------------
         self.union_monitor = QWidget()
@@ -2208,7 +2292,8 @@ class QuantApplication(QWidget):
         self.func_doc_line.setObjectName("FuncDetailLabel")
         self.func_content = QTextBrowser()
         self.func_content.setObjectName("FuncContent")
-        self.func_content.setContextMenuPolicy(Qt.NoContextMenu)
+        self.func_content.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.func_content.customContextMenuRequested[QPoint].connect(self.func_doc_right_menu)
         self.func_doc_layout.addWidget(self.func_doc_line)
         self.func_doc_layout.addWidget(self.func_content)
         self.func_doc.setLayout(self.func_doc_layout)
