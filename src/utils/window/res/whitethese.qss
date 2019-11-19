@@ -334,6 +334,19 @@ QCheckBox::indicator:checked {
     image: url(./utils/window/res/check_w.png);
 }
 
+/* **************************QRadioButton*******************/
+QRadioButton {
+  background-color: transparent;
+  color: #333333;
+  spacing: 4px;
+  padding: 0px;
+}
+
+QRadioButton::indicator {
+  margin-left: 4px;
+  height: 12px;
+  width: 12px;
+}
 
 /* **************************QSpinBox************************/
 QAbstractSpinBox {
@@ -366,7 +379,7 @@ QAbstractSpinBox:on {
 }
 
 QAbstractSpinBox:focus, clicked {
-    border: 1px solid #175B89;
+    border: 1px solid #7CADCE;
 }
 
 QAbstractSpinBox::up-arrow, QAbstractSpinBox::up-arrow:disabled, QAbstractSpinBox::up-arrow:off {
@@ -424,11 +437,6 @@ QComboBox::down-arrow {
     image: url(./utils/window/res/down-arrow-w.png);
     height: 10px;
     width:10px;
-}
-
-/* **************************QRadioButton**********************/
-QRadioButton {
-    background-color: transparent;
 }
 
 /* **************************QGroupBox*************************/
@@ -535,6 +543,10 @@ QLineEdit:selected, QLineEdit:pressed, QLineEdit:focus {
     background-color: #FFFFFF;
 }
 
+#StrategyTabWidget QListWidget{
+    background-color: #FFFFFF;
+}
+
 #StrategyTabWidget QGroupBox {
     border: 1px solid #CCCCCC;
 }
@@ -545,7 +557,7 @@ QLineEdit:selected, QLineEdit:pressed, QLineEdit:focus {
     padding-bottom: 0px;
 }
 
-#StrategyTabWidget QLabel {
+#StrategyTabWidget QLabel, #StrategyTabWidget QComboBox {
     min-height: 20px;
     max-height: 20px;
 }

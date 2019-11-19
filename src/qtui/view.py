@@ -429,7 +429,7 @@ class StrategyPolicy(QWidget):
         self.tradeDirectionComboBox.setFixedWidth(105)
         self.defaultOrderComboBox.setFixedWidth(105)
 
-        self.defaultOrderLineEdit.setFixedWidth(65)
+        self.defaultOrderLineEdit.setFixedWidth(105)
 
         self.miniOrderLineEdit.setFixedWidth(65)
         self.marginRateLineEdit.setFixedWidth(65)
