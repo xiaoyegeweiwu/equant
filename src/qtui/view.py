@@ -142,6 +142,7 @@ class StrategyPolicy(QWidget):
 
     def run_policy(self):
         self.runPolicy = QWidget()
+        self.runPolicy.setObjectName("RunPolicy")
         run_layout = QVBoxLayout()
         h_spacerItem = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
         v_spacerItem = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
@@ -258,6 +259,7 @@ class StrategyPolicy(QWidget):
 
     def create_contract_policy(self):
         self.contractPolicy = QWidget()
+        self.contractPolicy.setObjectName("ContractPolicy")
         v_spacerItem = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
         main_layout = QHBoxLayout()
         left_layout = QHBoxLayout()
@@ -287,6 +289,7 @@ class StrategyPolicy(QWidget):
 
     def create_money_policy(self):
         self.moneyPolicy = QWidget()
+        self.moneyPolicy.setObjectName("MoneyPolicy")
         h_spacerItem = QSpacerItem(150, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
         main_layout = QVBoxLayout()
         h_layout1 = QHBoxLayout()
@@ -431,6 +434,7 @@ class StrategyPolicy(QWidget):
 
     def create_sample_policy(self):
         send_order_widget = QWidget()
+        send_order_widget.setObjectName("SendOrderWidget")
         send_order_layout = QVBoxLayout()
         self.groupBox = QGroupBox('发单设置')
         main_layout = QVBoxLayout()
@@ -481,6 +485,7 @@ class StrategyPolicy(QWidget):
 
     def create_param_policy(self):
         self.paramPolicy = QWidget()
+        self.paramPolicy.setObjectName("ParamPolicy")
 
         main_layout = QVBoxLayout()
         label = QLabel('鼠标单击"当前值"进行参数修改：')

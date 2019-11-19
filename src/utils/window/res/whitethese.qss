@@ -206,6 +206,7 @@ QTabWidget QDoubleSpinBox {
 
 /*面板*/
 QTabWidget::pane {
+    background-color: #FFFFFF;
     border: 0px;
     border-radius: 0px;
     margin: 0px;
@@ -414,6 +415,7 @@ QComboBox::drop-down {
     subcontrol-origin: padding;
     subcontrol-position: top right;  /* */
     width: 16px;
+    border-style: flat;
 }
 
 /* 下拉三角 */
@@ -520,6 +522,11 @@ QLineEdit:selected, QLineEdit:pressed, QLineEdit:focus {
 #SearchTree {
     background-color: #FFFFFF;
     border-left: 1px solid #DBDBDB;
+}
+
+/* 运行弹窗选项卡背景色 */
+#RunPolicy, #ContractPolicy, #MoneyPolicy, #SendOrderWidget, #ParamPolicy{
+    background-color: #FFFFFF;
 }
 
 /* *****************************************标题栏相关*************************************/
