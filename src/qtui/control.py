@@ -156,15 +156,6 @@ class Controller(object):
 
         self.mainWnd.show()
         self.mainApp.exec_()
-
-    def send_theme_setting(self, text):
-        while True:
-            print(self.mainApp.applicationState())
-            time.sleep(0.5)
-            if self.mainApp.applicationState() == 4:
-                print(self.mainApp.applicationState())
-                self.app.contentEdit.sendThemeSignal(text)
-                break
         
     def set_help_text(self, funcName, text):
         self.app.set_help_text(funcName, text)
