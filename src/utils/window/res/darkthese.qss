@@ -454,6 +454,7 @@ QComboBox::drop-down {
     subcontrol-origin: padding;
     subcontrol-position: top right;  /* */
     width: 16px;
+    border-style: flat;
 }
 
 /* 下拉三角 */
