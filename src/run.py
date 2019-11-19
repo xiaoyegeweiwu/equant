@@ -67,6 +67,7 @@ def main():
 
 
 if __name__ == '__main__':
+    sys.path.append(".")
     sys.excepthook = excepthook_
     # ------------任务栏显示app的图标-----------------
     if 'Windows' == platform.system():

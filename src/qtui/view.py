@@ -108,6 +108,8 @@ class StrategyPolicy(QWidget):
         # print('--------------------------------')
         # print(self.style())
         self.contractWin = ContractWin()
+        print(self.contractWin.row)
+        self.contractWin.confirm_signal.connect(self.add_contract)
         # self.contractWin.setStyle(self.style())
 
         self.main_contractWin = FramelessWindow()
@@ -557,7 +559,6 @@ class StrategyPolicy(QWidget):
     def create_contract_win(self):
         # 增加合约槽函数，弹出合约设置窗口
         self.set_default_value()
-        self.contractWin.confirm_signal.connect(self.add_contract)
         self.main_contractWin.setWindowModality(Qt.ApplicationModal)  # 阻塞父窗口
         self.main_contractWin.show()
 
@@ -607,11 +608,6 @@ class StrategyPolicy(QWidget):
             self.main_contractSelectWin.close()
 
     def add_contract(self, sample_dict):
-        if self.contractWin.row != -1:
-            row = self.contractWin.row
-        else:
-            row = self.contractTableWidget.rowCount()
-            self.contractTableWidget.setRowCount(row + 1)
         KLineType = sample_dict.get('KLineType')
         if KLineType == 'T':
             _KlineType = '分笔'
@@ -629,10 +625,23 @@ class StrategyPolicy(QWidget):
             start = sample_dict.get('KLineCount')
         else:
             start = '不执行历史K线'
-
         items = [sample_dict.get('contract'), _KlineType, sample_dict.get('KLineSlice'), start, json.dumps(sample_dict)]
+
+        if self.contractWin.row != -1:
+            row = self.contractWin.row
+        else:
+            row = self.contractTableWidget.rowCount()
+            sample_dict_list = []
+            for i in range(row):
+                sample_dict_list.append(json.loads(self.contractTableWidget.takeItem(i, 4).text()))
+            if json.loads(items[4]) in sample_dict_list:
+                QMessageBox.warning(self, '提示', '请勿添加重复合约设置！', QMessageBox.Yes)
+                return
+            self.contractTableWidget.setRowCount(row + 1)
+
         for j in range(len(items)):
             item = QTableWidgetItem(str(items[j]))
+            item.setTextAlignment(Qt.AlignCenter)
             self.contractTableWidget.setItem(row, j, item)
 
     def delete_contract(self):
@@ -647,7 +656,6 @@ class StrategyPolicy(QWidget):
         row = items[0].row()
         item = self.contractTableWidget.item(row, 4)
         sample_dict = json.loads(item.text())
-        self.contractWin.confirm_signal.connect(self.add_contract)
         # ------------------设置合约-----------------------------
         self.contractWin.contractCodeLineEdit.setText(sample_dict.get('contract'))
         self.contractWin.contractCodeLineEdit.setEnabled(False)
@@ -1160,6 +1168,7 @@ class StrategyPolicy(QWidget):
         self.contractTableWidget.setRowCount(row + 1)
         for j in range(len(values)):
             item = QTableWidgetItem(str(values[j]))
+            item.setTextAlignment(Qt.AlignCenter)
             self.contractTableWidget.setItem(row, j, item)
 
     def insert_params(self, values):
@@ -1281,6 +1290,7 @@ class ContractWin(QWidget):
 
     def valid(self, index):
         if index == 0:
+            self.kLinePeriodComboBox.setCurrentIndex(0)
             self.kLinePeriodComboBox.setEnabled(False)
         else:
             self.kLinePeriodComboBox.setEnabled(True)
