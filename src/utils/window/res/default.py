@@ -1,4 +1,4 @@
-MARGINS = 1
+MARGINS = 5
 
 DARKSTYLE = r"utils/window/res/darkthese.qss"
 WHITESTYLE = r"utils/window/res/whitethese.qss"
@@ -14,6 +14,3 @@ TITLE_LABEL_SIZE = 35
 TITLE_BUTTON_SIZE = 30
 TITLE_ICON_SIZE = 20
 #
-
-THESE_STATE_WHITE = "浅色"
-THESE_STATE_DARK = "深色"

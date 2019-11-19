@@ -9,7 +9,7 @@ body{
     height: 100%;
     padding: 0;
     margin: 0; 
-    background-color: #d9d9d9;
+    background-color: #FFF;
 }
 
 /*标签上的关闭按钮*/
@@ -24,7 +24,7 @@ body{
     content: '';
     width: 10px;
     height: 1px;
-    background: #3c3f41;
+    background: #888;
     display: block;
 }
 #tabs a:before{
@@ -34,45 +34,44 @@ body{
     transform: translateY(-24px) rotate(-45deg);
 }
 #tabs a:hover:before, #tabs li a:hover:after{
-    background: #aa2b30;
+    background: #F00;
 }
 
 
 /*标签栏*/
 #tabs { 
-    margin: 0;
+    margin: 0px;
+    padding: 0px;
     width: 100%;
-    height: 38px;
+    height: 32px;
     position: relative;
-    color: #3c3f41;
+    color: #666;
     background: #f0f0f0;
     overflow: hidden;                           /*处理超出的内容*/
 }
 
 #tabs li{
-    top: 5px;
-    height:33px;
+    top: 0px;
+    height:32px;
     line-height: 34px;                          /*行距，一行文字的高度*/
     padding: 0 .6em 0 .8em;
 
     display: inline-block;
     position: relative;
     text-align: left;
-    cursor: default;
-
+    cursor: default;    
 }
 
 /*鼠标经过*/
 #tabs li:hover {
-    color: #030101;
-    background-color: #d9d9d9;
+    color: #222;
+    background-color: #f8f8f8;
 }
 
 /*当前选中*/
 #tabs li.current{
-    color: #030101;
-    background: #ffffff;
-
+    color: #111;
+    background-color: #fff;
 }
 
 /*编辑器*/

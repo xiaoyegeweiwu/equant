@@ -14,8 +14,7 @@ from qtui.model import QuantModel, SendRequest
 from qtui.view import QuantApplication
 from utils.language import *
 from capi.com_types import *
-from utils.window.framelesswindow import FramelessWindow, CommonHelper, DARKSTYLE, WHITESTYLE, THESE_STATE_DARK, \
-    THESE_STATE_WHITE
+from utils.window.framelesswindow import FramelessWindow, CommonHelper
 from qtui.reportview.reportview import ReportView
 
 
@@ -36,27 +35,24 @@ class Controller(object):
 
         # 创建主窗口
         self.mainApp = QApplication(sys.argv)
-        self.reportView = ReportView()
-        self.app = QuantApplication(self)
         self.mainApp.setFont(QFont("Microsoft YaHei", 10))
-        if self.app.settings.contains('theme') and self.app.settings.value('theme') == 'vs-dark':
-            qss_path = DARKSTYLE
-            theme = THESE_STATE_DARK
+        style = CommonHelper.readQss("utils/window/res/whitethese.qss")
+        self.mainApp.setStyleSheet(style)
+        m = QSharedMemory(self.mainApp.applicationName())
+        if not m.create(1):
+            QMessageBox.warning(None, '警告', '程序已经在运行！！！')
         else:
-            qss_path = WHITESTYLE
-            theme = THESE_STATE_WHITE
-        # 回测报告窗口（主线程中创建)
-        self.mainWnd = FramelessWindow()
-        style = CommonHelper.readQss(qss_path)
-        self.mainWnd.setStyleSheet(style)
-        self.mainWnd.setWindowTitle('极星量化')
-        self.mainWnd.setWinThese(theme)
-        self.mainWnd.setWindowIcon(QIcon('icon/epolestar ix2.ico'))
-        screen = QDesktopWidget().screenGeometry()
-        self.mainWnd.setGeometry(screen.width() * 0.1, screen.height() * 0.1, screen.width() * 0.8,
-                     screen.height() * 0.8)
-        self.mainWnd.titleBar.buttonClose.clicked.connect(self.quitThread)
-        self.mainWnd.setWidget(self.app)
+            # 回测报告窗口（主线程中创建)
+            self.reportView = ReportView()
+            self.app = QuantApplication(self)
+            self.mainWnd = FramelessWindow()
+            self.mainWnd.setWindowTitle('极星量化')
+            self.mainWnd.setWindowIcon(QIcon('icon/epolestar ix2.ico'))
+            screen = QDesktopWidget().screenGeometry()
+            self.mainWnd.setGeometry(screen.width() * 0.1, screen.height() * 0.1, screen.width() * 0.8,
+                         screen.height() * 0.8)
+            self.mainWnd.titleBar.buttonClose.clicked.connect(self.quitThread)
+            self.mainWnd.setWidget(self.app)
 
 
         # 创建模块

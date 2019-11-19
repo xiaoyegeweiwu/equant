@@ -8,7 +8,7 @@ import traceback
 import time
 
 from PyQt5 import QtCore, QtGui
-from PyQt5.QtCore import Qt, QPoint, QUrl, pyqtSignal, pyqtSlot, QSharedMemory, QTimer, QDir, QSettings
+from PyQt5.QtCore import Qt, QPoint, QUrl, pyqtSignal, pyqtSlot, QSharedMemory, QTimer, QDir
 from PyQt5.QtGui import QTextCursor, QIcon, QKeySequence
 from PyQt5.QtWebChannel import QWebChannel
 from PyQt5.QtWebEngineWidgets import QWebEngineView, QWebEngineSettings
@@ -85,7 +85,6 @@ class StrategyPolicy(QWidget):
         self.deleteContract.clicked.connect(self.delete_contract)
         self.updateContract.clicked.connect(self.update_contract)
         self.confirm.clicked.connect(self.enter)
-        # self.setContentsMargins(0, 0, 0, 0)
 
         self._control = control
 
@@ -1448,7 +1447,6 @@ class WebEngineView(QWebEngineView):
     saveSignal = pyqtSignal()
     switchSignal = pyqtSignal(str)
     setThemeSignal = pyqtSignal(str)
-    themeSignal = pyqtSignal(str)
 
     def __init__(self, *args, **kwargs):
         super(WebEngineView, self).__init__(*args, **kwargs)
@@ -1939,7 +1937,6 @@ class QuantApplication(QWidget):
         self.run_btn.setEnabled(status)
 
     def emit_custom_signal(self):
-        print('emit_custom_signal')
         self.contentEdit.sendSaveSignal()
 
     def create_func_tab(self):
