@@ -126,10 +126,6 @@ class StrategyPolicy(QWidget):
         self.main_contractWin.setStyleSheet('')
         self.main_contractWin.setStyleSheet(style)
 
-        with open(r'C:\Users\xiaok\Desktop\gitquant\equant\src\qtui\test.qss', 'r', encoding='utf-8') as f:
-            style = f.read()
-        self.setStyleSheet(style)
-
         self.layout().setContentsMargins(0, 0, 0, 0)
         self.layout().setSpacing(0)
 
