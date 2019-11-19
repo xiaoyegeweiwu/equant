@@ -61,8 +61,8 @@ class StrategyPolicy(QWidget):
         self.main_layout.addLayout(layout1)
         self.main_layout.addLayout(layout2)
         self.setLayout(self.main_layout)
-        self.setMinimumSize(580, 660)
-        self.setBaseSize(580, 660)
+        self.setMinimumSize(580, 600)
+        self.setBaseSize(580, 600)
 
         self.contractTableWidget.hideColumn(4)
         self.contractTableWidget.verticalHeader().setVisible(False)
@@ -126,6 +126,10 @@ class StrategyPolicy(QWidget):
         self.main_contractWin.setStyleSheet('')
         self.main_contractWin.setStyleSheet(style)
 
+        with open(r'C:\Users\xiaok\Desktop\gitquant\equant\src\qtui\test.qss', 'r', encoding='utf-8') as f:
+            style = f.read()
+        self.setStyleSheet(style)
+
         self.layout().setContentsMargins(0, 0, 0, 0)
         self.layout().setSpacing(0)
 
@@ -159,16 +163,18 @@ class StrategyPolicy(QWidget):
         h_layout1.addWidget(self.KLineCheckBox)
         h_layout2 = QHBoxLayout()
         self.snapShotCheckBox = QCheckBox('即时行情触发')
+        self.snapShotCheckBox.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         h_layout2.addWidget(self.snapShotCheckBox)
         h_layout3 = QHBoxLayout()
         self.tradeCheckBox = QCheckBox('交易数据触发')
+        self.tradeCheckBox.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         h_layout3.addWidget(self.tradeCheckBox)
         h_layout4 = QHBoxLayout()
         self.cycleCheckBox = QCheckBox('每间隔')
+        self.cycleCheckBox.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         self.cycleLineEdit = QLineEdit('200')
         self.cycleLabel = QLabel('毫秒执行代码（100的整数倍）')
         self.cycleLabel.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-        self.cycleLabel.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         h_layout4.addWidget(self.cycleCheckBox)
         h_layout4.addWidget(self.cycleLineEdit)
         h_layout4.addWidget(self.cycleLabel)
@@ -190,14 +196,19 @@ class StrategyPolicy(QWidget):
 
         rignt_hlayout2 = QHBoxLayout()
         self.timerListWidget = QListWidget()
+        self.timerListWidget.scroll
+        self.timerListWidget.setFixedHeight(100)
         self.timerListWidget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         rignt_hlayout2.addWidget(self.timerListWidget)
         rignt_hlayout3 = QHBoxLayout()
         self.timerEdit = QTimeEdit()
         self.timerEdit.setDisplayFormat('HH:mm:ss')
         self.addTimerButton = QPushButton('增加')
+        self.addTimerButton.setFixedWidth(60)
         self.deleteTimerButton = QPushButton('删除')
+        self.deleteTimerButton.setFixedWidth(60)
         rignt_hlayout3.addWidget(self.timerEdit)
+        rignt_hlayout3.addItem(h_spacerItem)
         rignt_hlayout3.addWidget(self.addTimerButton)
         rignt_hlayout3.addWidget(self.deleteTimerButton)
 
@@ -214,7 +225,6 @@ class StrategyPolicy(QWidget):
         policy_layout = QVBoxLayout()
         policy_layout1 = QHBoxLayout()
         order_label = QLabel('发单时机：')
-        order_label.setFixedWidth(100)
         self.set_label_size_policy(order_label)
         self.sendOrderRealtime = QRadioButton('实时发单')
         self.sendOrderRealtime.setChecked(True)
@@ -225,7 +235,7 @@ class StrategyPolicy(QWidget):
         policy_layout1.addItem(h_spacerItem)
         policy_layout2 = QHBoxLayout()
         run_label = QLabel('运行模式：')
-        run_label.setFixedWidth(100)
+
         self.set_label_size_policy(run_label)
         self.actualCheckBox = QCheckBox('实盘运行')
         self.alarmCheckBox = QCheckBox('发单报警')
@@ -237,17 +247,25 @@ class StrategyPolicy(QWidget):
         policy_layout2.addItem(h_spacerItem)
         policy_layout3 = QHBoxLayout()
         user_label = QLabel('账户：')
-        user_label.setFixedWidth(100)
         self.set_label_size_policy(user_label)
         self.userComboBox = QComboBox()
         policy_layout3.addWidget(user_label)
         policy_layout3.addWidget(self.userComboBox)
         policy_layout3.addItem(h_spacerItem)
 
+        # 设置对齐
+        order_label.setFixedWidth(80)
+        run_label.setFixedWidth(80)
+        user_label.setFixedWidth(80)
+        self.sendOrderRealtime.setFixedWidth(120)
+        self.actualCheckBox.setFixedWidth(120)
+        self.sendOrderKStable.setFixedWidth(120)
+        self.alarmCheckBox.setFixedWidth(120)
+
         policy_layout.addLayout(policy_layout1)
         policy_layout.addLayout(policy_layout2)
         policy_layout.addLayout(policy_layout3)
-        policy_layout.setSpacing(20)
+        policy_layout.setSpacing(10)
         self.basePolicy.setLayout(policy_layout)
         # ------------------------------------------------------------
         run_layout.addWidget(self.trigger)
@@ -290,11 +308,11 @@ class StrategyPolicy(QWidget):
     def create_money_policy(self):
         self.moneyPolicy = QWidget()
         self.moneyPolicy.setObjectName("MoneyPolicy")
-        h_spacerItem = QSpacerItem(150, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        h_spacerItem = QSpacerItem(500, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
         main_layout = QVBoxLayout()
         h_layout1 = QHBoxLayout()
         label1 = QLabel('初始资金：')
-        label1.setFixedWidth(130)
+        label1.setFixedWidth(100)
         self.set_label_size_policy(label1)
         self.initFundlineEdit = QLineEdit('1000000')
         label12 = QLabel('元')
@@ -306,7 +324,7 @@ class StrategyPolicy(QWidget):
 
         h_layout2 = QHBoxLayout()
         label2 = QLabel('交易方向：')
-        label2.setFixedWidth(130)
+        label2.setFixedWidth(100)
         self.set_label_size_policy(label2)
         self.tradeDirectionComboBox = QComboBox()
         self.tradeDirectionComboBox.addItems(['双向交易', '仅多头', '仅空头'])
@@ -316,7 +334,7 @@ class StrategyPolicy(QWidget):
 
         h_layout3 = QHBoxLayout()
         label3 = QLabel('默认下单量：')
-        label3.setFixedWidth(130)
+        label3.setFixedWidth(100)
         self.set_label_size_policy(label3)
         self.defaultOrderComboBox = QComboBox()
         self.defaultOrderComboBox.addItems(['按固定合约数', '按资金比例', '按固定资金'])
@@ -333,7 +351,7 @@ class StrategyPolicy(QWidget):
 
         h_layout4 = QHBoxLayout()
         label4 = QLabel('最小下单量：')
-        label4.setFixedWidth(130)
+        label4.setFixedWidth(100)
         self.set_label_size_policy(label4)
         self.miniOrderLineEdit = QLineEdit('1')
         self.miniOrderLineEdit.setFixedWidth(50)
@@ -346,7 +364,7 @@ class StrategyPolicy(QWidget):
 
         h_layout5 = QHBoxLayout()
         label5 = QLabel('保证金率：')
-        label5.setFixedWidth(130)
+        label5.setFixedWidth(100)
         self.set_label_size_policy(label5)
         self.marginRateLineEdit = QLineEdit('8')
         self.marginRateLineEdit.setFixedWidth(50)
@@ -359,7 +377,7 @@ class StrategyPolicy(QWidget):
 
         h_layout6 = QHBoxLayout()
         label6 = QLabel('开仓收费方式：')
-        label6.setFixedWidth(130)
+        label6.setFixedWidth(100)
         self.set_label_size_policy(label6)
         self.openTypeComboBox = QComboBox()
         self.openTypeComboBox.addItems(['固定值', '比例'])
@@ -369,7 +387,7 @@ class StrategyPolicy(QWidget):
 
         h_layout7 = QHBoxLayout()
         label7 = QLabel('开仓手续费(率)：')
-        label7.setFixedWidth(130)
+        label7.setFixedWidth(100)
         self.set_label_size_policy(label7)
         self.openFeeRateLineEdit = QLineEdit('1')
         self.openFeeRateLineEdit.setFixedWidth(50)
@@ -382,7 +400,7 @@ class StrategyPolicy(QWidget):
 
         h_layout8 = QHBoxLayout()
         label8 = QLabel('平仓收费方式：')
-        label8.setFixedWidth(130)
+        label8.setFixedWidth(100)
         self.set_label_size_policy(label8)
         self.closeTypeComboBox = QComboBox()
         self.closeTypeComboBox.addItems(['固定值', '比例'])
@@ -392,7 +410,7 @@ class StrategyPolicy(QWidget):
 
         h_layout9 = QHBoxLayout()
         label9 = QLabel('平仓手续费(率)：')
-        label9.setFixedWidth(130)
+        label9.setFixedWidth(100)
         self.set_label_size_policy(label9)
         self.closeFeeRateLineEdit = QLineEdit('1')
         self.closeFeeRateLineEdit.setFixedWidth(50)
@@ -405,7 +423,7 @@ class StrategyPolicy(QWidget):
 
         h_layout10 = QHBoxLayout()
         label10 = QLabel('滑点损耗：')
-        label10.setFixedWidth(130)
+        label10.setFixedWidth(100)
         self.set_label_size_policy(label10)
         self.slippageLineEdit = QLineEdit('0')
         self.slippageLineEdit.setFixedWidth(50)
@@ -493,6 +511,7 @@ class StrategyPolicy(QWidget):
         self.paramsTableWidget = QTableWidget()
         self.paramsTableWidget.setColumnCount(4)
         self.paramsTableWidget.setHorizontalHeaderLabels(['参数', '当前值', '类型', '描述'])
+        self.paramsTableWidget.verticalHeader().setVisible(False)  # 隐藏行号
         self.paramsTableWidget.horizontalHeader().setStretchLastSection(True)
         self.paramsTableWidget.horizontalHeader().setSectionResizeMode(QHeaderView.Interactive)
         self.paramsTableWidget.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeToContents)
@@ -2348,8 +2367,8 @@ class QuantApplication(QWidget):
         if path:
             self.strategy_policy_win = StrategyPolicy(self._controller, path, param=param, flag=flag)
             self.main_strategy_policy_win = FramelessWindow()
-            self.main_strategy_policy_win.setGeometry((self.width - 580)/2, (self.height - 660)/2, 580, 660)
-            self.main_strategy_policy_win.setBaseSize(580, 660)
+            self.main_strategy_policy_win.setGeometry((self.width - 580)/2, (self.height - 620)/2, 580, 620)
+            self.main_strategy_policy_win.setBaseSize(580, 620)
             self.main_strategy_policy_win.hideTheseBtn()
             self.main_strategy_policy_win.titleBar.iconLabel.hide()
             self.main_strategy_policy_win.titleBar.buttonMaximum.setEnabled(False)
