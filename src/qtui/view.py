@@ -108,6 +108,7 @@ class StrategyPolicy(QWidget):
         # print('--------------------------------')
         # print(self.style())
         self.contractWin = ContractWin()
+        self.contractWin.setObjectName("ContractWin")
         print(self.contractWin.row)
         self.contractWin.confirm_signal.connect(self.add_contract)
         # self.contractWin.setStyle(self.style())

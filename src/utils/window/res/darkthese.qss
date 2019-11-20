@@ -145,7 +145,7 @@ QLabel {
 /* *****************************************QScrollbar***********************************/
 /**********滚动条-水平**********/
 QScrollBar:horizontal {
-    height: 15px;
+    height: 7px;
     background: transparent;
     margin-bottom: 0px;
 }
@@ -159,12 +159,12 @@ QScrollBar::handle:horizontal:hover {
 }
 QScrollBar::sub-line:horizontal {
     background: transparent;
-    width: 8px;
+    width: 7px;
     subcontrol-position: left;
 }
 QScrollBar::add-line:horizontal {
     background: transparent;
-    width: 8px;
+    width: 7px;
     subcontrol-position: right;
 }
 QScrollBar::sub-line:horizontal:hover {
@@ -179,7 +179,7 @@ QScrollBar::add-page:horizontal,QScrollBar::sub-page:horizontal {
 
 /**********滚动条-垂直**********/
 QScrollBar:vertical {
-    width: 15px;
+    width: 7px;
     background: transparent;
     margin-right: 0px;
 }
@@ -193,12 +193,12 @@ QScrollBar::handle:vertical:hover {
 }
 QScrollBar::sub-line:vertical {
     background: transparent;
-    height: 8px;
+    height: 7px;
     subcontrol-position: top;
 }
 QScrollBar::add-line:vertical {
     background: transparent;
-    height: 8px;
+    height: 7px;
     subcontrol-position: bottom;
 }
 QScrollBar::sub-line:vertical:hover {
@@ -544,7 +544,10 @@ QMessageBox QPushButton[text="&No"] {
 #SearchLine {
     color: #A6A6A6;
     background-color: black;
-    border: 6px solid #252526;
+    /*border: 6px solid #252526;*/
+    /*border-left: 1px solid #383838;*/
+    margin: 6px;
+
 }
 
 
@@ -587,6 +590,7 @@ QMessageBox QPushButton[text="&No"] {
     border-left: 1px solid #383838;
 }
 
+/* 属性设置窗口属性 */
 #StrategyTabWidget QGroupBox {
     border: 1px solid #383838;
 }
@@ -613,6 +617,16 @@ QMessageBox QPushButton[text="&No"] {
 #StrategyTabWidget QLineEdit {
     min-height: 19px;
     max-height: 19px;
+}
+
+/********************* 合约选择窗口属性设置 ***************************************************/
+#ContractWin QLineEdit {
+    border: 1px solid #252526;
+}
+
+#ContractWin QGroupBox{
+    background-color: transparent;
+    border: 1px solid #252526;
 }
 
 /* *****************************************标题栏相关*************************************/
