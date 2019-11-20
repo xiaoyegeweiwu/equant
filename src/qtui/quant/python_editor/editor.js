@@ -63,7 +63,7 @@ function init_editor(layoutid, code_str, theme) {
                 //autoIndent:true,              //自动布局
                 //quickSuggestions: false,
                 //quickSuggestionsDelay: 500,   //代码提示延时
-                //contextmenu: false,
+                contextmenu: false,
                 scrollBeyondLastLine: true,
                 //lineNumbersMinChars: 5,
                 lineHeight: 24,
@@ -125,13 +125,13 @@ function save_file(reqid, file) {
     if (fname == "")
         fname = g_filename;
     data = {
-        'cmd': 'savefile_rsp',
-        'reqid': reqid,
-        'file': fname,
-        'txt': g_editor.getValue(),
-        'errtxt': ''
+        'cmd':'savefile_rsp',
+        'reqid':reqid,
+        'file':fname,
+        'txt':g_editor.getValue(),
+        'errtxt':''
     }
-    senddata(data);
+    senddata(data);  
 }
 //文件被修改
 function on_modify(reqid, file)
@@ -143,17 +143,17 @@ function on_modify(reqid, file)
         'cmd':'modify_nty',
         'file':fname
     }
-    senddata(data);  
+    //senddata(data);  
 }
 
 //////////////////////////////////////////////////////////////////////////////
 ///标签栏管理
 //////////////////////////////////////////////////////////////////////////////
 // == 值比较  === 类型比较 $(id) ---->  document.getElementById(id)
-function $(id) {
-    return typeof id === 'string' ? document.getElementById(id) : id;
+function $(id){
+    return typeof id === 'string' ? document.getElementById(id):id;
 }
-
+ 
 //全局字典
 var datas = new Array();
 
@@ -172,33 +172,42 @@ function switch_tab(newtab) {
     var tab = $(newtab.toString());
     if (!tab && newtab != "")
         return;
-
-    if (tab)
+    
+    if (tab){
         tab.className = 'current';
+        var btn = tab.children[0];
+        if (btn)
+            btn.className = 'curr_btn';
+    }
     load_file(newtab, tab ? datas[newtab] : '');
 
     tab = $(currtab.toString())
     if (tab)
+    {
         tab.className = '';
+        var btn = tab.children[0];
+        if (btn)
+            btn.className = '';
+    }
 
     currtab = newtab;
-    // g_filename = currtab.id;
 }
 
 // 添加标签
-function add_tab(name, value) {
+function add_tab(name, value){
     if (name == "" || datas[name])
         return;
 
     //新建标签
     var tab = document.createElement("li");
     tab.id = name;
-    tab.innerHTML = name.substr(name.lastIndexOf('/') + 1);
+    tab.innerHTML = name.substr(name.lastIndexOf('/')+1);
 
     //新建关闭按钮
     var btn = document.createElement("a");
     btn.href = "#";
     btn.innerHTML = "x";
+    btn.className = 'curr_btn'
 
     //添加按钮到标签上
     tab.appendChild(btn);
@@ -206,13 +215,14 @@ function add_tab(name, value) {
     $('tabs').appendChild(tab);
 
     //设置标签和按钮的单击事件
-    tab.onclick = function () {
+    tab.onclick = function(){
         switch_tab(this.id);
         Bridge.switchFile(g_filename);
     }
-    btn.onclick = function () {
+    btn.onclick = function(){
         var tab = this.parentNode;
-        if (tab.className == 'current') {
+        if (tab.className == 'current')
+        {
             var _tab = tab.nextElementSibling;
             if (!_tab)
                 _tab = tab.previousElementSibling;
@@ -220,6 +230,16 @@ function add_tab(name, value) {
         }
         delete datas[tab.id];
         tab.remove();
+    }
+    tab.onmouseover = function(){
+        var btn = this.children[0];
+        if (btn && btn.className != 'curr_btn')
+            btn.className = 'over_btn';
+    }
+    tab.onmouseout = function(){
+        var btn = this.children[0];
+        if (btn && btn.className != 'curr_btn')
+            btn.className = '';
     }
 
     //添加标签关联的数据
