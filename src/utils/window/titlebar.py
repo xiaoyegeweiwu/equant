@@ -59,7 +59,7 @@ class TitleBar(QWidget):
 
         self.theseSelect = QPushButton()
         self.theseSelect.setObjectName("theseSelect")
-        self.theseSelect.setIcon(QIcon("icon/darkthese.png"))
+        self.theseSelect.setIcon(QIcon("icon/whitethese.png"))
         self.theseSelect.clicked.connect(self._theseCallback)
 
         self.buttonMinimum.setFixedSize(TITLE_BUTTON_SIZE, TITLE_BUTTON_SIZE)
@@ -92,7 +92,6 @@ class TitleBar(QWidget):
             self.win.setStyleSheet("""""")
             self.win._widget.contentEdit.sendSetThemeSignal('vs')
 
-            self.theseSelect.setIcon(QIcon("icon/darkthese.png"))
             style = CommonHelper.readQss(WHITESTYLE)
             self.win.setStyleSheet(style)
 
@@ -101,7 +100,6 @@ class TitleBar(QWidget):
             self.win.setStyleSheet("""""")
             self.win._widget.contentEdit.sendSetThemeSignal('vs-dark')
 
-            self.theseSelect.setIcon(QIcon("icon/whitethese.png"))
             style = CommonHelper.readQss(DARKSTYLE)
             self.win.setStyleSheet(style)
             self.theseState = THESE_STATE_DARK
