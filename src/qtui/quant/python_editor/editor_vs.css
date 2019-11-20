@@ -33,7 +33,7 @@ body{
 #tabs a:after{
     transform: translateY(-24px) rotate(-45deg);
 }
-#tabs a:hover:before, #tabs li a:hover:after{
+#tabs a:hover:before, #tabs a:hover:after{
     background: #F00;
 }
 
