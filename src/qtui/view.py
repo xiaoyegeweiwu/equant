@@ -547,7 +547,7 @@ class StrategyPolicy(QWidget):
         if not self.timerListWidget.findItems(ti, Qt.MatchExactly):
             self.timerListWidget.addItem(ti)
         else:
-            QMessageBox.warning(self, "提示", "已存在该时间！", QMessageBox.Yes)
+            QMessageBox.warning(self, "提示", "已存在该时间！请重新提交！", QMessageBox.Yes)
 
     def delete_timer(self):
         row = self.timerListWidget.currentRow()

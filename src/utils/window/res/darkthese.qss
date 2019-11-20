@@ -527,6 +527,17 @@ QLineEdit:selected, QLineEdit:pressed, QLineEdit:focus {
     border: 1px solid #135785;
 }
 
+/* *****************************************QMessageBox**************************************/
+QMessageBox QPushButton[text="&Yes"] {
+    min-width: 60px;
+    qproperty-text: "确定";
+}
+
+QMessageBox QPushButton[text="&No"] {
+    min-width: 60px;
+    qproperty-text: "取消";
+}
+
 /***************************************************************************/
 
 /* 函数检索输入框*/
