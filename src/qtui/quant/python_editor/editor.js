@@ -66,7 +66,7 @@ function init_editor(layoutid, code_str, theme) {
                 //contextmenu: false,
                 scrollBeyondLastLine: true,
                 //lineNumbersMinChars: 5,
-                //lineHeight: 24,
+                lineHeight: 24,
                 //fontFamily:'Consolas',
                 mouseWheelZoom: true,
                 scrollbar: {
