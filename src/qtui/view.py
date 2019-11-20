@@ -195,9 +195,7 @@ class StrategyPolicy(QWidget):
 
         rignt_hlayout2 = QHBoxLayout()
         self.timerListWidget = QListWidget()
-        self.timerListWidget.scroll
         self.timerListWidget.setFixedHeight(100)
-        self.timerListWidget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         rignt_hlayout2.addWidget(self.timerListWidget)
         rignt_hlayout3 = QHBoxLayout()
         self.timerEdit = QTimeEdit()
@@ -530,9 +528,9 @@ class StrategyPolicy(QWidget):
         self.paramsTableWidget.setHorizontalHeaderLabels(['参数', '当前值', '类型', '描述'])
         self.paramsTableWidget.verticalHeader().setVisible(False)  # 隐藏行号
         self.paramsTableWidget.horizontalHeader().setStretchLastSection(True)
-        self.paramsTableWidget.horizontalHeader().setSectionResizeMode(QHeaderView.Interactive)
         self.paramsTableWidget.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeToContents)
         self.paramsTableWidget.horizontalHeader().setSectionResizeMode(3, QHeaderView.ResizeToContents)
+        self.paramsTableWidget.horizontalHeader().setSectionResizeMode(QHeaderView.Interactive)
         main_layout.addWidget(label)
         main_layout.addWidget(self.paramsTableWidget)
 
@@ -1193,10 +1191,13 @@ class ContractWin(QWidget):
         label1 = QLabel('商品代码：')
         self.contractCodeLineEdit = QLineEdit()
         self.select = QPushButton('选择')
+        self.select.setFixedWidth(60)
         h_layout1.addWidget(label1)
         h_layout1.addWidget(self.contractCodeLineEdit)
         h_layout1.addWidget(self.select)
         h_layout1.addItem(h_spacerItem)
+        h_layout1.setSpacing(10)
+        h_layout1.setContentsMargins(10, 0, 10, 0)
 
         h_layout2 = QHBoxLayout()
         label2 = QLabel('K线类型：')
@@ -1206,6 +1207,8 @@ class ContractWin(QWidget):
         h_layout2.addWidget(label2)
         h_layout2.addWidget(self.kLineTypeComboBox)
         h_layout2.addItem(h_spacerItem)
+        h_layout2.setSpacing(10)
+        h_layout2.setContentsMargins(10, 0, 10, 0)
 
         h_layout3 = QHBoxLayout()
         label3 = QLabel('K线周期：')
@@ -1214,6 +1217,15 @@ class ContractWin(QWidget):
         h_layout3.addWidget(label3)
         h_layout3.addWidget(self.kLinePeriodComboBox)
         h_layout3.addItem(h_spacerItem)
+        h_layout3.setSpacing(10)
+        h_layout3.setContentsMargins(10, 0, 10, 0)
+
+        # label 对齐
+        label1.setFixedWidth(80)
+        label2.setFixedWidth(80)
+        label3.setFixedWidth(80)
+        self.kLineTypeComboBox.setFixedWidth(55)
+        self.kLinePeriodComboBox.setFixedWidth(55)
 
         # -------------运算起始点-----------------------------
         h_layout4 = QHBoxLayout()
@@ -1257,11 +1269,14 @@ class ContractWin(QWidget):
         self.groupBox.setLayout(groupbox_layout)
         h_layout4.addWidget(self.groupBox)
 
+        h_layout4.setSpacing(10)
+        h_layout4.setContentsMargins(10, 0, 10, 0)
+
         h_layout5 = QHBoxLayout()
         self.confirm = QPushButton('确定')
-        self.confirm.setMinimumWidth(60)
+        self.confirm.setMinimumWidth(80)
         self.cancel = QPushButton('取消')
-        self.cancel.setMinimumWidth(60)
+        self.cancel.setMinimumWidth(80)
         h_layout5.setSpacing(10)
         h_layout5.setContentsMargins(0, 10, 20, 0)
         h_layout5.addItem(h_spacerItem)
@@ -1273,8 +1288,6 @@ class ContractWin(QWidget):
         main_layout.addLayout(h_layout3)
         main_layout.addLayout(h_layout4)
         main_layout.addLayout(h_layout5)
-
-        main_layout.addStretch(1)
 
         self.setLayout(main_layout)
         # self.setMinimumSize(310, 300)
@@ -2082,6 +2095,7 @@ class QuantApplication(QWidget):
 
         # 函数树结构
         self.func_tree = QTreeWidget()
+        self.func_tree.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.func_tree.setObjectName("FuncTree")
         self.func_tree.setColumnCount(2)
         self.func_tree.setHeaderLabels(['函数名', '函数介绍'])
@@ -2206,7 +2220,7 @@ class QuantApplication(QWidget):
         self.cbComboBox.addItems(['对盘价', '最新价', '市价'])
         self.cbComboBox.currentIndexChanged.connect(self.valid_spin)
         spacerItem = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
-        spacerItem2 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Minimum)
+        spacerItem2 = QSpacerItem(20, 10, QSizePolicy.Minimum, QSizePolicy.Minimum)
         self.spin = QSpinBox()
         self.spin.setMinimum(1)
         self.spin.setMaximum(100)
@@ -2234,7 +2248,7 @@ class QuantApplication(QWidget):
         self.union_layout.addItem(spacerItem2, 0, 12, 1, 1)
         self.union_layout.addWidget(self.reducePositionCheckBox, 0, 13, 1, 1)
         self.union_layout.addItem(spacerItem, 0, 14, 1, 1)
-        self.union_layout.setSpacing(0)
+        self.union_layout.setSpacing(5)
         self.union_layout.setContentsMargins(0, 0, 0, 0)
 
         self.one_key_sync.clicked.connect(lambda: self.save_position_config(True))
