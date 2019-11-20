@@ -374,6 +374,19 @@ QCheckBox::indicator:checked {
     image: url(./utils/window/res/check.png);
 }
 
+/* **************************QRadioButton*******************/
+QRadioButton {
+  background-color: transparent;
+  color: #BBBBBB;
+  spacing: 4px;
+  padding: 0px;
+}
+
+QRadioButton::indicator {
+  margin-left: 4px;
+  height: 12px;
+  width: 12px;
+}
 
 /* **************************QSpinBox************************/
 QAbstractSpinBox {
@@ -573,7 +586,7 @@ QLineEdit:selected, QLineEdit:pressed, QLineEdit:focus {
     padding-bottom: 0px;
 }
 
-#StrategyTabWidget QLabel {
+#StrategyTabWidget QLabel, #StrategyTabWidget QComboBox {
     min-height: 20px;
     max-height: 20px;
 }

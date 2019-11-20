@@ -12,6 +12,8 @@
 // 保存文件
 // {"cmd":"savefile_req", "reqid":0, "file":""}
 // {"cmd":"savefile_rsp", "reqid":0, "file":"", "txt":"", "errtxt":""}
+// 文件修改通知
+// {"cmd":"modify_nty", "file":""}
 //////////////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////////////
@@ -21,9 +23,12 @@
 //当前代码编辑器所打开的文件，为空则为新建文件
 var g_model = null;
 var g_filename = "";
+var g_modify = false;
 //编辑器实例
 var g_editor = null;
 
+//屏蔽右键
+document.oncontextmenu=new Function("event.returnValue=false;");
 
 //初始化编辑器
 function init_editor(layoutid, code_str, theme) {
@@ -32,7 +37,7 @@ function init_editor(layoutid, code_str, theme) {
     //初始化编辑器
     require.config(
         {
-            paths: {'vs': 'monaco-editor-0.16.2/package/min/vs'},
+            paths: {'vs': 'monaco-editor/package/min/vs'},
             'vs/nls': {availableLanguages: {'*': 'zh-cn'}}
         }
     );
@@ -45,7 +50,7 @@ function init_editor(layoutid, code_str, theme) {
                 value: code_str,                //初始文本内容
                 automaticLayout: true,          //随布局Element自动调整大小                        
                 minimap: {enabled: true},       //代码略缩图
-                fontSize: 20,                   //字体大小
+                fontSize: 14,                   //字体大小
                 //wordWrap: "on",               //自动换行，注意大小写
                 //wrappingIndent: "indent",     //自动缩进
                 //glyphMargin: true,            //字形边缘
@@ -56,10 +61,31 @@ function init_editor(layoutid, code_str, theme) {
                 //cursorStyle: 'line',          //光标样式
                 //automaticLayout: false,       //自动布局
                 //autoIndent:true,              //自动布局
+                //quickSuggestions: false,
                 //quickSuggestionsDelay: 500,   //代码提示延时
-                contextmenu: false,
+                //contextmenu: false,
+                scrollBeyondLastLine: true,
+                //lineNumbersMinChars: 5,
+                lineHeight: 24,
+                //fontFamily:'Consolas',
+                mouseWheelZoom: true,
+                scrollbar: {
+                    vertical: 1,
+                    horizontal: 1,
+                    useShadows: true,
+                    horizontalSliderSize: 7,
+                    verticalSliderSize: 7,
+                    horizontalScrollbarSize: 7,
+                    verticalScrollbarSize: 7,
+                },
             }
         );
+        g_editor.onDidChangeModelContent((v) => {
+            if (!g_modify)
+                on_modify(0, g_filename)
+            g_modify = true;
+        });
+
     });
 
     //自适应大小，可以不要
@@ -86,8 +112,10 @@ function set_theme(theme, fontsize) {
 }
 
 //设置代码文件
-function load_file(file, txt) {
+function load_file(file, txt)
+{
     g_filename = file;
+    g_modify = false;
     g_editor.setValue(txt);
 }
 
@@ -105,7 +133,18 @@ function save_file(reqid, file) {
     }
     senddata(data);
 }
-
+//文件被修改
+function on_modify(reqid, file)
+{
+    fname = file;
+    if (fname == "")
+        fname = g_filename;
+    data = {
+        'cmd':'modify_nty',
+        'file':fname
+    }
+    senddata(data);  
+}
 
 //////////////////////////////////////////////////////////////////////////////
 ///标签栏管理

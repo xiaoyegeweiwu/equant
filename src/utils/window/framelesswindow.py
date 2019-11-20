@@ -50,10 +50,6 @@ class FramelessWindow(QWidget):
 
     def setWinThese(self, theme):
         self.titleBar.theseState = theme
-        if theme == THESE_STATE_WHITE:
-            self.titleBar.theseSelect.setIcon(QIcon("icon/darkthese.png"))
-        elif theme == THESE_STATE_DARK:
-            self.titleBar.theseSelect.setIcon(QIcon("icon/whitethese.png"))
 
     def hideTheseBtn(self):
         """隐藏换肤按钮"""
