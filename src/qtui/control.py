@@ -6,7 +6,6 @@ import importlib
 import traceback
 import re
 
-from PyQt5.QtCore import QTimer, QSharedMemory
 from PyQt5.QtGui import QFont, QIcon
 from PyQt5.QtWidgets import QApplication, QMessageBox, QDesktopWidget
 

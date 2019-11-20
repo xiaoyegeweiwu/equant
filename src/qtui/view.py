@@ -20,7 +20,7 @@ from report.fieldConfigure import RunMode, StrategyStatus
 from api.base_api import BaseApi
 from api.api_func import _all_func_
 from capi.com_types import *
-from qtui.utils import parseStrategtParam, Tree, get_strategy_filters, FileIconProvider
+from qtui.utils import parseStrategtParam, Tree, get_strategy_filters, FileIconProvider, MyMessageBox
 from utils.utils import save
 
 from qtui.reportview.reportview import ReportView
@@ -108,7 +108,6 @@ class StrategyPolicy(QWidget):
         # print('--------------------------------')
         # print(self.style())
         self.contractWin = ContractWin()
-        print(self.contractWin.row)
         self.contractWin.confirm_signal.connect(self.add_contract)
         # self.contractWin.setStyle(self.style())
 
@@ -121,7 +120,6 @@ class StrategyPolicy(QWidget):
         self.main_contractWin.titleBar.buttonClose.clicked.connect(self.main_contractWin.close)
         self.main_contractWin.setWidget(self.contractWin)
         self.contractWin.cancel.clicked.connect(self.main_contractWin.close)
-        self.contractWin.cancel.clicked.connect(self.contractWin.close)
         if self._control.mainWnd.titleBar.theseState == '浅色':
             style = CommonHelper.readQss(WHITESTYLE)
         else:
@@ -547,7 +545,7 @@ class StrategyPolicy(QWidget):
         if not self.timerListWidget.findItems(ti, Qt.MatchExactly):
             self.timerListWidget.addItem(ti)
         else:
-            QMessageBox.warning(self, "提示", "已存在该时间！请重新提交！", QMessageBox.Yes)
+            MyMessageBox.warning(self, "提示", "已存在该时间！请重新提交！", QMessageBox.Yes)
 
     def delete_timer(self):
         row = self.timerListWidget.currentRow()
@@ -633,7 +631,7 @@ class StrategyPolicy(QWidget):
             for i in range(row):
                 sample_dict_list.append(json.loads(self.contractTableWidget.takeItem(i, 4).text()))
             if json.loads(items[4]) in sample_dict_list:
-                QMessageBox.warning(self, '提示', '请勿添加重复合约设置！', QMessageBox.Yes)
+                MyMessageBox.warning(self, '提示', '请勿添加重复合约设置！', QMessageBox.Yes)
                 return
             self.contractTableWidget.setRowCount(row + 1)
 
@@ -753,40 +751,40 @@ class StrategyPolicy(QWidget):
                 timerFormatter.append(t)
 
         if float(initFund) < 1000:
-            QMessageBox.warning(self, "极星量化", "初始资金不能小于1000元", QMessageBox.Yes)
+            MyMessageBox.warning(self, "极星量化", "初始资金不能小于1000元", QMessageBox.Yes)
             return
 
         if cycle == "":
-            QMessageBox.warning(self, "极星量化", "定时触发周期不能为空", QMessageBox.Yes)
+            MyMessageBox.warning(self, "极星量化", "定时触发周期不能为空", QMessageBox.Yes)
             return
         elif int(cycle) % 100 != 0:
-            QMessageBox.warning(self, "极星量化", "定时触发周期为100的整数倍", QMessageBox.Yes)
+            MyMessageBox.warning(self, "极星量化", "定时触发周期为100的整数倍", QMessageBox.Yes)
             return
         else:
             pass
 
         if minQty == "":
-            QMessageBox.warning(self, "极星量化", "最小下单量不能为空", QMessageBox.Yes)
+            MyMessageBox.warning(self, "极星量化", "最小下单量不能为空", QMessageBox.Yes)
             return
         elif int(minQty) > MAXSINGLETRADESIZE:
-            QMessageBox.warning(self, "极星量化", "最小下单量不能大于1000", QMessageBox.Yes)
+            MyMessageBox.warning(self, "极星量化", "最小下单量不能大于1000", QMessageBox.Yes)
             return
         else:
             pass
 
         if isConOpenTimes:
             if conOpenTimes == '' or int(conOpenTimes) < 1 or int(conOpenTimes) > 100:
-                QMessageBox.warning(self, "极星量化", "最大连续同向开仓次数必须介于1-100之间", QMessageBox.Yes)
+                MyMessageBox.warning(self, "极星量化", "最大连续同向开仓次数必须介于1-100之间", QMessageBox.Yes)
                 return
 
         if isOpenTimes:
             if openTimes == '' or int(openTimes) < 1 or int(openTimes) > 100:
-                QMessageBox.warning(self, "极星量化", "每根K线同向开仓次数必须介于1-100之间", QMessageBox.Yes)
+                MyMessageBox.warning(self, "极星量化", "每根K线同向开仓次数必须介于1-100之间", QMessageBox.Yes)
                 return
 
         # 用户是否确定用新参数重新运行
         if self._paramFlag:
-            reply = QMessageBox.question(self, '提示', '点确定后会重新运行策略？', QMessageBox.Yes | QMessageBox.No)
+            reply = MyMessageBox.question(self, '提示', '点确定后会重新运行策略？', QMessageBox.Yes | QMessageBox.No)
             if reply == QMessageBox.No:
                 return
 
@@ -1310,19 +1308,19 @@ class ContractWin(QWidget):
 
     def valid_contract(self):
         if not self.contractCodeLineEdit.text():
-            QMessageBox.warning(self, '提示', '请先选择合约！！！', QMessageBox.Yes)
+            MyMessageBox.warning(self, '提示', '请先选择合约！！！', QMessageBox.Yes)
             return
         if self.startDateRadioButton.isChecked():
             try:
                 assert len(self.startDateLineEdit.text()) == 8
             except:
-                QMessageBox.warning(self, '提示', '输入的时间格式不合法，请重新输入！！！', QMessageBox.Yes)
+                MyMessageBox.warning(self, '提示', '输入的时间格式不合法，请重新输入！！！', QMessageBox.Yes)
                 return
         if self.qtyRadioButton.isChecked():
             try:
                 assert int(self.qtylineEdit.text())
             except:
-                QMessageBox.warning(self, '提示', '固定根数输入不合法，请重新输入！！！', QMessageBox.Yes)
+                MyMessageBox.warning(self, '提示', '固定根数输入不合法，请重新输入！！！', QMessageBox.Yes)
                 return
         self.confirm_signal.emit(self.get_contract_policy())
         self.parent().close()
@@ -1500,7 +1498,7 @@ class ContractSelect(QWidget):
             root = QTreeWidgetItem(self.choice_tree)
             root.setText(0, item.text(0))
         else:
-            QMessageBox.warning(self, '提示', '选择的合约数不能超过1个！！！', QMessageBox.Yes)
+            MyMessageBox.warning(self, '提示', '选择的合约数不能超过1个！！！', QMessageBox.Yes)
         pass
 
     def clear_choice(self):
@@ -1795,14 +1793,14 @@ class QuantApplication(QWidget):
         delete = QAction('删除', self.strategy_tree)
         add_strategy = QAction('新建策略')
         add_group = QAction('新建分组')
-        refresh = QAction('刷新', self.strategy_tree)
+        # refresh = QAction('刷新', self.strategy_tree)
         self.strategy_tree.popMenu.addAction(import_file)
         self.strategy_tree.popMenu.addMenu(self.strategy_tree.addType)
         self.strategy_tree.addType.addAction(add_strategy)
         self.strategy_tree.addType.addAction(add_group)
         self.strategy_tree.popMenu.addAction(rename)
         self.strategy_tree.popMenu.addAction(delete)
-        self.strategy_tree.popMenu.addAction(refresh)
+        # self.strategy_tree.popMenu.addAction(refresh)
 
         # 右键动作
         action = self.strategy_tree.popMenu.exec_(self.strategy_tree.mapToGlobal(point))
@@ -1818,7 +1816,7 @@ class QuantApplication(QWidget):
                 if fname:
                     _path = item_path + '/' + os.path.split(fname)[1]
                     if os.path.exists(_path):
-                        reply = QMessageBox.question(self, '提示', '所选的分组中存在同名文件，是否覆盖？', QMessageBox.Yes | QMessageBox.No)
+                        reply = MyMessageBox.question(self, '提示', '所选的分组中存在同名文件，是否覆盖？', QMessageBox.Yes | QMessageBox.No)
                         if reply == QMessageBox.Yes:
                             shutil.copy(fname, _path)
                     else:
@@ -1832,9 +1830,12 @@ class QuantApplication(QWidget):
                 value = ''
                 while True:
                     value, ok = QInputDialog.getText(self, '新建文件', '策略名称', QLineEdit.Normal)
-                    path = os.path.join(item_path, value + '.py')
+                    if not value.strip().endswith('.py'):
+                        path = os.path.join(item_path, value.strip() + '.py')
+                    else:
+                        path = os.path.join(item_path, value.strip())
                     if os.path.exists(path) and ok:
-                        QMessageBox.warning(self, '提示', '策略名在选择的分组%s已经存在！！！' % value, QMessageBox.Yes)
+                        MyMessageBox.warning(self, '提示', '策略名%s在选择的分组已经存在！！！' % value.strip(), QMessageBox.Yes)
                     elif not ok:
                         break
                     else:
@@ -1845,9 +1846,13 @@ class QuantApplication(QWidget):
                 value = ''
                 while True:
                     value, ok = QInputDialog.getText(self, '新建文件', '策略名称', QLineEdit.Normal)
-                    path = os.path.join(os.path.split(item_path)[0], value + '.py')
+                    if not value.strip().endswith('.py'):
+                        path = os.path.join(os.path.split(item_path)[0], value.strip() + '.py')
+                    else:
+                        path = os.path.join(os.path.split(item_path)[0], value.strip())
+
                     if os.path.exists(path) and ok:
-                        QMessageBox.warning(self, '提示', '策略名在选择的分组%s已经存在！！！' % value, QMessageBox.Yes)
+                        MyMessageBox.warning(self, '提示', '策略名在选择的分组%s已经存在！！！' % value, QMessageBox.Yes)
                     elif not ok:
                         break
                     else:
@@ -1855,7 +1860,7 @@ class QuantApplication(QWidget):
                             pass
                         break
             else:
-                QMessageBox.warning(self, '提示', '请选择分组！！！', QMessageBox.Yes)
+                MyMessageBox.warning(self, '提示', '请选择分组！！！', QMessageBox.Yes)
 
         elif action == add_group:
             value = ''
@@ -1873,7 +1878,7 @@ class QuantApplication(QWidget):
                 else:
                     path = os.path.join(os.path.split(item_path)[0], value)
                 if os.path.exists(path) and ok:
-                    QMessageBox.warning(self, '提示', '分组%s已经存在！！！' % value, QMessageBox.Yes)
+                    MyMessageBox.warning(self, '提示', '分组%s已经存在！！！' % value, QMessageBox.Yes)
                 elif not ok:
                     break
                 else:
@@ -1882,10 +1887,10 @@ class QuantApplication(QWidget):
                     self.model.setNameFilters(self.strategy_filter)
                     break
 
-        elif action == refresh:
-            index = self.strategy_tree.currentIndex()
-            model = index.model()  # 请注意这里可以获得model的对象
-            model.dataChanged.emit(index, index)
+        # elif action == refresh:
+        #     index = self.strategy_tree.currentIndex()
+        #     model = index.model()  # 请注意这里可以获得model的对象
+        #     model.dataChanged.emit(index, index)
         elif action == rename:
             index = self.strategy_tree.currentIndex()
             model = index.model()  # 请注意这里可以获得model的对象
@@ -1895,9 +1900,12 @@ class QuantApplication(QWidget):
                 (file_path, filename) = os.path.split(item_path)
                 while True:
                     value, ok = QInputDialog.getText(self, '修改%s策略名' % filename, '策略名称', QLineEdit.Normal, value)
-                    new_path = os.path.join(file_path, value + '.py')
+                    if not value.strip().endswith('.py'):
+                        new_path = os.path.join(file_path, value.strip() + '.py')
+                    else:
+                        new_path = os.path.join(file_path, value.strip())
                     if os.path.exists(new_path) and ok:
-                        QMessageBox.warning(self, '提示', '策略名在此分组中%s已经存在！！！' % value, QMessageBox.Yes)
+                        MyMessageBox.warning(self, '提示', '策略名%s在此分组中已经存在！！！' % value.strip(), QMessageBox.Yes)
                     elif not ok:
                         break
                     else:
@@ -1910,7 +1918,7 @@ class QuantApplication(QWidget):
                     value, ok = QInputDialog.getText(self, '修改%s文件夹' % dir_name, '分组名称', QLineEdit.Normal, value)
                     new_path = os.path.join(dir_path, value)
                     if os.path.exists(new_path) and ok:
-                        QMessageBox.warning(self, '提示', '分组%s已经存在！！！' % value, QMessageBox.Yes)
+                        MyMessageBox.warning(self, '提示', '分组%s已经存在！！！' % value, QMessageBox.Yes)
                     elif not ok:
                         break
                     else:
@@ -1921,12 +1929,13 @@ class QuantApplication(QWidget):
             model = index.model()  # 请注意这里可以获得model的对象
             item_path = model.filePath(index)
             if item_path and os.path.isdir(item_path):
-                reply = QMessageBox.question(self, '提示', '确定删除分组及目录下的所有文件吗？', QMessageBox.Yes | QMessageBox.No)
+                reply = MyMessageBox.question(self, '提示', '确定删除分组及目录下的所有文件吗？', QMessageBox.Yes | QMessageBox.No)
                 if reply == QMessageBox.Yes:
                     shutil.rmtree(item_path)
                     self.strategy_filter.remove(os.path.split(item_path)[1])
             elif item_path and not os.path.isdir(item_path):
-                reply = QMessageBox.question(self, '提示', '确定删除文件%s吗？' % item_path, QMessageBox.Yes | QMessageBox.No)
+                print(item_path)
+                reply = MyMessageBox.question(self, '提示', '确定删除策略%s吗？' % os.path.split(item_path)[1], QMessageBox.Yes | QMessageBox.No)
                 if reply == QMessageBox.Yes:
                     os.remove(item_path)
             else:
@@ -2216,6 +2225,7 @@ class QuantApplication(QWidget):
         self.union_monitor.setObjectName("UnionMonitor")
         self.union_layout = QGridLayout()
         self.one_key_sync = QPushButton('持仓一键同步')
+        self.one_key_sync.setMinimumWidth(100)
         self.cbComboBox = QComboBox()
         self.cbComboBox.addItems(['对盘价', '最新价', '市价'])
         self.cbComboBox.currentIndexChanged.connect(self.valid_spin)
@@ -2450,13 +2460,13 @@ class QuantApplication(QWidget):
             self.main_strategy_policy_win.setWindowModality(Qt.ApplicationModal)  # 设置阻塞父窗口
             self.main_strategy_policy_win.show()
         else:
-            QMessageBox.warning(self, '提示', '请选择策略！！！', QMessageBox.Yes)
+            MyMessageBox.warning(self, '提示', '请选择策略！！！', QMessageBox.Yes)
 
     def save_strategy(self):
         if self.strategy_path:
             self.contentEdit.on_saveclick(self.strategy_path)
         else:
-            QMessageBox.warning(self, '提示', '请选择策略！！！', QMessageBox.Yes)
+            MyMessageBox.warning(self, '提示', '请选择策略！！！', QMessageBox.Yes)
 
     def updateLogText(self):
         guiQueue = self._controller.get_logger().getGuiQ()
@@ -2527,7 +2537,7 @@ class QuantApplication(QWidget):
 
     def show_warn(self):
         """极星9.5退出时，弹出窗口槽函数"""
-        QMessageBox.critical(self, "错误", "极星9.5退出", QMessageBox.Yes)
+        MyMessageBox.critical(self, "错误", "极星9.5退出", QMessageBox.Yes)
 
     def addExecute(self, dataDict):
         values = self._formatMonitorInfo(dataDict)
