@@ -113,7 +113,7 @@ QLabel {
 /* *****************************************QScrollbar***********************************/
 /**********滚动条-水平**********/
 QScrollBar:horizontal {
-    height: 15px;
+    height: 7px;
     background: transparent;
     margin-bottom: 0px;
 }
@@ -127,12 +127,12 @@ QScrollBar::handle:horizontal:hover {
 }
 QScrollBar::sub-line:horizontal {
     background: transparent;
-    width: 8px;
+    width: 7px;
     subcontrol-position: left;
 }
 QScrollBar::add-line:horizontal {
     background: transparent;
-    width: 8px;
+    width: 7px;
     subcontrol-position: right;
 }
 QScrollBar::sub-line:horizontal:hover {
@@ -146,11 +146,10 @@ QScrollBar::add-page:horizontal,QScrollBar::sub-page:horizontal {
 }
 
 /**********滚动条-垂直**********/
-/**********滚动条-水平**********/
 QScrollBar:vertical {
-    height: 15px;
+    width: 7px;
     background: transparent;
-    margin-bottom: 0px;
+    margin-right: 0px;
 }
 QScrollBar::handle:vertical {
     background: #C0C0BF;
@@ -162,13 +161,13 @@ QScrollBar::handle:vertical:hover {
 }
 QScrollBar::sub-line:vertical {
     background: transparent;
-    width: 8px;
-    subcontrol-position: left;
+    height: 7px;
+    subcontrol-position: top;
 }
 QScrollBar::add-line:vertical {
     background: transparent;
-    width: 8px;
-    subcontrol-position: right;
+    height: 7px;
+    subcontrol-position: bottom;
 }
 QScrollBar::sub-line:vertical:hover {
     background: rgb(68, 69, 73);
@@ -176,7 +175,7 @@ QScrollBar::sub-line:vertical:hover {
 QScrollBar::add-line:vertical:hover {
     background: rgb(68, 69, 73);
 }
-QScrollBar::add-page:vertical,QScrollBar::sub-page:horizontal {
+QScrollBar::add-page:vertical,QScrollBar::sub-page:vertical {
     background: transparent;
 }
 
@@ -279,11 +278,10 @@ QColumnView {
     color: #333333;
 }
 
-QTreeView:selected,
-QListView:selected,
-QColumnView:selected {
-    background: #F3F3F3;
-    color: #333333;
+QTreeView::item:selected,
+QListView::item:selected,
+QColumnView::item:selected {
+    color: #FFFFFF;
 }
 
 QTreeView::item:pressed,
@@ -487,7 +485,7 @@ QLineEdit:disabled {
 QLineEdit:selected, QLineEdit:pressed, QLineEdit:focus {
     background: #FFFFFF;
     color: #333333;
-    border: 1px solid #7CADCE;
+    border: 1px solid #135785;
 }
 
 /* *****************************************QMessageBox**************************************/
@@ -505,9 +503,11 @@ QMessageBox QPushButton[text="&No"] {
 
 /* 函数检索输入框*/
 #SearchLine {
-    background-color: #FFFFFF;
+    background-color: #EFEFEF;
     color: #767676;
-    border: 6px solid #F3F3F3;
+    border: 6px solid #FFFFFF;
+    margin-top: 0px;
+
 }
 
 
@@ -554,6 +554,7 @@ QMessageBox QPushButton[text="&No"] {
     background-color: #FFFFFF;
 }
 
+/* 属性设置窗口属性 */
 #StrategyTabWidget QListWidget{
     background-color: #FFFFFF;
 }
@@ -589,6 +590,10 @@ QMessageBox QPushButton[text="&No"] {
 #StrategyTabWidget QLineEdit {
     min-height: 19px;
     max-height: 19px;
+}
+
+#ContractWin QLineEdit {
+    border: 1px solid #CCCCCC;
 }
 
 /* *****************************************标题栏相关*************************************/
