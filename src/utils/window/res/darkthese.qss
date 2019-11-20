@@ -306,11 +306,10 @@ QColumnView {
     color: #CCCCCC;
 }
 
-QTreeView:selected,
-QListView:selected,
-QColumnView:selected {
-    background: #1464A0;
-    color: #32414B;
+QTreeView::item:selected,
+QListView::item:selected,
+QColumnView::item:selected {
+    color: #FFFFFF;
 }
 
 QTreeView::item:pressed,
@@ -538,6 +537,36 @@ QMessageBox QPushButton[text="&No"] {
     qproperty-text: "取消";
 }
 
+/*
+QMenu::icon {
+  margin: 0px;
+  padding-left: 4px;
+}
+
+QMenu::item {
+  background-color: #32414B;
+  padding: 4px 24px 4px 24px;
+  border: 1px transparent #32414B;
+}
+
+QMenu::item:selected {
+  color: #F0F0F0;
+}
+
+QMenu::indicator {
+  width: 12px;
+  height: 12px;
+  padding-left: 6px;
+}
+
+QMenu::right-arrow {
+  margin: 5px;
+  image: url(":/qss_icons/rc/arrow_right.png");
+  height: 12px;
+  width: 12px;
+}
+*/
+
 /***************************************************************************/
 
 /* 函数检索输入框*/
@@ -673,3 +702,4 @@ TitleBar {
 #Framless {
     background: #363636;
 }
+

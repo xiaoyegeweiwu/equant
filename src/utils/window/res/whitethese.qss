@@ -278,11 +278,10 @@ QColumnView {
     color: #333333;
 }
 
-QTreeView:selected,
-QListView:selected,
-QColumnView:selected {
-    background: #F3F3F3;
-    color: #333333;
+QTreeView::item:selected,
+QListView::item:selected,
+QColumnView::item:selected {
+    color: #FFFFFF;
 }
 
 QTreeView::item:pressed,
