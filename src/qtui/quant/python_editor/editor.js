@@ -154,7 +154,7 @@ function $(id){
     return typeof id === 'string' ? document.getElementById(id):id;
 }
  
-//全局字典
+//全局字典 文件名->文件内容
 var datas = new Array();
 
 // 当前标签
@@ -162,40 +162,38 @@ var currtab = ""
 
 // 切换标签
 function switch_tab(newtab) {
-    if (g_filename){
-        save_strategy(g_filename, g_editor.getValue());
-        datas[currtab] = g_editor.getValue();
-    }
     if (newtab == currtab)
         return;
 
-    var tab = $(newtab.toString());
-    if (!tab && newtab != "")
+    var n_tab = $(newtab.toString());
+    if (!n_tab && newtab != "")
         return;
     
-    if (tab){
-        tab.className = 'current';
-        var btn = tab.children[0];
+    if (n_tab){
+        n_tab.className = 'current';
+        var btn = n_tab.children[0];
         if (btn)
             btn.className = 'curr_btn';
     }
-    load_file(newtab, tab ? datas[newtab] : '');
 
-    tab = $(currtab.toString())
-    if (tab)
-    {
-        tab.className = '';
-        var btn = tab.children[0];
+    var c_tab = $(currtab.toString())
+    if (c_tab){
+        c_tab.className = '';
+        var btn = c_tab.children[0];
         if (btn)
             btn.className = '';
+
+        datas[currtab] = g_editor.getValue();
+        save_strategy(g_filename, g_editor.getValue());
     }
 
+    load_file(newtab, n_tab ? datas[newtab] : '');
     currtab = newtab;
 }
 
 // 添加标签
 function add_tab(name, value){
-    if (name == "" || datas[name])
+    if (name == "" || datas.hasOwnProperty(name))
         return;
 
     //新建标签
@@ -247,39 +245,6 @@ function add_tab(name, value){
     //切换到新标签
     switch_tab(name);
 }
-
-// function update_tab(name, value) {
-//     var tab = $(currtab.toString());
-//     tab.id = name;
-//     tab.innerHTML = name.substr(name.lastIndexOf('/') + 1);
-//
-//     var btn = document.createElement("a");
-//     btn.href = "#";
-//     btn.innerHTML = "x";
-//
-//     //添加按钮到标签上
-//     tab.appendChild(btn);
-//     //添加按钮到标签栏上
-//     $('tabs').appendChild(tab);
-//
-//     //设置标签和按钮的单击事件
-//     tab.onclick = function () {
-//         switch_tab(this.id);
-//     }
-//     btn.onclick = function () {
-//         var tab = this.parentNode;
-//         if (tab.className == 'current') {
-//             var _tab = tab.nextElementSibling;
-//             if (!_tab)
-//                 _tab = tab.previousElementSibling;
-//             switch_tab(_tab ? _tab.id : '');
-//         }
-//         delete datas[tab.id];
-//         tab.remove();
-//     }
-//
-//     currtab = name;
-// }
 
 //////////////////////////////////////////////////////////////////////////////
 ///websocket客户端
