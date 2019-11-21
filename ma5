@@ -1,0 +1,51 @@
+﻿import talib
+from talib import MA_Type
+
+p = 30
+p1=5
+p2=10
+p3=20
+p4=30
+p5=60
+
+code="SPD|s|OI|001|005"
+code1="ZCE|S|OI|001|005"
+def initialize(context): 
+    
+    SetBarInterval(code, 'M', 1, 2000)
+    SetBarInterval(code1, 'M', 1, 2000)
+    SetOrderWay(2)
+    SetActual()
+def handle_data(context):
+    
+    
+    MA1 = talib.MA(Open(), timeperiod=p1, matype=0)
+    MA2 = talib.MA(Open(), timeperiod=p2, matype=0)
+    MA3 = talib.MA(Open(), timeperiod=p3, matype=0)
+    MA4 = talib.MA(Open(), timeperiod=p4, matype=0)
+    MA5 = talib.MA(Open(), timeperiod=p5, matype=0)
+    
+    if MarketPosition(code1) == 0:
+        if Close()[-1] > MA1[-1] and MA1[-1] > MA2[-1] and MA2[-1] > MA3[-1] and MA3[-1] > MA4[-1] and MA4[-1] > MA5[-1] and MarketPosition(code1)==0:
+        
+            Buy(1, Close()[-1],code1)
+        elif Close()[-1] < MA1[-1] and MA1[-1] < MA2[-1] and MA2[-1] < MA3[-1] and MA3[-1] < MA4[-1] and MA4[-1]< MA5[-1]and MarketPosition(code1)==0:
+           SellShort(1, Close()[-1],code1)
+          
+        else:
+            pass
+   
+    else:
+        if Close()[-1] < MA1[-1]:
+         
+            Sell(1, Close()[-1],code1)
+        elif Close()[-1] > MA1[-1]:
+          
+           BuyToCover(1,Close()[-1],code1)   
+        else:
+           pass
+    PlotNumeric("ma1", MA1[-1], color=0xFF0000)
+    PlotNumeric("ma2", MA2[-1], color=0x00aa00)
+    PlotNumeric("ma3", MA3[-1], color=0x0000FF)
+    PlotNumeric("ma4", MA4[-1], color=0xFF00FF) 
+    PlotNumeric("ma5", MA5[-1], color=0xFF00FF) 
