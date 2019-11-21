@@ -1804,8 +1804,8 @@ class StrategyModel(object):
 
     def getContractUnit(self, contNo):
         commodityNo = self.getCommodityInfoFromContNo(contNo)['CommodityCode']
-        if contNo == 'ZCE|S|OI|001|005':
-            self.logger.debug("222222:commNo:%s,%s" %(commodityNo, self._qteModel._commodityData))
+        #if contNo == 'ZCE|S|OI|001|005':
+        #    self.logger.debug("222222:commNo:%s,%s" %(commodityNo, self._qteModel._commodityData))
         if commodityNo not in self._qteModel._commodityData:
             return 0
 
