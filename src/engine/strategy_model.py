@@ -1799,6 +1799,12 @@ class StrategyModel(object):
         ret['CommodityNo'] = contList[-1]
         return ret
 
+    def setStopWinKtBlack(self, op, kt):
+        return self._cfgModel.setStopWinKtBlack(op, kt)
+        
+    def getStopWinKtBlack(self):
+        return self._cfgModel.getStopWinKtBlack()
+
     def getCanTrade(self, contNo):
         return 0
 

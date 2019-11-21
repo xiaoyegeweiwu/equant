@@ -191,6 +191,7 @@ class StrategyConfig_new(object):
             'WinPoint' : {},         # 止盈信息
             'StopPoint' : {},        # 止损信息
             'FloatStopPoint' : {},   # 浮动止损信息
+            'StopWinKtBlack': [],    # 不触发止损止盈浮动K线类型
             'SubQuoteContract' : [], # 即时行情订阅合约列表
             'Params': {}, # 用户设置参数
             'Pending': False,  # 是否允许向实盘下单
@@ -605,6 +606,25 @@ class StrategyConfig_new(object):
             "StopType": '0',
         }
 
+    def setStopWinKtBlack(self, op, kt):
+        if kt not in ('D', 'M', 'T'):
+            raise Exception("设置的K线类型必须为 'D', 'M', 'T'中的一个")
+            
+        if op not in (0, 1):
+            raise Exception("设置的操作类型必须为 0: 取消, 1: 增加 中的一个")
+            
+        if op == 0:
+            if kt in self._metaData["StopWinKtBlack"]:
+                self._metaData["StopWinKtBlack"].remove(kt)
+        else:
+            if kt not in self._metaData["StopWinKtBlack"]:
+                self._metaData["StopWinKtBlack"].append(kt)
+                
+        return 0
+                
+    def getStopWinKtBlack(self):
+        return self._metaData["StopWinKtBlack"]
+            
     def getStopWinParams(self, contractNo=None):
         '''获取止盈信息'''
         contNo = self.getBenchmark() if not contractNo else contractNo

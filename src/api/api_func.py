@@ -324,6 +324,7 @@ _all_func_ = {
                     ['SetWinPoint'         , '设置策略的止盈点'],
                     ['SetStopPoint'        , '设置策略的止损点'],
                     ['SetFloatStopPoint'   , '设置策略的浮动止损点'],
+                    ['SetStopWinKtBlack'   , '设置不触发止损止盈和浮动止损的K线类型'],
                     ['SubQuote'            , '订阅指定合约即时行情'],
                     ['UnsubQuote'          , '退订指定合约即时行情'],
                 ],

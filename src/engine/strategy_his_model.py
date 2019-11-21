@@ -1018,8 +1018,9 @@ class StrategyHisQuote(object):
                 handle_data(context)
 
             # 处理历史回测阶段止损止盈
-            self._stopWinOrLose(key[0], True, row)
-            self._stopFloatWinLose(key[0], True, row)
+            if key[1] not in self._config.getStopWinKtBlack():
+                self._stopWinOrLose(key[0], True, row)
+                self._stopFloatWinLose(key[0], True, row)
 
             # # 要显示的k线
             if isShow:
@@ -1079,9 +1080,9 @@ class StrategyHisQuote(object):
             args = {
                 "Status": ST_STATUS_HISTORY,
                 "TriggerType": ST_TRIGGER_HIS_KLINE,
-                "ContractNo": event.getContractNo(),
-                "KLineType": event.getKLineType(),
-                "KLineSlice": event.getKLineSlice(),
+                "ContractNo": key[0],
+                "KLineType": key[1],
+                "KLineSlice": key[2],
                 "TradeDate": kLineData["TradeDate"],
                 "DateTimeStamp": kLineData["DateTimeStamp"],
                 "TriggerData": kLineData
@@ -1091,8 +1092,9 @@ class StrategyHisQuote(object):
             handle_data(context)
 
         # 处理中间阶段止损止盈,按照历史回测止损止盈
-        self._stopWinOrLose(key[0], True, kLineData)
-        self._stopFloatWinLose(key[0], True, kLineData)
+        if key[1] not in self._config.getStopWinKtBlack():
+            self._stopWinOrLose(key[0], True, kLineData)
+            self._stopFloatWinLose(key[0], True, kLineData)
 
         # **********************************
         if isShow:
@@ -1174,11 +1176,12 @@ class StrategyHisQuote(object):
             return
 
         allData = event.getData()
+        klineType = event.getKLineType()
         args = {
             "Status": ST_STATUS_CONTINUES,
             "TriggerType": eventCode,
             "ContractNo": event.getContractNo(),
-            "KLineType": event.getKLineType(),
+            "KLineType": klineType,
             "KLineSlice": event.getKLineSlice(),
             "TradeDate": allData["TradeDate"],
             "DateTimeStamp": allData["DateTimeStamp"],
@@ -1203,8 +1206,9 @@ class StrategyHisQuote(object):
             # 处理实时阶段止损止盈
             lv1Data = event.getData()["Data"]
             if 4 in lv1Data:
-                self._stopWinOrLose(event.getContractNo(), False, lv1Data)
-                self._stopFloatWinLose(event.getContractNo(), False, lv1Data)
+                if klineType not in self._config.getStopWinKtBlack():
+                    self._stopWinOrLose(event.getContractNo(), False, lv1Data)
+                    self._stopFloatWinLose(event.getContractNo(), False, lv1Data)
             else:
                 # 交易所套利无最新价
                 comtype = event.getContractNo().split('|')[1]

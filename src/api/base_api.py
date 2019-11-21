@@ -5940,6 +5940,45 @@ class BaseApi(object):
         '''
         return self._dataModel.setFloatStopPoint(startPoint, stopPoint, nPriceType, nAddTick, contractNo)
 
+    def SetStopWinKtBlack(self, op, kt):
+        '''
+        【说明】
+             设置不触发止损止盈和浮动止损的K线类型
+
+        【语法】
+              int SetStopWinKtBlack(op, kt)
+
+        【参数】
+              op  操作类型必须为 0: 取消设置, 1: 增加设置，中的一个
+              kt  K线类型必须为 'D', 'M', 'T'   ，中的一个
+
+        【备注】
+              返回整型，0成功，-1失败
+
+        【示例】
+              无
+        '''
+        return self._dataModel.setStopWinKtBlack(op, kt)
+
+    def GetStopWinKtBlack(self):
+        '''
+        【说明】
+             获取不触发止损止盈和浮动止损的K线类型列表
+
+        【语法】
+              list GetStopWinKtBlack()
+
+        【参数】
+
+
+        【备注】
+              返回不触发止损/止盈/浮动止损的K线类型列表
+
+        【示例】
+              无
+        '''
+        return self._dataModel.getStopWinKtBlack()
+
     def SubQuote(self, contNoTuple):
         '''
         【说明】
@@ -7633,6 +7672,9 @@ def SetStopPoint(stopPoint, nPriceType=0, nAddTick=0, contractNo=''):
 
 def SetFloatStopPoint(startPoint, stopPoint, nPriceType=0, nAddTick=0, contractNo=''):
     return baseApi.SetFloatStopPoint(startPoint, stopPoint, nPriceType, nAddTick, contractNo)
+
+def SetStopWinKtBlack(op, kt):
+    return baseApi.SetStopWinKtBlack(op, kt)
 
 def SubQuote(*args):
     return baseApi.SubQuote(args)
