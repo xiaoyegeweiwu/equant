@@ -23,7 +23,6 @@
 //当前代码编辑器所打开的文件，为空则为新建文件
 var g_model = null;
 var g_filename = "";
-var g_modify = false;
 //编辑器实例
 var g_editor = null;
 
@@ -81,9 +80,8 @@ function init_editor(layoutid, code_str, theme) {
             }
         );
         g_editor.onDidChangeModelContent((v) => {
-            if (!g_modify)
-                on_modify(0, g_filename)
-            g_modify = true;
+            if (org_datas[g_filename] != g_editor.getValue())
+                on_modify(g_filename)
         });
 
     });
@@ -115,15 +113,12 @@ function set_theme(theme, fontsize) {
 function load_file(file, txt)
 {
     g_filename = file;
-    g_modify = false;
     g_editor.setValue(txt);
 }
 
 //保存代码到本地文件, 第一行为文件名, 文件名如果为空在在python端弹出保存对话框
 function save_file(reqid, file) {
-    fname = file;
-    if (fname == "")
-        fname = g_filename;
+    fname = file ? file : g_filename;
     data = {
         'cmd':'savefile_rsp',
         'reqid':reqid,
@@ -134,16 +129,14 @@ function save_file(reqid, file) {
     senddata(data);  
 }
 //文件被修改
-function on_modify(reqid, file)
+function on_modify(file)
 {
-    fname = file;
-    if (fname == "")
-        fname = g_filename;
+    fname = file ? file : g_filename;
     data = {
         'cmd':'modify_nty',
         'file':fname
     }
-    //senddata(data);  
+    //senddata(data);
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -156,6 +149,7 @@ function $(id){
  
 //全局字典 文件名->文件内容
 var datas = new Array();
+var org_datas = new Array();
 
 // 当前标签
 var currtab = ""
@@ -184,6 +178,7 @@ function switch_tab(newtab) {
             btn.className = '';
 
         datas[currtab] = g_editor.getValue();
+        org_datas[name] = g_editor.getValue();
         save_strategy(g_filename, g_editor.getValue());
     }
 
@@ -227,6 +222,7 @@ function add_tab(name, value){
             switch_tab(_tab ? _tab.id : '');
         }
         delete datas[tab.id];
+        delete org_datas[tab.id];
         tab.remove();
     }
     tab.onmouseover = function(){
@@ -242,6 +238,7 @@ function add_tab(name, value){
 
     //添加标签关联的数据
     datas[name] = value;
+    org_datas[name] = value;
     //切换到新标签
     switch_tab(name);
 }
