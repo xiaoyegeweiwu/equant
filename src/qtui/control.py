@@ -6,6 +6,7 @@ import importlib
 import traceback
 import re
 
+from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QFont, QIcon
 from PyQt5.QtWidgets import QApplication, QMessageBox, QDesktopWidget
 
@@ -32,12 +33,18 @@ class Controller(object):
 
         # UI2EG发送请求对象
         self._request = SendRequest(self._ui2egQueue, self.logger)
-
+        # 高分辨率支持
+        QApplication.setAttribute(Qt.AA_EnableHighDpiScaling);
         # 创建主窗口
         self.mainApp = QApplication(sys.argv)
+        # 根据分辨率调整字体
+        font = QFont("Microsoft YaHei UI", 10)
+        pointsize = font.pointSize()
+        font.setPixelSize(pointsize * 90 / 72)
+        self.mainApp.setFont(font)
+
         self.reportView = ReportView()
         self.app = QuantApplication(self)
-        self.mainApp.setFont(QFont("Microsoft YaHei", 10))
         if self.app.settings.contains('theme') and self.app.settings.value('theme') == 'vs-dark':
             qss_path = DARKSTYLE
             theme = THESE_STATE_DARK
