@@ -43,7 +43,17 @@ class Controller(object):
         font.setPixelSize(pointsize * 90 / 72)
         self.mainApp.setFont(font)
 
+        ###############回测报告#####################
+        style = CommonHelper.readQss(DARKSTYLE)
+        self.reportWnd = FramelessWindow()
+        self.reportWnd.setStyleSheet(style)
+        self.reportWnd.setWindowTitle("回测报告")
+        self.reportWnd.setWinThese(THESE_STATE_DARK)
+        self.reportWnd.setWindowIcon(QIcon('icon/epolestar ix2.ico'))
         self.reportView = ReportView()
+        self.reportWnd.setWidget(self.reportView)
+        ##############################################
+
         self.app = QuantApplication(self)
         if self.app.settings.contains('theme') and self.app.settings.value('theme') == 'vs-dark':
             qss_path = DARKSTYLE

@@ -23,7 +23,6 @@ from capi.com_types import *
 from qtui.utils import parseStrategtParam, Tree, get_strategy_filters, FileIconProvider, MyMessageBox
 from utils.utils import save
 
-from qtui.reportview.reportview import ReportView
 from utils.window.framelesswindow import FramelessWindow, CommonHelper
 from utils.window.res.default import *
 
@@ -1640,6 +1639,8 @@ class QuantApplication(QWidget):
         self._logger = self._controller.get_logger()
 
         self.reportView = self._controller.reportView
+        # 回测报告窗口句柄
+        self.reportWnd = self._controller.reportWnd
 
         self.hbox = QHBoxLayout()
         self.hbox.setContentsMargins(0, 0, 0, 0)
@@ -2773,4 +2774,5 @@ class QuantApplication(QWidget):
         save(data, runMode, stName)
 
         self.reportView.reportShowSig.emit(data)
+        self.reportWnd.show()
 
