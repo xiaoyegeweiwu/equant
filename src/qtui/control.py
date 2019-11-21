@@ -6,6 +6,7 @@ import importlib
 import traceback
 import re
 
+from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QFont, QIcon
 from PyQt5.QtWidgets import QApplication, QMessageBox, QDesktopWidget
 
@@ -34,6 +35,7 @@ class Controller(object):
         self._request = SendRequest(self._ui2egQueue, self.logger)
 
         # 创建主窗口
+        QApplication.setAttribute(Qt.AA_EnableHighDpiScaling)  # 高分辨率下适应屏幕
         self.mainApp = QApplication(sys.argv)
         self.reportView = ReportView()
         self.app = QuantApplication(self)

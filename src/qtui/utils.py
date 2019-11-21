@@ -174,6 +174,17 @@ class MyMessageBox(QMessageBox):
 
         return result
 
+def getText(title, label):
+    inputDialog = QInputDialog()
+    inputDialog.setOkButtonText('确定')
+    inputDialog.setCancelButtonText('取消')
+    inputDialog.setLabelText(label)
+    inputDialog.setWindowTitle(title)
+    ok = inputDialog.exec_()
+    value = inputDialog.textValue()
+
+    return value, ok
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

@@ -20,7 +20,7 @@ from report.fieldConfigure import RunMode, StrategyStatus
 from api.base_api import BaseApi
 from api.api_func import _all_func_
 from capi.com_types import *
-from qtui.utils import parseStrategtParam, Tree, get_strategy_filters, FileIconProvider, MyMessageBox
+from qtui.utils import parseStrategtParam, Tree, get_strategy_filters, FileIconProvider, MyMessageBox, getText
 from utils.utils import save
 
 from qtui.reportview.reportview import ReportView
@@ -630,7 +630,7 @@ class StrategyPolicy(QWidget):
             row = self.contractTableWidget.rowCount()
             sample_dict_list = []
             for i in range(row):
-                sample_dict_list.append(json.loads(self.contractTableWidget.takeItem(i, 4).text()))
+                sample_dict_list.append(json.loads(self.contractTableWidget.item(i, 4).text()))
             if json.loads(items[4]) in sample_dict_list:
                 MyMessageBox.warning(self, '提示', '请勿添加重复合约设置！', QMessageBox.Yes)
                 return
@@ -1739,8 +1739,8 @@ class QuantApplication(QWidget):
         self.settings.setValue('main_splitter', self.main_splitter.saveState())
         self.settings.setValue(
             'theme', 'vs' if self._controller.mainWnd.getWinThese() == '浅色' else 'vs-dark')
-        self._controller.sendExitRequest()
-        self._controller.quitThread()
+        # self._controller.sendExitRequest()
+        # self._controller.quitThread()
 
     def init_control(self):
         self._exchange = self._controller.model.getExchange()
@@ -1830,7 +1830,7 @@ class QuantApplication(QWidget):
             if item_path and os.path.isdir(item_path):
                 value = ''
                 while True:
-                    value, ok = QInputDialog.getText(self, '新建文件', '策略名称', QLineEdit.Normal)
+                    value, ok = getText('新增文件', '策略名称：')
                     if not value.strip().endswith('.py'):
                         path = os.path.join(item_path, value.strip() + '.py')
                     else:
@@ -1846,7 +1846,7 @@ class QuantApplication(QWidget):
             elif not os.path.isdir(item_path):
                 value = ''
                 while True:
-                    value, ok = QInputDialog.getText(self, '新建文件', '策略名称', QLineEdit.Normal)
+                    value, ok = getText('新建文件', '策略名称：')
                     if not value.strip().endswith('.py'):
                         path = os.path.join(os.path.split(item_path)[0], value.strip() + '.py')
                     else:
@@ -1873,7 +1873,7 @@ class QuantApplication(QWidget):
                     index = self.strategy_tree.currentIndex()
                     model = index.model()  # 请注意这里可以获得model的对象
                     item_path = model.filePath(index)
-                value, ok = QInputDialog.getText(self, '新建文件夹', '分组名称', QLineEdit.Normal, value)
+                value, ok = getText('新建分组', '分组名称：')
                 if os.path.isdir(item_path):
                     path = os.path.join(item_path, value)
                 else:
@@ -1900,7 +1900,7 @@ class QuantApplication(QWidget):
                 value = ''
                 (file_path, filename) = os.path.split(item_path)
                 while True:
-                    value, ok = QInputDialog.getText(self, '修改%s策略名' % filename, '策略名称', QLineEdit.Normal, value)
+                    value, ok = getText('修改%s策略名' % filename, '策略名称')
                     if not value.strip().endswith('.py'):
                         new_path = os.path.join(file_path, value.strip() + '.py')
                     else:
@@ -1916,7 +1916,7 @@ class QuantApplication(QWidget):
                 value = ''
                 (dir_path, dir_name) = os.path.split(item_path)
                 while True:
-                    value, ok = QInputDialog.getText(self, '修改%s文件夹' % dir_name, '分组名称', QLineEdit.Normal, value)
+                    value, ok = getText('修改%s文件夹' % dir_name, '分组名称')
                     new_path = os.path.join(dir_path, value)
                     if os.path.exists(new_path) and ok:
                         MyMessageBox.warning(self, '提示', '分组%s已经存在！！！' % value, QMessageBox.Yes)
@@ -2435,6 +2435,8 @@ class QuantApplication(QWidget):
             self.strategy_policy_win.setStyleSheet(style)
             self.strategy_policy_win.confirm.clicked.connect(self.main_strategy_policy_win.close)  # todo
             self.strategy_policy_win.cancel.clicked.connect(self.main_strategy_policy_win.close)
+            self.strategy_policy_win.contractWin.select.clicked.connect(
+                lambda: self.strategy_policy_win.contractSelect(self._exchange, self._commodity, self._contract))
 
             # ----------------------解析g_params参数----------------------------
             g_params = parseStrategtParam(path)
@@ -2456,8 +2458,6 @@ class QuantApplication(QWidget):
                 self.strategy_policy_win.paramsTableWidget.setItem(i, 1, QTableWidgetItem(str(item[1][0])))
                 self.strategy_policy_win.paramsTableWidget.setItem(i, 2, QTableWidgetItem(param_type))
                 self.strategy_policy_win.paramsTableWidget.setItem(i, 3, QTableWidgetItem(str(item[1][1])))
-            self.strategy_policy_win.contractWin.select.clicked.connect(
-                lambda: self.strategy_policy_win.contractSelect(self._exchange, self._commodity, self._contract))
             self.main_strategy_policy_win.setWindowModality(Qt.ApplicationModal)  # 设置阻塞父窗口
             self.main_strategy_policy_win.show()
         else:
