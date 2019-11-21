@@ -262,7 +262,7 @@ class MainFrmQt(QWidget):
     def path2url(self, path):
         workdir = os.path.dirname(os.path.realpath(__file__))
         # 设置工程所在目录为当前目录
-        # os.chdir(workdir)
+        #os.chdir(workdir)
         return 'file:' + request.pathname2url(os.path.abspath(path))
 
     def set_reg(self):

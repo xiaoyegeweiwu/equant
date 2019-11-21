@@ -12,6 +12,8 @@
 // 保存文件
 // {"cmd":"savefile_req", "reqid":0, "file":""}
 // {"cmd":"savefile_rsp", "reqid":0, "file":"", "txt":"", "errtxt":""}
+// 文件修改通知
+// {"cmd":"modify_nty", "file":""}
 //////////////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////////////
@@ -21,9 +23,12 @@
 //当前代码编辑器所打开的文件，为空则为新建文件
 var g_model = null;
 var g_filename = "";
+var g_modify = false;
 //编辑器实例
 var g_editor = null;
 
+//屏蔽右键
+document.oncontextmenu=new Function("event.returnValue=false;");
 
 //初始化编辑器
 function init_editor(layoutid, code_str, theme) {
@@ -32,7 +37,7 @@ function init_editor(layoutid, code_str, theme) {
     //初始化编辑器
     require.config(
         {
-            paths: {'vs': 'monaco-editor-0.16.2/package/min/vs'},
+            paths: {'vs': 'monaco-editor/package/min/vs'},
             'vs/nls': {availableLanguages: {'*': 'zh-cn'}}
         }
     );
@@ -41,11 +46,11 @@ function init_editor(layoutid, code_str, theme) {
             document.getElementById(layoutid),
             {
                 language: 'python',             //程序语言
-                theme: theme,               //界面主题
+                theme: theme,                   //界面主题
                 value: code_str,                //初始文本内容
                 automaticLayout: true,          //随布局Element自动调整大小                        
                 minimap: {enabled: true},       //代码略缩图
-                fontSize: 20,                   //字体大小
+                fontSize: 14,                   //字体大小
                 //wordWrap: "on",               //自动换行，注意大小写
                 //wrappingIndent: "indent",     //自动缩进
                 //glyphMargin: true,            //字形边缘
@@ -56,10 +61,31 @@ function init_editor(layoutid, code_str, theme) {
                 //cursorStyle: 'line',          //光标样式
                 //automaticLayout: false,       //自动布局
                 //autoIndent:true,              //自动布局
+                //quickSuggestions: false,
                 //quickSuggestionsDelay: 500,   //代码提示延时
                 contextmenu: false,
+                scrollBeyondLastLine: true,
+                //lineNumbersMinChars: 5,
+                lineHeight: 24,
+                //fontFamily:'Consolas',
+                mouseWheelZoom: true,
+                scrollbar: {
+                    vertical: 1,
+                    horizontal: 1,
+                    useShadows: true,
+                    horizontalSliderSize: 7,
+                    verticalSliderSize: 7,
+                    horizontalScrollbarSize: 7,
+                    verticalScrollbarSize: 7,
+                },
             }
         );
+        g_editor.onDidChangeModelContent((v) => {
+            if (!g_modify)
+                on_modify(0, g_filename)
+            g_modify = true;
+        });
+
     });
 
     //自适应大小，可以不要
@@ -86,8 +112,10 @@ function set_theme(theme, fontsize) {
 }
 
 //设置代码文件
-function load_file(file, txt) {
+function load_file(file, txt)
+{
     g_filename = file;
+    g_modify = false;
     g_editor.setValue(txt);
 }
 
@@ -97,25 +125,36 @@ function save_file(reqid, file) {
     if (fname == "")
         fname = g_filename;
     data = {
-        'cmd': 'savefile_rsp',
-        'reqid': reqid,
-        'file': fname,
-        'txt': g_editor.getValue(),
-        'errtxt': ''
+        'cmd':'savefile_rsp',
+        'reqid':reqid,
+        'file':fname,
+        'txt':g_editor.getValue(),
+        'errtxt':''
     }
-    senddata(data);
+    senddata(data);  
 }
-
+//文件被修改
+function on_modify(reqid, file)
+{
+    fname = file;
+    if (fname == "")
+        fname = g_filename;
+    data = {
+        'cmd':'modify_nty',
+        'file':fname
+    }
+    //senddata(data);  
+}
 
 //////////////////////////////////////////////////////////////////////////////
 ///标签栏管理
 //////////////////////////////////////////////////////////////////////////////
 // == 值比较  === 类型比较 $(id) ---->  document.getElementById(id)
-function $(id) {
-    return typeof id === 'string' ? document.getElementById(id) : id;
+function $(id){
+    return typeof id === 'string' ? document.getElementById(id):id;
 }
-
-//全局字典
+ 
+//全局字典 文件名->文件内容
 var datas = new Array();
 
 // 当前标签
@@ -123,43 +162,50 @@ var currtab = ""
 
 // 切换标签
 function switch_tab(newtab) {
-    if (g_filename){
-        save_strategy(g_filename, g_editor.getValue());
-        datas[currtab] = g_editor.getValue();
-    }
     if (newtab == currtab)
         return;
 
-    var tab = $(newtab.toString());
-    if (!tab && newtab != "")
+    var n_tab = $(newtab.toString());
+    if (!n_tab && newtab != "")
         return;
+    
+    if (n_tab){
+        n_tab.className = 'current';
+        var btn = n_tab.children[0];
+        if (btn)
+            btn.className = 'curr_btn';
+    }
 
-    if (tab)
-        tab.className = 'current';
-    load_file(newtab, tab ? datas[newtab] : '');
+    var c_tab = $(currtab.toString())
+    if (c_tab){
+        c_tab.className = '';
+        var btn = c_tab.children[0];
+        if (btn)
+            btn.className = '';
 
-    tab = $(currtab.toString())
-    if (tab)
-        tab.className = '';
+        datas[currtab] = g_editor.getValue();
+        save_strategy(g_filename, g_editor.getValue());
+    }
 
+    load_file(newtab, n_tab ? datas[newtab] : '');
     currtab = newtab;
-    // g_filename = currtab.id;
 }
 
 // 添加标签
-function add_tab(name, value) {
-    if (name == "" || datas[name])
+function add_tab(name, value){
+    if (name == "" || datas.hasOwnProperty(name))
         return;
 
     //新建标签
     var tab = document.createElement("li");
     tab.id = name;
-    tab.innerHTML = name.substr(name.lastIndexOf('/') + 1);
+    tab.innerHTML = name.substr(name.lastIndexOf('/')+1);
 
     //新建关闭按钮
     var btn = document.createElement("a");
     btn.href = "#";
     btn.innerHTML = "x";
+    btn.className = 'curr_btn'
 
     //添加按钮到标签上
     tab.appendChild(btn);
@@ -167,13 +213,14 @@ function add_tab(name, value) {
     $('tabs').appendChild(tab);
 
     //设置标签和按钮的单击事件
-    tab.onclick = function () {
+    tab.onclick = function(){
         switch_tab(this.id);
         Bridge.switchFile(g_filename);
     }
-    btn.onclick = function () {
+    btn.onclick = function(){
         var tab = this.parentNode;
-        if (tab.className == 'current') {
+        if (tab.className == 'current')
+        {
             var _tab = tab.nextElementSibling;
             if (!_tab)
                 _tab = tab.previousElementSibling;
@@ -182,45 +229,22 @@ function add_tab(name, value) {
         delete datas[tab.id];
         tab.remove();
     }
+    tab.onmouseover = function(){
+        var btn = this.children[0];
+        if (btn && btn.className != 'curr_btn')
+            btn.className = 'over_btn';
+    }
+    tab.onmouseout = function(){
+        var btn = this.children[0];
+        if (btn && btn.className != 'curr_btn')
+            btn.className = '';
+    }
 
     //添加标签关联的数据
     datas[name] = value;
     //切换到新标签
     switch_tab(name);
 }
-
-// function update_tab(name, value) {
-//     var tab = $(currtab.toString());
-//     tab.id = name;
-//     tab.innerHTML = name.substr(name.lastIndexOf('/') + 1);
-//
-//     var btn = document.createElement("a");
-//     btn.href = "#";
-//     btn.innerHTML = "x";
-//
-//     //添加按钮到标签上
-//     tab.appendChild(btn);
-//     //添加按钮到标签栏上
-//     $('tabs').appendChild(tab);
-//
-//     //设置标签和按钮的单击事件
-//     tab.onclick = function () {
-//         switch_tab(this.id);
-//     }
-//     btn.onclick = function () {
-//         var tab = this.parentNode;
-//         if (tab.className == 'current') {
-//             var _tab = tab.nextElementSibling;
-//             if (!_tab)
-//                 _tab = tab.previousElementSibling;
-//             switch_tab(_tab ? _tab.id : '');
-//         }
-//         delete datas[tab.id];
-//         tab.remove();
-//     }
-//
-//     currtab = name;
-// }
 
 //////////////////////////////////////////////////////////////////////////////
 ///websocket客户端

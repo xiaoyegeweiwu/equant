@@ -6,7 +6,7 @@ import importlib
 import traceback
 import re
 
-from PyQt5.QtCore import QTimer, QSharedMemory
+from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QFont, QIcon
 from PyQt5.QtWidgets import QApplication, QMessageBox, QDesktopWidget
 
@@ -24,21 +24,38 @@ class Controller(object):
 
     def __init__(self, logger, ui2eg_q, eg2ui_q):
 
-        #日志对象
+        # 日志对象
         self.logger = logger
-        #初始化多语言
+        # 初始化多语言
         # load_language("config")
         self._ui2egQueue = ui2eg_q
         self._eg2uiQueue = eg2ui_q
 
         # UI2EG发送请求对象
         self._request = SendRequest(self._ui2egQueue, self.logger)
-
+        # 高分辨率支持
+        QApplication.setAttribute(Qt.AA_EnableHighDpiScaling);
         # 创建主窗口
+        QApplication.setAttribute(Qt.AA_EnableHighDpiScaling)  # 高分辨率下适应屏幕
         self.mainApp = QApplication(sys.argv)
+        # 根据分辨率调整字体
+        font = QFont("Microsoft YaHei UI", 10)
+        pointsize = font.pointSize()
+        font.setPixelSize(pointsize * 90 / 72)
+        self.mainApp.setFont(font)
+
+        ###############回测报告#####################
+        style = CommonHelper.readQss(DARKSTYLE)
+        self.reportWnd = FramelessWindow()
+        self.reportWnd.setStyleSheet(style)
+        self.reportWnd.setWindowTitle("回测报告")
+        self.reportWnd.setWinThese(THESE_STATE_DARK)
+        self.reportWnd.setWindowIcon(QIcon('icon/epolestar ix2.ico'))
         self.reportView = ReportView()
+        self.reportWnd.setWidget(self.reportView)
+        ##############################################
+
         self.app = QuantApplication(self)
-        self.mainApp.setFont(QFont("Microsoft YaHei", 10))
         if self.app.settings.contains('theme') and self.app.settings.value('theme') == 'vs-dark':
             qss_path = DARKSTYLE
             theme = THESE_STATE_DARK
@@ -54,10 +71,9 @@ class Controller(object):
         self.mainWnd.setWindowIcon(QIcon('icon/epolestar ix2.ico'))
         screen = QDesktopWidget().screenGeometry()
         self.mainWnd.setGeometry(screen.width() * 0.1, screen.height() * 0.1, screen.width() * 0.8,
-                     screen.height() * 0.8)
+                                 screen.height() * 0.8)
         self.mainWnd.titleBar.buttonClose.clicked.connect(self.quitThread)
         self.mainWnd.setWidget(self.app)
-
 
         # 创建模块
         self.model = QuantModel(self.app, self._ui2egQueue, self._eg2uiQueue, self.logger)
@@ -100,15 +116,15 @@ class Controller(object):
         # 更新监控界面策略信息
         try:
             strategyDict = self.strategyManager.getStrategyDict()
-            #TODO: strategyDict的异常策略应该怎么处理?
+            # TODO: strategyDict的异常策略应该怎么处理?
             for stId in strategyDict:
                 if "RunningData" not in strategyDict[stId]:
                     continue
                 try:
-                    #TODO：StrategyState为什么会不存在呢？
+                    # TODO：StrategyState为什么会不存在呢？
                     if strategyDict[stId]["StrategyState"] == ST_STATUS_PAUSE or strategyDict[stId][
-                          "StrategyState"] == ST_STATUS_QUIT or strategyDict[stId][
-                          "StrategyState"] == ST_STATUS_EXCEPTION:
+                        "StrategyState"] == ST_STATUS_QUIT or strategyDict[stId][
+                        "StrategyState"] == ST_STATUS_EXCEPTION:
                         continue
                 except KeyError as e:
                     self.logger.warn(f"策略数据错误: {stId}, {strategyDict[stId]}")
@@ -143,9 +159,9 @@ class Controller(object):
         self.logger.info("after app.close")
 
     def run(self):
-        #启动监控策略线程
+        # 启动监控策略线程
         # self.monitorThread.start()
-        #启动接收数据线程
+        # 启动接收数据线程
         self.receiveEgThread.start()
 
         # self.sigThread.start()
@@ -156,15 +172,6 @@ class Controller(object):
 
         self.mainWnd.show()
         self.mainApp.exec_()
-
-    def send_theme_setting(self, text):
-        while True:
-            print(self.mainApp.applicationState())
-            time.sleep(0.5)
-            if self.mainApp.applicationState() == 4:
-                print(self.mainApp.applicationState())
-                self.app.contentEdit.sendThemeSignal(text)
-                break
         
     def set_help_text(self, funcName, text):
         self.app.set_help_text(funcName, text)
@@ -212,7 +219,7 @@ class Controller(object):
         return g_params
 
     def load(self, strategyPath, param={}):
-        #TODO：新增param参数，用于接收用户策略的参数
+        # TODO：新增param参数，用于接收用户策略的参数
         """
         加载合约事件
         :param strategyPath: 策略路径
@@ -226,7 +233,7 @@ class Controller(object):
         self.app.create_strategy_policy_win(param=param)
 
         config = self.app.getConfig()
-        if config:   # 获取到config
+        if config:  # 获取到config
             self._request.loadRequest(strategyPath, config)
             self.logger.info("load strategy")
 
@@ -338,11 +345,11 @@ class Controller(object):
             if id in strategyDict:
                 status = self.strategyManager.queryStrategyStatus(id)
                 if status == ST_STATUS_QUIT:
-                    self.logger.info("策略%s已停止!"%(id))
+                    self.logger.info("策略%s已停止!" % (id))
                     continue
                 self._request.strategyQuit(id)
             else:
-                self.logger.info("策略管理器中不存在策略%s"%(id))
+                self.logger.info("策略管理器中不存在策略%s" % (id))
 
     def delStrategy(self, strategyIdList):
         # 获取策略管理器
@@ -377,6 +384,7 @@ class Controller(object):
 
 class ChildThread(threading.Thread):
     """带停止标志位的线程"""
+
     def __init__(self, target, wait=0):
         threading.Thread.__init__(self)
 

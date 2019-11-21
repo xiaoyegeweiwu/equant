@@ -82,7 +82,7 @@ class Tree(QTreeView):
 
 def get_strategy_filters(root_path):
     """获取策略根目录下所有可用的文件夹"""
-    strategy_filters = ['*.py']
+    strategy_filters = ['*.py', '*.pyc']
     for current_path, dirs, files in os.walk(root_path):
         if '__pycache__' not in dirs:
             strategy_filters.extend(dirs)
@@ -153,6 +153,37 @@ class FileIconProvider(QFileIconProvider):
         if type_info.isFile() and type_info.suffix() == "py":  # 文件并且是txt
             return self.PyIcon
         return super(FileIconProvider, self).icon(type_info)
+
+
+class MyMessageBox(QMessageBox):
+
+    # This is a much better way to extend __init__
+    def __init__(self, *args, **kwargs):
+        super(MyMessageBox, self).__init__(*args, **kwargs)
+        # Anything else you want goes below
+
+    # We only need to extend resizeEvent, not every event.
+    def resizeEvent(self, event):
+
+        result = super(MyMessageBox, self).resizeEvent(event)
+
+        details_box = self.findChild(QTextEdit)
+        # 'is not' is better style than '!=' for None
+        if details_box is not None:
+            details_box.setFixedSize(details_box.sizeHint())
+
+        return result
+
+def getText(title, label):
+    inputDialog = QInputDialog()
+    inputDialog.setOkButtonText('确定')
+    inputDialog.setCancelButtonText('取消')
+    inputDialog.setLabelText(label)
+    inputDialog.setWindowTitle(title)
+    ok = inputDialog.exec_()
+    value = inputDialog.textValue()
+
+    return value, ok
 
 
 if __name__ == "__main__":

@@ -2,7 +2,7 @@
 QWidget {
     padding: 0px;
     border: 0px;
-    background-color: #252526;
+    background-color: #252526; /*252526*/
     color: #C2C3C3;
     selection-background-color: #125685;
 }
@@ -19,6 +19,7 @@ QPushButton {
     border-radius: 0px;
     color: #FFFFFF;
     padding: 3px;
+    margin-right: 5px;  /*两个控件间距*/
     outline: none;
 }
 
@@ -134,7 +135,7 @@ QTabBar::tab:bottom {
 QLabel {
     background-color: transparent;
     border: 0px solid #32414B;
-    padding: 5px;
+    padding: 0px;
     margin: 0px;
     color: #C3C3C3;
     min-height: 30px;
@@ -144,7 +145,7 @@ QLabel {
 /* *****************************************QScrollbar***********************************/
 /**********滚动条-水平**********/
 QScrollBar:horizontal {
-    height: 15px;
+    height: 7px;
     background: transparent;
     margin-bottom: 0px;
 }
@@ -158,12 +159,12 @@ QScrollBar::handle:horizontal:hover {
 }
 QScrollBar::sub-line:horizontal {
     background: transparent;
-    width: 8px;
+    width: 7px;
     subcontrol-position: left;
 }
 QScrollBar::add-line:horizontal {
     background: transparent;
-    width: 8px;
+    width: 7px;
     subcontrol-position: right;
 }
 QScrollBar::sub-line:horizontal:hover {
@@ -178,7 +179,7 @@ QScrollBar::add-page:horizontal,QScrollBar::sub-page:horizontal {
 
 /**********滚动条-垂直**********/
 QScrollBar:vertical {
-    width: 15px;
+    width: 7px;
     background: transparent;
     margin-right: 0px;
 }
@@ -192,12 +193,12 @@ QScrollBar::handle:vertical:hover {
 }
 QScrollBar::sub-line:vertical {
     background: transparent;
-    height: 8px;
+    height: 7px;
     subcontrol-position: top;
 }
 QScrollBar::add-line:vertical {
     background: transparent;
-    height: 8px;
+    height: 7px;
     subcontrol-position: bottom;
 }
 QScrollBar::sub-line:vertical:hover {
@@ -248,6 +249,10 @@ QTableView {
     border: 1px solid #252526;
     gridline-color: #252526;
     border-radius: 0px;
+}
+
+QTableView::item:selected {
+    color: #FFFFFF;
 }
 
 QTableView:selected {
@@ -305,11 +310,10 @@ QColumnView {
     color: #CCCCCC;
 }
 
-QTreeView:selected,
-QListView:selected,
-QColumnView:selected {
-    background: #1464A0;
-    color: #32414B;
+QTreeView::item:selected,
+QListView::item:selected,
+QColumnView::item:selected {
+    color: #FFFFFF;
 }
 
 QTreeView::item:pressed,
@@ -339,7 +343,7 @@ QColumnView::item:!selected:hover {
 
 /* **************************QCheckBox*********************************/
 QCheckBox {
-    background-color: #252526;
+    background-color: transparent;
     color: #BBBBBB;
     spacing: 4px;
     outline: none;
@@ -359,8 +363,9 @@ QCheckBox QWidget:disabled {
 /* checkbox 小方块设置 */
 QCheckBox::indicator {
     background-color: #3C3C3C;
-    height: 16px;
-    width: 16px;
+    border: 1px solid #252526;
+    height: 12px;
+    width: 12px;
 }
 
 QCheckBox::indicator:focus {
@@ -372,6 +377,19 @@ QCheckBox::indicator:checked {
     image: url(./utils/window/res/check.png);
 }
 
+/* **************************QRadioButton*******************/
+QRadioButton {
+  background-color: transparent;
+  color: #BBBBBB;
+  spacing: 4px;
+  padding: 0px;
+}
+
+QRadioButton::indicator {
+  margin-left: 4px;
+  height: 12px;
+  width: 12px;
+}
 
 /* **************************QSpinBox************************/
 QAbstractSpinBox {
@@ -452,6 +470,7 @@ QComboBox::drop-down {
     subcontrol-origin: padding;
     subcontrol-position: top right;  /* */
     width: 16px;
+    border-style: flat;
 }
 
 /* 下拉三角 */
@@ -462,42 +481,28 @@ QComboBox::down-arrow {
     width:10px;
 }
 
-/* 函数检索输入框*/
-#SearchLine {
-    color: #A6A6A6;
+/* **************************QGroupBox*************************/
+QGroupBox {
+  font-weight: bold;
+  border: 1px solid #383838;
+  padding: 4px;
+  margin-top: 8px;
 }
 
-
-/* 组合监控功能区背景色设置 */
-#UnionMonitor {
-    background-color: #252526;
-    padding: 0px;
-    margin: 0px;
-
+QGroupBox::title {
+  subcontrol-origin: margin;
+  subcontrol-position: top left;
+  left: 8px;
+  padding-left: 10px;
+  padding-right: 5px;
+  padding-top: 0px;
+  padding-bottom: 16px;
 }
 
-/* 持仓同步表格控件 */
-#PosTableHeader::section::horizontal {
-    border-top: 1px solid #383838;
-}
-
-#PosTableHeader::section::vertical {
-    border-top: 1px solid #383838;
-}
-
-/* 函数简介label属性设置 */
-#FuncDetailLabel {
-    padding: 0px;
-}
-
-/*********************************************************************************************************************/
-/* 函数目录树属性设置*/
-#FuncTab::tab:selected {
-    background-color: #2D2D2D;
-}
-
-#FuncTab::tab:!selected {
-    background-color: #383838;
+QGroupBox::indicator {
+  margin-left: 2px;
+  height: 12px;
+  width: 12px;
 }
 
 /* *****************************************QLineEdit**************************************/
@@ -523,6 +528,138 @@ QLineEdit:selected, QLineEdit:pressed, QLineEdit:focus {
     background: #1E1E1E;
     color: #F0F0F0;
     border: 1px solid #135785;
+}
+
+/* *****************************************QMessageBox**************************************/
+QMessageBox QPushButton[text="&Yes"] {
+    min-width: 60px;
+    qproperty-text: "确定";
+}
+
+QMessageBox QPushButton[text="&No"] {
+    min-width: 60px;
+    qproperty-text: "取消";
+}
+
+/*
+QMenu::icon {
+  margin: 0px;
+  padding-left: 4px;
+}
+
+QMenu::item {
+  background-color: #32414B;
+  padding: 4px 24px 4px 24px;
+  border: 1px transparent #32414B;
+}
+
+QMenu::item:selected {
+  color: #F0F0F0;
+}
+
+QMenu::indicator {
+  width: 12px;
+  height: 12px;
+  padding-left: 6px;
+}
+
+QMenu::right-arrow {
+  margin: 5px;
+  image: url(":/qss_icons/rc/arrow_right.png");
+  height: 12px;
+  width: 12px;
+}
+*/
+
+/***************************************************************************/
+
+/* 函数检索输入框*/
+#SearchLine {
+    color: #A6A6A6;
+    background-color: black;
+    /*border: 6px solid #252526;*/
+    /*border-left: 1px solid #383838;*/
+    margin: 6px;
+
+}
+
+
+/* 组合监控功能区背景色设置 */
+#UnionMonitor {
+    background-color: #252526;
+    padding: 0px;
+    margin: 0px;
+
+}
+
+/* 持仓同步表格控件 */
+#PosTableHeader::section::horizontal {
+    border-top: 1px solid #383838;
+}
+
+#PosTableHeader::section::vertical {
+    border-top: 1px solid #383838;
+}
+
+/* 函数简介label属性设置 */
+#FuncDetailLabel {
+    background-color: #343434;
+    padding: 0px;
+    border-left: 1px solid #383838;
+}
+
+/* 函数简介内容设置 */
+#FuncContent {
+    border-left: 1px solid #383838;
+}
+
+#FuncTree {
+    background-color: #252526;
+    border-left: 1px solid #383838;
+}
+
+#SearchTree {
+    background-color: #252526;
+    border-left: 1px solid #383838;
+}
+
+/* 属性设置窗口属性 */
+#StrategyTabWidget QGroupBox {
+    border: 1px solid #383838;
+}
+
+#StrategyTabWidget QLineEdit {
+    padding-top: 0px;
+    margin: 0px;
+    padding-bottom: 0px;
+}
+
+#StrategyTabWidget QLabel, #StrategyTabWidget QComboBox {
+    min-height: 20px;
+    max-height: 20px;
+}
+
+#StrategyTabWidget QListWidget,
+#StrategyTabWidget QLineEdit,
+#StrategyTabWidget QComboBox,
+#StrategyTabWidget QTableView{
+    border: 1px solid #383838;
+
+}
+
+#StrategyTabWidget QLineEdit {
+    min-height: 19px;
+    max-height: 19px;
+}
+
+/********************* 合约选择窗口属性设置 ***************************************************/
+#ContractWin QLineEdit {
+    border: 1px solid #252526;
+}
+
+#ContractWin QGroupBox{
+    background-color: transparent;
+    border: 1px solid #252526;
 }
 
 /* *****************************************标题栏相关*************************************/

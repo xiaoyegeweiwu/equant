@@ -64,12 +64,6 @@ class Event:
         if 'StrategyId' not in self._record:
             return 0
         return self._record['StrategyId']
-        
-    def getGroupId(self):
-        '''参数优化组ID等于第一个策略ID'''
-        if 'GroupId' not in self._record:
-            return 0
-        return self._record['GroupId']
   
     def getEventSrc(self):
         return self._record["EventSrc"]

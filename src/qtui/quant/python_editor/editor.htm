@@ -7,7 +7,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>python-editor</title>
     <script src="editor.js" type="text/javascript"></script>
-    <script src="monaco-editor-0.16.2/package/min/vs/loader.js"></script>
+    <script src="monaco-editor/package/min/vs/loader.js"></script>
 </head>
 
 <script src="qwebchannel.js" type="text/javascript"></script>
@@ -58,8 +58,8 @@
 
 <!--编辑器-->
 <div id="editor">
-    <script>
-        init_editor("editor", "# equant code editor\n\n", 'vs-dark')
+    <script type="text/javascript">
+        init_editor("editor", "# equant code editor\n\n", 'vs-dark');
     </script>
     <link id="main_link" href="editor.css" type="text/css" rel="stylesheet"/>
 </div>

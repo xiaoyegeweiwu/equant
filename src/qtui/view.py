@@ -5,11 +5,10 @@ import pandas as pd
 import shutil
 # import sys
 import traceback
-from threading import Thread
 import time
 
 from PyQt5 import QtCore, QtGui
-from PyQt5.QtCore import Qt, QPoint, QUrl, pyqtSignal, pyqtSlot, QSharedMemory, QThread, QTimer, QDir, QSettings
+from PyQt5.QtCore import Qt, QPoint, QUrl, pyqtSignal, pyqtSlot, QSharedMemory, QTimer, QDir, QSettings
 from PyQt5.QtGui import QTextCursor, QIcon, QKeySequence
 from PyQt5.QtWebChannel import QWebChannel
 from PyQt5.QtWebEngineWidgets import QWebEngineView, QWebEngineSettings
@@ -17,17 +16,13 @@ from PyQt5.QtWidgets import *
 
 from engine.strategy_cfg_model_new import StrategyConfig_new
 from report.fieldConfigure import RunMode, StrategyStatus
-from qtui.contractSelect import Ui_contractSelect
-from qtui.contractWin import Ui_contractWin
-from qtui.strategyPolicy import Ui_strategyMainWin
 
 from api.base_api import BaseApi
 from api.api_func import _all_func_
 from capi.com_types import *
-from qtui.utils import parseStrategtParam, Tree, get_strategy_filters, FileIconProvider
+from qtui.utils import parseStrategtParam, Tree, get_strategy_filters, FileIconProvider, MyMessageBox, getText
 from utils.utils import save
 
-from qtui.reportview.reportview import ReportView
 from utils.window.framelesswindow import FramelessWindow, CommonHelper
 from utils.window.res.default import *
 
@@ -38,25 +33,36 @@ class StrategyPolicy(QWidget):
     def __init__(self, control, path, flag=False, master=None, param=None, parent=None):
         super().__init__(parent)
 
-        self.main_layout = QGridLayout()
+        self.main_layout = QVBoxLayout()
+        layout1 = QHBoxLayout()
+        layout2 = QHBoxLayout()
+        h_spacerItem = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
         self.confirm = QPushButton('确定')
         self.cancel = QPushButton('取消')
+        self.confirm.setMinimumWidth(80)
+        self.cancel.setMinimumWidth(80)
 
         self.strategyTabWidget = QTabWidget()
+        self.strategyTabWidget.setObjectName("StrategyTabWidget")
         self.run_policy()
         self.create_contract_policy()
         self.create_money_policy()
         self.create_sample_policy()
         self.create_param_policy()
 
-        self.main_layout.addWidget(self.strategyTabWidget, 0, 0, 1, 5)
-        h_spacerItem = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
-        self.main_layout.addItem(h_spacerItem, 1, 0, 1, 1)
-        self.main_layout.addWidget(self.confirm, 1, 1, 1, 1)
-        self.main_layout.addWidget(self.cancel, 1, 2, 1, 1)
+        layout1.addWidget(self.strategyTabWidget)
+
+        layout2.addItem(h_spacerItem)
+        layout2.addWidget(self.confirm)
+        layout2.addWidget(self.cancel)
+        layout2.setSpacing(6)
+        layout2.setContentsMargins(0, 10, 20, 10)
+        self.main_layout.addLayout(layout1)
+        self.main_layout.addLayout(layout2)
         self.setLayout(self.main_layout)
-        self.setMinimumSize(580, 660)
-        self.setBaseSize(580, 660)
+        self.setMinimumSize(580, 600)
+        self.setBaseSize(580, 600)
 
         self.contractTableWidget.hideColumn(4)
         self.contractTableWidget.verticalHeader().setVisible(False)
@@ -78,9 +84,7 @@ class StrategyPolicy(QWidget):
         self.addContract.clicked.connect(self.create_contract_win)
         self.deleteContract.clicked.connect(self.delete_contract)
         self.updateContract.clicked.connect(self.update_contract)
-        self.cancel.clicked.connect(self.close)
         self.confirm.clicked.connect(self.enter)
-        # self.setContentsMargins(0, 0, 0, 0)
 
         self._control = control
 
@@ -103,10 +107,12 @@ class StrategyPolicy(QWidget):
         # print('--------------------------------')
         # print(self.style())
         self.contractWin = ContractWin()
+        self.contractWin.setObjectName("ContractWin")
+        self.contractWin.confirm_signal.connect(self.add_contract)
         # self.contractWin.setStyle(self.style())
 
         self.main_contractWin = FramelessWindow()
-        self.main_contractWin.setFixedSize(410, 360)
+        self.main_contractWin.setFixedSize(410, 335)
         self.main_contractWin.hideTheseBtn()
         self.main_contractWin.titleBar.iconLabel.hide()
         self.main_contractWin.titleBar.buttonMaximum.setEnabled(False)
@@ -137,6 +143,7 @@ class StrategyPolicy(QWidget):
 
     def run_policy(self):
         self.runPolicy = QWidget()
+        self.runPolicy.setObjectName("RunPolicy")
         run_layout = QVBoxLayout()
         h_spacerItem = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
         v_spacerItem = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
@@ -153,16 +160,18 @@ class StrategyPolicy(QWidget):
         h_layout1.addWidget(self.KLineCheckBox)
         h_layout2 = QHBoxLayout()
         self.snapShotCheckBox = QCheckBox('即时行情触发')
+        self.snapShotCheckBox.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         h_layout2.addWidget(self.snapShotCheckBox)
         h_layout3 = QHBoxLayout()
         self.tradeCheckBox = QCheckBox('交易数据触发')
+        self.tradeCheckBox.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         h_layout3.addWidget(self.tradeCheckBox)
         h_layout4 = QHBoxLayout()
         self.cycleCheckBox = QCheckBox('每间隔')
+        self.cycleCheckBox.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         self.cycleLineEdit = QLineEdit('200')
         self.cycleLabel = QLabel('毫秒执行代码（100的整数倍）')
         self.cycleLabel.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-        self.cycleLabel.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         h_layout4.addWidget(self.cycleCheckBox)
         h_layout4.addWidget(self.cycleLineEdit)
         h_layout4.addWidget(self.cycleLabel)
@@ -184,14 +193,17 @@ class StrategyPolicy(QWidget):
 
         rignt_hlayout2 = QHBoxLayout()
         self.timerListWidget = QListWidget()
-        self.timerListWidget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        self.timerListWidget.setFixedHeight(100)
         rignt_hlayout2.addWidget(self.timerListWidget)
         rignt_hlayout3 = QHBoxLayout()
         self.timerEdit = QTimeEdit()
         self.timerEdit.setDisplayFormat('HH:mm:ss')
         self.addTimerButton = QPushButton('增加')
+        self.addTimerButton.setFixedWidth(60)
         self.deleteTimerButton = QPushButton('删除')
+        self.deleteTimerButton.setFixedWidth(60)
         rignt_hlayout3.addWidget(self.timerEdit)
+        rignt_hlayout3.addItem(h_spacerItem)
         rignt_hlayout3.addWidget(self.addTimerButton)
         rignt_hlayout3.addWidget(self.deleteTimerButton)
 
@@ -208,7 +220,6 @@ class StrategyPolicy(QWidget):
         policy_layout = QVBoxLayout()
         policy_layout1 = QHBoxLayout()
         order_label = QLabel('发单时机：')
-        order_label.setFixedWidth(100)
         self.set_label_size_policy(order_label)
         self.sendOrderRealtime = QRadioButton('实时发单')
         self.sendOrderRealtime.setChecked(True)
@@ -219,7 +230,7 @@ class StrategyPolicy(QWidget):
         policy_layout1.addItem(h_spacerItem)
         policy_layout2 = QHBoxLayout()
         run_label = QLabel('运行模式：')
-        run_label.setFixedWidth(100)
+
         self.set_label_size_policy(run_label)
         self.actualCheckBox = QCheckBox('实盘运行')
         self.alarmCheckBox = QCheckBox('发单报警')
@@ -231,17 +242,26 @@ class StrategyPolicy(QWidget):
         policy_layout2.addItem(h_spacerItem)
         policy_layout3 = QHBoxLayout()
         user_label = QLabel('账户：')
-        user_label.setFixedWidth(100)
         self.set_label_size_policy(user_label)
         self.userComboBox = QComboBox()
         policy_layout3.addWidget(user_label)
         policy_layout3.addWidget(self.userComboBox)
         policy_layout3.addItem(h_spacerItem)
 
+        # 设置对齐
+        order_label.setFixedWidth(80)
+        run_label.setFixedWidth(80)
+        user_label.setFixedWidth(80)
+        self.sendOrderRealtime.setFixedWidth(120)
+        self.actualCheckBox.setFixedWidth(120)
+        self.sendOrderKStable.setFixedWidth(120)
+        self.alarmCheckBox.setFixedWidth(120)
+        self.userComboBox.setFixedWidth(120)
+
         policy_layout.addLayout(policy_layout1)
         policy_layout.addLayout(policy_layout2)
         policy_layout.addLayout(policy_layout3)
-        policy_layout.setSpacing(20)
+        policy_layout.setSpacing(10)
         self.basePolicy.setLayout(policy_layout)
         # ------------------------------------------------------------
         run_layout.addWidget(self.trigger)
@@ -253,10 +273,13 @@ class StrategyPolicy(QWidget):
 
     def create_contract_policy(self):
         self.contractPolicy = QWidget()
+        self.contractPolicy.setObjectName("ContractPolicy")
         v_spacerItem = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
         main_layout = QHBoxLayout()
+        main_layout.setContentsMargins(6, 6, 6, 6)
         left_layout = QHBoxLayout()
         self.contractTableWidget = QTableWidget()
+        self.contractTableWidget.setObjectName("ContractTableWidget")
         self.contractTableWidget.setColumnCount(5)
         self.contractTableWidget.setHorizontalHeaderLabels(['合约', 'K线类型', 'K线周期', '运算起始点', 'data'])
         self.contractTableWidget.horizontalHeader().setStretchLastSection(True)
@@ -264,8 +287,11 @@ class StrategyPolicy(QWidget):
         left_layout.addWidget(self.contractTableWidget)
         right_layout = QVBoxLayout()
         self.addContract = QPushButton('增加')
+        self.addContract.setFixedWidth(70)
         self.deleteContract = QPushButton('删除')
+        self.deleteContract.setFixedWidth(70)
         self.updateContract = QPushButton('修改')
+        self.updateContract.setFixedWidth(70)
         right_layout.addItem(v_spacerItem)
         right_layout.addWidget(self.addContract)
         right_layout.addWidget(self.deleteContract)
@@ -279,12 +305,12 @@ class StrategyPolicy(QWidget):
 
     def create_money_policy(self):
         self.moneyPolicy = QWidget()
-        h_spacerItem = QSpacerItem(150, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.moneyPolicy.setObjectName("MoneyPolicy")
+        h_spacerItem = QSpacerItem(300, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
         main_layout = QVBoxLayout()
-        label_list = []  # label标签
         h_layout1 = QHBoxLayout()
         label1 = QLabel('初始资金：')
-        label1.setFixedWidth(130)
+        label1.setFixedWidth(100)
         self.set_label_size_policy(label1)
         self.initFundlineEdit = QLineEdit('1000000')
         label12 = QLabel('元')
@@ -296,7 +322,7 @@ class StrategyPolicy(QWidget):
 
         h_layout2 = QHBoxLayout()
         label2 = QLabel('交易方向：')
-        label2.setFixedWidth(130)
+        label2.setFixedWidth(100)
         self.set_label_size_policy(label2)
         self.tradeDirectionComboBox = QComboBox()
         self.tradeDirectionComboBox.addItems(['双向交易', '仅多头', '仅空头'])
@@ -306,13 +332,12 @@ class StrategyPolicy(QWidget):
 
         h_layout3 = QHBoxLayout()
         label3 = QLabel('默认下单量：')
-        label3.setFixedWidth(130)
+        label3.setFixedWidth(100)
         self.set_label_size_policy(label3)
         self.defaultOrderComboBox = QComboBox()
         self.defaultOrderComboBox.addItems(['按固定合约数', '按资金比例', '按固定资金'])
         self.defaultOrderComboBox.currentIndexChanged.connect(self.change_line_edit)
         self.defaultOrderLineEdit = QLineEdit('1')
-        self.defaultOrderLineEdit.setFixedWidth(80)
         self.label32 = QLabel('手')
         self.set_label_size_policy(self.label32)
         h_layout3.addWidget(label3)
@@ -323,10 +348,9 @@ class StrategyPolicy(QWidget):
 
         h_layout4 = QHBoxLayout()
         label4 = QLabel('最小下单量：')
-        label4.setFixedWidth(130)
+        label4.setFixedWidth(100)
         self.set_label_size_policy(label4)
         self.miniOrderLineEdit = QLineEdit('1')
-        self.miniOrderLineEdit.setFixedWidth(50)
         label41 = QLabel('手(1-1000)')
         self.set_label_size_policy(label41)
         h_layout4.addWidget(label4)
@@ -336,10 +360,9 @@ class StrategyPolicy(QWidget):
 
         h_layout5 = QHBoxLayout()
         label5 = QLabel('保证金率：')
-        label5.setFixedWidth(130)
+        label5.setFixedWidth(100)
         self.set_label_size_policy(label5)
         self.marginRateLineEdit = QLineEdit('8')
-        self.marginRateLineEdit.setFixedWidth(50)
         label51 = QLabel('%')
         self.set_label_size_policy(label51)
         h_layout5.addWidget(label5)
@@ -349,7 +372,7 @@ class StrategyPolicy(QWidget):
 
         h_layout6 = QHBoxLayout()
         label6 = QLabel('开仓收费方式：')
-        label6.setFixedWidth(130)
+        label6.setFixedWidth(100)
         self.set_label_size_policy(label6)
         self.openTypeComboBox = QComboBox()
         self.openTypeComboBox.addItems(['固定值', '比例'])
@@ -359,10 +382,9 @@ class StrategyPolicy(QWidget):
 
         h_layout7 = QHBoxLayout()
         label7 = QLabel('开仓手续费(率)：')
-        label7.setFixedWidth(130)
+        label7.setFixedWidth(100)
         self.set_label_size_policy(label7)
         self.openFeeRateLineEdit = QLineEdit('1')
-        self.openFeeRateLineEdit.setFixedWidth(50)
         label71 = QLabel('%')
         self.set_label_size_policy(label71)
         h_layout7.addWidget(label7)
@@ -372,7 +394,7 @@ class StrategyPolicy(QWidget):
 
         h_layout8 = QHBoxLayout()
         label8 = QLabel('平仓收费方式：')
-        label8.setFixedWidth(130)
+        label8.setFixedWidth(100)
         self.set_label_size_policy(label8)
         self.closeTypeComboBox = QComboBox()
         self.closeTypeComboBox.addItems(['固定值', '比例'])
@@ -382,10 +404,9 @@ class StrategyPolicy(QWidget):
 
         h_layout9 = QHBoxLayout()
         label9 = QLabel('平仓手续费(率)：')
-        label9.setFixedWidth(130)
+        label9.setFixedWidth(100)
         self.set_label_size_policy(label9)
         self.closeFeeRateLineEdit = QLineEdit('1')
-        self.closeFeeRateLineEdit.setFixedWidth(50)
         label91 = QLabel('%')
         self.set_label_size_policy(label91)
         h_layout9.addWidget(label9)
@@ -395,13 +416,26 @@ class StrategyPolicy(QWidget):
 
         h_layout10 = QHBoxLayout()
         label10 = QLabel('滑点损耗：')
-        label10.setFixedWidth(130)
+        label10.setFixedWidth(100)
         self.set_label_size_policy(label10)
         self.slippageLineEdit = QLineEdit('0')
-        self.slippageLineEdit.setFixedWidth(50)
         h_layout10.addWidget(label10)
         h_layout10.addWidget(self.slippageLineEdit)
         h_layout10.addItem(h_spacerItem)
+
+        self.initFundlineEdit.setFixedWidth(105)
+        self.tradeDirectionComboBox.setFixedWidth(105)
+        self.defaultOrderComboBox.setFixedWidth(105)
+
+        self.defaultOrderLineEdit.setFixedWidth(105)
+
+        self.miniOrderLineEdit.setFixedWidth(105)
+        self.marginRateLineEdit.setFixedWidth(105)
+        self.openTypeComboBox.setFixedWidth(105)
+        self.openFeeRateLineEdit.setFixedWidth(105)
+        self.closeTypeComboBox.setFixedWidth(105)
+        self.closeFeeRateLineEdit.setFixedWidth(105)
+        self.slippageLineEdit.setFixedWidth(105)
 
         main_layout.addLayout(h_layout1)
         main_layout.addLayout(h_layout2)
@@ -417,13 +451,15 @@ class StrategyPolicy(QWidget):
         v_spacerItem = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
         main_layout.addItem(v_spacerItem)
 
-        main_layout.setSpacing(20)
+        main_layout.setSpacing(15)
+        main_layout.setContentsMargins(20, 10, 0, 0)
 
         self.moneyPolicy.setLayout(main_layout)
         self.strategyTabWidget.addTab(self.moneyPolicy, '资金设置')
 
     def create_sample_policy(self):
         send_order_widget = QWidget()
+        send_order_widget.setObjectName("SendOrderWidget")
         send_order_layout = QVBoxLayout()
         self.groupBox = QGroupBox('发单设置')
         main_layout = QVBoxLayout()
@@ -463,7 +499,12 @@ class StrategyPolicy(QWidget):
         main_layout.addLayout(h_layout2)
         main_layout.addLayout(h_layout3)
         main_layout.addLayout(h_layout4)
-        main_layout.setSpacing(20)
+        main_layout.setSpacing(15)
+
+        self.isConOpenTimesCheckBox.setFixedWidth(150)
+        self.openTimesCheckBox.setFixedWidth(150)
+        self.isConOpenTimesLineEdit.setFixedWidth(50)
+        self.openTimeslineEdit.setFixedWidth(50)
 
         self.groupBox.setLayout(main_layout)
         send_order_layout.addWidget(self.groupBox)
@@ -474,17 +515,20 @@ class StrategyPolicy(QWidget):
 
     def create_param_policy(self):
         self.paramPolicy = QWidget()
+        self.paramPolicy.setObjectName("ParamPolicy")
 
         main_layout = QVBoxLayout()
         label = QLabel('鼠标单击"当前值"进行参数修改：')
+        label.setObjectName("ParamLabel")
         self.set_label_size_policy(label)
         self.paramsTableWidget = QTableWidget()
         self.paramsTableWidget.setColumnCount(4)
         self.paramsTableWidget.setHorizontalHeaderLabels(['参数', '当前值', '类型', '描述'])
+        self.paramsTableWidget.verticalHeader().setVisible(False)  # 隐藏行号
         self.paramsTableWidget.horizontalHeader().setStretchLastSection(True)
-        self.paramsTableWidget.horizontalHeader().setSectionResizeMode(QHeaderView.Interactive)
         self.paramsTableWidget.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeToContents)
         self.paramsTableWidget.horizontalHeader().setSectionResizeMode(3, QHeaderView.ResizeToContents)
+        self.paramsTableWidget.horizontalHeader().setSectionResizeMode(QHeaderView.Interactive)
         main_layout.addWidget(label)
         main_layout.addWidget(self.paramsTableWidget)
 
@@ -498,7 +542,10 @@ class StrategyPolicy(QWidget):
     def add_timer(self):
         t = self.timerEdit.text()
         ti = t.replace(':', '')
-        self.timerListWidget.addItem(ti)
+        if not self.timerListWidget.findItems(ti, Qt.MatchExactly):
+            self.timerListWidget.addItem(ti)
+        else:
+            MyMessageBox.warning(self, "提示", "已存在该时间！请重新提交！", QMessageBox.Yes)
 
     def delete_timer(self):
         row = self.timerListWidget.currentRow()
@@ -507,9 +554,28 @@ class StrategyPolicy(QWidget):
 
     def create_contract_win(self):
         # 增加合约槽函数，弹出合约设置窗口
-        self.contractWin.confirm_signal.connect(self.add_contract)
+        self.set_default_value()
         self.main_contractWin.setWindowModality(Qt.ApplicationModal)  # 阻塞父窗口
         self.main_contractWin.show()
+
+    def set_default_value(self):
+        # ------------------设置合约-----------------------------
+        self.contractWin.contractCodeLineEdit.setText('')
+        self.contractWin.contractCodeLineEdit.setEnabled(True)
+        self.contractWin.select.setEnabled(True)
+        # ------------------设置k线类型--------------------------
+        self.contractWin.kLineTypeComboBox.setCurrentIndex(2)
+        # ------------------设置k线周期--------------------------
+        self.contractWin.kLinePeriodComboBox.setCurrentIndex(0)
+        # ------------------设置运算起始点-----------------------
+        self.contractWin.AllkLineRadioButton.setChecked(False)
+
+        self.contractWin.startDateRadioButton.setChecked(False)
+        self.contractWin.startDateLineEdit.setText('')
+        self.contractWin.historyRadioButton.setChecked(False)
+        self.contractWin.qtyRadioButton.setChecked(True)
+        self.contractWin.qtylineEdit.setText('2000')
+        self.contractWin.row = -1
 
     def contractSelect(self, exchange, commodity, contract):
         self.contractSelectWin = ContractSelect(exchange, commodity, contract)
@@ -538,11 +604,6 @@ class StrategyPolicy(QWidget):
             self.main_contractSelectWin.close()
 
     def add_contract(self, sample_dict):
-        if self.contractWin.row != -1:
-            row = self.contractWin.row
-        else:
-            row = self.contractTableWidget.rowCount()
-            self.contractTableWidget.setRowCount(row + 1)
         KLineType = sample_dict.get('KLineType')
         if KLineType == 'T':
             _KlineType = '分笔'
@@ -560,10 +621,23 @@ class StrategyPolicy(QWidget):
             start = sample_dict.get('KLineCount')
         else:
             start = '不执行历史K线'
-
         items = [sample_dict.get('contract'), _KlineType, sample_dict.get('KLineSlice'), start, json.dumps(sample_dict)]
+
+        if self.contractWin.row != -1:
+            row = self.contractWin.row
+        else:
+            row = self.contractTableWidget.rowCount()
+            sample_dict_list = []
+            for i in range(row):
+                sample_dict_list.append(json.loads(self.contractTableWidget.item(i, 4).text()))
+            if json.loads(items[4]) in sample_dict_list:
+                MyMessageBox.warning(self, '提示', '请勿添加重复合约设置！', QMessageBox.Yes)
+                return
+            self.contractTableWidget.setRowCount(row + 1)
+
         for j in range(len(items)):
             item = QTableWidgetItem(str(items[j]))
+            item.setTextAlignment(Qt.AlignCenter)
             self.contractTableWidget.setItem(row, j, item)
 
     def delete_contract(self):
@@ -578,7 +652,6 @@ class StrategyPolicy(QWidget):
         row = items[0].row()
         item = self.contractTableWidget.item(row, 4)
         sample_dict = json.loads(item.text())
-        self.contractWin.confirm_signal.connect(self.add_contract)
         # ------------------设置合约-----------------------------
         self.contractWin.contractCodeLineEdit.setText(sample_dict.get('contract'))
         self.contractWin.contractCodeLineEdit.setEnabled(False)
@@ -678,40 +751,40 @@ class StrategyPolicy(QWidget):
                 timerFormatter.append(t)
 
         if float(initFund) < 1000:
-            QMessageBox.warning(self, "极星量化", "初始资金不能小于1000元", QMessageBox.Yes)
+            MyMessageBox.warning(self, "极星量化", "初始资金不能小于1000元", QMessageBox.Yes)
             return
 
         if cycle == "":
-            QMessageBox.warning(self, "极星量化", "定时触发周期不能为空", QMessageBox.Yes)
+            MyMessageBox.warning(self, "极星量化", "定时触发周期不能为空", QMessageBox.Yes)
             return
         elif int(cycle) % 100 != 0:
-            QMessageBox.warning(self, "极星量化", "定时触发周期为100的整数倍", QMessageBox.Yes)
+            MyMessageBox.warning(self, "极星量化", "定时触发周期为100的整数倍", QMessageBox.Yes)
             return
         else:
             pass
 
         if minQty == "":
-            QMessageBox.warning(self, "极星量化", "最小下单量不能为空", QMessageBox.Yes)
+            MyMessageBox.warning(self, "极星量化", "最小下单量不能为空", QMessageBox.Yes)
             return
         elif int(minQty) > MAXSINGLETRADESIZE:
-            QMessageBox.warning(self, "极星量化", "最小下单量不能大于1000", QMessageBox.Yes)
+            MyMessageBox.warning(self, "极星量化", "最小下单量不能大于1000", QMessageBox.Yes)
             return
         else:
             pass
 
         if isConOpenTimes:
             if conOpenTimes == '' or int(conOpenTimes) < 1 or int(conOpenTimes) > 100:
-                QMessageBox.warning(self, "极星量化", "最大连续同向开仓次数必须介于1-100之间", QMessageBox.Yes)
+                MyMessageBox.warning(self, "极星量化", "最大连续同向开仓次数必须介于1-100之间", QMessageBox.Yes)
                 return
 
         if isOpenTimes:
             if openTimes == '' or int(openTimes) < 1 or int(openTimes) > 100:
-                QMessageBox.warning(self, "极星量化", "每根K线同向开仓次数必须介于1-100之间", QMessageBox.Yes)
+                MyMessageBox.warning(self, "极星量化", "每根K线同向开仓次数必须介于1-100之间", QMessageBox.Yes)
                 return
 
         # 用户是否确定用新参数重新运行
         if self._paramFlag:
-            reply = QMessageBox.question(self, '提示', '点确定后会重新运行策略？', QMessageBox.Yes | QMessageBox.No)
+            reply = MyMessageBox.question(self, '提示', '点确定后会重新运行策略？', QMessageBox.Yes | QMessageBox.No)
             if reply == QMessageBox.No:
                 return
 
@@ -1029,8 +1102,9 @@ class StrategyPolicy(QWidget):
             self.cycleLineEdit.setText(conf[VCycle]),
 
             # 定时触发通过函数设置
-            for t in conf[VTimer].split('\n'):
-                self.timerListWidget.addItem(t)   # todo
+            if conf[VTimer] != '':
+                for t in conf[VTimer].split('\n'):
+                    self.timerListWidget.addItem(t)   # todo
 
             self.KLineCheckBox.setChecked(conf[VIsKLine]),
             self.snapShotCheckBox.setChecked(conf[VIsMarket]),
@@ -1090,6 +1164,7 @@ class StrategyPolicy(QWidget):
         self.contractTableWidget.setRowCount(row + 1)
         for j in range(len(values)):
             item = QTableWidgetItem(str(values[j]))
+            item.setTextAlignment(Qt.AlignCenter)
             self.contractTableWidget.setItem(row, j, item)
 
     def insert_params(self, values):
@@ -1101,12 +1176,120 @@ class StrategyPolicy(QWidget):
             self.paramsTableWidget.setItem(row, j, item)
 
 
-class ContractWin(QMainWindow, Ui_contractWin):
+class ContractWin(QWidget):
     confirm_signal = pyqtSignal(dict)
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setupUi(self)
+        main_layout = QVBoxLayout()  # 主布局
+
+        h_spacerItem = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        h_layout1 = QHBoxLayout()
+        label1 = QLabel('商品代码：')
+        self.contractCodeLineEdit = QLineEdit()
+        self.select = QPushButton('选择')
+        self.select.setFixedWidth(60)
+        h_layout1.addWidget(label1)
+        h_layout1.addWidget(self.contractCodeLineEdit)
+        h_layout1.addWidget(self.select)
+        h_layout1.addItem(h_spacerItem)
+        h_layout1.setSpacing(10)
+        h_layout1.setContentsMargins(10, 0, 10, 0)
+
+        h_layout2 = QHBoxLayout()
+        label2 = QLabel('K线类型：')
+        self.kLineTypeComboBox = QComboBox()
+        self.kLineTypeComboBox.addItems(['分笔', '秒', '分钟', '日线'])
+        self.kLineTypeComboBox.setCurrentIndex(2)
+        h_layout2.addWidget(label2)
+        h_layout2.addWidget(self.kLineTypeComboBox)
+        h_layout2.addItem(h_spacerItem)
+        h_layout2.setSpacing(10)
+        h_layout2.setContentsMargins(10, 0, 10, 0)
+
+        h_layout3 = QHBoxLayout()
+        label3 = QLabel('K线周期：')
+        self.kLinePeriodComboBox = QComboBox()
+        self.kLinePeriodComboBox.addItems(['1', '2', '3', '5', '10', '15', '30', '60', '120'])
+        h_layout3.addWidget(label3)
+        h_layout3.addWidget(self.kLinePeriodComboBox)
+        h_layout3.addItem(h_spacerItem)
+        h_layout3.setSpacing(10)
+        h_layout3.setContentsMargins(10, 0, 10, 0)
+
+        # label 对齐
+        label1.setFixedWidth(80)
+        label2.setFixedWidth(80)
+        label3.setFixedWidth(80)
+        self.kLineTypeComboBox.setFixedWidth(55)
+        self.kLinePeriodComboBox.setFixedWidth(55)
+
+        # -------------运算起始点-----------------------------
+        h_layout4 = QHBoxLayout()
+        self.groupBox = QGroupBox('运算起始点')
+        self.groupBox.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        groupbox_layout = QVBoxLayout()
+        h_layout41 = QHBoxLayout()
+        self.AllkLineRadioButton = QRadioButton('所有K线')
+        h_layout41.addWidget(self.AllkLineRadioButton)
+
+        h_layout42 = QHBoxLayout()
+        self.startDateRadioButton = QRadioButton('起始日期')
+        self.startDateLineEdit = QLineEdit()
+        label42 = QLabel('格式(YYYYMMDD)')
+        label42.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        h_layout42.addWidget(self.startDateRadioButton)
+        h_layout42.addWidget(self.startDateLineEdit)
+        h_layout42.addWidget(label42)
+        h_layout42.addItem(h_spacerItem)
+
+        h_layout43 = QHBoxLayout()
+        self.qtyRadioButton = QRadioButton('固定根数')
+        self.qtyRadioButton.setChecked(True)
+        self.qtylineEdit = QLineEdit('2000')
+        self.qtylineEdit.setMaximumWidth(60)
+        label43 = QLabel('根')
+        label43.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        h_layout43.addWidget(self.qtyRadioButton)
+        h_layout43.addWidget(self.qtylineEdit)
+        h_layout43.addWidget(label43)
+        h_layout43.addItem(h_spacerItem)
+
+        h_layout44 = QHBoxLayout()
+        self.historyRadioButton = QRadioButton('不执行历史K线')
+        h_layout44.addWidget(self.historyRadioButton)
+
+        groupbox_layout.addLayout(h_layout41)
+        groupbox_layout.addLayout(h_layout42)
+        groupbox_layout.addLayout(h_layout43)
+        groupbox_layout.addLayout(h_layout44)
+        self.groupBox.setLayout(groupbox_layout)
+        h_layout4.addWidget(self.groupBox)
+
+        h_layout4.setSpacing(10)
+        h_layout4.setContentsMargins(10, 0, 10, 0)
+
+        h_layout5 = QHBoxLayout()
+        self.confirm = QPushButton('确定')
+        self.confirm.setMinimumWidth(80)
+        self.cancel = QPushButton('取消')
+        self.cancel.setMinimumWidth(80)
+        h_layout5.setSpacing(10)
+        h_layout5.setContentsMargins(0, 10, 20, 0)
+        h_layout5.addItem(h_spacerItem)
+        h_layout5.addWidget(self.confirm)
+        h_layout5.addWidget(self.cancel)
+
+        main_layout.addLayout(h_layout1)
+        main_layout.addLayout(h_layout2)
+        main_layout.addLayout(h_layout3)
+        main_layout.addLayout(h_layout4)
+        main_layout.addLayout(h_layout5)
+
+        self.setLayout(main_layout)
+        # self.setMinimumSize(310, 300)
+
         self.kLineTypeComboBox.currentIndexChanged.connect(self.valid)
         self.qtylineEdit.setValidator(QtGui.QIntValidator())
         self.confirm.clicked.connect(self.valid_contract)
@@ -1118,19 +1301,26 @@ class ContractWin(QMainWindow, Ui_contractWin):
 
     def valid(self, index):
         if index == 0:
+            self.kLinePeriodComboBox.setCurrentIndex(0)
             self.kLinePeriodComboBox.setEnabled(False)
         else:
             self.kLinePeriodComboBox.setEnabled(True)
 
     def valid_contract(self):
         if not self.contractCodeLineEdit.text():
-            QMessageBox.warning(self, '提示', '请先选择合约！！！', QMessageBox.Yes)
+            MyMessageBox.warning(self, '提示', '请先选择合约！！！', QMessageBox.Yes)
             return
         if self.startDateRadioButton.isChecked():
             try:
                 assert len(self.startDateLineEdit.text()) == 8
             except:
-                QMessageBox.warning(self, '提示', '输入的时间格式不合法，请重新输入！！！', QMessageBox.Yes)
+                MyMessageBox.warning(self, '提示', '输入的时间格式不合法，请重新输入！！！', QMessageBox.Yes)
+                return
+        if self.qtyRadioButton.isChecked():
+            try:
+                assert int(self.qtylineEdit.text())
+            except:
+                MyMessageBox.warning(self, '提示', '固定根数输入不合法，请重新输入！！！', QMessageBox.Yes)
                 return
         self.confirm_signal.emit(self.get_contract_policy())
         self.parent().close()
@@ -1178,7 +1368,7 @@ class ContractWin(QMainWindow, Ui_contractWin):
         }
 
 
-class ContractSelect(QMainWindow, Ui_contractSelect):
+class ContractSelect(QWidget):
     exchangeList = ["SPD", "ZCE", "DCE", "SHFE", "INE", "CFFEX",
                     "CME", "COMEX", "LME", "NYMEX", "HKEX", "CBOT", "ICUS", "ICEU", "SGX"]
     commodityType = {"P": "现货", "Y": "现货", "F": "期货", "O": "期权",
@@ -1197,7 +1387,33 @@ class ContractSelect(QMainWindow, Ui_contractSelect):
 
     def __init__(self, exchange, commodity, contract, parent=None):
         super().__init__(parent)
-        self.setupUi(self)
+        main_layout = QVBoxLayout()
+
+        h_spacerItem = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        layout1 = QHBoxLayout()
+        self.contract_tree = QTreeWidget()
+        self.contract_child_tree = QTreeWidget()
+        self.choice_tree = QTreeWidget()
+        layout1.addWidget(self.contract_tree)
+        layout1.addWidget(self.contract_child_tree)
+        layout1.addWidget(self.choice_tree)
+
+        layout2 = QHBoxLayout()
+        self.confirm = QPushButton('确定')
+        self.confirm.setMinimumWidth(60)
+        self.cancel = QPushButton('取消')
+        self.cancel.setMinimumWidth(60)
+        layout2.setSpacing(10)
+        layout2.setContentsMargins(0, 10, 20, 20)
+        layout2.addItem(h_spacerItem)
+        layout2.addWidget(self.confirm)
+        layout2.addWidget(self.cancel)
+
+        main_layout.addLayout(layout1)
+        main_layout.addLayout(layout2)
+
+        self.setLayout(main_layout)
         self.contract_tree.setColumnCount(2)
         self.contract_tree.setHeaderHidden(True)
         self.contract_tree.hideColumn(1)
@@ -1245,12 +1461,6 @@ class ContractSelect(QMainWindow, Ui_contractSelect):
                     child = QTreeWidgetItem(root)
                     child.setText(0, text)
                     child.setText(1, comm.CommodityNo)
-        # for contract in ['ZCE【郑商所】', 'DCE【大商所】']:
-        #     root = QTreeWidgetItem(self.contract_tree)
-        #     root.setText(0, contract)
-        #     for child_contract in ['苹果', '棉花', '红枣']:
-        #         child = QTreeWidgetItem(root)
-        #         child.setText(0, child_contract)
 
     def load_child_contract(self):
         self.contract_child_tree.clear()
@@ -1288,7 +1498,7 @@ class ContractSelect(QMainWindow, Ui_contractSelect):
             root = QTreeWidgetItem(self.choice_tree)
             root.setText(0, item.text(0))
         else:
-            QMessageBox.warning(self, '提示', '选择的合约数不能超过1个！！！', QMessageBox.Yes)
+            MyMessageBox.warning(self, '提示', '选择的合约数不能超过1个！！！', QMessageBox.Yes)
         pass
 
     def clear_choice(self):
@@ -1300,7 +1510,6 @@ class WebEngineView(QWebEngineView):
     saveSignal = pyqtSignal()
     switchSignal = pyqtSignal(str)
     setThemeSignal = pyqtSignal(str)
-    themeSignal = pyqtSignal(str)
 
     def __init__(self, *args, **kwargs):
         super(WebEngineView, self).__init__(*args, **kwargs)
@@ -1343,10 +1552,6 @@ class WebEngineView(QWebEngineView):
 
     def sendSetThemeSignal(self, theme):
         self.setThemeSignal.emit(theme)
-
-    def sendThemeSignal(self, text):
-        print('sendThemeSignalsendThemeSignalsendThemeSignalsendThemeSignalsendThemeSignalsendThemeSignal')
-        self.themeSignal.emit(text)
 
     @pyqtSlot(str)
     def switchFile(self, path):
@@ -1434,6 +1639,8 @@ class QuantApplication(QWidget):
         self._logger = self._controller.get_logger()
 
         self.reportView = self._controller.reportView
+        # 回测报告窗口句柄
+        self.reportWnd = self._controller.reportWnd
 
         self.hbox = QHBoxLayout()
         self.hbox.setContentsMargins(0, 0, 0, 0)
@@ -1533,8 +1740,8 @@ class QuantApplication(QWidget):
         self.settings.setValue('main_splitter', self.main_splitter.saveState())
         self.settings.setValue(
             'theme', 'vs' if self._controller.mainWnd.getWinThese() == '浅色' else 'vs-dark')
-        self._controller.sendExitRequest()
-        self._controller.quitThread()
+        # self._controller.sendExitRequest()
+        # self._controller.quitThread()
 
     def init_control(self):
         self._exchange = self._controller.model.getExchange()
@@ -1588,14 +1795,14 @@ class QuantApplication(QWidget):
         delete = QAction('删除', self.strategy_tree)
         add_strategy = QAction('新建策略')
         add_group = QAction('新建分组')
-        refresh = QAction('刷新', self.strategy_tree)
+        # refresh = QAction('刷新', self.strategy_tree)
         self.strategy_tree.popMenu.addAction(import_file)
         self.strategy_tree.popMenu.addMenu(self.strategy_tree.addType)
         self.strategy_tree.addType.addAction(add_strategy)
         self.strategy_tree.addType.addAction(add_group)
         self.strategy_tree.popMenu.addAction(rename)
         self.strategy_tree.popMenu.addAction(delete)
-        self.strategy_tree.popMenu.addAction(refresh)
+        # self.strategy_tree.popMenu.addAction(refresh)
 
         # 右键动作
         action = self.strategy_tree.popMenu.exec_(self.strategy_tree.mapToGlobal(point))
@@ -1611,7 +1818,7 @@ class QuantApplication(QWidget):
                 if fname:
                     _path = item_path + '/' + os.path.split(fname)[1]
                     if os.path.exists(_path):
-                        reply = QMessageBox.question(self, '提示', '所选的分组中存在同名文件，是否覆盖？', QMessageBox.Yes | QMessageBox.No)
+                        reply = MyMessageBox.question(self, '提示', '所选的分组中存在同名文件，是否覆盖？', QMessageBox.Yes | QMessageBox.No)
                         if reply == QMessageBox.Yes:
                             shutil.copy(fname, _path)
                     else:
@@ -1624,10 +1831,13 @@ class QuantApplication(QWidget):
             if item_path and os.path.isdir(item_path):
                 value = ''
                 while True:
-                    value, ok = QInputDialog.getText(self, '新建文件', '策略名称', QLineEdit.Normal)
-                    path = os.path.join(item_path, value + '.py')
+                    value, ok = getText('新增文件', '策略名称：')
+                    if not value.strip().endswith('.py'):
+                        path = os.path.join(item_path, value.strip() + '.py')
+                    else:
+                        path = os.path.join(item_path, value.strip())
                     if os.path.exists(path) and ok:
-                        QMessageBox.warning(self, '提示', '策略名在选择的分组%s已经存在！！！' % value, QMessageBox.Yes)
+                        MyMessageBox.warning(self, '提示', '策略名%s在选择的分组已经存在！！！' % value.strip(), QMessageBox.Yes)
                     elif not ok:
                         break
                     else:
@@ -1637,10 +1847,14 @@ class QuantApplication(QWidget):
             elif not os.path.isdir(item_path):
                 value = ''
                 while True:
-                    value, ok = QInputDialog.getText(self, '新建文件', '策略名称', QLineEdit.Normal)
-                    path = os.path.join(os.path.split(item_path)[0], value + '.py')
+                    value, ok = getText('新建文件', '策略名称：')
+                    if not value.strip().endswith('.py'):
+                        path = os.path.join(os.path.split(item_path)[0], value.strip() + '.py')
+                    else:
+                        path = os.path.join(os.path.split(item_path)[0], value.strip())
+
                     if os.path.exists(path) and ok:
-                        QMessageBox.warning(self, '提示', '策略名在选择的分组%s已经存在！！！' % value, QMessageBox.Yes)
+                        MyMessageBox.warning(self, '提示', '策略名在选择的分组%s已经存在！！！' % value, QMessageBox.Yes)
                     elif not ok:
                         break
                     else:
@@ -1648,7 +1862,7 @@ class QuantApplication(QWidget):
                             pass
                         break
             else:
-                QMessageBox.warning(self, '提示', '请选择分组！！！', QMessageBox.Yes)
+                MyMessageBox.warning(self, '提示', '请选择分组！！！', QMessageBox.Yes)
 
         elif action == add_group:
             value = ''
@@ -1660,13 +1874,13 @@ class QuantApplication(QWidget):
                     index = self.strategy_tree.currentIndex()
                     model = index.model()  # 请注意这里可以获得model的对象
                     item_path = model.filePath(index)
-                value, ok = QInputDialog.getText(self, '新建文件夹', '分组名称', QLineEdit.Normal, value)
+                value, ok = getText('新建分组', '分组名称：')
                 if os.path.isdir(item_path):
                     path = os.path.join(item_path, value)
                 else:
                     path = os.path.join(os.path.split(item_path)[0], value)
                 if os.path.exists(path) and ok:
-                    QMessageBox.warning(self, '提示', '分组%s已经存在！！！' % value, QMessageBox.Yes)
+                    MyMessageBox.warning(self, '提示', '分组%s已经存在！！！' % value, QMessageBox.Yes)
                 elif not ok:
                     break
                 else:
@@ -1675,10 +1889,10 @@ class QuantApplication(QWidget):
                     self.model.setNameFilters(self.strategy_filter)
                     break
 
-        elif action == refresh:
-            index = self.strategy_tree.currentIndex()
-            model = index.model()  # 请注意这里可以获得model的对象
-            model.dataChanged.emit(index, index)
+        # elif action == refresh:
+        #     index = self.strategy_tree.currentIndex()
+        #     model = index.model()  # 请注意这里可以获得model的对象
+        #     model.dataChanged.emit(index, index)
         elif action == rename:
             index = self.strategy_tree.currentIndex()
             model = index.model()  # 请注意这里可以获得model的对象
@@ -1687,10 +1901,13 @@ class QuantApplication(QWidget):
                 value = ''
                 (file_path, filename) = os.path.split(item_path)
                 while True:
-                    value, ok = QInputDialog.getText(self, '修改%s策略名' % filename, '策略名称', QLineEdit.Normal, value)
-                    new_path = os.path.join(file_path, value + '.py')
+                    value, ok = getText('修改%s策略名' % filename, '策略名称')
+                    if not value.strip().endswith('.py'):
+                        new_path = os.path.join(file_path, value.strip() + '.py')
+                    else:
+                        new_path = os.path.join(file_path, value.strip())
                     if os.path.exists(new_path) and ok:
-                        QMessageBox.warning(self, '提示', '策略名在此分组中%s已经存在！！！' % value, QMessageBox.Yes)
+                        MyMessageBox.warning(self, '提示', '策略名%s在此分组中已经存在！！！' % value.strip(), QMessageBox.Yes)
                     elif not ok:
                         break
                     else:
@@ -1700,10 +1917,10 @@ class QuantApplication(QWidget):
                 value = ''
                 (dir_path, dir_name) = os.path.split(item_path)
                 while True:
-                    value, ok = QInputDialog.getText(self, '修改%s文件夹' % dir_name, '分组名称', QLineEdit.Normal, value)
+                    value, ok = getText('修改%s文件夹' % dir_name, '分组名称')
                     new_path = os.path.join(dir_path, value)
                     if os.path.exists(new_path) and ok:
-                        QMessageBox.warning(self, '提示', '分组%s已经存在！！！' % value, QMessageBox.Yes)
+                        MyMessageBox.warning(self, '提示', '分组%s已经存在！！！' % value, QMessageBox.Yes)
                     elif not ok:
                         break
                     else:
@@ -1714,18 +1931,119 @@ class QuantApplication(QWidget):
             model = index.model()  # 请注意这里可以获得model的对象
             item_path = model.filePath(index)
             if item_path and os.path.isdir(item_path):
-                reply = QMessageBox.question(self, '提示', '确定删除分组及目录下的所有文件吗？', QMessageBox.Yes | QMessageBox.No)
+                reply = MyMessageBox.question(self, '提示', '确定删除分组及目录下的所有文件吗？', QMessageBox.Yes | QMessageBox.No)
                 if reply == QMessageBox.Yes:
                     shutil.rmtree(item_path)
                     self.strategy_filter.remove(os.path.split(item_path)[1])
             elif item_path and not os.path.isdir(item_path):
-                reply = QMessageBox.question(self, '提示', '确定删除文件%s吗？' % item_path, QMessageBox.Yes | QMessageBox.No)
+                print(item_path)
+                reply = MyMessageBox.question(self, '提示', '确定删除策略%s吗？' % os.path.split(item_path)[1], QMessageBox.Yes | QMessageBox.No)
                 if reply == QMessageBox.Yes:
                     os.remove(item_path)
             else:
                 pass
         else:
             pass
+
+    # QTextBrowser 右键菜单
+    def user_log_right_menu(self, point):
+        self.user_log_widget.popMenu = QMenu()
+        copy = QAction('复制')
+        select_all = QAction('全选')
+        clear = QAction('清除')
+
+        self.user_log_widget.popMenu.addAction(copy)
+        self.user_log_widget.popMenu.addAction(select_all)
+        self.user_log_widget.popMenu.addAction(clear)
+
+        # 右键动作
+        action = self.user_log_widget.popMenu.exec_(self.user_log_widget.mapToGlobal(point))
+        if action == copy:
+            self.user_log_widget.copy()
+        elif action == select_all:
+            self.user_log_widget.selectAll()
+        elif action == clear:
+            self.user_log_widget.clear()
+
+    def error_log_right_menu(self, point):
+        self.error_info_widget.popMenu = QMenu()
+        copy = QAction('复制')
+        select_all = QAction('全选')
+        clear = QAction('清除')
+
+        self.error_info_widget.popMenu.addAction(copy)
+        self.error_info_widget.popMenu.addAction(select_all)
+        self.error_info_widget.popMenu.addAction(clear)
+
+        # 右键动作
+        action = self.error_info_widget.popMenu.exec_(self.error_info_widget.mapToGlobal(point))
+        if action == copy:
+            self.error_info_widget.copy()
+        elif action == select_all:
+            self.error_info_widget.selectAll()
+        elif action == clear:
+            self.error_info_widget.clear()
+
+    def signal_log_right_menu(self, point):
+        self.signal_log_widget.popMenu = QMenu()
+        copy = QAction('复制')
+        select_all = QAction('全选')
+        clear = QAction('清除')
+        refresh = QAction('刷新')
+
+        self.signal_log_widget.popMenu.addAction(copy)
+        self.signal_log_widget.popMenu.addAction(select_all)
+        self.signal_log_widget.popMenu.addAction(clear)
+        self.signal_log_widget.popMenu.addAction(refresh)
+
+        # 右键动作
+        action = self.signal_log_widget.popMenu.exec_(self.signal_log_widget.mapToGlobal(point))
+        if action == copy:
+            self.signal_log_widget.copy()
+        elif action == select_all:
+            self.signal_log_widget.selectAll()
+        elif action == clear:
+            self.signal_log_widget.clear()
+        elif action == refresh:
+            self.loadSigLogFile()
+
+    def sys_log_right_menu(self, point):
+        self.sys_log_widget.popMenu = QMenu()
+        copy = QAction('复制')
+        select_all = QAction('全选')
+        clear = QAction('清除')
+        refresh = QAction('刷新')
+
+        self.sys_log_widget.popMenu.addAction(copy)
+        self.sys_log_widget.popMenu.addAction(select_all)
+        self.sys_log_widget.popMenu.addAction(clear)
+        self.sys_log_widget.popMenu.addAction(refresh)
+
+        # 右键动作
+        action = self.sys_log_widget.popMenu.exec_(self.sys_log_widget.mapToGlobal(point))
+        if action == copy:
+            self.sys_log_widget.copy()
+        elif action == select_all:
+            self.sys_log_widget.selectAll()
+        elif action == clear:
+            self.sys_log_widget.clear()
+        elif action == refresh:
+            self.loadSysLogFile()
+
+    def func_doc_right_menu(self, point):
+        self.func_content.popMenu = QMenu()
+        copy = QAction('复制')
+        select_all = QAction('全选')
+
+        self.func_content.popMenu.addAction(copy)
+        self.func_content.popMenu.addAction(select_all)
+
+        # 右键动作
+        action = self.func_content.popMenu.exec_(self.func_content.mapToGlobal(point))
+        if action == copy:
+            self.func_content.copy()
+        elif action == select_all:
+            self.func_content.selectAll()
 
     def create_content_vbox(self):
         # self.content_vbox = QGroupBox('内容')
@@ -1756,8 +2074,8 @@ class QuantApplication(QWidget):
         self.content_layout.addWidget(self.save_btn, 0, 2, 1, 1)
         self.content_layout.addWidget(self.contentEdit, 2, 0, 20, 3)
         self.content_vbox.setLayout(self.content_layout)
-        self.run_btn.clicked.connect(lambda: self.create_strategy_policy_win({}, self.strategy_path, False))
         self.run_btn.clicked.connect(self.emit_custom_signal)
+        self.run_btn.clicked.connect(lambda: self.create_strategy_policy_win({}, self.strategy_path, False))
         self.save_btn.clicked.connect(self.emit_custom_signal)
         self.save_btn.setShortcut("Ctrl+S")  # ctrl + s 快捷保存
 
@@ -1788,6 +2106,7 @@ class QuantApplication(QWidget):
 
         # 函数树结构
         self.func_tree = QTreeWidget()
+        self.func_tree.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.func_tree.setObjectName("FuncTree")
         self.func_tree.setColumnCount(2)
         self.func_tree.setHeaderLabels(['函数名', '函数介绍'])
@@ -1881,8 +2200,14 @@ class QuantApplication(QWidget):
         self.log_widget = QTabWidget()
         self.log_widget.setTabPosition(QTabWidget.South)
         self.user_log_widget = QTextBrowser()
+        self.user_log_widget.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.user_log_widget.customContextMenuRequested[QPoint].connect(self.user_log_right_menu)
         self.signal_log_widget = QTextBrowser()
+        self.signal_log_widget.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.signal_log_widget.customContextMenuRequested[QPoint].connect(self.signal_log_right_menu)
         self.sys_log_widget = QTextBrowser()
+        self.sys_log_widget.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.sys_log_widget.customContextMenuRequested[QPoint].connect(self.sys_log_right_menu)
         self.log_widget.addTab(self.user_log_widget, '用户日志')
         self.log_widget.addTab(self.signal_log_widget, '信号日志')
         self.log_widget.addTab(self.sys_log_widget, '系统日志')
@@ -1894,17 +2219,20 @@ class QuantApplication(QWidget):
         # self.sys_log_widget.textChanged.connect(lambda: self.sys_log_widget.moveCursor(QTextCursor.End))
         # self.sys_log_widget.moveCursor(QTextCursor.End)
         self.error_info_widget = QTextBrowser()
+        self.error_info_widget.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.error_info_widget.customContextMenuRequested[QPoint].connect(self.error_log_right_menu)
 
         # -------------------组合监控----------------------------
         self.union_monitor = QWidget()
         self.union_monitor.setObjectName("UnionMonitor")
         self.union_layout = QGridLayout()
         self.one_key_sync = QPushButton('持仓一键同步')
+        self.one_key_sync.setMinimumWidth(100)
         self.cbComboBox = QComboBox()
         self.cbComboBox.addItems(['对盘价', '最新价', '市价'])
         self.cbComboBox.currentIndexChanged.connect(self.valid_spin)
         spacerItem = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
-        spacerItem2 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Minimum)
+        spacerItem2 = QSpacerItem(20, 10, QSizePolicy.Minimum, QSizePolicy.Minimum)
         self.spin = QSpinBox()
         self.spin.setMinimum(1)
         self.spin.setMaximum(100)
@@ -1917,22 +2245,22 @@ class QuantApplication(QWidget):
         self.intervalSpinBox.setMaximumWidth(80)
         self.intervalSpinBox.setSingleStep(100)
         self.reducePositionCheckBox = QCheckBox('仅自动减仓')
-
-        self.union_layout.addWidget(self.one_key_sync, 0, 0, 1, 1)
-        self.union_layout.addItem(spacerItem2, 0, 1, 1, 1)
-        self.union_layout.addWidget(QLabel('同步设置：'), 0, 2, 1, 1)
-        self.union_layout.addWidget(self.cbComboBox, 0, 3, 1, 1)
-        self.union_layout.addWidget(QLabel('+'), 0, 4, 1, 1)
-        self.union_layout.addWidget(self.spin, 0, 5, 1, 1)
-        self.union_layout.addWidget(QLabel('跳'), 0, 6, 1, 1)
-        self.union_layout.addItem(spacerItem2, 0, 7, 1, 1)
-        self.union_layout.addWidget(self.intervalCheckBox, 0, 8, 1, 1)
-        self.union_layout.addWidget(self.intervalSpinBox, 0, 9, 1, 1)
-        self.union_layout.addWidget(QLabel('毫秒'), 0, 10, 1, 1)
-        self.union_layout.addItem(spacerItem2, 0, 11, 1, 1)
-        self.union_layout.addWidget(self.reducePositionCheckBox, 0, 12, 1, 1)
-        self.union_layout.addItem(spacerItem, 0, 13, 1, 1)
-        self.union_layout.setSpacing(0)
+        self.union_layout.addItem(spacerItem2, 0, 0, 1, 1)
+        self.union_layout.addWidget(self.one_key_sync, 0, 1, 1, 1)
+        self.union_layout.addItem(spacerItem2, 0, 2, 1, 1)
+        self.union_layout.addWidget(QLabel('同步设置：'), 0, 3, 1, 1)
+        self.union_layout.addWidget(self.cbComboBox, 0, 4, 1, 1)
+        self.union_layout.addWidget(QLabel('+'), 0, 5, 1, 1)
+        self.union_layout.addWidget(self.spin, 0, 6, 1, 1)
+        self.union_layout.addWidget(QLabel('跳'), 0, 7, 1, 1)
+        self.union_layout.addItem(spacerItem2, 0, 8, 1, 1)
+        self.union_layout.addWidget(self.intervalCheckBox, 0, 9, 1, 1)
+        self.union_layout.addWidget(self.intervalSpinBox, 0, 10, 1, 1)
+        self.union_layout.addWidget(QLabel('毫秒'), 0, 11, 1, 1)
+        self.union_layout.addItem(spacerItem2, 0, 12, 1, 1)
+        self.union_layout.addWidget(self.reducePositionCheckBox, 0, 13, 1, 1)
+        self.union_layout.addItem(spacerItem, 0, 14, 1, 1)
+        self.union_layout.setSpacing(5)
         self.union_layout.setContentsMargins(0, 0, 0, 0)
 
         self.one_key_sync.clicked.connect(lambda: self.save_position_config(True))
@@ -1976,7 +2304,7 @@ class QuantApplication(QWidget):
         self.pos_table.setSelectionMode(QAbstractItemView.ExtendedSelection)
         self.pos_table.setHorizontalHeaderLabels(["账号", "合约", "账户仓", "策略仓", "仓差",
                                                   "策略多", "策略空", "策略今多", "策略今空", "账户多", "账户空", "账户今多", "账户今空"])
-        self.union_layout.addWidget(self.pos_table, 1, 0, 1, 14)
+        self.union_layout.addWidget(self.pos_table, 1, 0, 1, 15)
         self.union_monitor.setLayout(self.union_layout)
 
         self.tab_widget.addTab(self.strategy_table, "策略运行")  # 策略运行tab
@@ -2038,6 +2366,9 @@ class QuantApplication(QWidget):
         self.func_doc_line.setText('函数简介')
         self.func_doc_line.setObjectName("FuncDetailLabel")
         self.func_content = QTextBrowser()
+        self.func_content.setObjectName("FuncContent")
+        self.func_content.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.func_content.customContextMenuRequested[QPoint].connect(self.func_doc_right_menu)
         self.func_doc_layout.addWidget(self.func_doc_line)
         self.func_doc_layout.addWidget(self.func_content)
         self.func_doc.setLayout(self.func_doc_layout)
@@ -2087,13 +2418,13 @@ class QuantApplication(QWidget):
         if path:
             self.strategy_policy_win = StrategyPolicy(self._controller, path, param=param, flag=flag)
             self.main_strategy_policy_win = FramelessWindow()
-            self.main_strategy_policy_win.setGeometry((self.width - 580)/2, (self.height - 660)/2, 580, 660)
-            self.main_strategy_policy_win.setBaseSize(580, 660)
+            self.main_strategy_policy_win.setGeometry((self.width - 580)/2, (self.height - 620)/2, 580, 620)
+            self.main_strategy_policy_win.setBaseSize(580, 620)
             self.main_strategy_policy_win.hideTheseBtn()
             self.main_strategy_policy_win.titleBar.iconLabel.hide()
             self.main_strategy_policy_win.titleBar.buttonMaximum.setEnabled(False)
             self.main_strategy_policy_win.setWindowTitle('属性设置')
-            self.main_strategy_policy_win.titleBar.buttonClose.clicked.connect(self.strategy_policy_win.close)
+            # self.main_strategy_policy_win.titleBar.buttonClose.clicked.connect(self.strategy_policy_win.close)
             self.main_strategy_policy_win.setWidget(self.strategy_policy_win)
             if self._controller.mainWnd.getWinThese() == '浅色':
                 style = CommonHelper.readQss(WHITESTYLE)
@@ -2103,8 +2434,10 @@ class QuantApplication(QWidget):
             self.main_strategy_policy_win.setStyleSheet(style)
             self.strategy_policy_win.setStyleSheet('')
             self.strategy_policy_win.setStyleSheet(style)
-            self.strategy_policy_win.confirm.clicked.connect(self.main_strategy_policy_win.close)
+            self.strategy_policy_win.confirm.clicked.connect(self.main_strategy_policy_win.close)  # todo
             self.strategy_policy_win.cancel.clicked.connect(self.main_strategy_policy_win.close)
+            self.strategy_policy_win.contractWin.select.clicked.connect(
+                lambda: self.strategy_policy_win.contractSelect(self._exchange, self._commodity, self._contract))
 
             # ----------------------解析g_params参数----------------------------
             g_params = parseStrategtParam(path)
@@ -2126,18 +2459,16 @@ class QuantApplication(QWidget):
                 self.strategy_policy_win.paramsTableWidget.setItem(i, 1, QTableWidgetItem(str(item[1][0])))
                 self.strategy_policy_win.paramsTableWidget.setItem(i, 2, QTableWidgetItem(param_type))
                 self.strategy_policy_win.paramsTableWidget.setItem(i, 3, QTableWidgetItem(str(item[1][1])))
-            self.strategy_policy_win.contractWin.select.clicked.connect(
-                lambda: self.strategy_policy_win.contractSelect(self._exchange, self._commodity, self._contract))
             self.main_strategy_policy_win.setWindowModality(Qt.ApplicationModal)  # 设置阻塞父窗口
             self.main_strategy_policy_win.show()
         else:
-            QMessageBox.warning(self, '提示', '请选择策略！！！', QMessageBox.Yes)
+            MyMessageBox.warning(self, '提示', '请选择策略！！！', QMessageBox.Yes)
 
     def save_strategy(self):
         if self.strategy_path:
             self.contentEdit.on_saveclick(self.strategy_path)
         else:
-            QMessageBox.warning(self, '提示', '请选择策略！！！', QMessageBox.Yes)
+            MyMessageBox.warning(self, '提示', '请选择策略！！！', QMessageBox.Yes)
 
     def updateLogText(self):
         guiQueue = self._controller.get_logger().getGuiQ()
@@ -2160,7 +2491,7 @@ class QuantApplication(QWidget):
         else:
             if usrData:
                 if self.user_log_widget.verticalScrollBar().maximum() - \
-                        self.user_log_widget.verticalScrollBar().sliderPosition() in [4, 0]:
+                        self.user_log_widget.verticalScrollBar().sliderPosition() in [4, 0] and self.auto_scroll:
                     self.user_log_widget.insertPlainText(usrData)
                     cursor = self.user_log_widget.textCursor()
                     self.user_log_widget.moveCursor(cursor.End)
@@ -2208,7 +2539,7 @@ class QuantApplication(QWidget):
 
     def show_warn(self):
         """极星9.5退出时，弹出窗口槽函数"""
-        QMessageBox.critical(self, "错误", "极星9.5退出", QMessageBox.Yes)
+        MyMessageBox.critical(self, "错误", "极星9.5退出", QMessageBox.Yes)
 
     def addExecute(self, dataDict):
         values = self._formatMonitorInfo(dataDict)
@@ -2417,6 +2748,10 @@ class QuantApplication(QWidget):
         for i in range(len(positions)):
             for j in range(len(positions[i])):
                 item = QTableWidgetItem(str(positions[i][j]))
+                if j in range(2):
+                    item.setTextAlignment(Qt.AlignCenter)
+                else:
+                    item.setTextAlignment(Qt.AlignRight)
                 self.pos_table.setItem(i, j, item)
 
     def reportDisplay(self, data, id):
@@ -2439,14 +2774,5 @@ class QuantApplication(QWidget):
         save(data, runMode, stName)
 
         self.reportView.reportShowSig.emit(data)
+        self.reportWnd.show()
 
-
-if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    m = QSharedMemory(app.applicationName())
-    if not m.create(1):
-        QMessageBox.warning(None, '警告', '程序已经在运行！！！')
-    else:
-        quant = QuantApplication()
-        quant.show()
-        sys.exit(app.exec_())
