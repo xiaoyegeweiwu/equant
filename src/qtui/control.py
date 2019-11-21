@@ -38,6 +38,7 @@ class Controller(object):
         # 创建主窗口
         QApplication.setAttribute(Qt.AA_EnableHighDpiScaling)  # 高分辨率下适应屏幕
         self.mainApp = QApplication(sys.argv)
+
         # 根据分辨率调整字体
         font = QFont("Microsoft YaHei UI", 10)
         pointsize = font.pointSize()
@@ -53,7 +54,9 @@ class Controller(object):
         self.reportWnd.setWindowIcon(QIcon('icon/epolestar ix2.ico'))
         self.reportView = ReportView()
         self.reportWnd.setWidget(self.reportView)
+
         ##############################################
+
 
         self.app = QuantApplication(self)
         if self.app.settings.contains('theme') and self.app.settings.value('theme') == 'vs-dark':
