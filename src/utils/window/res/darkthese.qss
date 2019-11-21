@@ -251,6 +251,10 @@ QTableView {
     border-radius: 0px;
 }
 
+QTableView::item:selected {
+    color: #FFFFFF;
+}
+
 QTableView:selected {
     background: #1E1E1E;
 }

@@ -33,13 +33,29 @@ class Controller(object):
 
         # UI2EG发送请求对象
         self._request = SendRequest(self._ui2egQueue, self.logger)
-
+        # 高分辨率支持
+        QApplication.setAttribute(Qt.AA_EnableHighDpiScaling);
         # 创建主窗口
         QApplication.setAttribute(Qt.AA_EnableHighDpiScaling)  # 高分辨率下适应屏幕
         self.mainApp = QApplication(sys.argv)
+        # 根据分辨率调整字体
+        font = QFont("Microsoft YaHei UI", 10)
+        pointsize = font.pointSize()
+        font.setPixelSize(pointsize * 90 / 72)
+        self.mainApp.setFont(font)
+
+        ###############回测报告#####################
+        style = CommonHelper.readQss(DARKSTYLE)
+        self.reportWnd = FramelessWindow()
+        self.reportWnd.setStyleSheet(style)
+        self.reportWnd.setWindowTitle("回测报告")
+        self.reportWnd.setWinThese(THESE_STATE_DARK)
+        self.reportWnd.setWindowIcon(QIcon('icon/epolestar ix2.ico'))
         self.reportView = ReportView()
+        self.reportWnd.setWidget(self.reportView)
+        ##############################################
+
         self.app = QuantApplication(self)
-        self.mainApp.setFont(QFont("Microsoft YaHei", 10))
         if self.app.settings.contains('theme') and self.app.settings.value('theme') == 'vs-dark':
             qss_path = DARKSTYLE
             theme = THESE_STATE_DARK
