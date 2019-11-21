@@ -70,6 +70,8 @@ class StrategyQuote(QuoteModel):
     def onContract(self, event):
         dataDict = event.getData()
         for k, v in dataDict.items():
+            #if 'ZCE|S|OI' in k:
+            #    self.logger.debug("333333333:k:%s,v:%s" %(k, v))
             self._contractData[k] = QuoteDataModel(self.logger, v)
 
     def onUnderlayMap(self, event):

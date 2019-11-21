@@ -1790,8 +1790,12 @@ class StrategyModel(object):
         if len(contList) == 0:
             return ret
 
+        #if contNo not in self._qteModel._contractData:
+        #    return ret
+
         ret['ExchangeCode'] = contList[0]
-        ret['CommodityCode'] = '|'.join(contList[:-1])
+        ret['CommodityCode'] = '|'.join(contList[0:3])
+        #ret['CommodityCode'] = self._qteModel._contractData[contNo].getContract()['CommodityNo']
         ret['CommodityNo'] = contList[-1]
         return ret
 
@@ -1800,6 +1804,8 @@ class StrategyModel(object):
 
     def getContractUnit(self, contNo):
         commodityNo = self.getCommodityInfoFromContNo(contNo)['CommodityCode']
+        if contNo == 'ZCE|S|OI|001|005':
+            self.logger.debug("222222:commNo:%s,%s" %(commodityNo, self._qteModel._commodityData))
         if commodityNo not in self._qteModel._commodityData:
             return 0
 

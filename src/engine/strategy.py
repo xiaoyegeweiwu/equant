@@ -819,6 +819,7 @@ class Strategy:
     def _onCommodity(self, event):
         '''品种查询应答'''
         self._qteModel.onCommodity(event)
+        #self.logger.debug("1111111:%s" %self._dataModel.getContractUnit('ZCE|S|OI|001|005'))
         self._dataModel.initializeCalc()
 
     def _onContract(self, event):
